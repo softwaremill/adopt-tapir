@@ -2,8 +2,9 @@ package com.softwaremill.adopttapir.starter
 
 import cats.data.NonEmptyList
 import com.softwaremill.adopttapir.http.Http
-import com.softwaremill.adopttapir.starter.StarterApi.Queries._
 import com.softwaremill.adopttapir.util.ServerEndpoints
+import io.circe.generic.auto._
+import sttp.tapir.generic.auto._
 
 class StarterApi(http: Http, starterService: StarterService) {
   import http._
@@ -12,25 +13,10 @@ class StarterApi(http: Http, starterService: StarterService) {
 
   private val starterEndpoint = baseEndpoint.get
     .in(starterPath)
-    .in(query[String](tapirVersion))
-    .in(query[String](scalaVersion))
-    .in(query[String](sbtVersion))
-    .in(query[String](group))
-    .in(query[String](artifact))
-    .in(query[String](projectName))
-    .in(query[String](packageName))
-    .in(query[List[String]](dependencies))
+    .in(jsonBody[StarterDetails])
     .out(fileBody)
-    .serverLogic { case (tapirVersion, scalaVersion, sbtVersion, group, artifact, projectName, packageName, dependencies) =>
-      val details = StarterDetails(
-        tapirVersion,
-        scalaVersion,
-        sbtVersion,
-        ProjectDetails(group, artifact, projectName, packageName),
-        ModuleDependencies(dependencies)
-      )
-
-      starterService.generateZipFile(details).toOut
+    .serverLogic {
+      starterService.generateZipFile(_).toOut
     }
 
   val endpoints: ServerEndpoints =
