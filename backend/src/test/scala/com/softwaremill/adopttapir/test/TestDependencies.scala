@@ -1,6 +1,6 @@
 package com.softwaremill.adopttapir.test
 
-import cats.effect.{IO, Resource}
+import cats.effect.IO
 import com.softwaremill.adopttapir.Dependencies
 import org.scalatest.{BeforeAndAfterAll, Suite}
 import sttp.capabilities.fs2.Fs2Streams
@@ -11,11 +11,12 @@ import sttp.tapir.server.stub.TapirStubInterpreter
 
 import java.io.File
 
-trait TestDependencies extends BeforeAndAfterAll with TestEmbeddedPostgres {
+trait TestDependencies extends BeforeAndAfterAll {
   self: Suite with BaseTest =>
   var dependencies: Dependencies = _
 
-  private val stub: SttpBackendStub[IO, Fs2Streams[IO]] = AsyncHttpClientFs2Backend.stub[IO]
+  private val stub: SttpBackendStub[IO, Fs2Streams[IO]] = AsyncHttpClientFs2Backend
+    .stub[IO]
     .whenRequestMatches(_ => true)
     .thenRespond(new File("src/main/resources/temporal.zip"))
 
@@ -28,7 +29,6 @@ trait TestDependencies extends BeforeAndAfterAll with TestEmbeddedPostgres {
       Dependencies
         .wire(
           config = TestConfig,
-          xa = Resource.pure(currentDb.xa),
           clock = testClock
         )
         .allocated

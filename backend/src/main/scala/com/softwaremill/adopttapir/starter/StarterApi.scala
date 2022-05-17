@@ -1,15 +1,11 @@
 package com.softwaremill.adopttapir.starter
 
 import cats.data.NonEmptyList
-import cats.effect.IO
-import cats.implicits.catsSyntaxEitherId
-import com.softwaremill.adopttapir.http.{Error_OUT, Http}
+import com.softwaremill.adopttapir.http.Http
 import com.softwaremill.adopttapir.starter.StarterApi.Queries._
 import com.softwaremill.adopttapir.util.ServerEndpoints
-import doobie.util.transactor.Transactor
-import sttp.model.StatusCode
 
-class StarterApi(http: Http, starterService: StarterService, xa: Transactor[IO]) {
+class StarterApi(http: Http, starterService: StarterService) {
   import http._
 
   private val starterPath = "starter.zip"

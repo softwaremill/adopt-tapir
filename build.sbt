@@ -7,7 +7,6 @@ import sbtbuildinfo.{BuildInfoKey, BuildInfoOption}
 
 import scala.util.Try
 
-val doobieVersion = "1.0.0-RC2"
 val http4sVersion = "0.23.11"
 val circeVersion = "0.14.1"
 val tsecVersion = "0.4.0"
@@ -15,13 +14,6 @@ val sttpVersion = "3.6.1"
 val prometheusVersion = "0.15.0"
 val tapirVersion = "1.0.0-M9"
 val macwireVersion = "2.5.7"
-
-val dbDependencies = Seq(
-  "org.tpolecat" %% "doobie-core" % doobieVersion,
-  "org.tpolecat" %% "doobie-hikari" % doobieVersion,
-  "org.tpolecat" %% "doobie-postgres" % doobieVersion,
-  "org.flywaydb" % "flyway-core" % "8.5.10"
-)
 
 val httpDependencies = Seq(
   "org.http4s" %% "http4s-dsl" % http4sVersion,
@@ -79,19 +71,12 @@ val securityDependencies = Seq(
   "io.github.jmcardon" %% "tsec-cipher-jca" % tsecVersion
 )
 
-val emailDependencies = Seq(
-  "com.sun.mail" % "javax.mail" % "1.6.2" exclude ("javax.activation", "activation")
-)
-
 val scalatest = "org.scalatest" %% "scalatest" % "3.2.12" % Test
 val macwireDependencies = Seq(
   "com.softwaremill.macwire" %% "macrosautocats" % macwireVersion
 ).map(_ % Provided)
 
 val unitTestingStack = Seq(scalatest)
-
-val embeddedPostgres = "com.opentable.components" % "otj-pg-embedded" % "1.0.1" % Test
-val dbTestingStack = Seq(embeddedPostgres)
 
 val commonDependencies = baseDependencies ++ unitTestingStack ++ loggingDependencies ++ configDependencies ++ fileDependencies
 
@@ -137,7 +122,7 @@ lazy val dockerSettings = Seq(
   Docker / packageName := "adopttapir",
   dockerUsername := Some("softwaremill"),
   dockerUpdateLatest := true,
-  Docker / publishLocal := (Docker / publishLocal),
+  Docker / publishLocal := (Docker / publishLocal).value,
   Docker / version := git.gitDescribedVersion.value.getOrElse(git.formattedShaVersion.value.getOrElse("latest")),
   git.uncommittedSignifier := Some("dirty"),
   ThisBuild / git.formattedShaVersion := {
@@ -172,7 +157,7 @@ lazy val rootProject = (project in file("."))
 
 lazy val backend: Project = (project in file("backend"))
   .settings(
-    libraryDependencies ++= dbDependencies ++ httpDependencies ++ jsonDependencies ++ apiDocsDependencies ++ monitoringDependencies ++ dbTestingStack ++ securityDependencies ++ emailDependencies ++ macwireDependencies,
+    libraryDependencies ++= httpDependencies ++ jsonDependencies ++ apiDocsDependencies ++ monitoringDependencies ++ securityDependencies ++ macwireDependencies,
     Compile / mainClass := Some("com.softwaremill.adopttapir.Main")
   )
   .enablePlugins(BuildInfoPlugin)
