@@ -1,0 +1,21 @@
+GET {{url}}/starter.zip
+Accept: application/octet-stream
+Content-Type: application/json
+
+{
+  "tapirVersion" : "1.0.0",
+  "scalaVersion" : "2.13",
+  "sbtVersion" : "1.6.2",
+  "projectDetails" : {
+    "group" : "com.softwaremill",
+    "artifact" : "library",
+    "projectName" : "projectName",
+    "packageName" : "com.softwaremill"
+  },
+  "moduleDependencies" : {
+    "dependencies" : [
+    ]
+  }
+}
+
+###

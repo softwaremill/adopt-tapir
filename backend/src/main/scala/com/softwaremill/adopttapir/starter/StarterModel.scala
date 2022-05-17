@@ -9,8 +9,8 @@ case class StarterDetails(
 )
 
 case class ProjectDetails(group: String, artifact: String, projectName: String, packageName: String)
-case class ModuleDependencies(dependencies: List[String])
-case class Dependency(value: String)
+case class ModuleDependencies(dependencies: List[Dependency])
+case class Dependency(value: String) extends AnyVal
 
 
 object StarterDetails {
