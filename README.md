@@ -1,11 +1,8 @@
 ## Quick start
 
-### Backend: PostgreSQL & API
+### Backend: API
 
-You can spin up DB one easily using docker:
-
-Then, you can start the backend:
-
+To start the backend:
 ```sh
 ./backend-start.sh
 ```
