@@ -1,25 +1,43 @@
 package com.softwaremill.adopttapir.starter
 
-case class StarterDetails(
-    tapirVersion: String,
-    scalaVersion: String,
-    sbtVersion: String,
-    projectDetails: ProjectDetails,
-    moduleDependencies: ModuleDependencies
-)
-
-case class ProjectDetails(group: String, artifact: String, projectName: String, packageName: String)
-case class ModuleDependencies(dependencies: List[Dependency])
-case class Dependency(value: String) extends AnyVal
-
+sealed trait StarterDetails {
+  val projectName: String
+  val groupId: String
+  val serverImplementation: ServerImplementation
+}
 
 object StarterDetails {
-  val default: StarterDetails = StarterDetails(
-    tapirVersion = "1.0.0",
-    scalaVersion = "2.13",
-    sbtVersion = "1.6.2",
-    projectDetails = ProjectDetails("com.softwaremill", "library", "projectName", "com.softwaremill"),
-    ModuleDependencies(Nil)
-  )
+
+  case class FutureStarterDetails(
+      projectName: String,
+      groupId: String,
+      serverImplementation: ServerImplementation with FutureEff,
+  ) extends StarterDetails
+
+  case class IOStarterDetails(
+      projectName: String,
+      groupId: String,
+      serverImplementation: ServerImplementation with IOEff,
+  ) extends StarterDetails
+
+  case class ZIOStarterDetails(
+      projectName: String,
+      groupId: String,
+      serverImplementation: ServerImplementation with ZIOEff,
+  ) extends StarterDetails
 
 }
+
+sealed trait ServerImplementation
+
+object ServerImplementation {
+  case object Akka extends ServerImplementation with FutureEff
+  case object Netty extends ServerImplementation with FutureEff with IOEff
+  case object Http4s extends ServerImplementation with IOEff with ZIOEff
+  case object ZioHttp extends ServerImplementation with ZIOEff
+}
+
+sealed trait EffectType
+trait FutureEff extends EffectType
+trait IOEff extends EffectType
+trait ZIOEff extends EffectType

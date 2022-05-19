@@ -1,0 +1,4 @@
+@(plugins: List[com.softwaremill.adopttapir.template.sbt.Dependency])
+@for(dependency <- plugins) {
+addSbtPlugin(@{dependency.asSbtDependency})
+}

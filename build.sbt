@@ -49,7 +49,8 @@ val loggingDependencies = Seq(
 )
 
 val fileDependencies = Seq(
-  "com.github.pathikrit" %% "better-files" % "3.9.1"
+  "com.github.pathikrit" %% "better-files" % "3.9.1",
+  "com.lihaoyi" %% "os-lib" % "0.8.0"
 )
 
 val configDependencies = Seq(
@@ -167,4 +168,5 @@ lazy val backend: Project = (project in file("backend"))
   .settings(fatJarSettings)
   .enablePlugins(DockerPlugin)
   .enablePlugins(JavaServerAppPackaging)
+  .enablePlugins(SbtTwirl)
   .settings(dockerSettings)

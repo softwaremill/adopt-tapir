@@ -5,7 +5,7 @@ import cats.effect.{IO, Resource}
 import com.softwaremill.adopttapir.config.Config
 import com.softwaremill.adopttapir.http.{Http, HttpApi, HttpConfig}
 import com.softwaremill.adopttapir.metrics.VersionApi
-import com.softwaremill.adopttapir.starter.StarterApi
+import com.softwaremill.adopttapir.starter.api.StarterApi
 import com.softwaremill.adopttapir.util.Clock
 import com.softwaremill.macwire.autocats.autowire
 import io.prometheus.client.CollectorRegistry
