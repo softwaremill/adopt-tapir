@@ -30,7 +30,7 @@ class StarterApi(http: Http, starterService: StarterService) {
       .map(_.tag(starterPath))
 
   // TODO: add validation for all properties
-  private def transform(r: StarterRequest) = {
+  private def transform(r: StarterRequest): StarterDetails = {
     r.effect match {
       case Effect.FutureEffect =>
         FutureStarterDetails(r.projectName, r.groupId, r.serverImplementation.asInstanceOf[FutureEff with ServerImplementation])

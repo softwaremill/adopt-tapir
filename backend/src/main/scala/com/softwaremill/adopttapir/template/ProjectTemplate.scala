@@ -2,16 +2,15 @@ package com.softwaremill.adopttapir.template
 
 import com.softwaremill.adopttapir.starter.{StarterConfig, StarterDetails}
 import com.softwaremill.adopttapir.template.sbt.Dependency.{PluginDependency, ScalaDependency}
-import os.RelPath
 
-case class FileTemplate(
-    relativePath: RelPath,
+case class GeneratedFile(
+    relativePath: String,
     content: String
 )
 
 class ProjectTemplate(config: StarterConfig) {
 
-  def getBuildSbt(starterDetails: StarterDetails): FileTemplate = {
+  def getBuildSbt(starterDetails: StarterDetails): GeneratedFile = {
     val content = txt
       .sbtBuild(
         starterDetails.projectName,
@@ -38,16 +37,15 @@ class ProjectTemplate(config: StarterConfig) {
       )
       .toString()
 
-    FileTemplate(os.RelPath("build.sbt"), content)
+    GeneratedFile("build.sbt", content)
   }
 
-  def getBuildProperties(): FileTemplate = {
-    FileTemplate(
-      os.RelPath("project/build.properties"),
-      txt.buildProperties(config.sbtVersion).toString()
-    )
-  }
-  def getSbtPlugins(starterDetails: StarterDetails): FileTemplate = {
+  def getBuildProperties(): GeneratedFile = GeneratedFile(
+    "project/build.properties",
+    txt.buildProperties(config.sbtVersion).toString()
+  )
+
+  def getSbtPlugins(): GeneratedFile = {
     val content =
       txt
         .pluginsSbt(
@@ -64,25 +62,28 @@ class ProjectTemplate(config: StarterConfig) {
         )
         .toString()
 
-    FileTemplate(
-      os.RelPath("project/plugins.sbt"),
+    GeneratedFile(
+      "project/plugins.sbt",
       content
     )
   }
-  def getMain(starterDetails: StarterDetails): FileTemplate = {
+  def getMain(starterDetails: StarterDetails): GeneratedFile = {
     val groupId = starterDetails.groupId
 
-    FileTemplate(
-      os.RelPath("src/main/scala") / os.RelPath(groupId.split('.').mkString("/")) / "Main.scala",
+    GeneratedFile(
+      pathUnderPackage("src/main/scala", groupId, "Main.scala"),
       txt.Main(groupId).toString()
     )
   }
-  def getMainSpec(starterDetails: StarterDetails): FileTemplate = {
+  def getMainSpec(starterDetails: StarterDetails): GeneratedFile = {
     val groupId = starterDetails.groupId
 
-    FileTemplate(
-      os.RelPath("src/test/scala") / os.RelPath(groupId.split('.').mkString("/")) / "MainSpec.scala",
+    GeneratedFile(
+      pathUnderPackage("src/test/scala", groupId, "MainSpec.scala"),
       txt.MainSpec(groupId).toString()
     )
   }
+
+  private def pathUnderPackage(prefixDir: String, groupId: String, fileName: String): String =
+    prefixDir + "/" + groupId.split('.').mkString("/") + "/" + fileName
 }
