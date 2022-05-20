@@ -24,8 +24,6 @@ class StarterService(
         for {
           _ <- logger.debug("created temp dir: " + tempDir.toString)
           _ <- storeFiles(tempDir, filesToCreate)
-          // TODO: Storage leak: Zip files needs to be cleaned! In future just add something like IO cron job which will
-          //  periodically cleans the data older than 5 min with specific config.tempPrefix.
           dir <- zipDirectory(tempDir)
         } yield dir
       }(release = tempDir => if (config.deleteTempFolder) deleteRecursively(tempDir) else IO.unit)

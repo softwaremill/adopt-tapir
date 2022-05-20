@@ -4,6 +4,7 @@ import java.util.Locale
 import cats.data.NonEmptyList
 import cats.effect.IO
 import com.softwaremill.tagging._
+import sttp.capabilities.fs2.Fs2Streams
 import sttp.tapir.server.ServerEndpoint
 import tsec.common.SecureRandomId
 
@@ -15,5 +16,5 @@ package object util {
     def lowerCased: String @@ LowerCased = s.toLowerCase(Locale.ENGLISH).taggedWith[LowerCased]
   }
 
-  type ServerEndpoints = NonEmptyList[ServerEndpoint[Any, IO]]
+  type ServerEndpoints = NonEmptyList[ServerEndpoint[Fs2Streams[IO], IO]]
 }

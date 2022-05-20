@@ -38,7 +38,7 @@ trait TestDependencies extends BeforeAndAfterAll {
   }
 
   private lazy val serverStub: SttpBackend[IO, Any] =
-    TapirStubInterpreter[IO, Any](stub)
+    TapirStubInterpreter[IO, Any with Fs2Streams[IO]](stub)
       .whenServerEndpointsRunLogic(dependencies.api.allEndpoints)
       .backend()
 
