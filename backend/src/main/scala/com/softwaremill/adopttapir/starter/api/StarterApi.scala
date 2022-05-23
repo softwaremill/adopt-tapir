@@ -1,9 +1,10 @@
 package com.softwaremill.adopttapir.starter.api
 
-import cats.data.NonEmptyList
+import cats.data.{EitherT, NonEmptyList}
 import cats.effect.IO
+import cats.implicits.toBifunctorOps
+import com.softwaremill.adopttapir.Fail
 import com.softwaremill.adopttapir.http.Http
-import com.softwaremill.adopttapir.starter.StarterDetails.{FutureStarterDetails, IOStarterDetails, ZIOStarterDetails}
 import com.softwaremill.adopttapir.starter._
 import com.softwaremill.adopttapir.util.ServerEndpoints
 import fs2.io.file.Files
@@ -21,19 +22,20 @@ class StarterApi(http: Http, starterService: StarterService) {
     .in(jsonBody[StarterRequest])
     .out(streamBinaryBody(Fs2Streams[IO]))
     .serverLogic[IO] { request =>
-      val details: StarterDetails = transform(request)
+      val logicFlow: EitherT[IO, Fail, fs2.Stream[IO, Byte]] = for {
+        det <- EitherT(IO.pure(FormValidator.validate(request)))
+        result <- EitherT.liftF(starterService.generateZipFile(det).map(cleanResource))
+      } yield result
 
-      starterService
-        .generateZipFile(details)
-        .map { zippedFile =>
-          Right(
-            Files[IO]
-              .readAll(fs2.io.file.Path(zippedFile.getPath))
-              .onFinalize(IO.blocking(zippedFile.delete()) >> IO.unit)
-          )
-        }
-
+      logicFlow.value
+        .map(_.leftMap(http.failToResponseData))
     }
+
+  private def cleanResource(zippedFile: TapirFile): fs2.Stream[IO, Byte] = {
+    Files[IO]
+      .readAll(fs2.io.file.Path(zippedFile.getPath))
+      .onFinalize(IO.blocking(zippedFile.delete()) >> IO.unit)
+  }
 
   val endpoints: ServerEndpoints =
     NonEmptyList
@@ -41,17 +43,5 @@ class StarterApi(http: Http, starterService: StarterService) {
         starterEndpoint
       )
       .map(_.tag(starterPath))
-
-  // TODO: add validation for all properties
-  private def transform(r: StarterRequest): StarterDetails = {
-    r.effect match {
-      case Effect.FutureEffect =>
-        FutureStarterDetails(r.projectName, r.groupId, r.serverImplementation.asInstanceOf[FutureEff with ServerImplementation])
-      case Effect.IOEffect =>
-        IOStarterDetails(r.projectName, r.groupId, r.serverImplementation.asInstanceOf[IOEff with ServerImplementation])
-      case Effect.ZioEffect =>
-        ZIOStarterDetails(r.projectName, r.groupId, r.serverImplementation.asInstanceOf[ZIOEff with ServerImplementation])
-    }
-  }
 
 }

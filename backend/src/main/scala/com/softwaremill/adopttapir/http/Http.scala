@@ -35,14 +35,13 @@ class Http() extends Tapir with TapirJsonCirce with TapirSchemas with FLogging {
   val secureEndpoint: Endpoint[Id, Unit, (StatusCode, Error_OUT), Unit, Any] =
     baseEndpoint.securityIn(auth.bearer[String]().map(_.asInstanceOf[Id])(identity))
 
-  private val InternalServerError = (StatusCode.InternalServerError, "Internal server error")
-  private val failToResponseData: Fail => (StatusCode, String) = {
-    case Fail.NotFound(what)      => (StatusCode.NotFound, what)
-    case Fail.Conflict(msg)       => (StatusCode.Conflict, msg)
-    case Fail.IncorrectInput(msg) => (StatusCode.BadRequest, msg)
-    case Fail.Forbidden           => (StatusCode.Forbidden, "Forbidden")
-    case Fail.Unauthorized(msg)   => (StatusCode.Unauthorized, msg)
-    case _                        => InternalServerError
+  val failToResponseData: Fail => (StatusCode, Error_OUT) = {
+    case Fail.NotFound(what)      => (StatusCode.NotFound, Error_OUT(what))
+    case Fail.Conflict(msg)       => (StatusCode.Conflict, Error_OUT(msg))
+    case Fail.IncorrectInput(msg) => println(msg); (StatusCode.BadRequest, Error_OUT(msg))
+    case Fail.Forbidden           => (StatusCode.Forbidden, Error_OUT("Forbidden"))
+    case Fail.Unauthorized(msg)   => (StatusCode.Unauthorized, Error_OUT(msg))
+    case _                        => (StatusCode.InternalServerError, Error_OUT("Internal server error"))
   }
 
   implicit class IOOut[T](f: IO[T]) {
@@ -53,7 +52,7 @@ class Http() extends Tapir with TapirJsonCirce with TapirSchemas with FLogging {
     def toOut: IO[Either[(StatusCode, Error_OUT), T]] = {
       f.map(t => t.asRight[(StatusCode, Error_OUT)]).recoverWith { case f: Fail =>
         val (statusCode, message) = failToResponseData(f)
-        logger.warn[IO](s"Request fail: $message").map(_ => (statusCode, Error_OUT(message)).asLeft[T])
+        logger.warn[IO](s"Request fail: ${message.error}").map(_ => (statusCode, message).asLeft[T])
       }
     }
   }

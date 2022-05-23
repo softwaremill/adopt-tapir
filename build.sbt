@@ -49,7 +49,7 @@ val loggingDependencies = Seq(
 )
 
 val fileDependencies = Seq(
-  "com.github.pathikrit" %% "better-files" % "3.9.1",
+  "com.github.pathikrit" %% "better-files" % "3.9.1"
 )
 
 val configDependencies = Seq(
@@ -71,12 +71,14 @@ val securityDependencies = Seq(
   "io.github.jmcardon" %% "tsec-cipher-jca" % tsecVersion
 )
 
-val scalatest = "org.scalatest" %% "scalatest" % "3.2.12" % Test
 val macwireDependencies = Seq(
   "com.softwaremill.macwire" %% "macrosautocats" % macwireVersion
 ).map(_ % Provided)
 
-val unitTestingStack = Seq(scalatest)
+val unitTestingStack = Seq(
+  "org.scalatest" %% "scalatest" % "3.2.12" % Test,
+  "org.scalacheck" %% "scalacheck" % "1.16.0" % Test
+)
 
 val commonDependencies = baseDependencies ++ unitTestingStack ++ loggingDependencies ++ configDependencies ++ fileDependencies
 

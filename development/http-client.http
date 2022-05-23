@@ -3,7 +3,7 @@ Accept: application/octet-stream
 Content-Type: application/json
 
 {
-  "projectName" : "projectName",
+  "projectName" : "projectname",
   "groupId" : "softwaremill.com",
   "effect" : {
     "IOEffect" : {

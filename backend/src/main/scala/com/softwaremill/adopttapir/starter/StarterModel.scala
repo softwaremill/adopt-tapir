@@ -11,19 +11,19 @@ object StarterDetails {
   case class FutureStarterDetails(
       projectName: String,
       groupId: String,
-      serverImplementation: ServerImplementation with FutureEff,
+      serverImplementation: ServerImplementation
   ) extends StarterDetails
 
   case class IOStarterDetails(
       projectName: String,
       groupId: String,
-      serverImplementation: ServerImplementation with IOEff,
+      serverImplementation: ServerImplementation
   ) extends StarterDetails
 
   case class ZIOStarterDetails(
       projectName: String,
       groupId: String,
-      serverImplementation: ServerImplementation with ZIOEff,
+      serverImplementation: ServerImplementation
   ) extends StarterDetails
 
 }
@@ -31,13 +31,8 @@ object StarterDetails {
 sealed trait ServerImplementation
 
 object ServerImplementation {
-  case object Akka extends ServerImplementation with FutureEff
-  case object Netty extends ServerImplementation with FutureEff with IOEff
-  case object Http4s extends ServerImplementation with IOEff with ZIOEff
-  case object ZioHttp extends ServerImplementation with ZIOEff
+  case object Akka extends ServerImplementation
+  case object Netty extends ServerImplementation
+  case object Http4s extends ServerImplementation
+  case object ZioHttp extends ServerImplementation
 }
-
-sealed trait EffectType
-trait FutureEff extends EffectType
-trait IOEff extends EffectType
-trait ZIOEff extends EffectType
