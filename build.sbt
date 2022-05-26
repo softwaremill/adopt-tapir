@@ -12,17 +12,19 @@ val circeVersion = "0.14.1"
 val tsecVersion = "0.4.0"
 val sttpVersion = "3.6.1"
 val prometheusVersion = "0.15.0"
-val tapirVersion = "1.0.0-M9"
+val tapirVersion = "1.0.0-RC1"
 val macwireVersion = "2.5.7"
 
 val httpDependencies = Seq(
-  "org.http4s" %% "http4s-dsl" % http4sVersion,
   "org.http4s" %% "http4s-blaze-server" % http4sVersion,
-  "org.http4s" %% "http4s-blaze-client" % http4sVersion,
   "org.http4s" %% "http4s-circe" % http4sVersion,
   "com.softwaremill.sttp.client3" %% "async-http-client-backend-fs2" % sttpVersion,
   "com.softwaremill.sttp.client3" %% "slf4j-backend" % sttpVersion,
   "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % tapirVersion,
+  "com.softwaremill.sttp.tapir" %% "tapir-zio-http4s-server" % tapirVersion,
+  "com.softwaremill.sttp.tapir" %% "tapir-zio-http-server" % tapirVersion,
+  "com.softwaremill.sttp.tapir" %% "tapir-akka-http-server" % tapirVersion,
+  "com.softwaremill.sttp.tapir" %% "tapir-netty-server" % tapirVersion,
   "com.softwaremill.sttp.tapir" %% "tapir-sttp-stub-server" % tapirVersion
 )
 
@@ -77,7 +79,8 @@ val macwireDependencies = Seq(
 
 val unitTestingStack = Seq(
   "org.scalatest" %% "scalatest" % "3.2.12" % Test,
-  "org.scalacheck" %% "scalacheck" % "1.16.0" % Test
+  "org.scalacheck" %% "scalacheck" % "1.16.0" % Test,
+  "com.lihaoyi" %% "os-lib" % "0.8.1" % Test
 )
 
 val commonDependencies = baseDependencies ++ unitTestingStack ++ loggingDependencies ++ configDependencies ++ fileDependencies

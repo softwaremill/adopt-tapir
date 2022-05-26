@@ -1,7 +1,7 @@
 package com.softwaremill.adopttapir.starter.api
 
 import com.softwaremill.adopttapir.starter.ServerImplementation
-import com.softwaremill.adopttapir.starter.StarterDetails.{FutureStarterDetails, IOStarterDetails, ZIOStarterDetails}
+import com.softwaremill.adopttapir.starter.StarterDetails.{FutureStarterDetails, IOStarterDetails, ZIOStarterDetails, defaultTapirVersion}
 import com.softwaremill.adopttapir.starter.api.EffectRequest.{FutureEffect, IOEffect, ZioEffect}
 import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Akka, Http4s, Netty, ZioHttp}
 import com.softwaremill.adopttapir.starter.api.StarterRequestGenerators.randomStarterRequest
@@ -65,11 +65,41 @@ class FormValidatorSpec extends BaseTest {
     val request4 = request.copy(effect = ZioEffect, implementation = Http4s)
     val request5 = request.copy(effect = ZioEffect, implementation = ZioHttp)
 
-    FormValidator.validate(request).value shouldBe FutureStarterDetails(request.projectName, request.groupId, ServerImplementation.Akka)
-    FormValidator.validate(request1).value shouldBe FutureStarterDetails(request1.projectName, request1.groupId, ServerImplementation.Netty)
-    FormValidator.validate(request2).value shouldBe IOStarterDetails(request2.projectName, request2.groupId, ServerImplementation.Netty)
-    FormValidator.validate(request3).value shouldBe IOStarterDetails(request3.projectName, request3.groupId, ServerImplementation.Http4s)
-    FormValidator.validate(request4).value shouldBe ZIOStarterDetails(request4.projectName, request4.groupId, ServerImplementation.Http4s)
-    FormValidator.validate(request5).value shouldBe ZIOStarterDetails(request5.projectName, request5.groupId, ServerImplementation.ZioHttp)
+    FormValidator.validate(request).value shouldBe FutureStarterDetails(
+      request.projectName,
+      request.groupId,
+      ServerImplementation.Akka,
+      defaultTapirVersion
+    )
+    FormValidator.validate(request1).value shouldBe FutureStarterDetails(
+      request1.projectName,
+      request1.groupId,
+      ServerImplementation.Netty,
+      defaultTapirVersion
+    )
+    FormValidator.validate(request2).value shouldBe IOStarterDetails(
+      request2.projectName,
+      request2.groupId,
+      ServerImplementation.Netty,
+      defaultTapirVersion
+    )
+    FormValidator.validate(request3).value shouldBe IOStarterDetails(
+      request3.projectName,
+      request3.groupId,
+      ServerImplementation.Http4s,
+      defaultTapirVersion
+    )
+    FormValidator.validate(request4).value shouldBe ZIOStarterDetails(
+      request4.projectName,
+      request4.groupId,
+      ServerImplementation.Http4s,
+      defaultTapirVersion
+    )
+    FormValidator.validate(request5).value shouldBe ZIOStarterDetails(
+      request5.projectName,
+      request5.groupId,
+      ServerImplementation.ZioHttp,
+      defaultTapirVersion
+    )
   }
 }

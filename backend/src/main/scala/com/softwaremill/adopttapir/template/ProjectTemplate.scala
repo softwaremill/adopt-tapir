@@ -2,6 +2,7 @@ package com.softwaremill.adopttapir.template
 
 import com.softwaremill.adopttapir.starter.{StarterConfig, StarterDetails}
 import com.softwaremill.adopttapir.template.sbt.Dependency.{PluginDependency, ScalaDependency}
+import com.softwaremill.adopttapir.template.scala.{APIDefinitionsSpecView, APIDefinitionsView, MainView}
 
 case class GeneratedFile(
     relativePath: String,
@@ -11,29 +12,30 @@ case class GeneratedFile(
 class ProjectTemplate(config: StarterConfig) {
 
   def getBuildSbt(starterDetails: StarterDetails): GeneratedFile = {
+
+    val tapirVersion = starterDetails.tapirVersion
+
     val content = txt
       .sbtBuild(
         starterDetails.projectName,
         starterDetails.groupId,
         config.scalaVersion,
         httpDependencies = List(
-          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-core", "0.17.19"),
-          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-akka-http-server", "0.17.19"),
-          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-http4s-server", "0.17.19"),
-          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-sttp-client", "0.17.19"),
-          ScalaDependency("org.http4s", "http4s-circe", "0.21.20")
+          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-akka-http-server", tapirVersion),
+          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-netty-server", tapirVersion),
+          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-http4s-server", tapirVersion),
+          ScalaDependency("org.http4s", "http4s-blaze-server", "0.23.11"),
+          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-zio-http4s-server", tapirVersion),
+          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-zio-http-server", tapirVersion)
         ),
         monitoringDependencies = Nil,
-        jsonDependencies = List(
-          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-json-circe", "0.17.19")
+        jsonDependencies = Nil,
+        baseDependencies = List(
+          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-sttp-client", tapirVersion),
+          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-core", tapirVersion),
+          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-sttp-stub-server", tapirVersion)
         ),
-        baseDependencies = Nil,
-        docDependencies = List(
-          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-openapi-docs", "0.17.19"),
-          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-openapi-circe-yaml", "0.17.19"),
-          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-swagger-ui-http4s", "0.17.19"),
-          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-swagger-ui-akka-http", "0.17.19")
-        )
+        docDependencies = Nil
       )
       .toString()
 
@@ -72,15 +74,29 @@ class ProjectTemplate(config: StarterConfig) {
 
     GeneratedFile(
       pathUnderPackage("src/main/scala", groupId, "Main.scala"),
-      txt.Main(groupId).toString()
+      MainView.getProperMainContent(starterDetails)
     )
   }
-  def getMainSpec(starterDetails: StarterDetails): GeneratedFile = {
+
+  def getApiDefinitions(starterDetails: StarterDetails): GeneratedFile = {
     val groupId = starterDetails.groupId
 
+    val helloServerEndpoint = APIDefinitionsView.getHelloServerEndpoint(starterDetails)
+
     GeneratedFile(
-      pathUnderPackage("src/test/scala", groupId, "MainSpec.scala"),
-      txt.MainSpec(groupId).toString()
+      pathUnderPackage("src/main/scala", groupId, "ApiDefinitions.scala"),
+      txt.ApiDefinitions(starterDetails, helloServerEndpoint.additionalImports, helloServerEndpoint.logic).toString()
+    )
+  }
+
+  def getApiSpecDefinitions(starterDetails: StarterDetails): GeneratedFile = {
+    val groupId = starterDetails.groupId
+
+    val helloServerStub = APIDefinitionsSpecView.getHelloServerStub(starterDetails)
+
+    GeneratedFile(
+      pathUnderPackage("src/test/scala", groupId, "ApiDefinitionsSpec.scala"),
+      txt.ApiDefinitionsSpec(starterDetails, helloServerStub.additionalImports, helloServerStub.logic).toString()
     )
   }
 

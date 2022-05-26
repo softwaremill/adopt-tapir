@@ -18,15 +18,17 @@ class StarterService(
 ) extends FLogging {
 
   def generateZipFile(starterDetails: StarterDetails): IO[File] = {
-    val filesToCreate = generateFiles(starterDetails)
-    IO.blocking(newTemporaryDirectory(prefix = config.tempPrefix).toJava)
-      .bracket { tempDir =>
-        for {
-          _ <- logger.debug("created temp dir: " + tempDir.toString)
-          _ <- storeFiles(tempDir, filesToCreate)
-          dir <- zipDirectory(tempDir)
-        } yield dir
-      }(release = tempDir => if (config.deleteTempFolder) deleteRecursively(tempDir) else IO.unit)
+    IO(generateFiles(starterDetails)).flatMap { filesToCreate =>
+      IO.blocking(newTemporaryDirectory(prefix = config.tempPrefix).toJava)
+        .bracket { tempDir =>
+          for {
+            _ <- logger.debug("created temp dir: " + tempDir.toString)
+            _ <- storeFiles(tempDir, filesToCreate)
+            dir <- zipDirectory(tempDir)
+          } yield dir
+        }(release = tempDir => if (config.deleteTempFolder) deleteRecursively(tempDir) else IO.unit)
+    }
+
   }
 
   private def generateFiles(starterDetails: StarterDetails): List[GeneratedFile] = {
@@ -35,7 +37,8 @@ class StarterService(
       template.getSbtPlugins(),
       template.getBuildProperties(),
       template.getMain(starterDetails),
-      template.getMainSpec(starterDetails)
+      template.getApiDefinitions(starterDetails),
+      template.getApiSpecDefinitions(starterDetails)
     )
   }
 

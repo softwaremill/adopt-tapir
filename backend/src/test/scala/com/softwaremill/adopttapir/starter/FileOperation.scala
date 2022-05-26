@@ -2,7 +2,7 @@ package com.softwaremill.adopttapir.starter
 
 import cats.effect.{ExitCode, IO, IOApp}
 import com.softwaremill.adopttapir.config.Config
-import com.softwaremill.adopttapir.starter.StarterDetails.FutureStarterDetails
+import com.softwaremill.adopttapir.starter.StarterDetails.{FutureStarterDetails, IOStarterDetails, ZIOStarterDetails, defaultTapirVersion}
 import com.softwaremill.adopttapir.template.ProjectTemplate
 
 @deprecated("Only for development purpose")
@@ -15,7 +15,8 @@ object FileOperation extends IOApp {
     val details = FutureStarterDetails(
       "amadeusz",
       "com.mjoyit.experience",
-      ServerImplementation.Netty
+      ServerImplementation.Netty,
+      defaultTapirVersion
     )
 
     for {

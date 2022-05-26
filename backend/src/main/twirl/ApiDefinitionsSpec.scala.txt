@@ -1,0 +1,32 @@
+@(
+starterDetails: com.softwaremill.adopttapir.starter.StarterDetails,
+additionalImports: List[com.softwaremill.adopttapir.template.scala.Import],
+backendStub: String)
+package @{starterDetails.groupId}
+
+import @{starterDetails.groupId}.ApiDefinitions._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
+import sttp.client3.testing.SttpBackendStub
+import sttp.client3.{SttpBackend, UriContext, basicRequest}
+import sttp.tapir.server.stub.TapirStubInterpreter
+@for(additionalImport <- additionalImports) {
+@{additionalImport.asScalaImport}}
+
+class ApiDefinitionsSpec extends AnyFlatSpec with Matchers {
+
+  it should "work" in {
+    // given
+    @backendStub
+
+    // when
+    val response = basicRequest
+      .get(uri"http://test.com/hello?name=adam")
+      .send(backendStub)
+
+    // then
+    response.map(_.body shouldBe Right("hello adam"))
+
+  }
+
+}

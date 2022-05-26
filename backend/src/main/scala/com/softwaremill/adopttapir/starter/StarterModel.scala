@@ -4,26 +4,31 @@ sealed trait StarterDetails {
   val projectName: String
   val groupId: String
   val serverImplementation: ServerImplementation
+  val tapirVersion: String
 }
 
 object StarterDetails {
+  val defaultTapirVersion = "1.0.0-RC1"
 
   case class FutureStarterDetails(
       projectName: String,
       groupId: String,
-      serverImplementation: ServerImplementation
+      serverImplementation: ServerImplementation,
+      tapirVersion: String
   ) extends StarterDetails
 
   case class IOStarterDetails(
       projectName: String,
       groupId: String,
-      serverImplementation: ServerImplementation
+      serverImplementation: ServerImplementation,
+      tapirVersion: String
   ) extends StarterDetails
 
   case class ZIOStarterDetails(
       projectName: String,
       groupId: String,
-      serverImplementation: ServerImplementation
+      serverImplementation: ServerImplementation,
+      tapirVersion: String
   ) extends StarterDetails
 
 }

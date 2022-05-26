@@ -1,0 +1,21 @@
+@(
+starterDetails: com.softwaremill.adopttapir.starter.StarterDetails,
+additionalImports: List[com.softwaremill.adopttapir.template.scala.Import],
+helloEndpointServer: String)
+package @{starterDetails.groupId}
+
+import sttp.tapir.server.ServerEndpoint.Full
+import sttp.tapir.{PublicEndpoint, endpoint, query, stringBody}
+@for(additionalImport <- additionalImports) {
+@{additionalImport.asScalaImport}}
+
+object ApiDefinitions {
+  case class User(name: String) extends AnyVal
+
+  val helloEndpoint: PublicEndpoint[User, Unit, String, Any] = endpoint.get
+    .in("hello")
+    .in(query[User]("name"))
+    .out(stringBody)
+
+@helloEndpointServer
+}

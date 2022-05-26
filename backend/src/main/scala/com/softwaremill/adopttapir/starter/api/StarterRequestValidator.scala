@@ -4,7 +4,7 @@ import cats.data.ValidatedNec
 import cats.implicits.{catsSyntaxTuple2Semigroupal, catsSyntaxTuple3Semigroupal, catsSyntaxValidatedIdBinCompat0}
 import com.softwaremill.adopttapir.Fail._
 import com.softwaremill.adopttapir.starter.StarterDetails
-import com.softwaremill.adopttapir.starter.StarterDetails.{FutureStarterDetails, IOStarterDetails, ZIOStarterDetails}
+import com.softwaremill.adopttapir.starter.StarterDetails.{FutureStarterDetails, IOStarterDetails, ZIOStarterDetails, defaultTapirVersion}
 import com.softwaremill.adopttapir.starter.api.EffectRequest.{FutureEffect, IOEffect, ZioEffect}
 import com.softwaremill.adopttapir.starter.api.RequestValidation.{
   GroupIdShouldFollowJavaPackageConvention,
@@ -68,9 +68,9 @@ sealed trait FormValidator {
       validateEffectWithImplementation(r.effect, r.implementation)
     ).mapN { case (projectName, groupId, (effect, serverImplementation)) =>
       effect match {
-        case EffectRequest.IOEffect     => IOStarterDetails(projectName, groupId, serverImplementation.toModel())
-        case EffectRequest.FutureEffect => FutureStarterDetails(projectName, groupId, serverImplementation.toModel())
-        case EffectRequest.ZioEffect    => ZIOStarterDetails(projectName, groupId, serverImplementation.toModel())
+        case EffectRequest.IOEffect     => IOStarterDetails(projectName, groupId, serverImplementation.toModel(), defaultTapirVersion)
+        case EffectRequest.FutureEffect => FutureStarterDetails(projectName, groupId, serverImplementation.toModel(), defaultTapirVersion)
+        case EffectRequest.ZioEffect    => ZIOStarterDetails(projectName, groupId, serverImplementation.toModel(), defaultTapirVersion)
       }
     }.leftMap(errors => IncorrectInput(errors.toNonEmptyList.map(_.errMessage).toList.mkString(System.lineSeparator())))
       .toEither
