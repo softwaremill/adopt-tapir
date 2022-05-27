@@ -1,4 +1,4 @@
-GET {{url}}/starter.zip
+GET {{url}}/starter.zip?tapirVersion=1.0.0-RC1
 Accept: application/octet-stream
 Content-Type: application/json
 
@@ -6,12 +6,12 @@ Content-Type: application/json
   "projectName" : "projectname",
   "groupId" : "softwaremill.com",
   "effect" : {
-    "IOEffect" : {
+    "FutureEffect" : {
 
     }
   },
-  "serverImplementation" : {
-    "Http4s" : {
+  "implementation" : {
+    "Akka" : {
 
     }
   }

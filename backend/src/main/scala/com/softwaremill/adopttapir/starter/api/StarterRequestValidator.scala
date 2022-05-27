@@ -1,13 +1,20 @@
 package com.softwaremill.adopttapir.starter.api
 
 import cats.data.ValidatedNec
-import cats.implicits.{catsSyntaxTuple2Semigroupal, catsSyntaxTuple3Semigroupal, catsSyntaxValidatedIdBinCompat0}
+import cats.implicits.{
+  catsSyntaxTuple2Semigroupal,
+  catsSyntaxTuple3Semigroupal,
+  catsSyntaxTuple4Semigroupal,
+  catsSyntaxValidatedId,
+  catsSyntaxValidatedIdBinCompat0
+}
 import com.softwaremill.adopttapir.Fail._
 import com.softwaremill.adopttapir.starter.StarterDetails
 import com.softwaremill.adopttapir.starter.StarterDetails.{FutureStarterDetails, IOStarterDetails, ZIOStarterDetails, defaultTapirVersion}
 import com.softwaremill.adopttapir.starter.api.EffectRequest.{FutureEffect, IOEffect, ZIOEffect}
 import com.softwaremill.adopttapir.starter.api.RequestValidation.{
   GroupIdShouldFollowJavaPackageConvention,
+  NotInSemverNotation,
   ProjectNameShouldBeLowerCaseWritten,
   ProjectNameShouldNotContainWhiteSpaces
 }
@@ -18,6 +25,10 @@ sealed trait RequestValidation {
 }
 
 object RequestValidation {
+  case class NotInSemverNotation(input: String) extends RequestValidation {
+    override val errMessage: String = s"Provided input: `$input` is not in semantic versioning notation"
+  }
+
   case class ProjectNameShouldBeLowerCaseWritten(input: String) extends RequestValidation {
     override val errMessage: String = s"Project name: `$input` should be written with lowercase"
   }
@@ -54,26 +65,33 @@ object RequestValidation {
     override val errMessage: String = s"$prefixMessage ZIO effect will work only with Http4s and ZIOHttp"
   }
 }
-//TODO: Add semver validator for tapir version
-// semver regex
-// ^([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$
 
 sealed trait FormValidator {
   type ValidationResult[A] = ValidatedNec[RequestValidation, A]
 
-  def validate(r: StarterRequest): Either[IncorrectInput, StarterDetails] =
+  def validate(tapirVersion: String, r: StarterRequest): Either[IncorrectInput, StarterDetails] =
     (
+      validateSemanticVersioning(tapirVersion),
       validateProjectName(r.projectName),
       validateGroupId(r.groupId),
       validateEffectWithImplementation(r.effect, r.implementation)
-    ).mapN { case (projectName, groupId, (effect, serverImplementation)) =>
+    ).mapN { case (tapirVersion, projectName, groupId, (effect, serverImplementation)) =>
       effect match {
-        case EffectRequest.IOEffect     => IOStarterDetails(projectName, groupId, serverImplementation.toModel(), defaultTapirVersion)
-        case EffectRequest.FutureEffect => FutureStarterDetails(projectName, groupId, serverImplementation.toModel(), defaultTapirVersion)
-        case EffectRequest.ZIOEffect    => ZIOStarterDetails(projectName, groupId, serverImplementation.toModel(), defaultTapirVersion)
+        case EffectRequest.IOEffect     => IOStarterDetails(projectName, groupId, serverImplementation.toModel(), tapirVersion)
+        case EffectRequest.FutureEffect => FutureStarterDetails(projectName, groupId, serverImplementation.toModel(), tapirVersion)
+        case EffectRequest.ZIOEffect    => ZIOStarterDetails(projectName, groupId, serverImplementation.toModel(), tapirVersion)
       }
     }.leftMap(errors => IncorrectInput(errors.toNonEmptyList.map(_.errMessage).toList.mkString(System.lineSeparator())))
       .toEither
+
+  private def validateSemanticVersioning(version: String): ValidationResult[String] = {
+    // regex from: https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
+    val semverRgx =
+      "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
+    if (version.matches(semverRgx))
+      version.valid
+    else NotInSemverNotation(version).invalidNec
+  }
 
   private def validateProjectName(projectName: String): ValidationResult[String] = {
     val valid = projectName.validNec
