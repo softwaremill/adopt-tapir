@@ -38,7 +38,7 @@ class Http() extends Tapir with TapirJsonCirce with TapirSchemas with FLogging {
   val failToResponseData: Fail => (StatusCode, Error_OUT) = {
     case Fail.NotFound(what)      => (StatusCode.NotFound, Error_OUT(what))
     case Fail.Conflict(msg)       => (StatusCode.Conflict, Error_OUT(msg))
-    case Fail.IncorrectInput(msg) => println(msg); (StatusCode.BadRequest, Error_OUT(msg))
+    case Fail.IncorrectInput(msg) => (StatusCode.BadRequest, Error_OUT(msg))
     case Fail.Forbidden           => (StatusCode.Forbidden, Error_OUT("Forbidden"))
     case Fail.Unauthorized(msg)   => (StatusCode.Unauthorized, Error_OUT(msg))
     case _                        => (StatusCode.InternalServerError, Error_OUT("Internal server error"))
