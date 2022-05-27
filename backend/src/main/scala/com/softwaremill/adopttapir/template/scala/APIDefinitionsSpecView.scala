@@ -18,7 +18,8 @@ object APIDefinitionsSpecView {
         |  .thenRunLogic()
         |  .backend()""".stripMargin,
       List(
-        Import("scala.concurrent.{ExecutionContext, Future}")
+        Import("scala.concurrent.Future"),
+        Import("scala.concurrent.ExecutionContext.Implicits.global")
       )
     )
 

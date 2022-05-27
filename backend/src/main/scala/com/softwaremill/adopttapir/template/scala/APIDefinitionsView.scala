@@ -16,14 +16,14 @@ object APIDefinitionsView {
   private object HelloServerEndpoint {
 
     val future: PlainLogicWithImports = PlainLogicWithImports(
-      """  implicit val ec = ExecutionContext.global
-        |  val helloServerEndpoint: Full[Unit, Unit, User, Unit, String, Any, Future] = helloEndpoint.serverLogic(user =>
+      """  val helloServerEndpoint: Full[Unit, Unit, User, Unit, String, Any, Future] = helloEndpoint.serverLogic(user =>
         |    Future.successful {
         |      s"Hello ${user.name}".asRight[Unit]
         |    }
         |  )""".stripMargin,
       List(
-        Import("scala.concurrent.{ExecutionContext, Future}"),
+        Import("scala.concurrent.ExecutionContext.Implicits.global"),
+        Import("scala.concurrent.Future"),
         Import("cats.implicits.catsSyntaxEitherId")
       )
     )

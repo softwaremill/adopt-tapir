@@ -5,11 +5,10 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import sttp.tapir.server.akkahttp.AkkaHttpServerInterpreter
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.io.StdIn
 
 object Main {
-  implicit val ec = ExecutionContext.global
 
   def main(args: Array[String]): Unit = {
     implicit val actorSystem: ActorSystem = ActorSystem()

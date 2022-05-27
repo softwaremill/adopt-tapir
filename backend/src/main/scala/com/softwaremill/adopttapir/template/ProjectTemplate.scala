@@ -1,6 +1,7 @@
 package com.softwaremill.adopttapir.template
 
 import com.softwaremill.adopttapir.starter.{StarterConfig, StarterDetails}
+import com.softwaremill.adopttapir.template.sbt.BuildSbtView
 import com.softwaremill.adopttapir.template.sbt.Dependency.{PluginDependency, ScalaDependency}
 import com.softwaremill.adopttapir.template.scala.{APIDefinitionsSpecView, APIDefinitionsView, MainView}
 
@@ -25,14 +26,7 @@ class ProjectTemplate(config: StarterConfig) {
         starterDetails.projectName,
         starterDetails.groupId,
         config.scalaVersion,
-        httpDependencies = List(
-          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-akka-http-server", tapirVersion),
-          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-netty-server", tapirVersion),
-          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-http4s-server", tapirVersion),
-          ScalaDependency("org.http4s", "http4s-blaze-server", "0.23.11"),
-          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-zio-http4s-server", tapirVersion),
-          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-zio-http-server", tapirVersion)
-        ),
+        httpDependencies = BuildSbtView.getHttpDependencies(starterDetails),
         monitoringDependencies = Nil,
         jsonDependencies = Nil,
         baseDependencies = List(
