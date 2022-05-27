@@ -6,6 +6,7 @@ import org.http4s.server.Router
 import sttp.tapir.server.http4s.ztapir.ZHttp4sServerInterpreter
 import zio.interop.catz._
 import zio.{Scope, Task, ZIO, ZIOAppArgs, ZIOAppDefault}
+import scala.io.StdIn
 
 object Main extends ZIOAppDefault {
 
@@ -13,16 +14,12 @@ object Main extends ZIOAppDefault {
 
     val routes = ZHttp4sServerInterpreter().from(List(ApiDefinitions.helloServerEndpoint)).toRoutes
 
-    val serve: Task[Unit] =
-      BlazeServerBuilder[Task]
-        .withExecutionContext(runtime.runtimeConfig.executor.asExecutionContext)
-        .bindHttp(8080, "localhost")
-        .withHttpApp(Router("/" -> (routes)).orNotFound)
-        .serve
-        .compile
-        .drain
-
-    serve.exitCode
+    BlazeServerBuilder[Task]
+      .withExecutionContext(runtime.runtimeConfig.executor.asExecutionContext)
+      .bindHttp(8080, "localhost")
+      .withHttpApp(Router("/" -> (routes)).orNotFound)
+      .resource
+      .use { _ => ZIO.succeedBlocking(StdIn.readLine()) }
 
   }
 }

@@ -12,10 +12,10 @@ object FileOperation extends IOApp {
   val service = new StarterService(null, cfg.copy(deleteTempFolder = false), new ProjectTemplate(cfg))
 
   override def run(args: List[String]): IO[ExitCode] = {
-    val details = FutureStarterDetails(
+    val details = ZIOStarterDetails(
       "amadeusz",
       "com.mjoyit.experience",
-      ServerImplementation.Netty,
+      ServerImplementation.Http4s,
       defaultTapirVersion
     )
 

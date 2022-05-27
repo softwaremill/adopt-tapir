@@ -7,7 +7,7 @@ import org.scalatest.matchers.should.Matchers
 import better.files.{FileExtensions, File => BFile}
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
-import com.softwaremill.adopttapir.starter.ServerImplementation.{Akka, Http4s, Netty, ZioHttp}
+import com.softwaremill.adopttapir.starter.ServerImplementation.{Akka, Http4s, Netty, ZIOHttp}
 
 class StarterServiceITSpec extends AnyFlatSpec with Matchers {
 
@@ -116,10 +116,10 @@ class StarterServiceITSpec extends AnyFlatSpec with Matchers {
       .unsafeRunSync()
   }
 
-  it should "return zip file containing working sbt folder with ZIO ZioHttp implementation" in {
+  it should "return zip file containing working sbt folder with ZIO ZIOHttp implementation" in {
     val service = createStarterService
 
-    val starterDetails = ZIOStarterDetails("projectName", "com.softwaremill", ZioHttp, defaultTapirVersion)
+    val starterDetails = ZIOStarterDetails("projectName", "com.softwaremill", ZIOHttp, defaultTapirVersion)
 
     IO.blocking(BFile.newTemporaryDirectory("sbtTesting"))
       .bracket { tempDir =>

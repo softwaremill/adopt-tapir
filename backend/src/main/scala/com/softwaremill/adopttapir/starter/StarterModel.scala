@@ -39,5 +39,5 @@ object ServerImplementation {
   case object Akka extends ServerImplementation
   case object Netty extends ServerImplementation
   case object Http4s extends ServerImplementation
-  case object ZioHttp extends ServerImplementation
+  case object ZIOHttp extends ServerImplementation
 }

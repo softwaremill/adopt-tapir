@@ -5,13 +5,13 @@ import cats.implicits.{catsSyntaxTuple2Semigroupal, catsSyntaxTuple3Semigroupal,
 import com.softwaremill.adopttapir.Fail._
 import com.softwaremill.adopttapir.starter.StarterDetails
 import com.softwaremill.adopttapir.starter.StarterDetails.{FutureStarterDetails, IOStarterDetails, ZIOStarterDetails, defaultTapirVersion}
-import com.softwaremill.adopttapir.starter.api.EffectRequest.{FutureEffect, IOEffect, ZioEffect}
+import com.softwaremill.adopttapir.starter.api.EffectRequest.{FutureEffect, IOEffect, ZIOEffect}
 import com.softwaremill.adopttapir.starter.api.RequestValidation.{
   GroupIdShouldFollowJavaPackageConvention,
   ProjectNameShouldBeLowerCaseWritten,
   ProjectNameShouldNotContainWhiteSpaces
 }
-import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Akka, Http4s, Netty, ZioHttp}
+import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Akka, Http4s, Netty, ZIOHttp}
 
 sealed trait RequestValidation {
   def errMessage: String
@@ -48,10 +48,10 @@ object RequestValidation {
     override val errMessage: String = s"$prefixMessage IO effect will work only with Http4 and Netty"
   }
 
-  case class ZIOEffectWillWorkOnlyWithHttp4sAndZioHttp(effect: EffectRequest, implementation: ServerImplementationRequest)
+  case class ZIOEffectWillWorkOnlyWithHttp4sAndZIOHttp(effect: EffectRequest, implementation: ServerImplementationRequest)
       extends EffectValidation
       with RequestValidation {
-    override val errMessage: String = s"$prefixMessage ZIO effect will work only with Http4s and ZioHttp"
+    override val errMessage: String = s"$prefixMessage ZIO effect will work only with Http4s and ZIOHttp"
   }
 }
 //TODO: Add semver validator for tapir version
@@ -70,7 +70,7 @@ sealed trait FormValidator {
       effect match {
         case EffectRequest.IOEffect     => IOStarterDetails(projectName, groupId, serverImplementation.toModel(), defaultTapirVersion)
         case EffectRequest.FutureEffect => FutureStarterDetails(projectName, groupId, serverImplementation.toModel(), defaultTapirVersion)
-        case EffectRequest.ZioEffect    => ZIOStarterDetails(projectName, groupId, serverImplementation.toModel(), defaultTapirVersion)
+        case EffectRequest.ZIOEffect    => ZIOStarterDetails(projectName, groupId, serverImplementation.toModel(), defaultTapirVersion)
       }
     }.leftMap(errors => IncorrectInput(errors.toNonEmptyList.map(_.errMessage).toList.mkString(System.lineSeparator())))
       .toEither
@@ -105,9 +105,9 @@ sealed trait FormValidator {
       case t @ (IOEffect, Http4s)    => t.validNec
       case t @ (IOEffect, Netty)     => t.validNec
       case (IOEffect, _)             => RequestValidation.IOEffectWillWorkOnlyWithHttp4sAndNetty(effect, serverImplementation).invalidNec
-      case t @ (ZioEffect, Http4s)   => t.validNec
-      case t @ (ZioEffect, ZioHttp)  => t.validNec
-      case (ZioEffect, _)            => RequestValidation.ZIOEffectWillWorkOnlyWithHttp4sAndZioHttp(effect, serverImplementation).invalidNec
+      case t @ (ZIOEffect, Http4s)   => t.validNec
+      case t @ (ZIOEffect, ZIOHttp)  => t.validNec
+      case (ZIOEffect, _)            => RequestValidation.ZIOEffectWillWorkOnlyWithHttp4sAndZIOHttp(effect, serverImplementation).invalidNec
     }
   }
 }

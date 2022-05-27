@@ -11,7 +11,7 @@ object MainView {
     case StarterDetails.IOStarterDetails(_, groupId, Http4s, _)    => txt.MainIOHttp4s(groupId).toString()
     case StarterDetails.IOStarterDetails(_, groupId, Netty, _)     => txt.MainIONetty(groupId).toString()
     case StarterDetails.ZIOStarterDetails(_, groupId, Http4s, _)   => txt.MainZIOHttp4s(groupId).toString()
-    case StarterDetails.ZIOStarterDetails(_, groupId, ZioHttp, _)  => txt.MainZIOhttpZIO(groupId).toString()
+    case StarterDetails.ZIOStarterDetails(_, groupId, ZIOHttp, _)  => txt.MainZIOhttpZIO(groupId).toString()
     case _ => throw new UnsupportedOperationException(s"$starterDetails not supported")
   }
 

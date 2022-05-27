@@ -9,7 +9,7 @@ sealed trait EffectRequest
 object EffectRequest {
   case object IOEffect extends EffectRequest
   case object FutureEffect extends EffectRequest
-  case object ZioEffect extends EffectRequest
+  case object ZIOEffect extends EffectRequest
 }
 
 sealed trait ServerImplementationRequest {
@@ -26,7 +26,7 @@ object ServerImplementationRequest {
   case object Http4s extends ServerImplementationRequest {
     override def toModel(): ServerImplementation = ServerImplementation.Http4s
   }
-  case object ZioHttp extends ServerImplementationRequest {
-    override def toModel(): ServerImplementation = ServerImplementation.ZioHttp
+  case object ZIOHttp extends ServerImplementationRequest {
+    override def toModel(): ServerImplementation = ServerImplementation.ZIOHttp
   }
 }

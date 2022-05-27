@@ -2,8 +2,8 @@ package com.softwaremill.adopttapir.starter.api
 
 import com.softwaremill.adopttapir.starter.ServerImplementation
 import com.softwaremill.adopttapir.starter.StarterDetails.{FutureStarterDetails, IOStarterDetails, ZIOStarterDetails, defaultTapirVersion}
-import com.softwaremill.adopttapir.starter.api.EffectRequest.{FutureEffect, IOEffect, ZioEffect}
-import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Akka, Http4s, Netty, ZioHttp}
+import com.softwaremill.adopttapir.starter.api.EffectRequest.{FutureEffect, IOEffect, ZIOEffect}
+import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Akka, Http4s, Netty, ZIOHttp}
 import com.softwaremill.adopttapir.starter.api.StarterRequestGenerators.randomStarterRequest
 import com.softwaremill.adopttapir.test.BaseTest
 
@@ -43,18 +43,18 @@ class FormValidatorSpec extends BaseTest {
   }
 
   it should "raise a problem when effect will not match implementation" in {
-    FormValidator.validate(randomStarterRequest(FutureEffect, ZioHttp)).left.value.msg should
-      include("Picked FutureEffect with ZioHttp - Future effect will work only with Akka and Netty")
+    FormValidator.validate(randomStarterRequest(FutureEffect, ZIOHttp)).left.value.msg should
+      include("Picked FutureEffect with ZIOHttp - Future effect will work only with Akka and Netty")
     FormValidator.validate(randomStarterRequest(FutureEffect, Http4s)).left.value.msg should
       include("Picked FutureEffect with Http4s - Future effect will work only with Akka and Netty")
     FormValidator.validate(randomStarterRequest(IOEffect, Akka)).left.value.msg should
       include("Picked IOEffect with Akka - IO effect will work only with Http4 and Netty")
-    FormValidator.validate(randomStarterRequest(IOEffect, ZioHttp)).left.value.msg should
-      include("Picked IOEffect with ZioHttp - IO effect will work only with Http4 and Netty")
-    FormValidator.validate(randomStarterRequest(ZioEffect, Akka)).left.value.msg should
-      include("Picked ZioEffect with Akka - ZIO effect will work only with Http4s and ZioHttp")
-    FormValidator.validate(randomStarterRequest(ZioEffect, Netty)).left.value.msg should
-      include("Picked ZioEffect with Netty - ZIO effect will work only with Http4s and ZioHttp")
+    FormValidator.validate(randomStarterRequest(IOEffect, ZIOHttp)).left.value.msg should
+      include("Picked IOEffect with ZIOHttp - IO effect will work only with Http4 and Netty")
+    FormValidator.validate(randomStarterRequest(ZIOEffect, Akka)).left.value.msg should
+      include("Picked ZIOEffect with Akka - ZIO effect will work only with Http4s and ZIOHttp")
+    FormValidator.validate(randomStarterRequest(ZIOEffect, Netty)).left.value.msg should
+      include("Picked ZIOEffect with Netty - ZIO effect will work only with Http4s and ZIOHttp")
   }
 
   it should "not raise a problem with Effect and Implementation" in {
@@ -62,8 +62,8 @@ class FormValidatorSpec extends BaseTest {
     val request1 = request.copy(effect = FutureEffect, implementation = Netty)
     val request2 = request.copy(effect = IOEffect, implementation = Netty)
     val request3 = request.copy(effect = IOEffect, implementation = Http4s)
-    val request4 = request.copy(effect = ZioEffect, implementation = Http4s)
-    val request5 = request.copy(effect = ZioEffect, implementation = ZioHttp)
+    val request4 = request.copy(effect = ZIOEffect, implementation = Http4s)
+    val request5 = request.copy(effect = ZIOEffect, implementation = ZIOHttp)
 
     FormValidator.validate(request).value shouldBe FutureStarterDetails(
       request.projectName,
@@ -98,7 +98,7 @@ class FormValidatorSpec extends BaseTest {
     FormValidator.validate(request5).value shouldBe ZIOStarterDetails(
       request5.projectName,
       request5.groupId,
-      ServerImplementation.ZioHttp,
+      ServerImplementation.ZIOHttp,
       defaultTapirVersion
     )
   }

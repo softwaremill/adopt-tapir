@@ -9,6 +9,11 @@ case class GeneratedFile(
     content: String
 )
 
+/** Every method represent one of generated file. As template mechanism Twirl library were used. Which have some crucial limitations for
+  * more advanced logic. That's why it is passed to Twirl templates through simple String by using `*View` objects.
+  *
+  * As an example see @see [[APIDefinitionsView]]
+  */
 class ProjectTemplate(config: StarterConfig) {
 
   def getBuildSbt(starterDetails: StarterDetails): GeneratedFile = {
