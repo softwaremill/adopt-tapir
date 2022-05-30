@@ -1,22 +1,15 @@
 package com.softwaremill.adopttapir.starter.api
 
 import cats.data.ValidatedNec
-import cats.implicits.{
-  catsSyntaxTuple2Semigroupal,
-  catsSyntaxTuple3Semigroupal,
-  catsSyntaxTuple4Semigroupal,
-  catsSyntaxValidatedId,
-  catsSyntaxValidatedIdBinCompat0
-}
+import cats.implicits.{catsSyntaxTuple4Semigroupal, catsSyntaxValidatedId, catsSyntaxValidatedIdBinCompat0}
 import com.softwaremill.adopttapir.Fail._
 import com.softwaremill.adopttapir.starter.StarterDetails
-import com.softwaremill.adopttapir.starter.StarterDetails.{FutureStarterDetails, IOStarterDetails, ZIOStarterDetails, defaultTapirVersion}
+import com.softwaremill.adopttapir.starter.StarterDetails.{FutureStarterDetails, IOStarterDetails, ZIOStarterDetails}
 import com.softwaremill.adopttapir.starter.api.EffectRequest.{FutureEffect, IOEffect, ZIOEffect}
 import com.softwaremill.adopttapir.starter.api.RequestValidation.{
   GroupIdShouldFollowJavaPackageConvention,
   NotInSemverNotation,
-  ProjectNameShouldBeLowerCaseWritten,
-  ProjectNameShouldNotContainWhiteSpaces
+  ProjectNameShouldMatchRegex
 }
 import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Akka, Http4s, Netty, ZIOHttp}
 
@@ -33,8 +26,8 @@ object RequestValidation {
     override val errMessage: String = s"Project name: `$input` should be written with lowercase"
   }
 
-  case class ProjectNameShouldNotContainWhiteSpaces(input: String) extends RequestValidation {
-    override val errMessage: String = s"Project name: `$input` should not contain whitespaces"
+  case class ProjectNameShouldMatchRegex(input: String, regex: String) extends RequestValidation {
+    override val errMessage: String = s"Project name: `$input` should match regex: `$regex`"
   }
 
   case class GroupIdShouldFollowJavaPackageConvention(input: String) extends RequestValidation {
@@ -69,9 +62,9 @@ object RequestValidation {
 sealed trait FormValidator {
   type ValidationResult[A] = ValidatedNec[RequestValidation, A]
 
-  def validate(tapirVersion: String, r: StarterRequest): Either[IncorrectInput, StarterDetails] =
+  def validate(r: StarterRequest): Either[IncorrectInput, StarterDetails] =
     (
-      validateSemanticVersioning(tapirVersion),
+      validateSemanticVersioning(r.tapirVersion),
       validateProjectName(r.projectName),
       validateGroupId(r.groupId),
       validateEffectWithImplementation(r.effect, r.implementation)
@@ -94,17 +87,11 @@ sealed trait FormValidator {
   }
 
   private def validateProjectName(projectName: String): ValidationResult[String] = {
-    val valid = projectName.validNec
-    val lowerCase =
-      if (projectName != projectName.toLowerCase)
-        ProjectNameShouldBeLowerCaseWritten(projectName).invalidNec
-      else valid
-    val withoutWhitespaces =
-      if (projectName.toList.exists(_.isWhitespace))
-        ProjectNameShouldNotContainWhiteSpaces(projectName).invalidNec
-      else valid
+    val projectNameRgx = "[a-z0-9]+"
 
-    (lowerCase, withoutWhitespaces).mapN { case (projectName, _) => projectName }
+    if (projectName.matches(projectNameRgx))
+      projectName.validNec
+    else ProjectNameShouldMatchRegex(projectName, projectNameRgx).invalidNec
   }
 
   private def validateGroupId(groupId: String): ValidationResult[String] = {

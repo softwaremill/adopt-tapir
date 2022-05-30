@@ -1,4 +1,4 @@
-GET {{url}}/starter.zip?tapirVersion=1.0.0-RC1
+POST {{url}}/starter.zip
 Accept: application/octet-stream
 Content-Type: application/json
 
@@ -14,7 +14,8 @@ Content-Type: application/json
     "Akka" : {
 
     }
-  }
+  },
+  "tapirVersion" : "1.0.0-RC1"
 }
 
 ###

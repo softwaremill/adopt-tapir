@@ -17,14 +17,13 @@ class StarterApi(http: Http, starterService: StarterService) {
 
   private val starterPath = "starter.zip"
 
-  private val starterEndpoint = baseEndpoint.get
+  private val starterEndpoint = baseEndpoint.post
     .in(starterPath)
-    .in(query[String]("tapirVersion"))
     .in(jsonBody[StarterRequest])
     .out(streamBinaryBody(Fs2Streams[IO]))
-    .serverLogic[IO] { case (tapirVersion, request) =>
+    .serverLogic[IO] { request =>
       val logicFlow: EitherT[IO, Fail, fs2.Stream[IO, Byte]] = for {
-        det <- EitherT(IO.pure(FormValidator.validate(tapirVersion, request)))
+        det <- EitherT(IO.pure(FormValidator.validate(request)))
         result <- EitherT.liftF(starterService.generateZipFile(det).map(cleanResource))
       } yield result
 

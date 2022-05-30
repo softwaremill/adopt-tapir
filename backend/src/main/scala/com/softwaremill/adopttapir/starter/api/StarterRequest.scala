@@ -2,7 +2,13 @@ package com.softwaremill.adopttapir.starter.api
 
 import com.softwaremill.adopttapir.starter.ServerImplementation
 
-case class StarterRequest(projectName: String, groupId: String, effect: EffectRequest, implementation: ServerImplementationRequest)
+case class StarterRequest(
+    projectName: String,
+    groupId: String,
+    effect: EffectRequest,
+    implementation: ServerImplementationRequest,
+    tapirVersion: String
+)
 
 sealed trait EffectRequest
 
