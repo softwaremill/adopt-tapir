@@ -10,6 +10,7 @@ import com.softwaremill.adopttapir.util.ServerEndpoints
 import fs2.io.file.Files
 import io.circe.generic.auto._
 import sttp.capabilities.fs2.Fs2Streams
+import sttp.tapir.CodecFormat
 import sttp.tapir.generic.auto._
 import sttp.tapir.codec.enumeratum._
 
@@ -18,20 +19,26 @@ class StarterApi(http: Http, starterService: StarterService) {
 
   private val starterPath = "starter.zip"
 
-  private val starterEndpoint = baseEndpoint.post
-    .in(starterPath)
-    .in(jsonBody[StarterRequest])
-    .out(streamBinaryBody(Fs2Streams[IO]))
-    .serverLogic[IO] { request =>
-      val logicFlow: EitherT[IO, Fail, fs2.Stream[IO, Byte]] = for {
-        det <- EitherT(IO.pure(FormValidator.validate(request)))
-        result <- EitherT.liftF(starterService.generateZipFile(det).map(cleanResource))
-      } yield result
-
-      logicFlow.value
-        .map(_.leftMap(http.failToResponseData))
+  private val starterEndpoint = {
+    val zippedFileStream = {
+      val output = streamBinaryBody(Fs2Streams[IO])
+      output.copy(codec = output.codec.format(CodecFormat.Zip()))
     }
 
+    baseEndpoint.post
+      .in(starterPath)
+      .in(jsonBody[StarterRequest])
+      .out(zippedFileStream)
+      .serverLogic[IO] { request =>
+        val logicFlow: EitherT[IO, Fail, fs2.Stream[IO, Byte]] = for {
+          det <- EitherT(IO.pure(FormValidator.validate(request)))
+          result <- EitherT.liftF(starterService.generateZipFile(det).map(cleanResource))
+        } yield result
+
+        logicFlow.value
+          .map(_.leftMap(http.failToResponseData))
+      }
+  }
   private def cleanResource(zippedFile: TapirFile): fs2.Stream[IO, Byte] = {
     Files[IO]
       .readAll(fs2.io.file.Path(zippedFile.getPath))
