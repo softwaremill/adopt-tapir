@@ -8,15 +8,6 @@ jsonDependencies: List[com.softwaremill.adopttapir.template.sbt.Dependency],
 baseDependencies: List[com.softwaremill.adopttapir.template.sbt.Dependency],
 docDependencies: List[com.softwaremill.adopttapir.template.sbt.Dependency]
 )
-import com.softwaremill.SbtSoftwareMillCommon.commonSmlBuildSettings
-import sbt.Keys._
-import sbt._
-import sbtbuildinfo.BuildInfoKey.action
-import sbtbuildinfo.BuildInfoKeys.{buildInfoKeys, buildInfoOptions, buildInfoPackage}
-import sbtbuildinfo.{BuildInfoKey, BuildInfoOption}
-
-import scala.util.Try
-
 val httpDependencies = Seq(@for(dependency <- httpDependencies) {
   @{dependency.asSbtDependency},}
 )
@@ -50,62 +41,14 @@ val unitTestingStack = Seq(
 val commonDependencies = unitTestingStack ++ loggingDependencies ++ configDependencies @if(baseDependencies.nonEmpty) {++ baseDependencies}
 val backendDependencies = httpDependencies @if(jsonDependencies.nonEmpty) {++ jsonDependencies} @if(docDependencies.nonEmpty) {++ docDependencies} @if(monitoringDependencies.nonEmpty) {++ monitoringDependencies}
 
-lazy val commonSettings = commonSmlBuildSettings ++ Seq(
+lazy val commonSettings = Seq(
+  name := "@name",
+  version := "0.1.0-SNAPSHOT",
   organization := "@groupId",
   scalaVersion := "@scalaVersion",
   libraryDependencies ++= commonDependencies ++ backendDependencies
 )
 
-lazy val buildInfoSettings = Seq(
-  buildInfoKeys := Seq[BuildInfoKey](
-    name,
-    version,
-    scalaVersion,
-    sbtVersion,
-    action("lastCommitHash") {
-      import scala.sys.process._
-      // if the build is done outside of a git repository, we still want it to succeed
-      Try("git rev-parse HEAD".!!.trim).getOrElse("?")
-    }
-  ),
-  buildInfoOptions += BuildInfoOption.ToJson,
-  buildInfoOptions += BuildInfoOption.ToMap,
-  buildInfoPackage := "@{groupId}.version",
-  buildInfoObject := "BuildInfo"
-)
-
-lazy val fatJarSettings = Seq(
-  assembly / assemblyJarName := "@{name}.jar",
-  assembly / assemblyMergeStrategy := {
-    case PathList(ps @@ _*) if ps.last endsWith "io.netty.versions.properties"       => MergeStrategy.first
-    case PathList(ps @@ _*) if ps.last endsWith "pom.properties"                     => MergeStrategy.first
-    case PathList(ps @@ _*) if ps.last endsWith "scala-collection-compat.properties" => MergeStrategy.first
-    case x =>
-      val oldStrategy = (assembly / assemblyMergeStrategy).value
-      oldStrategy(x)
-  }
-)
-
-def haltOnCmdResultError(result: Int) {
-  if (result != 0) {
-    throw new Exception("Build failed.")
-  }
-}
-
-def now(): String = {
-  import java.text.SimpleDateFormat
-  import java.util.Date
-  new SimpleDateFormat("yyyy-MM-dd-hhmmss").format(new Date())
-}
 
 lazy val rootProject = (project in file("."))
   .settings(commonSettings)
-  .settings(
-    name := "@name"
-  )
-  .enablePlugins(BuildInfoPlugin)
-    .settings(commonSettings)
-    .settings(Revolver.settings)
-    .settings(buildInfoSettings)
-    .settings(fatJarSettings)
-    .enablePlugins(JavaServerAppPackaging)

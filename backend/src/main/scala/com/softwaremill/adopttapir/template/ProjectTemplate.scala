@@ -2,7 +2,7 @@ package com.softwaremill.adopttapir.template
 
 import com.softwaremill.adopttapir.starter.{StarterConfig, StarterDetails}
 import com.softwaremill.adopttapir.template.sbt.BuildSbtView
-import com.softwaremill.adopttapir.template.sbt.Dependency.{PluginDependency, ScalaDependency}
+import com.softwaremill.adopttapir.template.sbt.Dependency.ScalaDependency
 import com.softwaremill.adopttapir.template.scala.{APIDefinitionsSpecView, APIDefinitionsView, MainView}
 
 case class GeneratedFile(
@@ -46,28 +46,6 @@ class ProjectTemplate(config: StarterConfig) {
     txt.buildProperties(config.sbtVersion).toString()
   )
 
-  def getSbtPlugins(): GeneratedFile = {
-    val content =
-      txt
-        .pluginsSbt(
-          List(
-            PluginDependency("com.eed3si9n", "sbt-buildinfo", "0.11.0"),
-            PluginDependency("io.spray", "sbt-revolver", "0.9.1"),
-            PluginDependency("com.heroku", "sbt-heroku", "2.1.4"),
-            PluginDependency("com.softwaremill.sbt-softwaremill", "sbt-softwaremill-common", "2.0.9"),
-            PluginDependency("com.eed3si9n", "sbt-assembly", "1.2.0"),
-            PluginDependency("com.github.sbt", "sbt-native-packager", "1.9.9"),
-            PluginDependency("com.github.sbt", "sbt-git", "2.0.0"),
-            PluginDependency("com.timushev.sbt", "sbt-updates", "0.6.2")
-          )
-        )
-        .toString()
-
-    GeneratedFile(
-      "project/plugins.sbt",
-      content
-    )
-  }
   def getMain(starterDetails: StarterDetails): GeneratedFile = {
     val groupId = starterDetails.groupId
 

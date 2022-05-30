@@ -16,12 +16,8 @@ trait ScalaVersionFormat { self: Dependency =>
   override def asSbtDependency: String = s"\"$groupId\" %% \"$artifactId\" % \"$version\""
 }
 
-object Dependency{
+object Dependency {
   case class ScalaDependency(groupId: String, artifactId: String, version: String) extends Dependency with ScalaVersionFormat
 
   case class JavaDependency(groupId: String, artifactId: String, version: String) extends Dependency with DefaultFormat
-
-  case class PluginDependency(groupId: String, artifactId: String, version: String) extends Dependency with DefaultFormat
 }
-
-

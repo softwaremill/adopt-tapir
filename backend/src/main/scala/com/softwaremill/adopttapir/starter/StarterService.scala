@@ -34,7 +34,6 @@ class StarterService(
   private def generateFiles(starterDetails: StarterDetails): List[GeneratedFile] = {
     List(
       template.getBuildSbt(starterDetails),
-      template.getSbtPlugins(),
       template.getBuildProperties(),
       template.getMain(starterDetails),
       template.getApiDefinitions(starterDetails),
