@@ -21,10 +21,6 @@ val httpDependencies = Seq(
   "com.softwaremill.sttp.client3" %% "async-http-client-backend-fs2" % sttpVersion,
   "com.softwaremill.sttp.client3" %% "slf4j-backend" % sttpVersion,
   "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % tapirVersion,
-  "com.softwaremill.sttp.tapir" %% "tapir-zio-http4s-server" % tapirVersion,
-  "com.softwaremill.sttp.tapir" %% "tapir-zio-http-server" % tapirVersion,
-  "com.softwaremill.sttp.tapir" %% "tapir-akka-http-server" % tapirVersion,
-  "com.softwaremill.sttp.tapir" %% "tapir-netty-server" % tapirVersion,
   "com.softwaremill.sttp.tapir" %% "tapir-sttp-stub-server" % tapirVersion
 )
 
@@ -39,15 +35,15 @@ val jsonDependencies = Seq(
   "io.circe" %% "circe-core" % circeVersion,
   "io.circe" %% "circe-generic" % circeVersion,
   "io.circe" %% "circe-parser" % circeVersion,
+  "com.softwaremill.sttp.tapir" %% "tapir-enumeratum" % tapirVersion,
+  "com.beachape" %% "enumeratum-circe" % "1.7.0",
   "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % tapirVersion,
   "com.softwaremill.sttp.client3" %% "circe" % sttpVersion
 )
 
 val loggingDependencies = Seq(
   "com.typesafe.scala-logging" %% "scala-logging" % "3.9.4",
-  "ch.qos.logback" % "logback-classic" % "1.2.11",
-  "org.codehaus.janino" % "janino" % "3.1.7",
-  "de.siegmar" % "logback-gelf" % "4.0.2"
+  "ch.qos.logback" % "logback-classic" % "1.2.11"
 )
 
 val fileDependencies = Seq(

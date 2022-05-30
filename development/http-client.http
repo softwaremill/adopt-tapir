@@ -3,19 +3,11 @@ Accept: application/octet-stream
 Content-Type: application/json
 
 {
-  "projectName" : "projectname",
-  "groupId" : "softwaremill.com",
-  "effect" : {
-    "FutureEffect" : {
-
-    }
-  },
-  "implementation" : {
-    "Akka" : {
-
-    }
-  },
-  "tapirVersion" : "1.0.0-RC1"
+  "projectName": "projectname",
+  "groupId": "softwaremill.com",
+  "effect": "FutureEffect",
+  "implementation": "Akka",
+  "tapirVersion": "1.0.0-RC1"
 }
 
 ###

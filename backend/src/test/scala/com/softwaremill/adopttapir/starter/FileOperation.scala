@@ -2,7 +2,7 @@ package com.softwaremill.adopttapir.starter
 
 import cats.effect.{ExitCode, IO, IOApp}
 import com.softwaremill.adopttapir.config.Config
-import com.softwaremill.adopttapir.starter.StarterDetails.{FutureStarterDetails, IOStarterDetails, ZIOStarterDetails, defaultTapirVersion}
+import com.softwaremill.adopttapir.starter.StarterDetails.defaultTapirVersion
 import com.softwaremill.adopttapir.template.ProjectTemplate
 
 @deprecated("Only for development purpose")
@@ -12,9 +12,10 @@ object FileOperation extends IOApp {
   val service = new StarterService(null, cfg.copy(deleteTempFolder = false), new ProjectTemplate(cfg))
 
   override def run(args: List[String]): IO[ExitCode] = {
-    val details = ZIOStarterDetails(
+    val details = StarterDetails(
       "amadeusz",
       "com.mjoyit.experience",
+      ServerEffect.ZIOEffect,
       ServerImplementation.Http4s,
       defaultTapirVersion
     )

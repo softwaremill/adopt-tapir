@@ -4,7 +4,6 @@ import cats.data.ValidatedNec
 import cats.implicits.{catsSyntaxTuple4Semigroupal, catsSyntaxValidatedId, catsSyntaxValidatedIdBinCompat0}
 import com.softwaremill.adopttapir.Fail._
 import com.softwaremill.adopttapir.starter.StarterDetails
-import com.softwaremill.adopttapir.starter.StarterDetails.{FutureStarterDetails, IOStarterDetails, ZIOStarterDetails}
 import com.softwaremill.adopttapir.starter.api.EffectRequest.{FutureEffect, IOEffect, ZIOEffect}
 import com.softwaremill.adopttapir.starter.api.RequestValidation.{
   GroupIdShouldFollowJavaPackageConvention,
@@ -69,11 +68,7 @@ sealed trait FormValidator {
       validateGroupId(r.groupId),
       validateEffectWithImplementation(r.effect, r.implementation)
     ).mapN { case (tapirVersion, projectName, groupId, (effect, serverImplementation)) =>
-      effect match {
-        case EffectRequest.IOEffect     => IOStarterDetails(projectName, groupId, serverImplementation.toModel(), tapirVersion)
-        case EffectRequest.FutureEffect => FutureStarterDetails(projectName, groupId, serverImplementation.toModel(), tapirVersion)
-        case EffectRequest.ZIOEffect    => ZIOStarterDetails(projectName, groupId, serverImplementation.toModel(), tapirVersion)
-      }
+      StarterDetails(projectName, groupId, effect.toModel(), serverImplementation.toModel(), tapirVersion)
     }.leftMap(errors => IncorrectInput(errors.toNonEmptyList.map(_.errMessage).toList.mkString(System.lineSeparator())))
       .toEither
 

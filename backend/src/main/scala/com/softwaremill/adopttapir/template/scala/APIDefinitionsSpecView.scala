@@ -1,14 +1,15 @@
 package com.softwaremill.adopttapir.template.scala
 
+import com.softwaremill.adopttapir.starter.ServerEffect.{FutureEffect, IOEffect, ZIOEffect}
 import com.softwaremill.adopttapir.starter.StarterDetails
 
 object APIDefinitionsSpecView {
 
   def getHelloServerStub(starterDetails: StarterDetails): PlainLogicWithImports =
-    starterDetails match {
-      case _: StarterDetails.FutureStarterDetails => HelloWorldStub.future
-      case _: StarterDetails.IOStarterDetails     => HelloWorldStub.io
-      case _: StarterDetails.ZIOStarterDetails    => HelloWorldStub.zio
+    starterDetails.serverEffect match {
+      case FutureEffect => HelloWorldStub.future
+      case IOEffect     => HelloWorldStub.io
+      case ZIOEffect    => HelloWorldStub.zio
     }
 
   object HelloWorldStub {

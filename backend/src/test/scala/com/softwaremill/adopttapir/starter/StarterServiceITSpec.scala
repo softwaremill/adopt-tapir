@@ -1,20 +1,21 @@
 package com.softwaremill.adopttapir.starter
 
-import com.softwaremill.adopttapir.starter.StarterDetails.{FutureStarterDetails, IOStarterDetails, ZIOStarterDetails, defaultTapirVersion}
-import com.softwaremill.adopttapir.template.ProjectTemplate
-import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.should.Matchers
 import better.files.{FileExtensions, File => BFile}
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
+import com.softwaremill.adopttapir.starter.ServerEffect.{FutureEffect, IOEffect, ZIOEffect}
 import com.softwaremill.adopttapir.starter.ServerImplementation.{Akka, Http4s, Netty, ZIOHttp}
+import com.softwaremill.adopttapir.starter.StarterDetails.defaultTapirVersion
+import com.softwaremill.adopttapir.template.ProjectTemplate
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 class StarterServiceITSpec extends AnyFlatSpec with Matchers {
 
   it should "return zip file containing working sbt folder with Future Akka implementation" in {
     val service = createStarterService
 
-    val starterDetails = FutureStarterDetails("projectName", "com.softwaremill", Akka, defaultTapirVersion)
+    val starterDetails = StarterDetails("projectName", "com.softwaremill", FutureEffect, Akka, defaultTapirVersion)
 
     IO.blocking(BFile.newTemporaryDirectory("sbtTesting"))
       .bracket { tempDir =>
@@ -35,7 +36,7 @@ class StarterServiceITSpec extends AnyFlatSpec with Matchers {
   it should "return zip file containing working sbt folder with Future Netty implementation" in {
     val service = createStarterService
 
-    val starterDetails = FutureStarterDetails("projectName", "com.softwaremill", Netty, defaultTapirVersion)
+    val starterDetails = StarterDetails("projectName", "com.softwaremill", FutureEffect, Netty, defaultTapirVersion)
 
     IO.blocking(BFile.newTemporaryDirectory("sbtTesting"))
       .bracket { tempDir =>
@@ -56,7 +57,7 @@ class StarterServiceITSpec extends AnyFlatSpec with Matchers {
   it should "return zip file containing working sbt folder with IO Http4s implementation" in {
     val service = createStarterService
 
-    val starterDetails = IOStarterDetails("projectName", "com.softwaremill", Http4s, defaultTapirVersion)
+    val starterDetails = StarterDetails("projectName", "com.softwaremill", IOEffect, Http4s, defaultTapirVersion)
 
     IO.blocking(BFile.newTemporaryDirectory("sbtTesting"))
       .bracket { tempDir =>
@@ -77,7 +78,7 @@ class StarterServiceITSpec extends AnyFlatSpec with Matchers {
   it should "return zip file containing working sbt folder with IO Netty implementation" in {
     val service = createStarterService
 
-    val starterDetails = IOStarterDetails("projectName", "com.softwaremill", Netty, defaultTapirVersion)
+    val starterDetails = StarterDetails("projectName", "com.softwaremill", IOEffect, Netty, defaultTapirVersion)
 
     IO.blocking(BFile.newTemporaryDirectory("sbtTesting"))
       .bracket { tempDir =>
@@ -98,7 +99,7 @@ class StarterServiceITSpec extends AnyFlatSpec with Matchers {
   it should "return zip file containing working sbt folder with ZIO Http4s implementation" in {
     val service = createStarterService
 
-    val starterDetails = ZIOStarterDetails("projectName", "com.softwaremill", Http4s, defaultTapirVersion)
+    val starterDetails = StarterDetails("projectName", "com.softwaremill", ZIOEffect, Http4s, defaultTapirVersion)
 
     IO.blocking(BFile.newTemporaryDirectory("sbtTesting"))
       .bracket { tempDir =>
@@ -119,7 +120,7 @@ class StarterServiceITSpec extends AnyFlatSpec with Matchers {
   it should "return zip file containing working sbt folder with ZIO ZIOHttp implementation" in {
     val service = createStarterService
 
-    val starterDetails = ZIOStarterDetails("projectName", "com.softwaremill", ZIOHttp, defaultTapirVersion)
+    val starterDetails = StarterDetails("projectName", "com.softwaremill", ZIOEffect, ZIOHttp, defaultTapirVersion)
 
     IO.blocking(BFile.newTemporaryDirectory("sbtTesting"))
       .bracket { tempDir =>

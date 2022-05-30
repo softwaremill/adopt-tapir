@@ -1,35 +1,15 @@
 package com.softwaremill.adopttapir.starter
 
-sealed trait StarterDetails {
-  val projectName: String
-  val groupId: String
-  val serverImplementation: ServerImplementation
-  val tapirVersion: String
-}
+case class StarterDetails(
+    projectName: String,
+    groupId: String,
+    serverEffect: ServerEffect,
+    serverImplementation: ServerImplementation,
+    tapirVersion: String
+)
 
 object StarterDetails {
   val defaultTapirVersion = "1.0.0-RC1"
-
-  case class FutureStarterDetails(
-      projectName: String,
-      groupId: String,
-      serverImplementation: ServerImplementation,
-      tapirVersion: String
-  ) extends StarterDetails
-
-  case class IOStarterDetails(
-      projectName: String,
-      groupId: String,
-      serverImplementation: ServerImplementation,
-      tapirVersion: String
-  ) extends StarterDetails
-
-  case class ZIOStarterDetails(
-      projectName: String,
-      groupId: String,
-      serverImplementation: ServerImplementation,
-      tapirVersion: String
-  ) extends StarterDetails
 
 }
 
@@ -40,4 +20,11 @@ object ServerImplementation {
   case object Netty extends ServerImplementation
   case object Http4s extends ServerImplementation
   case object ZIOHttp extends ServerImplementation
+}
+
+sealed trait ServerEffect
+object ServerEffect {
+  case object FutureEffect extends ServerEffect
+  case object IOEffect extends ServerEffect
+  case object ZIOEffect extends ServerEffect
 }

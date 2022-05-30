@@ -11,6 +11,7 @@ import fs2.io.file.Files
 import io.circe.generic.auto._
 import sttp.capabilities.fs2.Fs2Streams
 import sttp.tapir.generic.auto._
+import sttp.tapir.codec.enumeratum._
 
 class StarterApi(http: Http, starterService: StarterService) {
   import http._

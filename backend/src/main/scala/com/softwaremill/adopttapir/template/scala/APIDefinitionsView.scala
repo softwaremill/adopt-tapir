@@ -1,16 +1,13 @@
 package com.softwaremill.adopttapir.template.scala
 
-import com.softwaremill.adopttapir.starter.StarterDetails
+import com.softwaremill.adopttapir.starter.{ServerEffect, StarterDetails}
 
 object APIDefinitionsView {
 
-  def getHelloServerEndpoint(starterDetails: StarterDetails): PlainLogicWithImports = starterDetails match {
-    case _: StarterDetails.FutureStarterDetails =>
-      APIDefinitionsView.HelloServerEndpoint.future
-    case _: StarterDetails.IOStarterDetails =>
-      APIDefinitionsView.HelloServerEndpoint.io
-    case _: StarterDetails.ZIOStarterDetails =>
-      APIDefinitionsView.HelloServerEndpoint.zio
+  def getHelloServerEndpoint(starterDetails: StarterDetails): PlainLogicWithImports = starterDetails.serverEffect match {
+    case ServerEffect.FutureEffect => HelloServerEndpoint.future
+    case ServerEffect.IOEffect     => HelloServerEndpoint.io
+    case ServerEffect.ZIOEffect    => HelloServerEndpoint.zio
   }
 
   private object HelloServerEndpoint {
