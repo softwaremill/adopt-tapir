@@ -5,14 +5,12 @@ import better.files.{FileExtensions, File => BFile}
 import cats.effect.IO
 import com.softwaremill.adopttapir.logging.FLogging
 import com.softwaremill.adopttapir.template.{GeneratedFile, ProjectTemplate}
-import com.softwaremill.adopttapir.util.Clock
 
 import java.io.File
 import java.util.zip.Deflater
 import scala.reflect.io.Directory
 
 class StarterService(
-    clock: Clock,
     config: StarterConfig,
     template: ProjectTemplate
 ) extends FLogging {
@@ -34,7 +32,7 @@ class StarterService(
   private def generateFiles(starterDetails: StarterDetails): List[GeneratedFile] = {
     List(
       template.getBuildSbt(starterDetails),
-      template.getBuildProperties(),
+      template.getBuildProperties,
       template.getMain(starterDetails),
       template.getApiDefinitions(starterDetails),
       template.getApiSpecDefinitions(starterDetails)

@@ -4,7 +4,6 @@ import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import com.softwaremill.adopttapir.config.Config
 import com.softwaremill.adopttapir.metrics.Metrics
-import com.softwaremill.adopttapir.util.DefaultClock
 import com.typesafe.scalalogging.StrictLogging
 
 object Main extends StrictLogging {
@@ -16,7 +15,7 @@ object Main extends StrictLogging {
     Config.log(config)
 
     Dependencies
-      .wire(config, DefaultClock)
+      .wire(config)
       .use { case Dependencies(httpApi) =>
         /*
         - allocates the http api resource, and never releases it (so that the http server is available

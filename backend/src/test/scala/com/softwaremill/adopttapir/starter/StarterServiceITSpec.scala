@@ -7,10 +7,9 @@ import com.softwaremill.adopttapir.starter.ServerEffect.{FutureEffect, IOEffect,
 import com.softwaremill.adopttapir.starter.ServerImplementation.{Akka, Http4s, Netty, ZIOHttp}
 import com.softwaremill.adopttapir.starter.StarterDetails.defaultTapirVersion
 import com.softwaremill.adopttapir.template.ProjectTemplate
-import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.should.Matchers
+import com.softwaremill.adopttapir.test.BaseTest
 
-class StarterServiceITSpec extends AnyFlatSpec with Matchers {
+class StarterServiceITSpec extends BaseTest {
 
   it should "return zip file containing working sbt folder with Future Akka implementation" in {
     val service = createStarterService
@@ -140,7 +139,7 @@ class StarterServiceITSpec extends AnyFlatSpec with Matchers {
 
   private def createStarterService = {
     val config = StarterConfig(deleteTempFolder = true, tempPrefix = "sbtService", sbtVersion = "1.6.2", scalaVersion = "2.13.8")
-    new StarterService(null, config, new ProjectTemplate(config))
+    new StarterService(config, new ProjectTemplate(config))
   }
 
 }

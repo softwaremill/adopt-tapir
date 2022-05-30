@@ -9,7 +9,7 @@ import com.softwaremill.adopttapir.template.ProjectTemplate
 object FileOperation extends IOApp {
 
   private val cfg = Config.read.starter
-  val service = new StarterService(null, cfg.copy(deleteTempFolder = false), new ProjectTemplate(cfg))
+  val service = new StarterService(cfg.copy(deleteTempFolder = false), new ProjectTemplate(cfg))
 
   override def run(args: List[String]): IO[ExitCode] = {
     val details = StarterDetails(

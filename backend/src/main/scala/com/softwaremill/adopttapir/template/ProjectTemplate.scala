@@ -41,7 +41,7 @@ class ProjectTemplate(config: StarterConfig) {
     GeneratedFile("build.sbt", content)
   }
 
-  def getBuildProperties(): GeneratedFile = GeneratedFile(
+  def getBuildProperties: GeneratedFile = GeneratedFile(
     "project/build.properties",
     txt.buildProperties(config.sbtVersion).toString()
   )

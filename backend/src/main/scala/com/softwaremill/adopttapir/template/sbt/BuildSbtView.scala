@@ -20,23 +20,25 @@ object BuildSbtView {
   }
 
   object HttpDependencies {
-    def akka(tapirVersion: String) = List(
+    def akka(tapirVersion: String): List[ScalaDependency] = List(
       ScalaDependency("com.softwaremill.sttp.tapir", "tapir-akka-http-server", tapirVersion),
       ScalaDependency("com.softwaremill.sttp.tapir", "tapir-cats", tapirVersion)
     )
-    def netty(tapirVersion: String) = List(
+    def netty(tapirVersion: String): List[ScalaDependency] = List(
       ScalaDependency("com.softwaremill.sttp.tapir", "tapir-netty-server", tapirVersion),
       ScalaDependency("com.softwaremill.sttp.tapir", "tapir-cats", tapirVersion)
     )
 
-    def http4s(tapirVersion: String) = List(
+    def http4s(tapirVersion: String): List[ScalaDependency] = List(
       ScalaDependency("com.softwaremill.sttp.tapir", "tapir-http4s-server", tapirVersion),
       ScalaDependency("org.http4s", "http4s-blaze-server", "0.23.11")
     )
 
-    def http4sZIO(tapirVersion: String) =
+    def http4sZIO(tapirVersion: String): List[ScalaDependency] =
       ScalaDependency("com.softwaremill.sttp.tapir", "tapir-zio-http4s-server", tapirVersion) :: http4s(tapirVersion)
 
-    def ZIOHttp(tapirVersion: String) = List(ScalaDependency("com.softwaremill.sttp.tapir", "tapir-zio-http-server", tapirVersion))
+    def ZIOHttp(tapirVersion: String): List[ScalaDependency] = List(
+      ScalaDependency("com.softwaremill.sttp.tapir", "tapir-zio-http-server", tapirVersion)
+    )
   }
 }

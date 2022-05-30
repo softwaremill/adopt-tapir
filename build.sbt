@@ -135,7 +135,7 @@ lazy val dockerSettings = Seq(
   }
 )
 
-def haltOnCmdResultError(result: Int) {
+def haltOnCmdResultError(result: Int): Unit = {
   if (result != 0) {
     throw new Exception("Build failed.")
   }

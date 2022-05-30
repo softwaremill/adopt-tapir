@@ -24,7 +24,7 @@ object APIDefinitionsSpecView {
       )
     )
 
-    val io = PlainLogicWithImports(
+    val io: PlainLogicWithImports = PlainLogicWithImports(
       """val backendStub: SttpBackend[IO, Any] = TapirStubInterpreter(SttpBackendStub.apply(new CatsMonadError[IO]()))
         |  .whenServerEndpoint(ApiDefinitions.helloServerEndpoint)
         |  .thenRunLogic()
@@ -35,7 +35,7 @@ object APIDefinitionsSpecView {
       )
     )
 
-    val zio = PlainLogicWithImports(
+    val zio: PlainLogicWithImports = PlainLogicWithImports(
       """val backendStub =
         |  TapirStubInterpreter(SttpBackendStub.apply(new RIOMonadError[Any]))
         |    .whenServerEndpoint(ApiDefinitions.helloServerEndpoint)
