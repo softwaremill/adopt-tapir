@@ -1,0 +1,2 @@
+@(version: String)
+sbt.version=@version

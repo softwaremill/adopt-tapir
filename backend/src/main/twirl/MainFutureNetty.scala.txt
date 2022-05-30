@@ -1,0 +1,22 @@
+@(groupId: String)
+package @groupId
+
+import sttp.tapir.server.netty.NettyFutureServer
+
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.io.StdIn
+
+object Main {
+  implicit val ec = ExecutionContext.global
+
+  def main(args: Array[String]): Unit = {
+    val program = for {
+      binding <- NettyFutureServer().port(8080).addEndpoints(List(ApiDefinitions.helloServerEndpoint)).start()
+      _ <- Future(StdIn.readLine())
+      stop <- binding.stop()
+    } yield stop
+
+    Await.result(program, Duration.Inf)
+  }
+}

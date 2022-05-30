@@ -1,25 +1,30 @@
 package com.softwaremill.adopttapir.starter
 
 case class StarterDetails(
-    tapirVersion: String,
-    scalaVersion: String,
-    sbtVersion: String,
-    projectDetails: ProjectDetails,
-    moduleDependencies: ModuleDependencies
+    projectName: String,
+    groupId: String,
+    serverEffect: ServerEffect,
+    serverImplementation: ServerImplementation,
+    tapirVersion: String
 )
 
-case class ProjectDetails(group: String, artifact: String, projectName: String, packageName: String)
-case class ModuleDependencies(dependencies: List[Dependency])
-case class Dependency(value: String) extends AnyVal
-
-
 object StarterDetails {
-  val default: StarterDetails = StarterDetails(
-    tapirVersion = "1.0.0",
-    scalaVersion = "2.13",
-    sbtVersion = "1.6.2",
-    projectDetails = ProjectDetails("com.softwaremill", "library", "projectName", "com.softwaremill"),
-    ModuleDependencies(Nil)
-  )
+  val defaultTapirVersion = "1.0.0-RC1"
 
+}
+
+sealed trait ServerImplementation
+
+object ServerImplementation {
+  case object Akka extends ServerImplementation
+  case object Netty extends ServerImplementation
+  case object Http4s extends ServerImplementation
+  case object ZIOHttp extends ServerImplementation
+}
+
+sealed trait ServerEffect
+object ServerEffect {
+  case object FutureEffect extends ServerEffect
+  case object IOEffect extends ServerEffect
+  case object ZIOEffect extends ServerEffect
 }

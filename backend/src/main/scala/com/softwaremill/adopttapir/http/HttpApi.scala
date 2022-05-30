@@ -7,6 +7,7 @@ import com.softwaremill.adopttapir.util.ServerEndpoints
 import com.typesafe.scalalogging.StrictLogging
 import org.http4s.HttpRoutes
 import org.http4s.blaze.server.BlazeServerBuilder
+import sttp.capabilities.fs2.Fs2Streams
 import sttp.tapir._
 import sttp.tapir.server.ServerEndpoint
 import sttp.tapir.server.http4s.{Http4sServerInterpreter, Http4sServerOptions}
@@ -55,7 +56,7 @@ class HttpApi(
 
   lazy val routes: HttpRoutes[IO] = Http4sServerInterpreter(serverOptions).toRoutes(allEndpoints)
 
-  lazy val allEndpoints: List[ServerEndpoint[Any, IO]] = {
+  lazy val allEndpoints: List[ServerEndpoint[Any with Fs2Streams[IO], IO]] = {
     // creating the documentation using `mainEndpoints` without the /api/v1 context path; instead, a server will be added
     // with the appropriate suffix
     val docsEndpoints = SwaggerInterpreter(swaggerUIOptions = SwaggerUIOptions.default.copy(contextPath = apiContextPath))

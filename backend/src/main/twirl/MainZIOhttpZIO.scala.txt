@@ -1,0 +1,16 @@
+@(groupId: String)
+package @groupId
+
+import sttp.tapir.server.ziohttp.ZioHttpInterpreter
+import zhttp.http.HttpApp
+import zhttp.service.Server
+import zio.{Scope, ZIO, ZIOAppArgs, ZIOAppDefault}
+
+object Main extends ZIOAppDefault {
+
+  override def run: ZIO[Any with ZIOAppArgs with Scope, Any, Any] = {
+    val app: HttpApp[Any, Throwable] = ZioHttpInterpreter().toHttp(ApiDefinitions.helloServerEndpoint)
+
+    Server.start(8080, app).exitCode
+  }
+}

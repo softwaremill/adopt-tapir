@@ -5,8 +5,7 @@ import cats.effect.{IO, Resource}
 import com.softwaremill.adopttapir.config.Config
 import com.softwaremill.adopttapir.http.{Http, HttpApi, HttpConfig}
 import com.softwaremill.adopttapir.metrics.VersionApi
-import com.softwaremill.adopttapir.starter.StarterApi
-import com.softwaremill.adopttapir.util.Clock
+import com.softwaremill.adopttapir.starter.api.StarterApi
 import com.softwaremill.macwire.autocats.autowire
 import io.prometheus.client.CollectorRegistry
 import sttp.tapir.server.metrics.prometheus.PrometheusMetrics
@@ -15,8 +14,7 @@ case class Dependencies(api: HttpApi)
 
 object Dependencies {
   def wire(
-      config: Config,
-      clock: Clock
+      config: Config
   ): Resource[IO, Dependencies] = {
     def buildHttpApi(
         http: Http,
@@ -37,7 +35,6 @@ object Dependencies {
     autowire[Dependencies](
       config.api,
       config.starter,
-      clock,
       buildHttpApi _
     )
   }

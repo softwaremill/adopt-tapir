@@ -1,0 +1,23 @@
+@(groupId: String)
+package @groupId
+
+import cats.effect.{ExitCode, IO, IOApp}
+import org.http4s.blaze.server.BlazeServerBuilder
+import org.http4s.server.Router
+import sttp.tapir.server.http4s.Http4sServerInterpreter
+
+import scala.io.StdIn
+
+object Main extends IOApp {
+
+  override def run(args: List[String]): IO[ExitCode] = {
+    val routes = Http4sServerInterpreter[IO]().toRoutes(List(ApiDefinitions.helloServerEndpoint))
+
+    BlazeServerBuilder[IO]
+      .bindHttp(8080, "localhost")
+      .withHttpApp(Router("/" -> routes).orNotFound)
+      .resource
+      .use { _ => IO(StdIn.readLine()) }
+      .as(ExitCode.Success)
+  }
+}

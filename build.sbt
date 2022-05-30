@@ -12,13 +12,11 @@ val circeVersion = "0.14.1"
 val tsecVersion = "0.4.0"
 val sttpVersion = "3.6.1"
 val prometheusVersion = "0.15.0"
-val tapirVersion = "1.0.0-M9"
+val tapirVersion = "1.0.0-RC1"
 val macwireVersion = "2.5.7"
 
 val httpDependencies = Seq(
-  "org.http4s" %% "http4s-dsl" % http4sVersion,
   "org.http4s" %% "http4s-blaze-server" % http4sVersion,
-  "org.http4s" %% "http4s-blaze-client" % http4sVersion,
   "org.http4s" %% "http4s-circe" % http4sVersion,
   "com.softwaremill.sttp.client3" %% "async-http-client-backend-fs2" % sttpVersion,
   "com.softwaremill.sttp.client3" %% "slf4j-backend" % sttpVersion,
@@ -37,15 +35,15 @@ val jsonDependencies = Seq(
   "io.circe" %% "circe-core" % circeVersion,
   "io.circe" %% "circe-generic" % circeVersion,
   "io.circe" %% "circe-parser" % circeVersion,
+  "com.softwaremill.sttp.tapir" %% "tapir-enumeratum" % tapirVersion,
+  "com.beachape" %% "enumeratum-circe" % "1.7.0",
   "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % tapirVersion,
   "com.softwaremill.sttp.client3" %% "circe" % sttpVersion
 )
 
 val loggingDependencies = Seq(
   "com.typesafe.scala-logging" %% "scala-logging" % "3.9.4",
-  "ch.qos.logback" % "logback-classic" % "1.2.11",
-  "org.codehaus.janino" % "janino" % "3.1.7",
-  "de.siegmar" % "logback-gelf" % "4.0.2"
+  "ch.qos.logback" % "logback-classic" % "1.2.11"
 )
 
 val fileDependencies = Seq(
@@ -71,12 +69,15 @@ val securityDependencies = Seq(
   "io.github.jmcardon" %% "tsec-cipher-jca" % tsecVersion
 )
 
-val scalatest = "org.scalatest" %% "scalatest" % "3.2.12" % Test
 val macwireDependencies = Seq(
   "com.softwaremill.macwire" %% "macrosautocats" % macwireVersion
 ).map(_ % Provided)
 
-val unitTestingStack = Seq(scalatest)
+val unitTestingStack = Seq(
+  "org.scalatest" %% "scalatest" % "3.2.12" % Test,
+  "org.scalacheck" %% "scalacheck" % "1.16.0" % Test,
+  "com.lihaoyi" %% "os-lib" % "0.8.1" % Test
+)
 
 val commonDependencies = baseDependencies ++ unitTestingStack ++ loggingDependencies ++ configDependencies ++ fileDependencies
 
@@ -134,7 +135,7 @@ lazy val dockerSettings = Seq(
   }
 )
 
-def haltOnCmdResultError(result: Int) {
+def haltOnCmdResultError(result: Int): Unit = {
   if (result != 0) {
     throw new Exception("Build failed.")
   }
@@ -167,4 +168,5 @@ lazy val backend: Project = (project in file("backend"))
   .settings(fatJarSettings)
   .enablePlugins(DockerPlugin)
   .enablePlugins(JavaServerAppPackaging)
+  .enablePlugins(SbtTwirl)
   .settings(dockerSettings)
