@@ -68,7 +68,7 @@ sealed trait FormValidator {
       validateGroupId(r.groupId),
       validateEffectWithImplementation(r.effect, r.implementation)
     ).mapN { case (tapirVersion, projectName, groupId, (effect, serverImplementation)) =>
-      StarterDetails(projectName, groupId, effect.toModel, serverImplementation.toModel, tapirVersion, r.documentationAdded)
+      StarterDetails(projectName, groupId, effect.toModel, serverImplementation.toModel, tapirVersion, r.addDocumentation)
     }.leftMap(errors => IncorrectInput(errors.toNonEmptyList.map(_.errMessage).toList.mkString(System.lineSeparator())))
       .toEither
 

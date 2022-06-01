@@ -1,6 +1,6 @@
 @(
 groupId: String,
-documentationAdded: Boolean
+addDocumentation: Boolean
 )
 package @groupId
 
@@ -19,7 +19,7 @@ object Main extends IOApp {
           bind <- server
             .port(8080)
             .host("localhost")
-            .addEndpoints(@if(documentationAdded) {ApiDefinitions.helloServerEndpoint :: ApiDefinitions.docEndpoints} else {List(ApiDefinitions.helloServerEndpoint)})
+            .addEndpoints(@if(addDocumentation) {ApiDefinitions.helloServerEndpoint :: ApiDefinitions.docEndpoints} else {List(ApiDefinitions.helloServerEndpoint)})
             .start()
           _ <- IO(StdIn.readLine())
           _ <- bind.stop()

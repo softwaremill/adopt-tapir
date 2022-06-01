@@ -35,7 +35,7 @@ class ProjectTemplate(config: StarterConfig) {
           ScalaDependency("com.softwaremill.sttp.tapir", "tapir-sttp-stub-server", tapirVersion)
         ),
         docDependencies =
-          if (starterDetails.documentationAdded)
+          if (starterDetails.addDocumentation)
             List(ScalaDependency("com.softwaremill.sttp.tapir", "tapir-swagger-ui-bundle", tapirVersion))
           else Nil
       )

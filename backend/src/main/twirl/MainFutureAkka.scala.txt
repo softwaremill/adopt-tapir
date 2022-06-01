@@ -1,6 +1,6 @@
 @(
 groupId: String,
-documentationAdded: Boolean
+addDocumentation: Boolean
 )
 package @groupId
 
@@ -16,7 +16,7 @@ object Main {
   def main(args: Array[String]): Unit = {
     implicit val actorSystem: ActorSystem = ActorSystem()
 
-    val route = AkkaHttpServerInterpreter().toRoute(ApiDefinitions.helloServerEndpoint@if(documentationAdded) { :: ApiDefinitions.docEndpoints})
+    val route = AkkaHttpServerInterpreter().toRoute(ApiDefinitions.helloServerEndpoint@if(addDocumentation) { :: ApiDefinitions.docEndpoints})
 
     val bindingFuture = Http()
       .newServerAt("localhost", 8080)

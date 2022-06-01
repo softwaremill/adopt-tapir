@@ -12,7 +12,7 @@ import sttp.client3.testing.SttpBackendStub
 import sttp.client3.{SttpBackend, UriContext, basicRequest}
 import sttp.tapir.server.stub.TapirStubInterpreter
 @for(additionalImport <- additionalImports) {
-@{additionalImport.asScalaImport}}
+@{additionalImport.asScalaImport()}}
 
 class ApiDefinitionsSpec extends AnyFlatSpec with Matchers with EitherValues{
 

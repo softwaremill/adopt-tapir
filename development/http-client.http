@@ -8,7 +8,7 @@ Content-Type: application/json
   "effect": "FutureEffect",
   "implementation": "Akka",
   "tapirVersion": "1.0.0-RC2",
-  "documentationAdded": true
+  "addDocumentation": true
 }
 
 ###

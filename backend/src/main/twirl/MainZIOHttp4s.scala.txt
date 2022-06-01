@@ -1,6 +1,6 @@
 @(
 groupId: String,
-documentationAdded: Boolean
+addDocumentation: Boolean
 )
 package @groupId
 
@@ -15,7 +15,7 @@ object Main extends ZIOAppDefault {
 
   override def run: ZIO[Any with ZIOAppArgs with Scope, Any, Any] = {
 
-    val routes = ZHttp4sServerInterpreter().from(ApiDefinitions.helloServerEndpoint@if(documentationAdded) { :: ApiDefinitions.docEndpoints}).toRoutes
+    val routes = ZHttp4sServerInterpreter().from(ApiDefinitions.helloServerEndpoint@if(addDocumentation) { :: ApiDefinitions.docEndpoints}).toRoutes
 
     BlazeServerBuilder[Task]
       .withExecutionContext(runtime.runtimeConfig.executor.asExecutionContext)

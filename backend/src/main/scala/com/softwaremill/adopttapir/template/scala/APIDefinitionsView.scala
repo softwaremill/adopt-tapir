@@ -11,7 +11,7 @@ object APIDefinitionsView {
   }
 
   def getDocEndpoints(starterDetails: StarterDetails): PlainLogicWithImports = {
-    if (starterDetails.documentationAdded) {
+    if (starterDetails.addDocumentation) {
       DocumentationEndpoint.prepareDocEndpoints(starterDetails.projectName, starterDetails.serverEffect)
     } else
       PlainLogicWithImports.empty

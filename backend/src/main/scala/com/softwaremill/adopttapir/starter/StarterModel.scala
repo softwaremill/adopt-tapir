@@ -6,7 +6,7 @@ case class StarterDetails(
     serverEffect: ServerEffect,
     serverImplementation: ServerImplementation,
     tapirVersion: String,
-    documentationAdded: Boolean
+    addDocumentation: Boolean
 )
 
 object StarterDetails {

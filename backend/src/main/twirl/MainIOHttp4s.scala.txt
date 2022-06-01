@@ -1,6 +1,6 @@
 @(
 groupId: String,
-documentationAdded: Boolean
+addDocumentation: Boolean
 )
 package @groupId
 
@@ -14,7 +14,7 @@ import scala.io.StdIn
 object Main extends IOApp {
 
   override def run(args: List[String]): IO[ExitCode] = {
-    val routes = Http4sServerInterpreter[IO]().toRoutes(ApiDefinitions.helloServerEndpoint@if(documentationAdded) { :: ApiDefinitions.docEndpoints})
+    val routes = Http4sServerInterpreter[IO]().toRoutes(ApiDefinitions.helloServerEndpoint@if(addDocumentation) { :: ApiDefinitions.docEndpoints})
 
     BlazeServerBuilder[IO]
       .bindHttp(8080, "localhost")

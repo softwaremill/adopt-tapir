@@ -9,7 +9,7 @@ case class StarterRequest(
     effect: EffectRequest,
     implementation: ServerImplementationRequest,
     tapirVersion: String,
-    documentationAdded: Boolean
+    addDocumentation: Boolean
 )
 
 object StarterRequest {}
