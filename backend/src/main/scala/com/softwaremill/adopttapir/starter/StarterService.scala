@@ -34,8 +34,8 @@ class StarterService(
       template.getBuildSbt(starterDetails),
       template.getBuildProperties,
       template.getMain(starterDetails),
-      template.getApiDefinitions(starterDetails),
-      template.getApiSpecDefinitions(starterDetails)
+      template.getEndpoints(starterDetails),
+      template.getEndpointsSpec(starterDetails)
     )
   }
 

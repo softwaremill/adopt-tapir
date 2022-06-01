@@ -16,7 +16,7 @@ object Main {
   def main(args: Array[String]): Unit = {
     implicit val actorSystem: ActorSystem = ActorSystem()
 
-    val route = AkkaHttpServerInterpreter().toRoute(ApiDefinitions.helloServerEndpoint@if(addDocumentation) { :: ApiDefinitions.docEndpoints})
+    val route = AkkaHttpServerInterpreter().toRoute(Endpoints.helloServerEndpoint@if(addDocumentation) { :: Endpoints.docEndpoints})
 
     val bindingFuture = Http()
       .newServerAt("localhost", 8080)

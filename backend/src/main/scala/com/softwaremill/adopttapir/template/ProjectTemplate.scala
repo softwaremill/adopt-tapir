@@ -3,7 +3,7 @@ package com.softwaremill.adopttapir.template
 import com.softwaremill.adopttapir.starter.{StarterConfig, StarterDetails}
 import com.softwaremill.adopttapir.template.sbt.BuildSbtView
 import com.softwaremill.adopttapir.template.sbt.Dependency.ScalaDependency
-import com.softwaremill.adopttapir.template.scala.{APIDefinitionsSpecView, APIDefinitionsView, MainView}
+import com.softwaremill.adopttapir.template.scala.{EndpointsSpecView, EndpointsView, MainView}
 
 case class GeneratedFile(
     relativePath: String,
@@ -13,7 +13,7 @@ case class GeneratedFile(
 /** Every method represent one of generated file. As template mechanism Twirl library were used. Which have some crucial limitations for
   * more advanced logic. That's why it is passed to Twirl templates through simple String by using `*View` objects.
   *
-  * As an example see @see [[APIDefinitionsView]]
+  * As an example see @see [[EndpointsView]]
   */
 class ProjectTemplate(config: StarterConfig) {
 
@@ -58,33 +58,33 @@ class ProjectTemplate(config: StarterConfig) {
     )
   }
 
-  def getApiDefinitions(starterDetails: StarterDetails): GeneratedFile = {
+  def getEndpoints(starterDetails: StarterDetails): GeneratedFile = {
     val groupId = starterDetails.groupId
 
-    val helloServerEndpoint = APIDefinitionsView.getHelloServerEndpoint(starterDetails)
-    val docEndpoints = APIDefinitionsView.getDocEndpoints(starterDetails)
+    val helloServerEndpoint = EndpointsView.getHelloServerEndpoint(starterDetails)
+    val docEndpoints = EndpointsView.getDocEndpoints(starterDetails)
 
     GeneratedFile(
-      pathUnderPackage("src/main/scala", groupId, "ApiDefinitions.scala"),
+      pathUnderPackage("src/main/scala", groupId, "Endpoints.scala"),
       txt
-        .ApiDefinitions(
+        .Endpoints(
           starterDetails,
-          helloServerEndpoint.additionalImports ++ docEndpoints.additionalImports,
-          helloServerEndpoint.logic,
-          docEndpoints.logic
+          helloServerEndpoint.imports ++ docEndpoints.imports,
+          helloServerEndpoint.body,
+          docEndpoints.body
         )
         .toString()
     )
   }
 
-  def getApiSpecDefinitions(starterDetails: StarterDetails): GeneratedFile = {
+  def getEndpointsSpec(starterDetails: StarterDetails): GeneratedFile = {
     val groupId = starterDetails.groupId
 
-    val helloServerStub = APIDefinitionsSpecView.getHelloServerStub(starterDetails)
+    val helloServerStub = EndpointsSpecView.getHelloServerStub(starterDetails)
 
     GeneratedFile(
-      pathUnderPackage("src/test/scala", groupId, "ApiDefinitionsSpec.scala"),
-      txt.ApiDefinitionsSpec(starterDetails, helloServerStub.additionalImports, helloServerStub.logic).toString()
+      pathUnderPackage("src/test/scala", groupId, "EndpointsSpec.scala"),
+      txt.EndpointsSpec(starterDetails, helloServerStub.imports, helloServerStub.body).toString()
     )
   }
 

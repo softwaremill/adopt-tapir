@@ -12,7 +12,7 @@ import zio.{Scope, ZIO, ZIOAppArgs, ZIOAppDefault}
 object Main extends ZIOAppDefault {
 
   override def run: ZIO[Any with ZIOAppArgs with Scope, Any, Any] = {
-    val app: HttpApp[Any, Throwable] = ZioHttpInterpreter().toHttp(ApiDefinitions.helloServerEndpoint@if(addDocumentation) { :: ApiDefinitions.docEndpoints})
+    val app: HttpApp[Any, Throwable] = ZioHttpInterpreter().toHttp(Endpoints.helloServerEndpoint@if(addDocumentation) { :: Endpoints.docEndpoints})
 
     Server.start(8080, app).exitCode
   }

@@ -2,24 +2,24 @@ package com.softwaremill.adopttapir.template.scala
 
 import com.softwaremill.adopttapir.starter.{ServerEffect, StarterDetails}
 
-object APIDefinitionsView {
+object EndpointsView {
 
-  def getHelloServerEndpoint(starterDetails: StarterDetails): PlainLogicWithImports = starterDetails.serverEffect match {
+  def getHelloServerEndpoint(starterDetails: StarterDetails): Code = starterDetails.serverEffect match {
     case ServerEffect.FutureEffect => HelloServerEndpoint.future
     case ServerEffect.IOEffect     => HelloServerEndpoint.io
     case ServerEffect.ZIOEffect    => HelloServerEndpoint.zio
   }
 
-  def getDocEndpoints(starterDetails: StarterDetails): PlainLogicWithImports = {
+  def getDocEndpoints(starterDetails: StarterDetails): Code = {
     if (starterDetails.addDocumentation) {
       DocumentationEndpoint.prepareDocEndpoints(starterDetails.projectName, starterDetails.serverEffect)
     } else
-      PlainLogicWithImports.empty
+      Code.empty
   }
 
   private object HelloServerEndpoint {
 
-    val future: PlainLogicWithImports = PlainLogicWithImports(
+    val future: Code = Code(
       """  val helloServerEndpoint: Full[Unit, Unit, User, Unit, String, Any, Future] = helloEndpoint.serverLogic(user =>
         |    Future.successful {
         |      s"Hello ${user.name}".asRight[Unit]
@@ -32,7 +32,7 @@ object APIDefinitionsView {
       )
     )
 
-    val io: PlainLogicWithImports = PlainLogicWithImports(
+    val io: Code = Code(
       """  val helloServerEndpoint: Full[Unit, Unit, User, Unit, String, Any, IO] = helloEndpoint.serverLogic(user =>
         |    IO.pure {
         |      s"Hello ${user.name}".asRight[Unit]
@@ -45,7 +45,7 @@ object APIDefinitionsView {
       )
     )
 
-    val zio: PlainLogicWithImports = PlainLogicWithImports(
+    val zio: Code = Code(
       """  val helloServerEndpoint: ZServerEndpoint[Any, Any] = helloEndpoint.zServerLogic(user =>
         |    ZIO.succeed {
         |      s"Hello ${user.name}"
@@ -61,10 +61,10 @@ object APIDefinitionsView {
 
   private object DocumentationEndpoint {
 
-    def prepareDocEndpoints(projectName: String, serverEffect: ServerEffect): PlainLogicWithImports = {
+    def prepareDocEndpoints(projectName: String, serverEffect: ServerEffect): Code = {
       val endpoints: List[String] = List("helloEndpoint")
 
-      PlainLogicWithImports(prepareCode(projectName, serverEffect, endpoints), prepareImports(serverEffect))
+      Code(prepareCode(projectName, serverEffect, endpoints), prepareImports(serverEffect))
     }
 
     private def prepareCode(projectName: String, serverEffect: ServerEffect, endpoints: List[String]): String = {

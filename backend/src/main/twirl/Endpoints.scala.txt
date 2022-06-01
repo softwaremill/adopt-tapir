@@ -10,7 +10,7 @@ import sttp.tapir.{PublicEndpoint, endpoint, query, stringBody}
 @for(additionalImport <- additionalImports) {
 @{additionalImport.asScalaImport}}
 
-object ApiDefinitions {
+object Endpoints {
   case class User(name: String) extends AnyVal
 
   val helloEndpoint: PublicEndpoint[User, Unit, String, Any] = endpoint.get

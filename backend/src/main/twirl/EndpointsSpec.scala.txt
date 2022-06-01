@@ -4,7 +4,7 @@ additionalImports: List[com.softwaremill.adopttapir.template.scala.Import],
 backendStub: String)
 package @{starterDetails.groupId}
 
-import @{starterDetails.groupId}.ApiDefinitions._
+import @{starterDetails.groupId}.Endpoints._
 import org.scalatest.EitherValues
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -14,7 +14,7 @@ import sttp.tapir.server.stub.TapirStubInterpreter
 @for(additionalImport <- additionalImports) {
 @{additionalImport.asScalaImport()}}
 
-class ApiDefinitionsSpec extends AnyFlatSpec with Matchers with EitherValues{
+class EndpointsSpec extends AnyFlatSpec with Matchers with EitherValues{
 
   it should "work" in {
     // given
