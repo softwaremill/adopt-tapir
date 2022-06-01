@@ -34,7 +34,10 @@ class ProjectTemplate(config: StarterConfig) {
           ScalaDependency("com.softwaremill.sttp.tapir", "tapir-core", tapirVersion),
           ScalaDependency("com.softwaremill.sttp.tapir", "tapir-sttp-stub-server", tapirVersion)
         ),
-        docDependencies = Nil
+        docDependencies =
+          if (starterDetails.documentationAdded)
+            List(ScalaDependency("com.softwaremill.sttp.tapir", "tapir-swagger-ui-bundle", tapirVersion))
+          else Nil
       )
       .toString()
 
@@ -59,10 +62,18 @@ class ProjectTemplate(config: StarterConfig) {
     val groupId = starterDetails.groupId
 
     val helloServerEndpoint = APIDefinitionsView.getHelloServerEndpoint(starterDetails)
+    val docEndpoints = APIDefinitionsView.getDocEndpoints(starterDetails)
 
     GeneratedFile(
       pathUnderPackage("src/main/scala", groupId, "ApiDefinitions.scala"),
-      txt.ApiDefinitions(starterDetails, helloServerEndpoint.additionalImports, helloServerEndpoint.logic).toString()
+      txt
+        .ApiDefinitions(
+          starterDetails,
+          helloServerEndpoint.additionalImports ++ docEndpoints.additionalImports,
+          helloServerEndpoint.logic,
+          docEndpoints.logic
+        )
+        .toString()
     )
   }
 

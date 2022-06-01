@@ -1,4 +1,7 @@
-@(groupId: String)
+@(
+groupId: String,
+documentationAdded: Boolean
+)
 package @groupId
 
 import cats.effect.{ExitCode, IO, IOApp}
@@ -11,7 +14,7 @@ import scala.io.StdIn
 object Main extends IOApp {
 
   override def run(args: List[String]): IO[ExitCode] = {
-    val routes = Http4sServerInterpreter[IO]().toRoutes(List(ApiDefinitions.helloServerEndpoint))
+    val routes = Http4sServerInterpreter[IO]().toRoutes(ApiDefinitions.helloServerEndpoint@if(documentationAdded) { :: ApiDefinitions.docEndpoints})
 
     BlazeServerBuilder[IO]
       .bindHttp(8080, "localhost")

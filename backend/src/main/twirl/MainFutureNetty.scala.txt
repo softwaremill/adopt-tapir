@@ -1,4 +1,7 @@
-@(groupId: String)
+@(
+groupId: String,
+documentationAdded: Boolean
+)
 package @groupId
 
 import sttp.tapir.server.netty.NettyFutureServer
@@ -12,7 +15,7 @@ object Main {
 
   def main(args: Array[String]): Unit = {
     val program = for {
-      binding <- NettyFutureServer().port(8080).addEndpoints(List(ApiDefinitions.helloServerEndpoint)).start()
+      binding <- NettyFutureServer().port(8080).addEndpoints(@if(documentationAdded) {ApiDefinitions.helloServerEndpoint :: ApiDefinitions.docEndpoints} else {List(ApiDefinitions.helloServerEndpoint)}).start()
       _ <- Future(StdIn.readLine())
       stop <- binding.stop()
     } yield stop

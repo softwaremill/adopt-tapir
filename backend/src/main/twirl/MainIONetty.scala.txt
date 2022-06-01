@@ -1,4 +1,7 @@
-@(groupId: String)
+@(
+groupId: String,
+documentationAdded: Boolean
+)
 package @groupId
 
 import cats.effect.{ExitCode, IO, IOApp}
@@ -16,7 +19,7 @@ object Main extends IOApp {
           bind <- server
             .port(8080)
             .host("localhost")
-            .addEndpoints(List(ApiDefinitions.helloServerEndpoint))
+            .addEndpoints(@if(documentationAdded) {ApiDefinitions.helloServerEndpoint :: ApiDefinitions.docEndpoints} else {List(ApiDefinitions.helloServerEndpoint)})
             .start()
           _ <- IO(StdIn.readLine())
           _ <- bind.stop()

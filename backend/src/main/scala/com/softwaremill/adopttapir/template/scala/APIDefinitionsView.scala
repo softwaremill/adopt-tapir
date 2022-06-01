@@ -10,6 +10,13 @@ object APIDefinitionsView {
     case ServerEffect.ZIOEffect    => HelloServerEndpoint.zio
   }
 
+  def getDocEndpoints(starterDetails: StarterDetails): PlainLogicWithImports = {
+    if (starterDetails.documentationAdded) {
+      DocumentationEndpoint.prepareDocEndpoints(starterDetails.projectName, starterDetails.serverEffect)
+    } else
+      PlainLogicWithImports.empty
+  }
+
   private object HelloServerEndpoint {
 
     val future: PlainLogicWithImports = PlainLogicWithImports(
@@ -50,5 +57,33 @@ object APIDefinitionsView {
         Import("zio.ZIO")
       )
     )
+  }
+
+  private object DocumentationEndpoint {
+
+    def prepareDocEndpoints(projectName: String, serverEffect: ServerEffect): PlainLogicWithImports = {
+      val endpoints: List[String] = List("helloEndpoint")
+
+      PlainLogicWithImports(prepareCode(projectName, serverEffect, endpoints), prepareImports(serverEffect))
+    }
+
+    private def prepareCode(projectName: String, serverEffect: ServerEffect, endpoints: List[String]): String = {
+      val effectStr = serverEffect match {
+        case ServerEffect.FutureEffect => ("ServerEndpoint[Any, Future]", "Future")
+        case ServerEffect.IOEffect     => ("ServerEndpoint[Any, IO]", "IO")
+        case ServerEffect.ZIOEffect    => ("ZServerEndpoint[Any, Any]", "Task")
+      }
+      s"""  val docEndpoints: List[${effectStr._1}] = SwaggerInterpreter().fromEndpoints[${effectStr._2}](List(${endpoints.mkString(
+          ","
+        )}), "${projectName}", "1.0.0")""".stripMargin
+    }
+
+    def prepareImports(serverEffect: ServerEffect): List[Import] = {
+      Import("sttp.tapir.swagger.bundle.SwaggerInterpreter") ::
+        (serverEffect match {
+          case ServerEffect.ZIOEffect => List(Import("zio.Task"))
+          case _                      => List(Import("sttp.tapir.server.ServerEndpoint"))
+        })
+    }
   }
 }

@@ -58,7 +58,7 @@ class FormValidatorSpec extends BaseTest {
   }
 
   it should "not raise a problem with Effect and Implementation" in {
-    val request = StarterRequest("project", "com.softwaremill", FutureEffect, Akka, tapirVersion = "1.0.0-RC1")
+    val request = StarterRequest("project", "com.softwaremill", FutureEffect, Akka, tapirVersion = "1.0.0-RC1", documentationAdded = true)
     val request1 = request.copy(effect = FutureEffect, implementation = Netty)
     val request2 = request.copy(effect = IOEffect, implementation = Netty)
     val request3 = request.copy(effect = IOEffect, implementation = Http4s)
@@ -70,42 +70,48 @@ class FormValidatorSpec extends BaseTest {
       request.groupId,
       ServerEffect.FutureEffect,
       ServerImplementation.Akka,
-      request.tapirVersion
+      request.tapirVersion,
+      documentationAdded = true
     )
     FormValidator.validate(request1).value shouldBe StarterDetails(
       request1.projectName,
       request1.groupId,
       ServerEffect.FutureEffect,
       ServerImplementation.Netty,
-      request1.tapirVersion
+      request1.tapirVersion,
+      documentationAdded = true
     )
     FormValidator.validate(request2).value shouldBe StarterDetails(
       request2.projectName,
       request2.groupId,
       ServerEffect.IOEffect,
       ServerImplementation.Netty,
-      request2.tapirVersion
+      request2.tapirVersion,
+      documentationAdded = true
     )
     FormValidator.validate(request3).value shouldBe StarterDetails(
       request3.projectName,
       request3.groupId,
       ServerEffect.IOEffect,
       ServerImplementation.Http4s,
-      request3.tapirVersion
+      request3.tapirVersion,
+      documentationAdded = true
     )
     FormValidator.validate(request4).value shouldBe StarterDetails(
       request4.projectName,
       request4.groupId,
       ServerEffect.ZIOEffect,
       ServerImplementation.Http4s,
-      request4.tapirVersion
+      request4.tapirVersion,
+      documentationAdded = true
     )
     FormValidator.validate(request5).value shouldBe StarterDetails(
       request5.projectName,
       request5.groupId,
       ServerEffect.ZIOEffect,
       ServerImplementation.ZIOHttp,
-      request5.tapirVersion
+      request5.tapirVersion,
+      documentationAdded = true
     )
   }
 }
