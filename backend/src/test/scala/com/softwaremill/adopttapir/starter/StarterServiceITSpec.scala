@@ -19,9 +19,7 @@ class StarterServiceITSpec extends BaseTest {
     val starterDetails =
       StarterDetails("projectName", "com.softwaremill", FutureEffect, Akka, defaultTapirVersion, addDocumentation = false)
 
-    checkZipped(service.generateZipFile(starterDetails)) { tempDir =>
-      os.proc("sbt", ";compile ;test").call(cwd = os.Path(tempDir)).exitCode shouldBe 0
-    }
+    sbtCompileTest(service.generateZipFile(starterDetails))
   }
 
   it should "return zip file containing working sbt folder with Future Netty implementation" in {
@@ -30,9 +28,7 @@ class StarterServiceITSpec extends BaseTest {
     val starterDetails =
       StarterDetails("projectName", "com.softwaremill", FutureEffect, Netty, defaultTapirVersion, addDocumentation = false)
 
-    checkZipped(service.generateZipFile(starterDetails)) { tempDir =>
-      os.proc("sbt", ";compile ;test").call(cwd = os.Path(tempDir)).exitCode shouldBe 0
-    }
+    sbtCompileTest(service.generateZipFile(starterDetails))
   }
 
   it should "return zip file containing working sbt folder with IO Http4s implementation" in {
@@ -41,9 +37,7 @@ class StarterServiceITSpec extends BaseTest {
     val starterDetails =
       StarterDetails("projectName", "com.softwaremill", IOEffect, Http4s, defaultTapirVersion, addDocumentation = false)
 
-    checkZipped(service.generateZipFile(starterDetails)) { tempDir =>
-      os.proc("sbt", ";compile ;test").call(cwd = os.Path(tempDir)).exitCode shouldBe 0
-    }
+    sbtCompileTest(service.generateZipFile(starterDetails))
   }
 
   it should "return zip file containing working sbt folder with IO Netty implementation" in {
@@ -51,9 +45,7 @@ class StarterServiceITSpec extends BaseTest {
 
     val starterDetails = StarterDetails("projectName", "com.softwaremill", IOEffect, Netty, defaultTapirVersion, addDocumentation = false)
 
-    checkZipped(service.generateZipFile(starterDetails)) { tempDir =>
-      os.proc("sbt", ";compile ;test").call(cwd = os.Path(tempDir)).exitCode shouldBe 0
-    }
+    sbtCompileTest(service.generateZipFile(starterDetails))
   }
 
   it should "return zip file containing working sbt folder with ZIO Http4s implementation" in {
@@ -62,9 +54,7 @@ class StarterServiceITSpec extends BaseTest {
     val starterDetails =
       StarterDetails("projectName", "com.softwaremill", ZIOEffect, Http4s, defaultTapirVersion, addDocumentation = false)
 
-    checkZipped(service.generateZipFile(starterDetails)) { tempDir =>
-      os.proc("sbt", ";compile ;test").call(cwd = os.Path(tempDir)).exitCode shouldBe 0
-    }
+    sbtCompileTest(service.generateZipFile(starterDetails))
   }
 
   it should "return zip file containing working sbt folder with ZIO ZIOHttp implementation" in {
@@ -73,9 +63,7 @@ class StarterServiceITSpec extends BaseTest {
     val starterDetails =
       StarterDetails("projectName", "com.softwaremill", ZIOEffect, ZIOHttp, defaultTapirVersion, addDocumentation = false)
 
-    checkZipped(service.generateZipFile(starterDetails)) { tempDir =>
-      os.proc("sbt", ";compile ;test").call(cwd = os.Path(tempDir)).exitCode shouldBe 0
-    }
+    sbtCompileTest(service.generateZipFile(starterDetails))
   }
 
   it should "return zip file containing working sbt folder with Future Akka implementation with doc endpoint" in {
@@ -84,9 +72,7 @@ class StarterServiceITSpec extends BaseTest {
     val starterDetails =
       StarterDetails("projectName", "com.softwaremill", FutureEffect, Akka, defaultTapirVersion, addDocumentation = true)
 
-    checkZipped(service.generateZipFile(starterDetails)) { tempDir =>
-      os.proc("sbt", ";compile ;test").call(cwd = os.Path(tempDir)).exitCode shouldBe 0
-    }
+    sbtCompileTest(service.generateZipFile(starterDetails))
   }
 
   it should "return zip file containing working sbt folder with Future Netty implementation with doc endpoint" in {
@@ -95,9 +81,7 @@ class StarterServiceITSpec extends BaseTest {
     val starterDetails =
       StarterDetails("projectName", "com.softwaremill", FutureEffect, Netty, defaultTapirVersion, addDocumentation = true)
 
-    checkZipped(service.generateZipFile(starterDetails)) { tempDir =>
-      os.proc("sbt", ";compile ;test").call(cwd = os.Path(tempDir)).exitCode shouldBe 0
-    }
+    sbtCompileTest(service.generateZipFile(starterDetails))
   }
 
   it should "return zip file containing working sbt folder with IO Http4s implementation with doc endpoint" in {
@@ -105,9 +89,7 @@ class StarterServiceITSpec extends BaseTest {
 
     val starterDetails = StarterDetails("projectName", "com.softwaremill", IOEffect, Http4s, defaultTapirVersion, addDocumentation = true)
 
-    checkZipped(service.generateZipFile(starterDetails)) { tempDir =>
-      os.proc("sbt", ";compile ;test").call(cwd = os.Path(tempDir)).exitCode shouldBe 0
-    }
+    sbtCompileTest(service.generateZipFile(starterDetails))
   }
 
   it should "return zip file containing working sbt folder with IO Netty implementation with doc endpoint" in {
@@ -115,9 +97,7 @@ class StarterServiceITSpec extends BaseTest {
 
     val starterDetails = StarterDetails("projectName", "com.softwaremill", IOEffect, Netty, defaultTapirVersion, addDocumentation = true)
 
-    checkZipped(service.generateZipFile(starterDetails)) { tempDir =>
-      os.proc("sbt", ";compile ;test").call(cwd = os.Path(tempDir)).exitCode shouldBe 0
-    }
+    sbtCompileTest(service.generateZipFile(starterDetails))
   }
 
   it should "return zip file containing working sbt folder with ZIO Http4s implementation with doc endpoint" in {
@@ -126,9 +106,7 @@ class StarterServiceITSpec extends BaseTest {
     val starterDetails =
       StarterDetails("projectName", "com.softwaremill", ZIOEffect, Http4s, defaultTapirVersion, addDocumentation = true)
 
-    checkZipped(service.generateZipFile(starterDetails)) { tempDir =>
-      os.proc("sbt", ";compile ;test").call(cwd = os.Path(tempDir)).exitCode shouldBe 0
-    }
+    sbtCompileTest(service.generateZipFile(starterDetails))
   }
 
   it should "return zip file containing working sbt folder with ZIO ZIOHttp implementation with doc endpoint" in {
@@ -137,9 +115,7 @@ class StarterServiceITSpec extends BaseTest {
     val starterDetails =
       StarterDetails("projectName", "com.softwaremill", ZIOEffect, ZIOHttp, defaultTapirVersion, addDocumentation = true)
 
-    checkZipped(service.generateZipFile(starterDetails)) { tempDir =>
-      os.proc("sbt", ";compile ;test").call(cwd = os.Path(tempDir)).exitCode shouldBe 0
-    }
+    sbtCompileTest(service.generateZipFile(starterDetails))
   }
 
   private def createStarterService = {
@@ -147,7 +123,7 @@ class StarterServiceITSpec extends BaseTest {
     new StarterService(config, new ProjectTemplate(config))
   }
 
-  private def checkZipped[A](file: IO[File])(examineDirFn: File => A): Unit = {
+  private def sbtCompileTest(file: IO[File]): Unit = {
     IO.blocking(BFile.newTemporaryDirectory("sbtTesting"))
       .bracket { tempDir =>
         for {
@@ -156,7 +132,7 @@ class StarterServiceITSpec extends BaseTest {
             zipFile.unzipTo(tempDir)
             zipFile.delete()
           }
-          _ <- IO.blocking(examineDirFn(tempDir.toJava))
+          _ <- IO.blocking(os.proc("sbt", ";compile ;test").call(cwd = os.Path((tempDir.toJava))).exitCode shouldBe 0)
 
         } yield zipFile
 

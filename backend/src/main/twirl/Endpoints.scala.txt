@@ -20,4 +20,6 @@ object Endpoints {
 
 @helloEndpointServer
 @docEndpoints
+
+  val all = List(helloServerEndpoint) @if(docEndpoints.nonEmpty){++ docEndpoints}
 }

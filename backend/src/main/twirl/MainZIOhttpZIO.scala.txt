@@ -1,7 +1,4 @@
-@(
-groupId: String,
-addDocumentation: Boolean
-)
+@(groupId: String)
 package @groupId
 
 import sttp.tapir.server.ziohttp.ZioHttpInterpreter
@@ -12,7 +9,7 @@ import zio.{Scope, ZIO, ZIOAppArgs, ZIOAppDefault}
 object Main extends ZIOAppDefault {
 
   override def run: ZIO[Any with ZIOAppArgs with Scope, Any, Any] = {
-    val app: HttpApp[Any, Throwable] = ZioHttpInterpreter().toHttp(Endpoints.helloServerEndpoint@if(addDocumentation) { :: Endpoints.docEndpoints})
+    val app: HttpApp[Any, Throwable] = ZioHttpInterpreter().toHttp(Endpoints.all)
 
     Server.start(8080, app).exitCode
   }
