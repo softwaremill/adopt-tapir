@@ -5,7 +5,7 @@ helloEndpointServer: String,
 docEndpoints: String)
 package @{starterDetails.groupId}
 
-import sttp.tapir.server.ServerEndpoint.Full
+import sttp.tapir.server.ServerEndpoint
 import sttp.tapir.{PublicEndpoint, endpoint, query, stringBody}
 @for(additionalImport <- additionalImports) {
 @{additionalImport.asScalaImport}}

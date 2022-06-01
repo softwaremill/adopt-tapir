@@ -2,7 +2,6 @@ package com.softwaremill.adopttapir.template
 
 import com.softwaremill.adopttapir.starter.{StarterConfig, StarterDetails}
 import com.softwaremill.adopttapir.template.sbt.BuildSbtView
-import com.softwaremill.adopttapir.template.sbt.Dependency.ScalaDependency
 import com.softwaremill.adopttapir.template.scala.{EndpointsSpecView, EndpointsView, MainView}
 
 case class GeneratedFile(
@@ -19,25 +18,13 @@ class ProjectTemplate(config: StarterConfig) {
 
   def getBuildSbt(starterDetails: StarterDetails): GeneratedFile = {
 
-    val tapirVersion = starterDetails.tapirVersion
-
     val content = txt
       .sbtBuild(
         starterDetails.projectName,
         starterDetails.groupId,
         config.scalaVersion,
-        httpDependencies = BuildSbtView.getHttpDependencies(starterDetails),
-        monitoringDependencies = Nil,
-        jsonDependencies = Nil,
-        baseDependencies = List(
-          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-sttp-client", tapirVersion),
-          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-core", tapirVersion),
-          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-sttp-stub-server", tapirVersion)
-        ),
-        docDependencies =
-          if (starterDetails.addDocumentation)
-            List(ScalaDependency("com.softwaremill.sttp.tapir", "tapir-swagger-ui-bundle", tapirVersion))
-          else Nil
+        starterDetails.tapirVersion,
+        (BuildSbtView.getDependencies _).andThen(BuildSbtView.format)(starterDetails)
       )
       .toString()
 
