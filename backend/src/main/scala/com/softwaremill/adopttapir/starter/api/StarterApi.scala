@@ -12,9 +12,9 @@ import io.circe.generic.auto._
 import sttp.capabilities.fs2.Fs2Streams
 import sttp.tapir.CodecFormat
 import sttp.tapir.generic.auto._
-import sttp.tapir.codec.enumeratum._
 
 class StarterApi(http: Http, starterService: StarterService) {
+
   import http._
 
   private val starterPath = "starter.zip"
@@ -39,6 +39,7 @@ class StarterApi(http: Http, starterService: StarterService) {
           .map(_.leftMap(http.failToResponseData))
       }
   }
+
   private def cleanResource(zippedFile: TapirFile): fs2.Stream[IO, Byte] = {
     Files[IO]
       .readAll(fs2.io.file.Path(zippedFile.getPath))

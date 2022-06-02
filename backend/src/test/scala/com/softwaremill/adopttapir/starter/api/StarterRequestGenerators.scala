@@ -8,6 +8,7 @@ import org.scalacheck.Gen
 object StarterRequestGenerators {
 
   def randomStarterRequest(): StarterRequest = randomStarterRequestGen().sample.get
+
   def randomStarterRequest(effect: EffectRequest, implementation: ServerImplementationRequest): StarterRequest =
     randomStarterRequest().copy(effect = effect, implementation = implementation)
 
@@ -17,6 +18,14 @@ object StarterRequestGenerators {
       groupId <- Gen.containerOf[List, String](Gen.alphaLowerStr).map(_.mkString("."))
       effect <- Gen.oneOf[EffectRequest](Seq(IOEffect, ZIOEffect, FutureEffect))
       serverImplementation <- Gen.oneOf[ServerImplementationRequest](Seq(Http4s, ZIOHttp, Akka, Netty))
-    } yield StarterRequest(projectName, groupId, effect, implementation = serverImplementation, StarterDetails.defaultTapirVersion)
+      documentationAdded <- Gen.oneOf(true, false)
+    } yield StarterRequest(
+      projectName,
+      groupId,
+      effect,
+      implementation = serverImplementation,
+      StarterDetails.defaultTapirVersion,
+      documentationAdded
+    )
   }
 }

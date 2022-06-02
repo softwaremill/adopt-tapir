@@ -11,7 +11,7 @@ import scala.io.StdIn
 object Main extends IOApp {
 
   override def run(args: List[String]): IO[ExitCode] = {
-    val routes = Http4sServerInterpreter[IO]().toRoutes(List(ApiDefinitions.helloServerEndpoint))
+    val routes = Http4sServerInterpreter[IO]().toRoutes(Endpoints.all)
 
     BlazeServerBuilder[IO]
       .bindHttp(8080, "localhost")

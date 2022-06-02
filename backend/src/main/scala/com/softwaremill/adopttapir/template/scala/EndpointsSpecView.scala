@@ -3,9 +3,9 @@ package com.softwaremill.adopttapir.template.scala
 import com.softwaremill.adopttapir.starter.ServerEffect.{FutureEffect, IOEffect, ZIOEffect}
 import com.softwaremill.adopttapir.starter.StarterDetails
 
-object APIDefinitionsSpecView {
+object EndpointsSpecView {
 
-  def getHelloServerStub(starterDetails: StarterDetails): PlainLogicWithImports =
+  def getHelloServerStub(starterDetails: StarterDetails): Code =
     starterDetails.serverEffect match {
       case FutureEffect => HelloWorldStub.future
       case IOEffect     => HelloWorldStub.io
@@ -13,7 +13,7 @@ object APIDefinitionsSpecView {
     }
 
   object HelloWorldStub {
-    val future: PlainLogicWithImports = PlainLogicWithImports(
+    val future: Code = Code(
       """val backendStub: SttpBackend[Future, Any] = TapirStubInterpreter(SttpBackendStub.asynchronousFuture)
         |  .whenServerEndpoint(helloServerEndpoint)
         |  .thenRunLogic()
@@ -24,9 +24,9 @@ object APIDefinitionsSpecView {
       )
     )
 
-    val io: PlainLogicWithImports = PlainLogicWithImports(
+    val io: Code = Code(
       """val backendStub: SttpBackend[IO, Any] = TapirStubInterpreter(SttpBackendStub.apply(new CatsMonadError[IO]()))
-        |  .whenServerEndpoint(ApiDefinitions.helloServerEndpoint)
+        |  .whenServerEndpoint(Endpoints.helloServerEndpoint)
         |  .thenRunLogic()
         |  .backend()""".stripMargin,
       List(
@@ -35,10 +35,10 @@ object APIDefinitionsSpecView {
       )
     )
 
-    val zio: PlainLogicWithImports = PlainLogicWithImports(
+    val zio: Code = Code(
       """val backendStub =
         |  TapirStubInterpreter(SttpBackendStub.apply(new RIOMonadError[Any]))
-        |    .whenServerEndpoint(ApiDefinitions.helloServerEndpoint)
+        |    .whenServerEndpoint(Endpoints.helloServerEndpoint)
         |    .thenRunLogic()
         |    .backend()""".stripMargin,
       List(

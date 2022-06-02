@@ -4,10 +4,11 @@ Content-Type: application/json
 
 {
   "projectName": "projectname",
-  "groupId": "softwaremill.com",
+  "groupId": "com.softwaremill",
   "effect": "FutureEffect",
   "implementation": "Akka",
-  "tapirVersion": "1.0.0-RC1"
+  "tapirVersion": "1.0.0-RC2",
+  "addDocumentation": true
 }
 
 ###

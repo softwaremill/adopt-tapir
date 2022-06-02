@@ -16,8 +16,9 @@ object FileOperation extends IOApp {
       "amadeusz",
       "com.mjoyit.experience",
       ServerEffect.ZIOEffect,
-      ServerImplementation.Http4s,
-      defaultTapirVersion
+      ServerImplementation.ZIOHttp,
+      defaultTapirVersion,
+      true
     )
 
     for {

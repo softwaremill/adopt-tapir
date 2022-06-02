@@ -12,7 +12,7 @@ object Main extends ZIOAppDefault {
 
   override def run: ZIO[Any with ZIOAppArgs with Scope, Any, Any] = {
 
-    val routes = ZHttp4sServerInterpreter().from(List(ApiDefinitions.helloServerEndpoint)).toRoutes
+    val routes = ZHttp4sServerInterpreter().from(Endpoints.all).toRoutes
 
     BlazeServerBuilder[Task]
       .withExecutionContext(runtime.runtimeConfig.executor.asExecutionContext)

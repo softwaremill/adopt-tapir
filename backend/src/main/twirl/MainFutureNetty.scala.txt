@@ -12,7 +12,7 @@ object Main {
 
   def main(args: Array[String]): Unit = {
     val program = for {
-      binding <- NettyFutureServer().port(8080).addEndpoints(List(ApiDefinitions.helloServerEndpoint)).start()
+      binding <- NettyFutureServer().port(8080).addEndpoints(Endpoints.all).start()
       _ <- Future(StdIn.readLine())
       stop <- binding.stop()
     } yield stop

@@ -1,7 +1,8 @@
 @(
 starterDetails: com.softwaremill.adopttapir.starter.StarterDetails,
 additionalImports: List[com.softwaremill.adopttapir.template.scala.Import],
-helloEndpointServer: String)
+helloEndpointServer: String,
+docEndpoints: String)
 package @{starterDetails.groupId}
 
 import sttp.tapir.server.ServerEndpoint.Full
@@ -9,7 +10,7 @@ import sttp.tapir.{PublicEndpoint, endpoint, query, stringBody}
 @for(additionalImport <- additionalImports) {
 @{additionalImport.asScalaImport}}
 
-object ApiDefinitions {
+object Endpoints {
   case class User(name: String) extends AnyVal
 
   val helloEndpoint: PublicEndpoint[User, Unit, String, Any] = endpoint.get
@@ -18,4 +19,7 @@ object ApiDefinitions {
     .out(stringBody)
 
 @helloEndpointServer
+@docEndpoints
+
+  val all = List(helloServerEndpoint) @if(docEndpoints.nonEmpty){++ docEndpoints}
 }
