@@ -1,6 +1,8 @@
 package com.softwaremill.adopttapir.template
 
+import better.files.Resource
 import com.softwaremill.adopttapir.starter.{StarterConfig, StarterDetails}
+import com.softwaremill.adopttapir.template.ProjectTemplate.ScalafmtConfigFile
 import com.softwaremill.adopttapir.template.sbt.BuildSbtView
 import com.softwaremill.adopttapir.template.scala.{EndpointsSpecView, EndpointsView, MainView}
 
@@ -75,6 +77,16 @@ class ProjectTemplate(config: StarterConfig) {
     )
   }
 
+  val pluginsSbt: GeneratedFile = GeneratedFile("project/plugins.sbt", templateResource("plugins.sbt"))
+
+  val scalafmtConf: GeneratedFile = GeneratedFile(ScalafmtConfigFile, templateResource("scalafmt.conf"))
+
   private def pathUnderPackage(prefixDir: String, groupId: String, fileName: String): String =
     prefixDir + "/" + groupId.split('.').mkString("/") + "/" + fileName
+
+  private def templateResource(fileName: String): String = Resource.getAsString(s"template/$fileName")
+}
+
+object ProjectTemplate {
+  val ScalafmtConfigFile = ".scalafmt.conf"
 }

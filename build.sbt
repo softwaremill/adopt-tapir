@@ -14,6 +14,7 @@ val sttpVersion = "3.6.1"
 val prometheusVersion = "0.15.0"
 val tapirVersion = "1.0.0-RC1"
 val macwireVersion = "2.5.7"
+val scalafmtVersion = "3.5.7"
 
 val httpDependencies = Seq(
   "org.http4s" %% "http4s-blaze-server" % http4sVersion,
@@ -73,13 +74,18 @@ val macwireDependencies = Seq(
   "com.softwaremill.macwire" %% "macrosautocats" % macwireVersion
 ).map(_ % Provided)
 
+val scalafmtStandaloneDependencies = Seq(
+  "org.scalameta" %% "scalafmt-dynamic" % scalafmtVersion
+)
+
 val unitTestingStack = Seq(
   "org.scalatest" %% "scalatest" % "3.2.12" % Test,
   "org.scalacheck" %% "scalacheck" % "1.16.0" % Test,
   "com.lihaoyi" %% "os-lib" % "0.8.1" % Test
 )
 
-val commonDependencies = baseDependencies ++ unitTestingStack ++ loggingDependencies ++ configDependencies ++ fileDependencies
+val commonDependencies =
+  baseDependencies ++ unitTestingStack ++ loggingDependencies ++ configDependencies ++ fileDependencies ++ scalafmtStandaloneDependencies
 
 lazy val commonSettings = commonSmlBuildSettings ++ Seq(
   organization := "com.softwaremill.adopttapir",
