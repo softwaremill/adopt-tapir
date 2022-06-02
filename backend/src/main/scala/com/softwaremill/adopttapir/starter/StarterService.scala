@@ -35,7 +35,9 @@ class StarterService(
       template.getBuildProperties,
       template.getMain(starterDetails),
       template.getEndpoints(starterDetails),
-      template.getEndpointsSpec(starterDetails)
+      template.getEndpointsSpec(starterDetails),
+      template.pluginsSbt,
+      template.scalafmtConf
     )
   }
 
