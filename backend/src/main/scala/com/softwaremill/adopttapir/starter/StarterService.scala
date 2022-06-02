@@ -22,6 +22,7 @@ class StarterService(
           for {
             _ <- logger.debug("created temp dir: " + tempDir.toString)
             _ <- storeFiles(tempDir, filesToCreate)
+            _ <- FormatScalaFiles(tempDir)
             dir <- zipDirectory(tempDir)
           } yield dir
         }(release = tempDir => if (config.deleteTempFolder) deleteRecursively(tempDir) else IO.unit)
