@@ -2,53 +2,19 @@
 name: String,
 groupId: String,
 scalaVersion: String,
-httpDependencies: List[com.softwaremill.adopttapir.template.sbt.Dependency],
-monitoringDependencies: List[com.softwaremill.adopttapir.template.sbt.Dependency],
-jsonDependencies: List[com.softwaremill.adopttapir.template.sbt.Dependency],
-baseDependencies: List[com.softwaremill.adopttapir.template.sbt.Dependency],
-docDependencies: List[com.softwaremill.adopttapir.template.sbt.Dependency]
+tapirVersion: String,
+dependencies: String
 )
-val httpDependencies = Seq(@for(dependency <- httpDependencies) {
-  @{dependency.asSbtDependency},}
-)
-@if(monitoringDependencies.nonEmpty) {
-val monitoringDependencies = Seq(@for(dependency <- monitoringDependencies) {
-  @{dependency.asSbtDependency},}
-)}
-@if(jsonDependencies.nonEmpty) {
-val jsonDependencies = Seq(@for(dependency <- jsonDependencies) {
-  @{dependency.asSbtDependency},}
-)}
-@if(baseDependencies.nonEmpty) {
-val baseDependencies = Seq(@for(dependency <- baseDependencies) {
-  @{dependency.asSbtDependency},}
-)}
-@if(docDependencies.nonEmpty) {
-val docDependencies = Seq(@for(dependency <- docDependencies) {
-  @{dependency.asSbtDependency},}
-)}
-val loggingDependencies = Seq(
-  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.4",
-  "ch.qos.logback" % "logback-classic" % "1.2.11"
-)
-val configDependencies = Seq(
-  "com.github.pureconfig" %% "pureconfig" % "0.17.1"
-)
-val unitTestingStack = Seq(
-  "org.scalatest" %% "scalatest" % "3.2.12" % Test
-)
+val tapirVersion = "@tapirVersion"
 
-val commonDependencies = unitTestingStack ++ loggingDependencies ++ configDependencies @if(baseDependencies.nonEmpty) {++ baseDependencies}
-val backendDependencies = httpDependencies @if(jsonDependencies.nonEmpty) {++ jsonDependencies} @if(docDependencies.nonEmpty) {++ docDependencies} @if(monitoringDependencies.nonEmpty) {++ monitoringDependencies}
-
-lazy val commonSettings = Seq(
-  name := "@name",
-  version := "0.1.0-SNAPSHOT",
-  organization := "@groupId",
-  scalaVersion := "@scalaVersion",
-  libraryDependencies ++= commonDependencies ++ backendDependencies
+lazy val rootProject = (project in file(".")).settings(
+  Seq(
+    name := "@name",
+    version := "0.1.0-SNAPSHOT",
+    organization := "@groupId",
+    scalaVersion := "@scalaVersion",
+    libraryDependencies ++= Seq(
+@dependencies
+    )
+  )
 )
-
-
-lazy val rootProject = (project in file("."))
-  .settings(commonSettings)

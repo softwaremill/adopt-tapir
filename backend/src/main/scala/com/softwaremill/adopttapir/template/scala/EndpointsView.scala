@@ -20,36 +20,30 @@ object EndpointsView {
   private object HelloServerEndpoint {
 
     val future: Code = Code(
-      """  val helloServerEndpoint: Full[Unit, Unit, User, Unit, String, Any, Future] = helloEndpoint.serverLogic(user =>
-        |    Future.successful {
-        |      s"Hello ${user.name}".asRight[Unit]
-        |    }
+      """  val helloServerEndpoint: ServerEndpoint[Any, Future] = helloEndpoint.serverLogicSuccess(user =>
+        |    Future.successful(s"Hello ${user.name}")
         |  )""".stripMargin,
       List(
         Import("scala.concurrent.ExecutionContext.Implicits.global"),
         Import("scala.concurrent.Future"),
-        Import("cats.implicits.catsSyntaxEitherId")
+        Import("sttp.tapir.server.ServerEndpoint")
       )
     )
 
     val io: Code = Code(
-      """  val helloServerEndpoint: Full[Unit, Unit, User, Unit, String, Any, IO] = helloEndpoint.serverLogic(user =>
-        |    IO.pure {
-        |      s"Hello ${user.name}".asRight[Unit]
-        |    }
+      """  val helloServerEndpoint: ServerEndpoint[Any, IO] = helloEndpoint.serverLogicSuccess(user =>
+        |    IO.pure(s"Hello ${user.name}")
         |  )
         |""".stripMargin,
       List(
         Import("cats.effect.IO"),
-        Import("cats.implicits.catsSyntaxEitherId")
+        Import("sttp.tapir.server.ServerEndpoint")
       )
     )
 
     val zio: Code = Code(
       """  val helloServerEndpoint: ZServerEndpoint[Any, Any] = helloEndpoint.zServerLogic(user =>
-        |    ZIO.succeed {
-        |      s"Hello ${user.name}"
-        |    }
+        |    ZIO.succeed(s"Hello ${user.name}")
         |  )
         |""".stripMargin,
       List(
@@ -82,7 +76,7 @@ object EndpointsView {
       Import("sttp.tapir.swagger.bundle.SwaggerInterpreter") ::
         (serverEffect match {
           case ServerEffect.ZIOEffect => List(Import("zio.Task"))
-          case _                      => List(Import("sttp.tapir.server.ServerEndpoint"))
+          case _                      => Nil
         })
     }
   }
