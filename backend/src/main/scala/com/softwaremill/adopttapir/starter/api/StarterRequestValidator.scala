@@ -30,7 +30,7 @@ object RequestValidation {
   }
 
   case class GroupIdShouldFollowJavaPackageConvention(input: String) extends RequestValidation {
-    override val errMessage: String = s"GroupId: `$input` should follow Java package convention"
+    override val errMessage: String = s"GroupId: `$input` should follow Java package convention and be smaller than 256 characters"
   }
 
   abstract class EffectValidation {
@@ -90,7 +90,7 @@ sealed trait FormValidator {
   }
 
   private def validateGroupId(groupId: String): ValidationResult[String] = {
-    if (groupId.matches("^[a-z][a-z0-9_]*(\\.[a-z0-9_]+)+[0-9a-z_]$")) groupId.validNec
+    if (groupId.matches("(?:^[a-z][a-z0-9_]*|[a-z][a-z0-9_]*\\.[a-z0-9_]+)+$") && groupId.length <= 256) groupId.validNec
     else GroupIdShouldFollowJavaPackageConvention(groupId).invalidNec
   }
 
