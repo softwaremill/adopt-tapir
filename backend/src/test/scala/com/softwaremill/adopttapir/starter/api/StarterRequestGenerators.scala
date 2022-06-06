@@ -15,7 +15,9 @@ object StarterRequestGenerators {
   private def randomStarterRequestGen(): Gen[StarterRequest] = {
     for {
       projectName <- Gen.alphaLowerStr suchThat (str => str == str.toLowerCase)
-      groupId <- Gen.containerOf[List, String](Gen.alphaLowerStr).map(_.mkString(".")) suchThat (str => str.length <= 256 && str.nonEmpty)
+      groupId <- Gen.containerOf[List, String](Gen.alphaLowerStr suchThat (str => str.nonEmpty)).map(_.mkString(".")) suchThat (str =>
+        str.length <= 256 && str.nonEmpty
+      )
       effect <- Gen.oneOf[EffectRequest](Seq(IOEffect, ZIOEffect, FutureEffect))
       serverImplementation <- Gen.oneOf[ServerImplementationRequest](Seq(Http4s, ZIOHttp, Akka, Netty))
       documentationAdded <- Gen.oneOf(true, false)

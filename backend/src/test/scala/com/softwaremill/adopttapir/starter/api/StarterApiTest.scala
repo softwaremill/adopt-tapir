@@ -29,6 +29,8 @@ class StarterApiTest extends BaseTest with TestDependencies {
     checkStreamZipContent(response.body) { unpackedDir =>
       unpackedDir.listRecursively.toList.filter(_.isRegularFile).map(_.path.getFileName.toString) should contain theSameElementsAs List(
         "build.properties",
+        "plugins.sbt",
+        ".scalafmt.conf",
         "build.sbt",
         "EndpointsSpec.scala",
         "Endpoints.scala",

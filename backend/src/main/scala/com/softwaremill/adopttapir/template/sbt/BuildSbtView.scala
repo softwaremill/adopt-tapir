@@ -58,7 +58,10 @@ object BuildSbtView {
     )
 
     def ioNetty(): List[ScalaDependency] =
-      ScalaDependency("com.softwaremill.sttp.tapir", "tapir-cats", Dependency.constantTapirVersion) :: netty()
+      List(
+        ScalaDependency("com.softwaremill.sttp.tapir", "tapir-cats", Dependency.constantTapirVersion),
+        ScalaDependency("com.softwaremill.sttp.tapir", "tapir-netty-server-cats", Dependency.constantTapirVersion)
+      )
 
     def http4s(): List[ScalaDependency] = List(
       ScalaDependency("com.softwaremill.sttp.tapir", "tapir-http4s-server", Dependency.constantTapirVersion),
@@ -66,7 +69,7 @@ object BuildSbtView {
     )
 
     def http4sZIO(): List[ScalaDependency] =
-      ScalaDependency("com.softwaremill.sttp.tapir", "tapir-zio-http4s-server", Dependency.constantTapirVersion) :: http4s()
+      ScalaDependency("com.softwaremill.sttp.tapir", "tapir-http4s-server-zio", Dependency.constantTapirVersion) :: http4s()
 
     def ZIOHttp(): List[ScalaDependency] = List(
       ScalaDependency("com.softwaremill.sttp.tapir", "tapir-zio-http-server", Dependency.constantTapirVersion)

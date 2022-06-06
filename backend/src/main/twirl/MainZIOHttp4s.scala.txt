@@ -15,7 +15,7 @@ object Main extends ZIOAppDefault {
     val routes = ZHttp4sServerInterpreter().from(Endpoints.all).toRoutes
 
     BlazeServerBuilder[Task]
-      .withExecutionContext(runtime.runtimeConfig.executor.asExecutionContext)
+      .withExecutionContext(runtime.executor.asExecutionContext)
       .bindHttp(8080, "localhost")
       .withHttpApp(Router("/" -> (routes)).orNotFound)
       .resource
