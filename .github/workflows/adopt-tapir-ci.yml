@@ -3,9 +3,8 @@ name: Adopt Tapir CI
 on:
   pull_request:
   push:
-    tags: [v*]
     branches:
-      - main
+      - deployment #TODO change to main before merging
     paths-ignore:
       - "helm/**"
   release:
@@ -42,3 +41,38 @@ jobs:
       - name: Run tests
         id: run-tests
         run: sbt test
+
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/deployment' #TODO change to main before merging
+    needs: [ verify ]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check-out repository
+        id: repo-checkout
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 11
+        id: jdk-setup
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      - name: Cache SBT
+        id: cache-sbt
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.sbt
+            ~/.ivy2/cache
+            ~/.coursier
+          key: ${{ runner.os }}-sbt-${{ hashFiles('**/build.sbt') }}
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Publish docker image
+        run: sbt backend/docker:publish
