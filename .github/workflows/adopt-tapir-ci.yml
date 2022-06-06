@@ -4,7 +4,7 @@ on:
   pull_request:
   push:
     branches:
-      - deployment #TODO change to main before merging
+      - main
     paths-ignore:
       - "helm/**"
   release:
@@ -43,7 +43,7 @@ jobs:
         run: sbt test
 
   deploy:
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/deployment' #TODO change to main before merging
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: [ verify ]
     runs-on: ubuntu-latest
 

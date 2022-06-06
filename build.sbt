@@ -123,6 +123,8 @@ lazy val fatJarSettings = Seq(
   }
 )
 
+def versionWithTimestamp(version: String): String = s"$version-${System.currentTimeMillis()}"
+
 lazy val dockerSettings = Seq(
   dockerExposedPorts := Seq(8080),
   dockerBaseImage := "adoptopenjdk:11.0.5_10-jdk-hotspot",
@@ -130,7 +132,9 @@ lazy val dockerSettings = Seq(
   dockerUsername := Some("softwaremill"),
   dockerUpdateLatest := true,
   Docker / publishLocal := (Docker / publishLocal).value,
-  Docker / version := git.gitDescribedVersion.value.getOrElse(git.formattedShaVersion.value.getOrElse("latest")),
+  Docker / version := git.gitDescribedVersion.value
+    .map(versionWithTimestamp)
+    .getOrElse(git.formattedShaVersion.value.map(versionWithTimestamp).getOrElse("latest")),
   git.uncommittedSignifier := Some("dirty"),
   ThisBuild / git.formattedShaVersion := {
     val base = git.baseVersion.?.value
