@@ -3,6 +3,7 @@ package com.softwaremill.adopttapir.starter.api
 import better.files.File
 import cats.effect.{IO, Resource}
 import com.softwaremill.adopttapir.http.Error_OUT
+import com.softwaremill.adopttapir.starter.StarterDetails.defaultTapirVersion
 import com.softwaremill.adopttapir.starter.api.EffectRequest.FutureEffect
 import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Akka, ZIOHttp}
 import com.softwaremill.adopttapir.starter.api.StarterApiTest.{mainPath, validRequest}
@@ -123,7 +124,7 @@ object StarterApiTest {
     groupId = "com.softwaremill",
     effect = FutureEffect,
     implementation = ServerImplementationRequest.Akka,
-    "1.0.0-RC2",
+    defaultTapirVersion,
     addDocumentation = true
   )
 
