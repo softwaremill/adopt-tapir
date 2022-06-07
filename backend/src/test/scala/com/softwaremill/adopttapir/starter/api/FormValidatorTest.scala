@@ -6,7 +6,7 @@ import com.softwaremill.adopttapir.starter.api.StarterRequestGenerators.randomSt
 import com.softwaremill.adopttapir.starter.{ServerEffect, ServerImplementation, StarterDetails}
 import com.softwaremill.adopttapir.test.BaseTest
 
-class FormValidatorSpec extends BaseTest {
+class FormValidatorTest extends BaseTest {
 
   "FormValidator" should "raise a problem with project name" in {
     // given

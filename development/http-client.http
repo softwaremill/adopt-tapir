@@ -7,7 +7,7 @@ Content-Type: application/json
   "groupId": "com.softwaremill",
   "effect": "FutureEffect",
   "implementation": "Akka",
-  "tapirVersion": "1.0.0-RC2",
+  "tapirVersion": "1.0.0-RC3",
   "addDocumentation": true
 }
 
