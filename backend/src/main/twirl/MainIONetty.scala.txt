@@ -2,7 +2,7 @@
 package @groupId
 
 import cats.effect.{ExitCode, IO, IOApp}
-import sttp.tapir.server.netty.NettyCatsServer
+import sttp.tapir.server.netty.cats.NettyCatsServer
 
 import scala.io.StdIn
 

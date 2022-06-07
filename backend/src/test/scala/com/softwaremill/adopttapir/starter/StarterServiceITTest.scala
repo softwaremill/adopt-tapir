@@ -11,7 +11,7 @@ import com.softwaremill.adopttapir.test.BaseTest
 
 import java.io.File
 
-class StarterServiceITSpec extends BaseTest {
+class StarterServiceITTest extends BaseTest {
 
   it should "return zip file containing working sbt folder with Future Akka implementation" in {
     val service = createStarterService
