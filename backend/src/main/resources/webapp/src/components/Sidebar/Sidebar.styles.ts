@@ -6,12 +6,23 @@ export const useStyles = makeStyles()(theme => ({
     flexDirection: 'column',
     justifyContent: 'space-between',
     alignItems: 'center',
-    width: '100%',
     height: '100%',
     backgroundColor: theme.palette.secondary.main,
     borderRightWidth: '2px',
     borderRightStyle: 'solid',
     borderRightColor: theme.palette.primary.main,
+  },
+
+  figureWrapper: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+
+  infoText: {
+    padding: theme.spacing(3),
+    textAlign: 'center',
+    color: theme.palette.neutral.main,
   },
 
   figure: {
