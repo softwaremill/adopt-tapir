@@ -16,7 +16,9 @@ import {
   JSON_INPUT_OUTPUT_OPTIONS,
 } from './ConfigurationForm.consts';
 
-// allow effect implementation based on effect type value
+// TODO:
+// error handling
+// make effect implementation options to be selectable based on effect type chosen
 
 export const ConfigurationForm: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -35,9 +37,9 @@ export const ConfigurationForm: React.FC = () => {
         body: JSON.stringify(formData),
       });
       const blob = await response.blob();
+      const file = URL.createObjectURL(blob);
 
       // download starter zip file
-      const file = URL.createObjectURL(blob);
       window.location.assign(file);
     } catch (error) {
       // catch me if you can

@@ -1,12 +1,11 @@
 import { CssBaseline, Grid, Paper, Box } from '@mui/material';
 import { Sidebar } from 'components/Sidebar';
 import { ConfigurationForm } from 'components/ConfigurationForm';
+import { Footer } from 'components/Footer';
 
 import { useStyles } from './App.styles';
 
 // TODO LIST:
-// social icons in sidebar - github, tapir docs, software mill www?
-// below configuration add a footer with software mill logo, copyrights and credits
 // add react router
 // create a separate path that can be embedded in an iframe
 // feature flags to hide some specific fields
@@ -31,6 +30,9 @@ export const App: React.FC = () => {
             <Paper variant="outlined" sx={{ padding: 3 }}>
               <ConfigurationForm />
             </Paper>
+          </Box>
+          <Box className={classes.footerWrapper}>
+            <Footer />
           </Box>
         </Grid>
       </Grid>

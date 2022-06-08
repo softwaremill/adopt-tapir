@@ -74,10 +74,3 @@ export const configurationSchema = yup
     // jsonInputOutput: yup.mixed(),
   })
   .required();
-
-// "projectName": "projectname",
-// "groupId": "com.softwaremill",
-// "effect": "FutureEffect",
-// "implementation": "Akka",
-// "tapirVersion": "1.0.0-RC2",
-// "addDocumentation": true
