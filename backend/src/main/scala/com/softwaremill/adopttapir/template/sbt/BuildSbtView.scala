@@ -2,7 +2,7 @@ package com.softwaremill.adopttapir.template.sbt
 
 import com.softwaremill.adopttapir.starter.ServerEffect._
 import com.softwaremill.adopttapir.starter.ServerImplementation.{Akka, Http4s, Netty, ZIOHttp}
-import com.softwaremill.adopttapir.starter.StarterDetails
+import com.softwaremill.adopttapir.starter.{JsonImplementation, StarterDetails}
 import com.softwaremill.adopttapir.template.sbt.Dependency.{JavaDependency, ScalaDependency, ScalaTestDependency}
 
 object BuildSbtView {
@@ -19,7 +19,23 @@ object BuildSbtView {
   def getDependencies(starterDetails: StarterDetails): List[Dependency] = {
     val httpDependencies = BuildSbtView.getHttpDependencies(starterDetails)
     val monitoringDependencies = Nil
-    val jsonDependencies = Nil
+    val jsonDependencies = starterDetails.jsonImplementation match {
+      case JsonImplementation.WithoutJson => Nil
+      case JsonImplementation.Circe =>
+        List(
+          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-json-circe", Dependency.constantTapirVersion)
+        )
+      case JsonImplementation.Jsoniter =>
+        List(
+          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-jsoniter-scala", Dependency.constantTapirVersion),
+          ScalaDependency("com.github.plokhotnyuk.jsoniter-scala", "jsoniter-scala-core", "2.13.26"),
+          ScalaDependency("com.github.plokhotnyuk.jsoniter-scala", "jsoniter-scala-macros", "2.13.26")
+        )
+      case JsonImplementation.ZIOJson =>
+        List(
+          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-json-zio", Dependency.constantTapirVersion)
+        )
+    }
     val docsDepenedencies =
       if (starterDetails.addDocumentation)
         List(ScalaDependency("com.softwaremill.sttp.tapir", "tapir-swagger-ui-bundle", Dependency.constantTapirVersion))

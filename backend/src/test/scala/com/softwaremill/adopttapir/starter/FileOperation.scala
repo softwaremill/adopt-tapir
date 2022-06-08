@@ -16,10 +16,10 @@ object FileOperation extends IOApp {
       "amadeusz",
       "com.mjoyit.experience",
       ServerEffect.ZIOEffect,
-      ServerImplementation.ZIOHttp,
+      ServerImplementation.Http4s,
       defaultTapirVersion,
       true,
-      JsonImplementation.WithoutJson
+      JsonImplementation.Circe
     )
 
     for {

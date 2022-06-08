@@ -1,6 +1,5 @@
 package com.softwaremill.adopttapir.example
 
-import sttp.tapir.Codec.JsonCodec
 import sttp.tapir.server.ServerEndpoint
 import sttp.tapir.swagger.bundle.SwaggerInterpreter
 import sttp.tapir.ztapir._
@@ -24,6 +23,7 @@ object ApiDefinitionsZIOJson {
 
   // zio-json imports
 
+  import sttp.tapir.Codec.JsonCodec
   import sttp.tapir.generic.auto._
   import sttp.tapir.json.zio._
   import zio.json.{DeriveJsonDecoder, DeriveJsonEncoder}

@@ -52,15 +52,17 @@ class ProjectTemplate(config: StarterConfig) {
 
     val helloServerEndpoint = EndpointsView.getHelloServerEndpoint(starterDetails)
     val docEndpoints = EndpointsView.getDocEndpoints(starterDetails)
+    val jsonEndpoint = EndpointsView.getJsonOutModel(starterDetails)
 
     GeneratedFile(
       pathUnderPackage("src/main/scala", groupId, "Endpoints.scala"),
       txt
         .Endpoints(
           starterDetails,
-          helloServerEndpoint.imports ++ docEndpoints.imports,
+          helloServerEndpoint.imports ++ docEndpoints.imports ++ jsonEndpoint.imports,
           helloServerEndpoint.body,
-          docEndpoints.body
+          docEndpoints.body,
+          jsonEndpoint = jsonEndpoint.body
         )
         .toString()
     )

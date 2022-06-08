@@ -57,8 +57,7 @@ object ApiDefinitionsJsoniter {
     }
   )
 
-  val booksListingServerEndpointFuture: ServerEndpoint[Any, Future] =
-    booksListing.serverLogicSuccess(_ => Future.successful(books.get()))
+  val booksListingServerEndpointFuture: ServerEndpoint[Any, Future] = booksListing.serverLogicSuccess(_ => Future.successful(books.get()))
 
   import cats.effect.IO
 
