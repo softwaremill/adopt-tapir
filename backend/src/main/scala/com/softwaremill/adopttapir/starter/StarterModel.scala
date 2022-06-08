@@ -6,7 +6,8 @@ case class StarterDetails(
     serverEffect: ServerEffect,
     serverImplementation: ServerImplementation,
     tapirVersion: String,
-    addDocumentation: Boolean
+    addDocumentation: Boolean,
+    jsonImplementation: JsonImplementation
 )
 
 object StarterDetails {
@@ -27,4 +28,13 @@ object ServerEffect {
   case object FutureEffect extends ServerEffect
   case object IOEffect extends ServerEffect
   case object ZIOEffect extends ServerEffect
+}
+
+sealed trait JsonImplementation
+
+object JsonImplementation {
+  case object WithoutJson extends JsonImplementation
+  case object Circe extends JsonImplementation
+  case object Jsoniter extends JsonImplementation
+  case object ZIOJson extends JsonImplementation
 }

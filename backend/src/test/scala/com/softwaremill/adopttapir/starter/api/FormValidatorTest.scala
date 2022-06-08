@@ -1,5 +1,6 @@
 package com.softwaremill.adopttapir.starter.api
 
+import com.softwaremill.adopttapir.starter.JsonImplementation.WithoutJson
 import com.softwaremill.adopttapir.starter.api.EffectRequest.{FutureEffect, IOEffect, ZIOEffect}
 import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Akka, Http4s, Netty, ZIOHttp}
 import com.softwaremill.adopttapir.starter.api.StarterRequestGenerators.randomStarterRequest
@@ -71,7 +72,8 @@ class FormValidatorTest extends BaseTest {
       ServerEffect.FutureEffect,
       ServerImplementation.Akka,
       request.tapirVersion,
-      addDocumentation = true
+      addDocumentation = true,
+      WithoutJson
     )
     FormValidator.validate(request1).value shouldBe StarterDetails(
       request1.projectName,
@@ -79,7 +81,8 @@ class FormValidatorTest extends BaseTest {
       ServerEffect.FutureEffect,
       ServerImplementation.Netty,
       request1.tapirVersion,
-      addDocumentation = true
+      addDocumentation = true,
+      WithoutJson
     )
     FormValidator.validate(request2).value shouldBe StarterDetails(
       request2.projectName,
@@ -87,7 +90,8 @@ class FormValidatorTest extends BaseTest {
       ServerEffect.IOEffect,
       ServerImplementation.Netty,
       request2.tapirVersion,
-      addDocumentation = true
+      addDocumentation = true,
+      WithoutJson
     )
     FormValidator.validate(request3).value shouldBe StarterDetails(
       request3.projectName,
@@ -95,7 +99,8 @@ class FormValidatorTest extends BaseTest {
       ServerEffect.IOEffect,
       ServerImplementation.Http4s,
       request3.tapirVersion,
-      addDocumentation = true
+      addDocumentation = true,
+      WithoutJson
     )
     FormValidator.validate(request4).value shouldBe StarterDetails(
       request4.projectName,
@@ -103,7 +108,8 @@ class FormValidatorTest extends BaseTest {
       ServerEffect.ZIOEffect,
       ServerImplementation.Http4s,
       request4.tapirVersion,
-      addDocumentation = true
+      addDocumentation = true,
+      WithoutJson
     )
     FormValidator.validate(request5).value shouldBe StarterDetails(
       request5.projectName,
@@ -111,7 +117,8 @@ class FormValidatorTest extends BaseTest {
       ServerEffect.ZIOEffect,
       ServerImplementation.ZIOHttp,
       request5.tapirVersion,
-      addDocumentation = true
+      addDocumentation = true,
+      WithoutJson
     )
   }
 }

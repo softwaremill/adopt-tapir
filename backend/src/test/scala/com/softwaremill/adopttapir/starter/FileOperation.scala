@@ -18,7 +18,8 @@ object FileOperation extends IOApp {
       ServerEffect.ZIOEffect,
       ServerImplementation.ZIOHttp,
       defaultTapirVersion,
-      true
+      true,
+      JsonImplementation.WithoutJson
     )
 
     for {

@@ -3,7 +3,6 @@ package com.softwaremill.adopttapir.starter.api
 import cats.data.ValidatedNec
 import cats.implicits.{catsSyntaxTuple4Semigroupal, catsSyntaxValidatedId, catsSyntaxValidatedIdBinCompat0}
 import com.softwaremill.adopttapir.Fail._
-import com.softwaremill.adopttapir.starter.StarterDetails
 import com.softwaremill.adopttapir.starter.api.EffectRequest.{FutureEffect, IOEffect, ZIOEffect}
 import com.softwaremill.adopttapir.starter.api.RequestValidation.{
   GroupIdShouldFollowJavaPackageConvention,
@@ -11,6 +10,7 @@ import com.softwaremill.adopttapir.starter.api.RequestValidation.{
   ProjectNameShouldMatchRegex
 }
 import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Akka, Http4s, Netty, ZIOHttp}
+import com.softwaremill.adopttapir.starter.{JsonImplementation, StarterDetails}
 
 sealed trait RequestValidation {
   def errMessage: String
@@ -68,7 +68,15 @@ sealed trait FormValidator {
       validateGroupId(r.groupId),
       validateEffectWithImplementation(r.effect, r.implementation)
     ).mapN { case (tapirVersion, projectName, groupId, (effect, serverImplementation)) =>
-      StarterDetails(projectName, groupId, effect.toModel, serverImplementation.toModel, tapirVersion, r.addDocumentation)
+      StarterDetails(
+        projectName,
+        groupId,
+        effect.toModel,
+        serverImplementation.toModel,
+        tapirVersion,
+        r.addDocumentation,
+        JsonImplementation.WithoutJson
+      )
     }.leftMap(errors => IncorrectInput(errors.toNonEmptyList.map(_.errMessage).toList.mkString(System.lineSeparator())))
       .toEither
 
