@@ -1,9 +1,10 @@
 @(
 starterDetails: com.softwaremill.adopttapir.starter.StarterDetails,
 additionalImports: List[com.softwaremill.adopttapir.template.scala.Import],
-backendStub: String)
+backendStub: String,
+unwrapper: String
+)
 package @{starterDetails.groupId}
-
 import @{starterDetails.groupId}.Endpoints._
 import org.scalatest.EitherValues
 import org.scalatest.flatspec.AnyFlatSpec
@@ -26,7 +27,8 @@ class EndpointsSpec extends AnyFlatSpec with Matchers with EitherValues{
       .send(backendStub)
 
     // then
-    response.map(_.body.value shouldBe "hello adam")
+    response.map(_.body.value shouldBe "Hello adam").unwrap
   }
 
+  @unwrapper
 }

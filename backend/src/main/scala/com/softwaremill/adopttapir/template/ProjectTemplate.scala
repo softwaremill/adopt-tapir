@@ -72,10 +72,11 @@ class ProjectTemplate(config: StarterConfig) {
     val groupId = starterDetails.groupId
 
     val helloServerStub = EndpointsSpecView.getHelloServerStub(starterDetails)
+    val unwrapper = EndpointsSpecView.Rich.prepareUnwrapper(starterDetails.serverEffect)
 
     GeneratedFile(
       pathUnderPackage("src/test/scala", groupId, "EndpointsSpec.scala"),
-      txt.EndpointsSpec(starterDetails, helloServerStub.imports, helloServerStub.body).toString()
+      txt.EndpointsSpec(starterDetails, helloServerStub.imports ++ unwrapper.imports, helloServerStub.body, unwrapper.body).toString()
     )
   }
 
