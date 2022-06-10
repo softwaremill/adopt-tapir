@@ -19,7 +19,25 @@ object BuildSbtView {
   def getDependencies(starterDetails: StarterDetails): List[Dependency] = {
     val httpDependencies = BuildSbtView.getHttpDependencies(starterDetails)
     val monitoringDependencies = Nil
-    val jsonDependencies = starterDetails.jsonImplementation match {
+    val jsonDependencies = getJsonDependencies(starterDetails)
+    val docsDepenedencies =
+      if (starterDetails.addDocumentation)
+        List(ScalaDependency("com.softwaremill.sttp.tapir", "tapir-swagger-ui-bundle", Dependency.constantTapirVersion))
+      else Nil
+    val baseDependencies = List(
+      ScalaDependency("com.typesafe.scala-logging", "scala-logging", "3.9.4"),
+      JavaDependency("ch.qos.logback", "logback-classic", "1.2.11")
+    )
+    val testDependencies = List(
+      ScalaTestDependency("com.softwaremill.sttp.tapir", "tapir-sttp-stub-server", Dependency.constantTapirVersion),
+      ScalaTestDependency("org.scalatest", "scalatest", "3.2.12")
+    ) ++ getJsonTestDependencies(starterDetails)
+
+    httpDependencies ++ docsDepenedencies ++ monitoringDependencies ++ jsonDependencies ++ baseDependencies ++ testDependencies
+  }
+
+  private def getJsonDependencies(starterDetails: StarterDetails) = {
+    starterDetails.jsonImplementation match {
       case JsonImplementation.WithoutJson => Nil
       case JsonImplementation.Circe =>
         List(
@@ -36,20 +54,15 @@ object BuildSbtView {
           ScalaDependency("com.softwaremill.sttp.tapir", "tapir-json-zio", Dependency.constantTapirVersion)
         )
     }
-    val docsDepenedencies =
-      if (starterDetails.addDocumentation)
-        List(ScalaDependency("com.softwaremill.sttp.tapir", "tapir-swagger-ui-bundle", Dependency.constantTapirVersion))
-      else Nil
-    val baseDependencies = List(
-      ScalaDependency("com.typesafe.scala-logging", "scala-logging", "3.9.4"),
-      JavaDependency("ch.qos.logback", "logback-classic", "1.2.11")
-    )
-    val testDependencies = List(
-      ScalaTestDependency("com.softwaremill.sttp.tapir", "tapir-sttp-stub-server", Dependency.constantTapirVersion),
-      ScalaTestDependency("org.scalatest", "scalatest", "3.2.12")
-    )
+  }
 
-    httpDependencies ++ docsDepenedencies ++ monitoringDependencies ++ jsonDependencies ++ baseDependencies ++ testDependencies
+  private def getJsonTestDependencies(starterDetails: StarterDetails) = {
+    starterDetails.jsonImplementation match {
+      case JsonImplementation.WithoutJson => Nil
+      case JsonImplementation.Circe       => List(ScalaTestDependency("com.softwaremill.sttp.client3", "circe", "3.6.2"))
+      case JsonImplementation.Jsoniter    => List(ScalaTestDependency("com.softwaremill.sttp.client3", "jsoniter", "3.6.2"))
+      case JsonImplementation.ZIOJson     => List(ScalaTestDependency("com.softwaremill.sttp.client3", "zio-json", "3.6.2"))
+    }
   }
 
   private def getHttpDependencies(starterDetails: StarterDetails): List[Dependency] = {

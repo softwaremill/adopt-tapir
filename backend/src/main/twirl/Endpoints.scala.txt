@@ -1,6 +1,6 @@
 @(
 starterDetails: com.softwaremill.adopttapir.starter.StarterDetails,
-additionalImports: List[com.softwaremill.adopttapir.template.scala.Import],
+additionalImports: Set[com.softwaremill.adopttapir.template.scala.Import],
 helloEndpointServer: String,
 docEndpoints: String,
 jsonEndpoint: String,
