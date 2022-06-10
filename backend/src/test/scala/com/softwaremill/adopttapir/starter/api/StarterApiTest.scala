@@ -5,14 +5,13 @@ import cats.effect.{IO, Resource}
 import com.softwaremill.adopttapir.http.Error_OUT
 import com.softwaremill.adopttapir.starter.StarterDetails.defaultTapirVersion
 import com.softwaremill.adopttapir.starter.api.EffectRequest.FutureEffect
+import com.softwaremill.adopttapir.starter.api.JsonImplementationRequest.Jsoniter
 import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Akka, ZIOHttp}
 import com.softwaremill.adopttapir.starter.api.StarterApiTest.{mainPath, validRequest}
 import com.softwaremill.adopttapir.test.Rich.RichIO
 import com.softwaremill.adopttapir.test.{BaseTest, TestDependencies}
 import fs2.io.file.Files
-import io.circe.generic.auto._
-import io.circe.parser
-import io.circe.syntax.EncoderOps
+import io.circe.jawn
 import org.scalatest.Assertion
 import sttp.client3.{HttpError, Response}
 
@@ -65,6 +64,8 @@ class StarterApiTest extends BaseTest with TestDependencies {
 
   }
 
+  import io.circe.generic.auto._
+
   it should "return request error with information about picking wrong implementation for an effect" in {
     // given
     val request = StarterRequestGenerators.randomStarterRequest().copy(effect = FutureEffect, implementation = ZIOHttp)
@@ -74,9 +75,9 @@ class StarterApiTest extends BaseTest with TestDependencies {
 
     // then
     ex.statusCode.code shouldBe 400
-    parser.parse(ex.body).value shouldBe Error_OUT(
+    jawn.decode[Error_OUT](ex.body).value.error should include(
       "Picked FutureEffect with ZIOHttp - Future effect will work only with Akka and Netty"
-    ).asJson
+    )
   }
 
   it should "return request error with information about wrong projectName " in {
@@ -89,9 +90,9 @@ class StarterApiTest extends BaseTest with TestDependencies {
 
     // then
     ex.statusCode.code shouldBe 400
-    parser.parse(ex.body).value shouldBe Error_OUT(
+    jawn.decode[Error_OUT](ex.body).value.error should include(
       "Project name: `Uppercase` should match regex: `[a-z0-9]+`"
-    ).asJson
+    )
   }
 
   def checkStreamZipContent(fileStream: fs2.Stream[IO, Byte])(assertionOnUnpackedDirFn: File => Assertion): Unit = {
@@ -125,7 +126,8 @@ object StarterApiTest {
     effect = FutureEffect,
     implementation = ServerImplementationRequest.Akka,
     defaultTapirVersion,
-    addDocumentation = true
+    addDocumentation = true,
+    json = Jsoniter
   )
 
   val mainPath = "src/main/scala"

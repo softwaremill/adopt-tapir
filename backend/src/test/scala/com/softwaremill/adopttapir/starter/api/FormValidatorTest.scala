@@ -2,6 +2,7 @@ package com.softwaremill.adopttapir.starter.api
 
 import com.softwaremill.adopttapir.starter.JsonImplementation.WithoutJson
 import com.softwaremill.adopttapir.starter.api.EffectRequest.{FutureEffect, IOEffect, ZIOEffect}
+import com.softwaremill.adopttapir.starter.api.JsonImplementationRequest.No
 import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Akka, Http4s, Netty, ZIOHttp}
 import com.softwaremill.adopttapir.starter.api.StarterRequestGenerators.randomStarterRequest
 import com.softwaremill.adopttapir.starter.{ServerEffect, ServerImplementation, StarterDetails}
@@ -43,6 +44,21 @@ class FormValidatorTest extends BaseTest {
     result.left.value.msg should include(s"Provided input: `$notValidTapirVersion` is not in semantic versioning notation")
   }
 
+  it should "raise a problem with picking ZIOJson for other effect than ZIO" in {
+    // given
+    val requestWithFutureEffect = randomStarterRequest().copy(json = JsonImplementationRequest.ZIOJson, effect = EffectRequest.FutureEffect)
+    val requestWithIOEffect = randomStarterRequest().copy(json = JsonImplementationRequest.ZIOJson, effect = EffectRequest.FutureEffect)
+
+    // when
+    val resultFuture = FormValidator.validate(requestWithFutureEffect)
+    val resultIO = FormValidator.validate(requestWithIOEffect)
+
+    // then
+    resultFuture.left.value.msg should include(s"ZIOJson will work only with ZIO effect")
+    resultIO.left.value.msg should include(s"ZIOJson will work only with ZIO effect")
+
+  }
+
   it should "raise a problem when effect will not match implementation" in {
     FormValidator.validate(randomStarterRequest(FutureEffect, ZIOHttp)).left.value.msg should
       include("Picked FutureEffect with ZIOHttp - Future effect will work only with Akka and Netty")
@@ -59,7 +75,7 @@ class FormValidatorTest extends BaseTest {
   }
 
   it should "not raise a problem with Effect and Implementation" in {
-    val request = StarterRequest("project", "com.softwaremill", FutureEffect, Akka, tapirVersion = "1.0.0-RC1", addDocumentation = true)
+    val request = StarterRequest("project", "com.softwaremill", FutureEffect, Akka, tapirVersion = "1.0.0-RC1", addDocumentation = true, No)
     val request1 = request.copy(effect = FutureEffect, implementation = Netty)
     val request2 = request.copy(effect = IOEffect, implementation = Netty)
     val request3 = request.copy(effect = IOEffect, implementation = Http4s)
