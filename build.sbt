@@ -22,12 +22,6 @@ val httpDependencies = Seq(
   "com.softwaremill.sttp.client3" %% "async-http-client-backend-fs2" % sttpVersion,
   "com.softwaremill.sttp.client3" %% "slf4j-backend" % sttpVersion,
   "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % tapirVersion,
-  "com.softwaremill.sttp.tapir" %% "tapir-sttp-stub-server" % tapirVersion,
-  "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % tapirVersion,
-  "com.softwaremill.sttp.tapir" %% "tapir-zio-http4s-server" % tapirVersion,
-  "com.softwaremill.sttp.tapir" %% "tapir-zio-http-server" % tapirVersion,
-  "com.softwaremill.sttp.tapir" %% "tapir-akka-http-server" % tapirVersion,
-  "com.softwaremill.sttp.tapir" %% "tapir-netty-server" % tapirVersion,
   "com.softwaremill.sttp.tapir" %% "tapir-sttp-stub-server" % tapirVersion
 )
 
@@ -45,13 +39,7 @@ val jsonDependencies = Seq(
   "com.softwaremill.sttp.tapir" %% "tapir-enumeratum" % tapirVersion,
   "com.beachape" %% "enumeratum-circe" % "1.7.0",
   "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % tapirVersion,
-  "com.softwaremill.sttp.client3" %% "circe" % sttpVersion,
-  // jsoniter
-  "com.softwaremill.sttp.tapir" %% "tapir-jsoniter-scala" % tapirVersion,
-  "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "2.13.26",
-  "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % "2.13.26",
-  // zio-json
-  "com.softwaremill.sttp.tapir" %% "tapir-json-zio" % tapirVersion
+  "com.softwaremill.sttp.client3" %% "circe" % sttpVersion
 )
 
 val loggingDependencies = Seq(
