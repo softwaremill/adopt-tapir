@@ -2,13 +2,16 @@ package com.softwaremill.adopttapir.template
 
 import better.files.Resource
 import com.softwaremill.adopttapir.starter.{StarterConfig, StarterDetails}
-import com.softwaremill.adopttapir.template.ProjectTemplate.{ScalafmtConfigFile, toSortedList}
+import com.softwaremill.adopttapir.template.ProjectTemplate.{ScalafmtConfigFile, sbtxFile, toSortedList}
 import com.softwaremill.adopttapir.template.sbt.BuildSbtView
 import com.softwaremill.adopttapir.template.scala.{EndpointsSpecView, EndpointsView, Import, MainView}
 
+import java.nio.file.attribute.PosixFilePermission
+
 case class GeneratedFile(
     relativePath: String,
-    content: String
+    content: String,
+    additionalPermissions: List[PosixFilePermission] = Nil
 )
 
 /** Every method represent one of generated file. As template mechanism Twirl library were used. Which have some crucial limitations for
@@ -99,6 +102,9 @@ class ProjectTemplate(config: StarterConfig) {
 
   val scalafmtConf: GeneratedFile = GeneratedFile(ScalafmtConfigFile, templateResource("scalafmt.conf"))
 
+  val sbtx: GeneratedFile =
+    GeneratedFile(sbtxFile, templateResource(sbtxFile), List(PosixFilePermission.GROUP_EXECUTE, PosixFilePermission.OWNER_EXECUTE))
+
   private def pathUnderPackage(prefixDir: String, groupId: String, fileName: String): String =
     prefixDir + "/" + groupId.split('.').mkString("/") + "/" + fileName
 
@@ -107,6 +113,7 @@ class ProjectTemplate(config: StarterConfig) {
 
 object ProjectTemplate {
   val ScalafmtConfigFile = ".scalafmt.conf"
+  val sbtxFile = "sbtx"
 
   def toSortedList(set: Set[Import]): List[Import] = set.toList.sortBy(_.fullName)
 }
