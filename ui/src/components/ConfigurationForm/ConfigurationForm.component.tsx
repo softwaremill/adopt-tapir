@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Box, Button, Typography, CircularProgress, Backdrop, Snackbar, Alert } from '@mui/material';
 import { useForm, FormProvider } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { StarterRequest } from 'api/starter';
+import { StarterRequest, JSONImplementation } from 'api/starter';
 import { FormTextField } from '../FormTextField';
 import { FormSelect } from '../FormSelect';
 import { FormRadioGroup } from '../FormRadioGroup';
@@ -13,7 +13,12 @@ import {
   EFFECT_TYPE_OPTIONS,
   ENDPOINTS_OPTIONS,
 } from './ConfigurationForm.consts';
-import { mapEffectTypeToEffectImplementation, getEffectImplementationOptions } from './ConfigurationForm.helpers';
+import {
+  mapEffectTypeToEffectImplementation,
+  mapEffectTypeToJSONImplementation,
+  getEffectImplementationOptions,
+  getJSONImplementationOptions,
+} from './ConfigurationForm.helpers';
 
 export const ConfigurationForm: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -23,13 +28,18 @@ export const ConfigurationForm: React.FC = () => {
   const form = useForm<StarterRequest>({
     mode: 'onBlur',
     resolver: yupResolver(starterValidationSchema),
+    defaultValues: {
+      tapirVersion: TAPIR_VERSION_OPTIONS[0].value,
+      addDocumentation: false,
+      json: JSONImplementation.No,
+    },
   });
 
-  const effectType = form.watch('effect');
-  const effectImplementation = form.watch('implementation');
+  const [effectType, effectImplementation, jsonImplementation] = form.watch(['effect', 'implementation', 'json']);
   const isEffectTypeSelected = Boolean(effectType);
 
   useEffect(() => {
+    // NOTE: reset effect implementation field value upon effect type change
     if (
       effectType &&
       effectImplementation &&
@@ -37,7 +47,16 @@ export const ConfigurationForm: React.FC = () => {
     ) {
       form.resetField('implementation');
     }
-  }, [effectType, effectImplementation, form]);
+
+    // NOTE: reset json field value upon effect type change
+    if (
+      effectType &&
+      jsonImplementation &&
+      !mapEffectTypeToJSONImplementation(effectType).includes(jsonImplementation)
+    ) {
+      form.resetField('json');
+    }
+  }, [effectType, effectImplementation, jsonImplementation, form]);
 
   const handleFormSubmit = async (formData: StarterRequest): Promise<void> => {
     try {
@@ -106,7 +125,6 @@ export const ConfigurationForm: React.FC = () => {
             name="tapirVersion"
             label="Tapir version"
             options={TAPIR_VERSION_OPTIONS}
-            defaultValue={TAPIR_VERSION_OPTIONS[0].value}
           />
 
           <FormSelect
@@ -128,7 +146,13 @@ export const ConfigurationForm: React.FC = () => {
             name="addDocumentation"
             label="Expose endpoint documentation using Swagger UI"
             options={ENDPOINTS_OPTIONS}
-            defaultValue={false}
+          />
+
+          <FormRadioGroup
+            className={classes.formEndpointsRow}
+            name="json"
+            label="Add JSON endpoint using"
+            options={getJSONImplementationOptions(effectType)}
           />
 
           <div className={cx(classes.actionsContainer, classes.formActionsRow)}>

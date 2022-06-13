@@ -1,21 +1,50 @@
 import * as yup from 'yup';
-import { EffectType, EffectImplementation } from 'api/starter';
+import { EffectType, EffectImplementation, JSONImplementation } from 'api/starter';
 import type { FormSelectOption } from '../FormSelect';
 import type { FormRadioOption } from '../FormRadioGroup';
 
-export const TAPIR_VERSION_OPTIONS: FormSelectOption[] = [
+export const TAPIR_VERSION_OPTIONS: FormSelectOption<string>[] = [
   {
     label: '1.0.0',
     value: '1.0.0-RC2',
   },
 ];
 
-export const EFFECT_TYPE_OPTIONS: FormSelectOption[] = Object.entries(EffectType).map(([key, value]) => ({
-  label: key,
-  value: value,
-}));
+export const EFFECT_TYPE_OPTIONS: FormSelectOption<EffectType>[] = [
+  {
+    label: 'Future',
+    value: EffectType.Future,
+  },
+  {
+    label: 'cats-effect',
+    value: EffectType.IO,
+  },
+  {
+    label: 'ZIO',
+    value: EffectType.ZIO,
+  },
+];
 
-export const ENDPOINTS_OPTIONS: FormRadioOption[] = [
+export const EFFECT_IMPLEMENTATIONS_OPTIONS: FormSelectOption<EffectImplementation>[] = [
+  {
+    label: 'Akka HTTP',
+    value: EffectImplementation.Akka,
+  },
+  {
+    label: 'Netty',
+    value: EffectImplementation.Netty,
+  },
+  {
+    label: 'http4s',
+    value: EffectImplementation.Http4s,
+  },
+  {
+    label: 'ZIO Http',
+    value: EffectImplementation.ZIOHttp,
+  },
+];
+
+export const ENDPOINTS_OPTIONS: FormRadioOption<boolean>[] = [
   {
     label: 'yes',
     value: true,
@@ -26,22 +55,22 @@ export const ENDPOINTS_OPTIONS: FormRadioOption[] = [
   },
 ];
 
-export const JSON_INPUT_OUTPUT_OPTIONS: FormRadioOption[] = [
+export const JSON_OUTPUT_OPTIONS: FormRadioOption<JSONImplementation>[] = [
+  {
+    label: "don't add",
+    value: JSONImplementation.No,
+  },
   {
     label: 'circe',
-    value: 'circe',
+    value: JSONImplementation.Circe,
   },
   {
     label: 'jsoniter',
-    value: 'jsoniter',
+    value: JSONImplementation.Jsoniter,
   },
   {
     label: 'zio-json',
-    value: 'zio-json',
-  },
-  {
-    label: 'no',
-    value: false, // check?
+    value: JSONImplementation.ZIOJson,
   },
 ];
 
@@ -75,5 +104,6 @@ export const starterValidationSchema = yup
       )
       .required('This field is required'),
     addDocumentation: yup.boolean().required('This field is required'),
+    json: yup.mixed().oneOf(Object.values(JSONImplementation)).required('This field is required'),
   })
   .required();
