@@ -1,6 +1,6 @@
 export enum EffectType {
   Future = 'FutureEffect',
-  IO = 'IOEffect',
+  'cats-effect' = 'IOEffect',
   ZIO = 'ZIOEffect',
 }
 

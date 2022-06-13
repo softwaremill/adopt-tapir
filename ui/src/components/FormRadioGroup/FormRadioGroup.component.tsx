@@ -14,7 +14,7 @@ interface FormRadioGroupProps {
   defaultValue?: FormRadioOption['value'];
 }
 
-// TODO: helper text?
+// NOTE: if radio group would need to show some error we would have to add a FormHelperText component here
 
 export const FormRadioGroup: React.FC<FormRadioGroupProps> = ({ className, name, label, options, defaultValue }) => {
   const { control } = useFormContext();
@@ -25,7 +25,7 @@ export const FormRadioGroup: React.FC<FormRadioGroupProps> = ({ className, name,
       control={control}
       defaultValue={defaultValue}
       render={({ field, fieldState }) => (
-        <FormControl className={className} error={Boolean(fieldState.error)}>
+        <FormControl className={className} error={Boolean(fieldState.error)} color="secondary" margin="normal">
           <FormLabel>{label}</FormLabel>
           <RadioGroup row {...field}>
             {options.map((option, index) => (

@@ -50,7 +50,7 @@ export const starterValidationSchema = yup
     projectName: yup
       .string()
       .strict()
-      .lowercase('Project name should be in lowercase')
+      .matches(/^[a-z0-9]+$/, 'Project name can consists of only lowercase characters and numbers')
       .required('This field is required'),
     groupId: yup
       .string()
@@ -59,8 +59,21 @@ export const starterValidationSchema = yup
       .max(256, 'GroupId should be smaller than 256 characters')
       .required('This field is required'),
     tapirVersion: yup.string().required('This field is required'),
-    effect: yup.mixed().oneOf(Object.values(EffectType)).required('This field is required'),
-    implementation: yup.mixed().oneOf(Object.values(EffectImplementation)).required('This field is required'),
+    effect: yup
+      .mixed()
+      .oneOf(
+        Object.values(EffectType),
+        `Effect type must be one of the following values: ${Object.keys(EffectType).join(', ')}`
+      )
+      .required('This field is required'),
+    implementation: yup
+      .mixed()
+      .oneOf(
+        Object.values(EffectImplementation),
+        /* eslint-disable no-template-curly-in-string */
+        'Server implementation must be one of the following values: ${values}'
+      )
+      .required('This field is required'),
     addDocumentation: yup.boolean().required('This field is required'),
   })
   .required();

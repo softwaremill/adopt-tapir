@@ -84,7 +84,7 @@ export const ConfigurationForm: React.FC = () => {
   return (
     <Box>
       <Typography variant="h3" component="h3" fontWeight={300} gutterBottom>
-        Generate tAPIr starter configuration
+        Generate tapir project
       </Typography>
       <FormProvider {...form}>
         <form className={classes.formContainer} noValidate onSubmit={form.handleSubmit(handleFormSubmit)}>
@@ -106,6 +106,7 @@ export const ConfigurationForm: React.FC = () => {
             name="tapirVersion"
             label="Tapir version"
             options={TAPIR_VERSION_OPTIONS}
+            defaultValue={TAPIR_VERSION_OPTIONS[0].value}
           />
 
           <FormSelect
@@ -117,7 +118,7 @@ export const ConfigurationForm: React.FC = () => {
           <FormSelect
             className={classes.formEffectsRow}
             name="implementation"
-            label="Effect implementation"
+            label="Server implementation"
             disabled={!isEffectTypeSelected}
             options={isEffectTypeSelected ? getEffectImplementationOptions(effectType) : []}
           />
@@ -125,22 +126,23 @@ export const ConfigurationForm: React.FC = () => {
           <FormRadioGroup
             className={classes.formEndpointsRow}
             name="addDocumentation"
-            label="Documentation endpoint"
+            label="Expose endpoint documentation using Swagger UI"
             options={ENDPOINTS_OPTIONS}
             defaultValue={false}
           />
 
           <div className={cx(classes.actionsContainer, classes.formActionsRow)}>
-            <Button variant="contained" color="secondary" size="medium" disableElevation onClick={handleFormReset}>
+            <Button variant="contained" color="secondary" size="medium" onClick={handleFormReset} disableElevation>
               Reset
             </Button>
 
-            <Button variant="contained" color="primary" size="medium" disableElevation type="submit">
+            <Button variant="contained" color="primary" size="medium" type="submit" disableElevation>
               Generate .zip
             </Button>
           </div>
         </form>
       </FormProvider>
+
       <Backdrop open={isLoading}>
         <CircularProgress />
       </Backdrop>

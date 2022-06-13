@@ -37,6 +37,7 @@ export const FormSelect: React.FC<FormSelectProps> = ({
           variant="outlined"
           size="small"
           margin="normal"
+          color="secondary"
           label={label}
           disabled={disabled}
           error={Boolean(fieldState.error)}

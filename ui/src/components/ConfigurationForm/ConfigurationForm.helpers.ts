@@ -3,7 +3,7 @@ import type { FormSelectOption } from '../FormSelect';
 
 const effectTypeImplementationMap: Record<EffectType, EffectImplementation[]> = {
   [EffectType.Future]: [EffectImplementation.Akka, EffectImplementation.Netty],
-  [EffectType.IO]: [EffectImplementation.Http4s, EffectImplementation.Netty],
+  [EffectType['cats-effect']]: [EffectImplementation.Http4s, EffectImplementation.Netty],
   [EffectType.ZIO]: [EffectImplementation.Http4s, EffectImplementation.ZIOHttp],
 };
 

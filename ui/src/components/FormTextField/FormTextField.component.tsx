@@ -30,6 +30,7 @@ export const FormTextField: React.FC<FormTextFieldProps> = ({
           variant="outlined"
           size="small"
           margin="normal"
+          color="secondary"
           label={label}
           placeholder={placeholder}
           error={Boolean(fieldState.error)}
