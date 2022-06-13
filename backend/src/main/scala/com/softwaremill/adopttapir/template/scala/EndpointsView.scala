@@ -23,13 +23,14 @@ object EndpointsView {
   }
 
   private object HelloServerEndpoint {
+    def bodyTemplate(serverKind: String, pureEffectFn: String): String =
+      s"""  val $helloServerEndpoint: $serverKind = $helloEndpoint.serverLogicSuccess(user =>
+         |    $pureEffectFn(s"Hello $${user.name}")
+         |  )""".stripMargin
 
     val future: Code = Code(
-      s"""  val $helloServerEndpoint: ServerEndpoint[Any, Future] = helloEndpoint.serverLogicSuccess(user =>
-         |    Future.successful(s"Hello $${user.name}")
-         |  )""".stripMargin,
+      bodyTemplate("ServerEndpoint[Any, Future]", "Future.successful"),
       Set(
-        Import("scala.concurrent.ExecutionContext.Implicits.global"),
         Import("scala.concurrent.Future"),
         Import("sttp.tapir._"),
         Import("sttp.tapir.server.ServerEndpoint")
@@ -37,10 +38,7 @@ object EndpointsView {
     )
 
     val io: Code = Code(
-      s"""  val $helloServerEndpoint: ServerEndpoint[Any, IO] = helloEndpoint.serverLogicSuccess(user =>
-         |    IO.pure(s"Hello $${user.name}")
-         |  )
-         |""".stripMargin,
+      bodyTemplate("ServerEndpoint[Any, IO]", "IO.pure"),
       Set(
         Import("cats.effect.IO"),
         Import("sttp.tapir._"),
@@ -49,10 +47,7 @@ object EndpointsView {
     )
 
     val zio: Code = Code(
-      s"""  val $helloServerEndpoint: ZServerEndpoint[Any, Any] = helloEndpoint.zServerLogic(user =>
-         |    ZIO.succeed(s"Hello $${user.name}")
-         |  )
-         |""".stripMargin,
+      bodyTemplate("ZServerEndpoint[Any, Any]", "ZIO.succeed"),
       Set(
         Import("sttp.tapir.ztapir._"),
         Import("zio.ZIO")
@@ -106,9 +101,10 @@ object EndpointsView {
             )
           )
         case JsonImplementation.Jsoniter =>
+          val codecs = "implicit val codecBooks: JsonValueCodec[Vector[Book]] = JsonCodecMaker.make"
+
           Code(
-            "implicit val codecBooks: JsonValueCodec[Vector[Book]] = JsonCodecMaker.make" +
-              System.lineSeparator() + prepareBookListing,
+            codecs + System.lineSeparator() + prepareBookListing,
             Set(
               Import("sttp.tapir.generic.auto._"),
               Import("sttp.tapir.json.jsoniter._"),
@@ -117,12 +113,14 @@ object EndpointsView {
             )
           )
         case JsonImplementation.ZIOJson =>
-          Code(
-            """  implicit val authorZioEncoder: zio.json.JsonEncoder[Author] = DeriveJsonEncoder.gen[Author]
+          val codecs =
+            """   implicit val authorZioEncoder: zio.json.JsonEncoder[Author] = DeriveJsonEncoder.gen[Author]
               |  implicit val authorZioDecoder: zio.json.JsonDecoder[Author] = DeriveJsonDecoder.gen[Author]
               |  implicit val bookZioEncoder: zio.json.JsonEncoder[Book] = DeriveJsonEncoder.gen[Book]
-              |  implicit val bookZioDecoder: zio.json.JsonDecoder[Book] = DeriveJsonDecoder.gen[Book]""".stripMargin +
-              System.lineSeparator() + prepareBookListing,
+              |  implicit val bookZioDecoder: zio.json.JsonDecoder[Book] = DeriveJsonDecoder.gen[Book]""".stripMargin
+
+          Code(
+            codecs + System.lineSeparator() + prepareBookListing,
             Set(
               Import("sttp.tapir.Codec.JsonCodec"),
               Import("sttp.tapir.generic.auto._"),

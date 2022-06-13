@@ -11,6 +11,7 @@ import com.softwaremill.adopttapir.starter.api.StarterApiTest.{mainPath, validRe
 import com.softwaremill.adopttapir.test.Rich.RichIO
 import com.softwaremill.adopttapir.test.{BaseTest, TestDependencies}
 import fs2.io.file.Files
+import io.circe.generic.auto._
 import io.circe.jawn
 import org.scalatest.Assertion
 import sttp.client3.{HttpError, Response}
@@ -63,8 +64,6 @@ class StarterApiTest extends BaseTest with TestDependencies {
     }
 
   }
-
-  import io.circe.generic.auto._
 
   it should "return request error with information about picking wrong implementation for an effect" in {
     // given

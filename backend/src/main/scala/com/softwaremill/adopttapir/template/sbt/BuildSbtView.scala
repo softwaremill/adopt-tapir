@@ -3,7 +3,7 @@ package com.softwaremill.adopttapir.template.sbt
 import com.softwaremill.adopttapir.starter.ServerEffect._
 import com.softwaremill.adopttapir.starter.ServerImplementation.{Akka, Http4s, Netty, ZIOHttp}
 import com.softwaremill.adopttapir.starter.{JsonImplementation, StarterDetails}
-import com.softwaremill.adopttapir.template.sbt.Dependency.{JavaDependency, ScalaDependency, ScalaTestDependency}
+import com.softwaremill.adopttapir.template.sbt.Dependency._
 
 object BuildSbtView {
 
@@ -17,51 +17,54 @@ object BuildSbtView {
   }
 
   def getDependencies(starterDetails: StarterDetails): List[Dependency] = {
-    val httpDependencies = BuildSbtView.getHttpDependencies(starterDetails)
+    val httpDependencies = getHttpDependencies(starterDetails)
     val monitoringDependencies = Nil
     val jsonDependencies = getJsonDependencies(starterDetails)
-    val docsDepenedencies =
-      if (starterDetails.addDocumentation)
-        List(ScalaDependency("com.softwaremill.sttp.tapir", "tapir-swagger-ui-bundle", Dependency.constantTapirVersion))
-      else Nil
+    val docsDepenedencies = getDocsDependencies(starterDetails)
     val baseDependencies = List(
       ScalaDependency("com.typesafe.scala-logging", "scala-logging", "3.9.4"),
       JavaDependency("ch.qos.logback", "logback-classic", "1.2.11")
     )
     val testDependencies = List(
-      ScalaTestDependency("com.softwaremill.sttp.tapir", "tapir-sttp-stub-server", Dependency.constantTapirVersion),
+      ScalaTestDependency("com.softwaremill.sttp.tapir", "tapir-sttp-stub-server", constantTapirVersion),
       ScalaTestDependency("org.scalatest", "scalatest", "3.2.12")
     ) ++ getJsonTestDependencies(starterDetails)
 
     httpDependencies ++ docsDepenedencies ++ monitoringDependencies ++ jsonDependencies ++ baseDependencies ++ testDependencies
   }
 
-  private def getJsonDependencies(starterDetails: StarterDetails) = {
+  private def getDocsDependencies(starterDetails: StarterDetails): List[ScalaDependency] = {
+    if (starterDetails.addDocumentation)
+      List(ScalaDependency("com.softwaremill.sttp.tapir", "tapir-swagger-ui-bundle", constantTapirVersion))
+    else Nil
+  }
+
+  private def getJsonDependencies(starterDetails: StarterDetails): List[ScalaDependency] = {
     starterDetails.jsonImplementation match {
       case JsonImplementation.WithoutJson => Nil
       case JsonImplementation.Circe =>
         List(
-          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-json-circe", Dependency.constantTapirVersion)
+          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-json-circe", constantTapirVersion)
         )
       case JsonImplementation.Jsoniter =>
         List(
-          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-jsoniter-scala", Dependency.constantTapirVersion),
-          ScalaDependency("com.github.plokhotnyuk.jsoniter-scala", "jsoniter-scala-core", "2.13.26"),
-          ScalaDependency("com.github.plokhotnyuk.jsoniter-scala", "jsoniter-scala-macros", "2.13.26")
+          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-jsoniter-scala", constantTapirVersion),
+          ScalaDependency("com.github.plokhotnyuk.jsoniter-scala", "jsoniter-scala-core", plokhotnyukJsoniterVersion),
+          ScalaDependency("com.github.plokhotnyuk.jsoniter-scala", "jsoniter-scala-macros", plokhotnyukJsoniterVersion)
         )
       case JsonImplementation.ZIOJson =>
         List(
-          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-json-zio", Dependency.constantTapirVersion)
+          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-json-zio", constantTapirVersion)
         )
     }
   }
 
-  private def getJsonTestDependencies(starterDetails: StarterDetails) = {
+  private def getJsonTestDependencies(starterDetails: StarterDetails): List[ScalaTestDependency] = {
     starterDetails.jsonImplementation match {
       case JsonImplementation.WithoutJson => Nil
-      case JsonImplementation.Circe       => List(ScalaTestDependency("com.softwaremill.sttp.client3", "circe", "3.6.2"))
-      case JsonImplementation.Jsoniter    => List(ScalaTestDependency("com.softwaremill.sttp.client3", "jsoniter", "3.6.2"))
-      case JsonImplementation.ZIOJson     => List(ScalaTestDependency("com.softwaremill.sttp.client3", "zio-json", "3.6.2"))
+      case JsonImplementation.Circe       => List(ScalaTestDependency("com.softwaremill.sttp.client3", "circe", sttpClientVersion))
+      case JsonImplementation.Jsoniter    => List(ScalaTestDependency("com.softwaremill.sttp.client3", "jsoniter", sttpClientVersion))
+      case JsonImplementation.ZIOJson     => List(ScalaTestDependency("com.softwaremill.sttp.client3", "zio-json", sttpClientVersion))
     }
   }
 
@@ -79,29 +82,29 @@ object BuildSbtView {
 
   object HttpDependencies {
     def akka(): List[ScalaDependency] = List(
-      ScalaDependency("com.softwaremill.sttp.tapir", "tapir-akka-http-server", Dependency.constantTapirVersion)
+      ScalaDependency("com.softwaremill.sttp.tapir", "tapir-akka-http-server", constantTapirVersion)
     )
 
     def netty(): List[ScalaDependency] = List(
-      ScalaDependency("com.softwaremill.sttp.tapir", "tapir-netty-server", Dependency.constantTapirVersion)
+      ScalaDependency("com.softwaremill.sttp.tapir", "tapir-netty-server", constantTapirVersion)
     )
 
     def ioNetty(): List[ScalaDependency] =
       List(
-        ScalaDependency("com.softwaremill.sttp.tapir", "tapir-cats", Dependency.constantTapirVersion),
-        ScalaDependency("com.softwaremill.sttp.tapir", "tapir-netty-server-cats", Dependency.constantTapirVersion)
+        ScalaDependency("com.softwaremill.sttp.tapir", "tapir-cats", constantTapirVersion),
+        ScalaDependency("com.softwaremill.sttp.tapir", "tapir-netty-server-cats", constantTapirVersion)
       )
 
     def http4s(): List[ScalaDependency] = List(
-      ScalaDependency("com.softwaremill.sttp.tapir", "tapir-http4s-server", Dependency.constantTapirVersion),
+      ScalaDependency("com.softwaremill.sttp.tapir", "tapir-http4s-server", constantTapirVersion),
       ScalaDependency("org.http4s", "http4s-blaze-server", "0.23.11")
     )
 
     def http4sZIO(): List[ScalaDependency] =
-      ScalaDependency("com.softwaremill.sttp.tapir", "tapir-http4s-server-zio", Dependency.constantTapirVersion) :: http4s()
+      ScalaDependency("com.softwaremill.sttp.tapir", "tapir-http4s-server-zio", constantTapirVersion) :: http4s()
 
     def ZIOHttp(): List[ScalaDependency] = List(
-      ScalaDependency("com.softwaremill.sttp.tapir", "tapir-zio-http-server", Dependency.constantTapirVersion)
+      ScalaDependency("com.softwaremill.sttp.tapir", "tapir-zio-http-server", constantTapirVersion)
     )
   }
 }

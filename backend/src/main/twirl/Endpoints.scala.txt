@@ -1,13 +1,12 @@
 @(
 starterDetails: com.softwaremill.adopttapir.starter.StarterDetails,
-additionalImports: Set[com.softwaremill.adopttapir.template.scala.Import],
+additionalImports: List[com.softwaremill.adopttapir.template.scala.Import],
 helloEndpointServer: String,
 docEndpoints: String,
 jsonEndpoint: String,
 )
 package @{starterDetails.groupId}
 
-import sttp.tapir.server.ServerEndpoint
 import sttp.tapir.{PublicEndpoint, endpoint, query, stringBody}
 @for(additionalImport <- additionalImports) {
 @{additionalImport.asScalaImport}}

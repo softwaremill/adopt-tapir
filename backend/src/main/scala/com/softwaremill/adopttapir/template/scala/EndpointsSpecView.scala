@@ -37,7 +37,7 @@ object EndpointsSpecView {
         case ServerEffect.ZIOEffect    => "SttpBackendStub(new RIOMonadError[Any])"
       }
 
-      val code =
+      val body =
         s"""val backendStub = TapirStubInterpreter($stub)
            |  .whenServerEndpoint($endpoint)
            |  .thenRunLogic()
@@ -61,23 +61,21 @@ object EndpointsSpecView {
 
       }
 
-      Code(code, imports)
+      Code(body, imports)
     }
   }
 
-  object Rich {
+  object Unwrapper {
     def prepareUnwrapper(effect: ServerEffect): Code = {
-      def prepareCode(kind: String, unwrapFn: String) =
+      def prepareBody(kind: String, unwrapFn: String): String =
         s"""implicit class Unwrapper[T](t: $kind) {
            |   def unwrap: T = $unwrapFn
-           |}
-           |
-           |""".stripMargin
+           |}""".stripMargin
 
       effect match {
         case ServerEffect.FutureEffect =>
           Code(
-            prepareCode("Future[T]", "Await.result(t, Duration.Inf)"),
+            prepareBody("Future[T]", "Await.result(t, Duration.Inf)"),
             Set(
               Import("scala.concurrent.Await"),
               Import("scala.concurrent.Future"),
@@ -85,9 +83,9 @@ object EndpointsSpecView {
             )
           )
         case ServerEffect.IOEffect =>
-          Code(prepareCode("IO[T]", "t.unsafeRunSync()"), Set(Import("cats.effect.unsafe.implicits.global")))
+          Code(prepareBody("IO[T]", "t.unsafeRunSync()"), Set(Import("cats.effect.unsafe.implicits.global")))
         case ServerEffect.ZIOEffect =>
-          Code(prepareCode("ZIO[Any, Throwable, T]", "zio.Runtime.default.unsafeRun(t)"), Set(Import("zio.ZIO")))
+          Code(prepareBody("ZIO[Any, Throwable, T]", "zio.Runtime.default.unsafeRun(t)"), Set(Import("zio.ZIO")))
       }
     }
   }

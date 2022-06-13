@@ -2,9 +2,9 @@ package com.softwaremill.adopttapir.template
 
 import better.files.Resource
 import com.softwaremill.adopttapir.starter.{StarterConfig, StarterDetails}
-import com.softwaremill.adopttapir.template.ProjectTemplate.ScalafmtConfigFile
+import com.softwaremill.adopttapir.template.ProjectTemplate.{ScalafmtConfigFile, toSortedList}
 import com.softwaremill.adopttapir.template.sbt.BuildSbtView
-import com.softwaremill.adopttapir.template.scala.{EndpointsSpecView, EndpointsView, MainView}
+import com.softwaremill.adopttapir.template.scala.{EndpointsSpecView, EndpointsView, Import, MainView}
 
 case class GeneratedFile(
     relativePath: String,
@@ -59,7 +59,7 @@ class ProjectTemplate(config: StarterConfig) {
       txt
         .Endpoints(
           starterDetails,
-          helloServerEndpoint.imports ++ docEndpoints.imports ++ jsonEndpoint.imports,
+          toSortedList(helloServerEndpoint.imports ++ docEndpoints.imports ++ jsonEndpoint.imports),
           helloServerEndpoint.body,
           docEndpoints.body,
           jsonEndpoint = jsonEndpoint.body
@@ -73,15 +73,14 @@ class ProjectTemplate(config: StarterConfig) {
 
     val helloServerStub = EndpointsSpecView.getHelloServerStub(starterDetails)
     val booksServerStub = EndpointsSpecView.getBookServerStub(starterDetails)
-
-    val unwrapper = EndpointsSpecView.Rich.prepareUnwrapper(starterDetails.serverEffect)
+    val unwrapper = EndpointsSpecView.Unwrapper.prepareUnwrapper(starterDetails.serverEffect)
 
     GeneratedFile(
       pathUnderPackage("src/test/scala", groupId, "EndpointsSpec.scala"),
       txt
         .EndpointsSpec(
           starterDetails,
-          helloServerStub.imports ++ unwrapper.imports ++ booksServerStub.imports,
+          toSortedList(helloServerStub.imports ++ unwrapper.imports ++ booksServerStub.imports),
           helloServerStub.body,
           unwrapper.body,
           booksServerStub.body
@@ -102,4 +101,6 @@ class ProjectTemplate(config: StarterConfig) {
 
 object ProjectTemplate {
   val ScalafmtConfigFile = ".scalafmt.conf"
+
+  def toSortedList(set: Set[Import]): List[Import] = set.toList.sortBy(_.fullName)
 }

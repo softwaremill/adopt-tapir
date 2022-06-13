@@ -2,7 +2,7 @@ package com.softwaremill.adopttapir.starter
 
 import cats.effect.{ExitCode, IO, IOApp}
 import com.softwaremill.adopttapir.config.Config
-import com.softwaremill.adopttapir.starter.JsonImplementation.Circe
+import com.softwaremill.adopttapir.starter.JsonImplementation.WithoutJson
 import com.softwaremill.adopttapir.starter.StarterDetails.defaultTapirVersion
 import com.softwaremill.adopttapir.template.ProjectTemplate
 
@@ -17,10 +17,10 @@ object FileOperation extends IOApp {
       "amadeusz",
       "com.mjoyit.experience",
       ServerEffect.ZIOEffect,
-      ServerImplementation.Http4s,
+      ServerImplementation.ZIOHttp,
       defaultTapirVersion,
       true,
-      Circe
+      WithoutJson
     )
 
     for {

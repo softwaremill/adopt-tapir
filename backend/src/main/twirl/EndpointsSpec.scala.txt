@@ -1,9 +1,9 @@
 @(
 starterDetails: com.softwaremill.adopttapir.starter.StarterDetails,
-additionalImports: Set[com.softwaremill.adopttapir.template.scala.Import],
+additionalImports: List[com.softwaremill.adopttapir.template.scala.Import],
 helloStub: String,
 unwrapper: String,
-booksStub: String,
+booksStub: String
 )
 package @{starterDetails.groupId}
 import @{starterDetails.groupId}.Endpoints._
