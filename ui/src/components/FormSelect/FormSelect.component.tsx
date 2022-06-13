@@ -1,9 +1,9 @@
 import { TextField, MenuItem } from '@mui/material';
 import { Controller, useFormContext } from 'react-hook-form';
 
-export type FormSelectOption = {
+export type FormSelectOption<T extends string = any> = {
   label: string;
-  value: string;
+  value: T;
 };
 
 interface FormSelectProps {

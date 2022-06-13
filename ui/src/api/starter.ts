@@ -1,6 +1,6 @@
 export enum EffectType {
   Future = 'FutureEffect',
-  'cats-effect' = 'IOEffect',
+  IO = 'IOEffect',
   ZIO = 'ZIOEffect',
 }
 
@@ -11,6 +11,13 @@ export enum EffectImplementation {
   ZIOHttp = 'ZIOHttp',
 }
 
+export enum JSONImplementation {
+  Circe = 'Circe',
+  Jsoniter = 'Jsoniter',
+  ZIOJson = 'ZIOJson',
+  No = 'No',
+}
+
 export type StarterRequest = {
   projectName: string;
   groupId: string;
@@ -18,4 +25,5 @@ export type StarterRequest = {
   implementation: EffectImplementation;
   tapirVersion: string;
   addDocumentation: boolean;
+  json: JSONImplementation;
 };
