@@ -84,8 +84,7 @@ object EndpointsView {
     private def prepareBookListing(starterDetails: StarterDetails): Code = {
       def prepareBookListing: String = {
         s"""  val $bookListing: PublicEndpoint[Unit, Unit, Vector[Book], Any] = endpoint.get
-           |    .in("books")
-           |    .in("list" / "all")
+           |    .in("books" / "list" / "all")
            |    .out(jsonBody[Vector[Book]])""".stripMargin
       }
 
