@@ -90,7 +90,7 @@ class StarterApiTest extends BaseTest with TestDependencies {
     // then
     ex.statusCode.code shouldBe 400
     jawn.decode[Error_OUT](ex.body).value.error should include(
-      "Project name: `Uppercase` should match regex: `[a-z0-9]+`"
+      "Project name: `Uppercase` should match regex: `^[a-z0-9]+$`"
     )
   }
 
