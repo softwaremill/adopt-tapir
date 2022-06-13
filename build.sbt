@@ -6,6 +6,8 @@ import sbtbuildinfo.BuildInfoKeys.{buildInfoKeys, buildInfoOptions, buildInfoPac
 import sbtbuildinfo.{BuildInfoKey, BuildInfoOption}
 
 import scala.util.Try
+import scala.sys.process.Process
+import complete.DefaultParsers._
 
 val http4sVersion = "0.23.11"
 val circeVersion = "0.14.1"
@@ -87,10 +89,29 @@ val unitTestingStack = Seq(
 val commonDependencies =
   baseDependencies ++ unitTestingStack ++ loggingDependencies ++ configDependencies ++ fileDependencies ++ scalafmtStandaloneDependencies
 
+lazy val uiProjectName = "ui"
+lazy val uiDirectory = settingKey[File]("Path to the ui project directory")
+lazy val updateYarn = taskKey[Unit]("Update yarn")
+lazy val yarnTask = inputKey[Unit]("Run yarn with arguments")
+lazy val copyWebapp = taskKey[Unit]("Copy webapp")
+
 lazy val commonSettings = commonSmlBuildSettings ++ Seq(
   organization := "com.softwaremill.adopttapir",
   scalaVersion := "2.13.8",
-  libraryDependencies ++= commonDependencies
+  libraryDependencies ++= commonDependencies,
+  uiDirectory := (ThisBuild / baseDirectory).value / uiProjectName,
+  updateYarn := {
+    streams.value.log("Updating npm/yarn dependencies")
+    haltOnCmdResultError(Process("yarn install", uiDirectory.value).!)
+  },
+  yarnTask := {
+    val taskName = spaceDelimited("<arg>").parsed.mkString(" ")
+    updateYarn.value
+    val localYarnCommand = "yarn " + taskName
+    def runYarnTask() = Process(localYarnCommand, uiDirectory.value).!
+    streams.value.log("Running yarn task: " + taskName)
+    haltOnCmdResultError(runYarnTask())
+  }
 )
 
 lazy val buildInfoSettings = Seq(
@@ -113,6 +134,7 @@ lazy val buildInfoSettings = Seq(
 
 lazy val fatJarSettings = Seq(
   assembly / assemblyJarName := "adopttapir.jar",
+  assembly := assembly.dependsOn(copyWebapp).value,
   assembly / assemblyMergeStrategy := {
     case PathList(ps @ _*) if ps.last endsWith "io.netty.versions.properties"       => MergeStrategy.first
     case PathList(ps @ _*) if ps.last endsWith "pom.properties"                     => MergeStrategy.first
@@ -131,7 +153,7 @@ lazy val dockerSettings = Seq(
   Docker / packageName := "adopttapir",
   dockerUsername := Some("softwaremill"),
   dockerUpdateLatest := true,
-  Docker / publishLocal := (Docker / publishLocal).value,
+  Docker / publishLocal := (Docker / publishLocal).dependsOn(copyWebapp).value,
   Docker / version := git.gitDescribedVersion.value
     .map(versionWithTimestamp)
     .getOrElse(git.formattedShaVersion.value.map(versionWithTimestamp).getOrElse("latest")),
@@ -169,7 +191,14 @@ lazy val rootProject = (project in file("."))
 lazy val backend: Project = (project in file("backend"))
   .settings(
     libraryDependencies ++= httpDependencies ++ jsonDependencies ++ apiDocsDependencies ++ monitoringDependencies ++ securityDependencies ++ macwireDependencies,
-    Compile / mainClass := Some("com.softwaremill.adopttapir.Main")
+    Compile / mainClass := Some("com.softwaremill.adopttapir.Main"),
+    copyWebapp := {
+      val source = uiDirectory.value / "build"
+      val target = (Compile / classDirectory).value / "webapp"
+      streams.value.log.info(s"Copying the webapp resources from $source to $target")
+      IO.copyDirectory(source, target)
+    },
+    copyWebapp := copyWebapp.dependsOn(yarnTask.toTask(" build")).value
   )
   .enablePlugins(BuildInfoPlugin)
   .settings(commonSettings)
