@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Box, Button, Typography, CircularProgress, Backdrop } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { Box, Button, Typography, CircularProgress, Backdrop, Snackbar, Alert } from '@mui/material';
 import { useForm, FormProvider } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { StarterRequest } from 'api/starter';
@@ -8,24 +8,38 @@ import { FormSelect } from '../FormSelect';
 import { FormRadioGroup } from '../FormRadioGroup';
 import { useStyles } from './ConfigurationForm.styles';
 import {
-  configurationSchema,
+  starterValidationSchema,
   TAPIR_VERSION_OPTIONS,
   EFFECT_TYPE_OPTIONS,
-  EFFECT_IMPLEMENTATION_OPTIONS,
   ENDPOINTS_OPTIONS,
-  JSON_INPUT_OUTPUT_OPTIONS,
 } from './ConfigurationForm.consts';
-
-// TODO:
-// error handling
-// make effect implementation options to be selectable based on effect type chosen
+import { mapEffectTypeToEffectImplementation, getEffectImplementationOptions } from './ConfigurationForm.helpers';
 
 export const ConfigurationForm: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const { classes, cx } = useStyles();
-  const form = useForm<StarterRequest>({ mode: 'onBlur', resolver: yupResolver(configurationSchema) });
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const handleFormSubmit = async (formData: StarterRequest) => {
+  const { classes, cx } = useStyles();
+  const form = useForm<StarterRequest>({
+    mode: 'onBlur',
+    resolver: yupResolver(starterValidationSchema),
+  });
+
+  const effectType = form.watch('effect');
+  const effectImplementation = form.watch('implementation');
+  const isEffectTypeSelected = Boolean(effectType);
+
+  useEffect(() => {
+    if (
+      effectType &&
+      effectImplementation &&
+      !mapEffectTypeToEffectImplementation(effectType).includes(effectImplementation)
+    ) {
+      form.resetField('implementation');
+    }
+  }, [effectType, effectImplementation, form]);
+
+  const handleFormSubmit = async (formData: StarterRequest): Promise<void> => {
     try {
       setIsLoading(true);
 
@@ -36,20 +50,35 @@ export const ConfigurationForm: React.FC = () => {
         },
         body: JSON.stringify(formData),
       });
-      const blob = await response.blob();
-      const file = URL.createObjectURL(blob);
 
-      // download starter zip file
-      window.location.assign(file);
+      if (response.ok) {
+        const blob = await response.blob();
+        const file = URL.createObjectURL(blob);
+
+        // download starter zip file
+        window.location.assign(file);
+      } else {
+        const json = await response.json();
+
+        throw new Error(json.error || 'Something went wrong, please try again later.');
+      }
     } catch (error) {
-      // catch me if you can
+      if (error instanceof Error) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage(error as string);
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleFormReset = () => {
+  const handleFormReset = (): void => {
     form.reset();
+  };
+
+  const handleCloseAlert = (): void => {
+    setErrorMessage('');
   };
 
   return (
@@ -78,7 +107,6 @@ export const ConfigurationForm: React.FC = () => {
             label="Tapir version"
             options={TAPIR_VERSION_OPTIONS}
           />
-          {/* <FormSelect name="scalaVersion" label="Scala version" options={[]} /> */}
 
           <FormSelect
             className={classes.formEffectsRow}
@@ -90,7 +118,8 @@ export const ConfigurationForm: React.FC = () => {
             className={classes.formEffectsRow}
             name="implementation"
             label="Effect implementation"
-            options={EFFECT_IMPLEMENTATION_OPTIONS}
+            disabled={!isEffectTypeSelected}
+            options={isEffectTypeSelected ? getEffectImplementationOptions(effectType) : []}
           />
 
           <FormRadioGroup
@@ -100,18 +129,6 @@ export const ConfigurationForm: React.FC = () => {
             options={ENDPOINTS_OPTIONS}
             defaultValue={false}
           />
-          {/* <FormRadioGroup
-              name="addMetrics"
-              label="Metrics endpoint"
-              options={ENDPOINTS_OPTIONS}
-              defaultValue={false}
-            /> */}
-          {/* <FormRadioGroup
-              name="jsonInputOutput"
-              label="JSON input/output"
-              options={JSON_INPUT_OUTPUT_OPTIONS}
-              defaultValue={false}
-            /> */}
 
           <div className={cx(classes.actionsContainer, classes.formActionsRow)}>
             <Button variant="contained" color="secondary" size="medium" disableElevation onClick={handleFormReset}>
@@ -127,6 +144,16 @@ export const ConfigurationForm: React.FC = () => {
       <Backdrop open={isLoading}>
         <CircularProgress />
       </Backdrop>
+      <Snackbar
+        open={Boolean(errorMessage)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        autoHideDuration={5000}
+        onClose={handleCloseAlert}
+      >
+        <Alert severity="error" variant="outlined">
+          {errorMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

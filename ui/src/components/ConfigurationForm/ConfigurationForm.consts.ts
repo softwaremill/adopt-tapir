@@ -15,13 +15,6 @@ export const EFFECT_TYPE_OPTIONS: FormSelectOption[] = Object.entries(EffectType
   value: value,
 }));
 
-export const EFFECT_IMPLEMENTATION_OPTIONS: FormSelectOption[] = Object.entries(EffectImplementation).map(
-  ([key, value]) => ({
-    label: key,
-    value: value,
-  })
-);
-
 export const ENDPOINTS_OPTIONS: FormRadioOption[] = [
   {
     label: 'yes',
@@ -52,7 +45,7 @@ export const JSON_INPUT_OUTPUT_OPTIONS: FormRadioOption[] = [
   },
 ];
 
-export const configurationSchema = yup
+export const starterValidationSchema = yup
   .object({
     projectName: yup
       .string()
@@ -66,11 +59,8 @@ export const configurationSchema = yup
       .max(256, 'GroupId should be smaller than 256 characters')
       .required('This field is required'),
     tapirVersion: yup.string().required('This field is required'),
-    // scalaVersion: yup.string().required(),
     effect: yup.mixed().oneOf(Object.values(EffectType)).required('This field is required'),
     implementation: yup.mixed().oneOf(Object.values(EffectImplementation)).required('This field is required'),
     addDocumentation: yup.boolean().required('This field is required'),
-    // metricEndpoint: yup.boolean().required(),
-    // jsonInputOutput: yup.mixed(),
   })
   .required();
