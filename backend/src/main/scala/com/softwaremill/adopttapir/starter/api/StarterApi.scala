@@ -11,7 +11,6 @@ import fs2.io.file.Files
 import com.softwaremill.adopttapir.infrastructure.Json._
 import sttp.capabilities.fs2.Fs2Streams
 import sttp.tapir.CodecFormat
-import sttp.tapir.generic.auto._
 
 class StarterApi(http: Http, starterService: StarterService) {
 
