@@ -1,10 +1,11 @@
 package com.softwaremill.adopttapir.starter.api
 
 import cats.data.ValidatedNec
-import cats.implicits.{catsSyntaxTuple4Semigroupal, catsSyntaxValidatedId, catsSyntaxValidatedIdBinCompat0}
+import cats.implicits.{catsSyntaxTuple5Semigroupal, catsSyntaxValidatedId, catsSyntaxValidatedIdBinCompat0}
 import com.softwaremill.adopttapir.Fail._
 import com.softwaremill.adopttapir.starter.StarterDetails
 import com.softwaremill.adopttapir.starter.api.EffectRequest.{FutureEffect, IOEffect, ZIOEffect}
+import com.softwaremill.adopttapir.starter.api.JsonImplementationRequest.ZIOJson
 import com.softwaremill.adopttapir.starter.api.RequestValidation.{
   GroupIdShouldFollowJavaPackageConvention,
   NotInSemverNotation,
@@ -56,6 +57,10 @@ object RequestValidation {
       with RequestValidation {
     override val errMessage: String = s"$prefixMessage ZIO effect will work only with Http4s and ZIOHttp"
   }
+
+  case class ZIOJsonWillWorkOnlyWithZIOEffect() extends RequestValidation {
+    override val errMessage: String = s"ZIOJson will work only with ZIO effect"
+  }
 }
 
 sealed trait FormValidator {
@@ -66,9 +71,18 @@ sealed trait FormValidator {
       validateSemanticVersioning(r.tapirVersion),
       validateProjectName(r.projectName),
       validateGroupId(r.groupId),
-      validateEffectWithImplementation(r.effect, r.implementation)
-    ).mapN { case (tapirVersion, projectName, groupId, (effect, serverImplementation)) =>
-      StarterDetails(projectName, groupId, effect.toModel, serverImplementation.toModel, tapirVersion, r.addDocumentation)
+      validateEffectWithImplementation(r.effect, r.implementation),
+      validateEffectWithJson(r.effect, r.json)
+    ).mapN { case (tapirVersion, projectName, groupId, (effect, serverImplementation), json) =>
+      StarterDetails(
+        projectName,
+        groupId,
+        effect.toModel,
+        serverImplementation.toModel,
+        tapirVersion,
+        r.addDocumentation,
+        json.toModel
+      )
     }.leftMap(errors => IncorrectInput(errors.toNonEmptyList.map(_.errMessage).toList.mkString(System.lineSeparator())))
       .toEither
 
@@ -108,6 +122,17 @@ sealed trait FormValidator {
       case t @ (ZIOEffect, Http4s)   => t.validNec
       case t @ (ZIOEffect, ZIOHttp)  => t.validNec
       case (ZIOEffect, _)            => RequestValidation.ZIOEffectWillWorkOnlyWithHttp4sAndZIOHttp(effect, serverImplementation).invalidNec
+    }
+  }
+
+  private def validateEffectWithJson(
+      effectRequest: EffectRequest,
+      json: JsonImplementationRequest
+  ): ValidatedNec[RequestValidation, JsonImplementationRequest] = {
+    (effectRequest, json) match {
+      case t @ (ZIOEffect, ZIOJson) => t._2.validNec
+      case (_, ZIOJson)             => RequestValidation.ZIOJsonWillWorkOnlyWithZIOEffect().invalidNec
+      case t                        => t._2.validNec
     }
   }
 }

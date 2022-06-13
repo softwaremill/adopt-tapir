@@ -2,10 +2,11 @@
 starterDetails: com.softwaremill.adopttapir.starter.StarterDetails,
 additionalImports: List[com.softwaremill.adopttapir.template.scala.Import],
 helloEndpointServer: String,
-docEndpoints: String)
+docEndpoints: String,
+jsonEndpoint: String,
+)
 package @{starterDetails.groupId}
 
-import sttp.tapir.server.ServerEndpoint
 import sttp.tapir.{PublicEndpoint, endpoint, query, stringBody}
 @for(additionalImport <- additionalImports) {
 @{additionalImport.asScalaImport}}
@@ -19,7 +20,8 @@ object Endpoints {
     .out(stringBody)
 
 @helloEndpointServer
+@jsonEndpoint
 @docEndpoints
 
-  val all = List(helloServerEndpoint) @if(docEndpoints.nonEmpty){++ docEndpoints}
+  val all = List(helloServerEndpoint@if(jsonEndpoint.nonEmpty){, booksListingServerEndpoint}) @if(docEndpoints.nonEmpty){++ docEndpoints}
 }

@@ -1,24 +1,26 @@
 @(
 starterDetails: com.softwaremill.adopttapir.starter.StarterDetails,
 additionalImports: List[com.softwaremill.adopttapir.template.scala.Import],
-backendStub: String)
+helloStub: String,
+unwrapper: String,
+booksStub: String
+)
 package @{starterDetails.groupId}
-
 import @{starterDetails.groupId}.Endpoints._
 import org.scalatest.EitherValues
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import sttp.client3.testing.SttpBackendStub
-import sttp.client3.{SttpBackend, UriContext, basicRequest}
+import sttp.client3.{UriContext, basicRequest}
 import sttp.tapir.server.stub.TapirStubInterpreter
 @for(additionalImport <- additionalImports) {
 @{additionalImport.asScalaImport()}}
 
 class EndpointsSpec extends AnyFlatSpec with Matchers with EitherValues{
 
-  it should "work" in {
+  it should "return hello message" in {
     // given
-    @backendStub
+    @helloStub
 
     // when
     val response = basicRequest
@@ -26,7 +28,23 @@ class EndpointsSpec extends AnyFlatSpec with Matchers with EitherValues{
       .send(backendStub)
 
     // then
-    response.map(_.body.value shouldBe "hello adam")
+    response.map(_.body.value shouldBe "Hello adam").unwrap
   }
 
+@if(booksStub.nonEmpty){
+  it should "list available books" in {
+    // given
+    @booksStub
+
+    // when
+    val response = basicRequest
+      .get(uri"http://test.com/books/list/all")
+      .response(asJson[Vector[Book]])
+      .send(backendStub)
+
+    // then
+    response.map(_.body.value shouldBe Endpoints.books.get()).unwrap
+  }
+}
+  @unwrapper
 }

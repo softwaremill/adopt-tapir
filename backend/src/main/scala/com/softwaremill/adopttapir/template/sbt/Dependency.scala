@@ -28,6 +28,8 @@ trait TestFormat extends ScalaFormat { self: Dependency =>
 
 object Dependency {
   val constantTapirVersion = "tapirVersion"
+  val sttpClientVersion = "3.6.2"
+  val plokhotnyukJsoniterVersion = "2.13.26"
 
   case class ScalaDependency(groupId: String, artifactId: String, version: String) extends Dependency with ScalaFormat
   case class ScalaTestDependency(groupId: String, artifactId: String, version: String) extends Dependency with TestFormat

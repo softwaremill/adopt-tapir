@@ -1,8 +1,6 @@
 package com.softwaremill.adopttapir.starter.api
 
 import com.softwaremill.adopttapir.starter.StarterDetails
-import com.softwaremill.adopttapir.starter.api.EffectRequest.{FutureEffect, IOEffect, ZIOEffect}
-import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Akka, Http4s, Netty, ZIOHttp}
 import org.scalacheck.Gen
 
 object StarterRequestGenerators {
@@ -18,16 +16,18 @@ object StarterRequestGenerators {
       groupId <- Gen.containerOf[List, String](Gen.alphaLowerStr suchThat (str => str.nonEmpty)).map(_.mkString(".")) suchThat (str =>
         str.length <= 256 && str.nonEmpty
       )
-      effect <- Gen.oneOf[EffectRequest](Seq(IOEffect, ZIOEffect, FutureEffect))
-      serverImplementation <- Gen.oneOf[ServerImplementationRequest](Seq(Http4s, ZIOHttp, Akka, Netty))
+      effect <- Gen.oneOf(EffectRequest.values)
+      serverImplementation <- Gen.oneOf(ServerImplementationRequest.values)
       documentationAdded <- Gen.oneOf(true, false)
+      json <- Gen.oneOf(JsonImplementationRequest.values)
     } yield StarterRequest(
       projectName,
       groupId,
       effect,
       implementation = serverImplementation,
       StarterDetails.defaultTapirVersion,
-      documentationAdded
+      documentationAdded,
+      json
     )
   }
 }

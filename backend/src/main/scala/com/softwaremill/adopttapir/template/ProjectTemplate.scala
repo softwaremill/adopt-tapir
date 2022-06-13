@@ -2,9 +2,9 @@ package com.softwaremill.adopttapir.template
 
 import better.files.Resource
 import com.softwaremill.adopttapir.starter.{StarterConfig, StarterDetails}
-import com.softwaremill.adopttapir.template.ProjectTemplate.ScalafmtConfigFile
+import com.softwaremill.adopttapir.template.ProjectTemplate.{ScalafmtConfigFile, toSortedList}
 import com.softwaremill.adopttapir.template.sbt.BuildSbtView
-import com.softwaremill.adopttapir.template.scala.{EndpointsSpecView, EndpointsView, MainView}
+import com.softwaremill.adopttapir.template.scala.{EndpointsSpecView, EndpointsView, Import, MainView}
 
 case class GeneratedFile(
     relativePath: String,
@@ -52,15 +52,17 @@ class ProjectTemplate(config: StarterConfig) {
 
     val helloServerEndpoint = EndpointsView.getHelloServerEndpoint(starterDetails)
     val docEndpoints = EndpointsView.getDocEndpoints(starterDetails)
+    val jsonEndpoint = EndpointsView.getJsonOutModel(starterDetails)
 
     GeneratedFile(
       pathUnderPackage("src/main/scala", groupId, "Endpoints.scala"),
       txt
         .Endpoints(
           starterDetails,
-          helloServerEndpoint.imports ++ docEndpoints.imports,
+          toSortedList(helloServerEndpoint.imports ++ docEndpoints.imports ++ jsonEndpoint.imports),
           helloServerEndpoint.body,
-          docEndpoints.body
+          docEndpoints.body,
+          jsonEndpoint = jsonEndpoint.body
         )
         .toString()
     )
@@ -70,10 +72,20 @@ class ProjectTemplate(config: StarterConfig) {
     val groupId = starterDetails.groupId
 
     val helloServerStub = EndpointsSpecView.getHelloServerStub(starterDetails)
+    val booksServerStub = EndpointsSpecView.getBookServerStub(starterDetails)
+    val unwrapper = EndpointsSpecView.Unwrapper.prepareUnwrapper(starterDetails.serverEffect)
 
     GeneratedFile(
       pathUnderPackage("src/test/scala", groupId, "EndpointsSpec.scala"),
-      txt.EndpointsSpec(starterDetails, helloServerStub.imports, helloServerStub.body).toString()
+      txt
+        .EndpointsSpec(
+          starterDetails,
+          toSortedList(helloServerStub.imports ++ unwrapper.imports ++ booksServerStub.imports),
+          helloServerStub.body,
+          unwrapper.body,
+          booksServerStub.body
+        )
+        .toString()
     )
   }
 
@@ -89,4 +101,6 @@ class ProjectTemplate(config: StarterConfig) {
 
 object ProjectTemplate {
   val ScalafmtConfigFile = ".scalafmt.conf"
+
+  def toSortedList(set: Set[Import]): List[Import] = set.toList.sortBy(_.fullName)
 }
