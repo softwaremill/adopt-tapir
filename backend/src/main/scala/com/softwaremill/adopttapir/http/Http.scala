@@ -10,13 +10,14 @@ import com.softwaremill.tagging._
 import io.circe.Printer
 import sttp.model.StatusCode
 import sttp.tapir.Codec.PlainCodec
+import sttp.tapir.codec.enumeratum.TapirCodecEnumeratum
 import sttp.tapir.generic.auto._
 import sttp.tapir.json.circe.TapirJsonCirce
 import sttp.tapir.{Codec, Endpoint, EndpointOutput, PublicEndpoint, Schema, SchemaType, Tapir}
 import tsec.common.SecureRandomId
 
 /** Helper class for defining HTTP endpoints. Import the members of this class when defining an HTTP API using tapir. */
-class Http() extends Tapir with TapirJsonCirce with TapirSchemas with FLogging {
+class Http() extends Tapir with TapirJsonCirce with TapirSchemas with TapirCodecEnumeratum with FLogging {
 
   val jsonErrorOutOutput: EndpointOutput[Error_OUT] = jsonBody[Error_OUT]
 
