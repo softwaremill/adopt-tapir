@@ -8,7 +8,7 @@ import com.softwaremill.adopttapir.http.Http
 import com.softwaremill.adopttapir.starter._
 import com.softwaremill.adopttapir.util.ServerEndpoints
 import fs2.io.file.Files
-import io.circe.generic.auto._
+import com.softwaremill.adopttapir.infrastructure.Json._
 import sttp.capabilities.fs2.Fs2Streams
 import sttp.tapir.CodecFormat
 import sttp.tapir.generic.auto._

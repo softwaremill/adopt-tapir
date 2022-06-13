@@ -3,7 +3,7 @@ package com.softwaremill.adopttapir.test
 import cats.effect.IO
 import com.softwaremill.adopttapir.starter.api.StarterRequest
 import com.softwaremill.adopttapir.test.Rich.RichIO
-import io.circe.generic.auto._
+import com.softwaremill.adopttapir.infrastructure.Json._
 import io.circe.syntax.EncoderOps
 import sttp.capabilities.fs2.Fs2Streams
 import sttp.client3.{Response, SttpBackend, UriContext, asStreamUnsafe, basicRequest}
