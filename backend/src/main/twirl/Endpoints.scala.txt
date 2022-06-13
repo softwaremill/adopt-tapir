@@ -9,7 +9,7 @@ package @{starterDetails.groupId}
 
 import sttp.tapir.{PublicEndpoint, endpoint, query, stringBody}
 @for(additionalImport <- additionalImports) {
-@{additionalImport.asScalaImport}}
+@{additionalImport.asScalaImport()}}
 
 object Endpoints {
   case class User(name: String) extends AnyVal
