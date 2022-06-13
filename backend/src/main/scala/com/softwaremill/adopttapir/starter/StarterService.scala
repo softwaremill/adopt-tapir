@@ -40,7 +40,8 @@ class StarterService(
       template.getEndpointsSpec(starterDetails),
       template.pluginsSbt,
       template.scalafmtConf,
-      template.sbtx
+      template.sbtx,
+      template.README
     )
   }
 
@@ -49,7 +50,6 @@ class StarterService(
       val file = BFile(destinationFolder.getPath, generatedFile.relativePath)
       file.parent.createDirectories()
       file.overwrite(generatedFile.content)
-      generatedFile.additionalPermissions.foreach(file.addPermission)
     }
   }
 
