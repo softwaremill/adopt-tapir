@@ -198,7 +198,8 @@ lazy val backend: Project = (project in file("backend"))
       streams.value.log.info(s"Copying the webapp resources from $source to $target")
       IO.copyDirectory(source, target)
     },
-    copyWebapp := copyWebapp.dependsOn(yarnTask.toTask(" build")).value
+    copyWebapp := copyWebapp.dependsOn(yarnTask.toTask(" build")).value,
+    Test / testOptions += Tests.Argument("-P8")
   )
   .enablePlugins(BuildInfoPlugin)
   .settings(commonSettings)
