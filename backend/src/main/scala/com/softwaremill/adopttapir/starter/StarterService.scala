@@ -16,17 +16,18 @@ class StarterService(
 ) extends FLogging {
 
   def generateZipFile(starterDetails: StarterDetails): IO[File] = {
-    IO(generateFiles(starterDetails)).flatMap { filesToCreate =>
-      IO.blocking(newTemporaryDirectory(prefix = config.tempPrefix).toJava)
-        .bracket { tempDir =>
-          for {
-            _ <- logger.debug("created temp dir: " + tempDir.toString)
-            _ <- storeFiles(tempDir, filesToCreate)
-            _ <- FormatScalaFiles(tempDir)
-            dir <- zipDirectory(tempDir)
-          } yield dir
-        }(release = tempDir => if (config.deleteTempFolder) deleteRecursively(tempDir) else IO.unit)
-    }
+    logger.info(s"received request: $starterDetails") *>
+      IO(generateFiles(starterDetails)).flatMap { filesToCreate =>
+        IO.blocking(newTemporaryDirectory(prefix = config.tempPrefix).toJava)
+          .bracket { tempDir =>
+            for {
+              _ <- logger.debug("created temp dir: " + tempDir.toString)
+              _ <- storeFiles(tempDir, filesToCreate)
+              _ <- FormatScalaFiles(tempDir)
+              dir <- zipDirectory(tempDir)
+            } yield dir
+          }(release = tempDir => if (config.deleteTempFolder) deleteRecursively(tempDir) else IO.unit)
+      }
 
   }
 
