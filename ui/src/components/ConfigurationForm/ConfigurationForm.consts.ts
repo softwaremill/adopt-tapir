@@ -11,7 +11,7 @@ import {
 export const TAPIR_VERSION_OPTIONS: FormSelectOption<string>[] = [
   {
     label: '1.0.0',
-    value: '1.0.0-RC2',
+    value: '1.0.0',
   },
 ];
 

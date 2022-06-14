@@ -11,7 +11,7 @@ case class StarterDetails(
 )
 
 object StarterDetails {
-  val defaultTapirVersion = "1.0.0-RC3"
+  val defaultTapirVersion = "1.0.0"
 }
 
 sealed trait ServerImplementation

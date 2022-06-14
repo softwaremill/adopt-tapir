@@ -19,10 +19,7 @@ class StarterApi(http: Http, starterService: StarterService) {
   private val starterPath = "starter.zip"
 
   private val starterEndpoint = {
-    val zippedFileStream = {
-      val output = streamBinaryBody(Fs2Streams[IO])
-      output.copy(codec = output.codec.format(CodecFormat.Zip()))
-    }
+    val zippedFileStream = streamBinaryBody(Fs2Streams[IO])(CodecFormat.Zip())
 
     baseEndpoint.post
       .in(starterPath)
