@@ -4,6 +4,7 @@ additionalImports: List[com.softwaremill.adopttapir.template.scala.Import],
 helloEndpointServer: String,
 docEndpoints: String,
 jsonEndpoint: String,
+library: String
 )
 package @{starterDetails.groupId}
 
@@ -18,10 +19,13 @@ object Endpoints {
     .in("hello")
     .in(query[User]("name"))
     .out(stringBody)
-
 @helloEndpointServer
+
 @jsonEndpoint
+
 @docEndpoints
 
   val all = List(helloServerEndpoint@if(jsonEndpoint.nonEmpty){, booksListingServerEndpoint}) @if(docEndpoints.nonEmpty){++ docEndpoints}
 }
+
+@library

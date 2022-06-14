@@ -22,6 +22,10 @@ object EndpointsView {
     JsonModelObject.prepareJsonEndpoint(starterDetails)
   }
 
+  def getJsonLibrary(starterDetails: StarterDetails): Code = {
+    if (starterDetails.jsonImplementation == JsonImplementation.WithoutJson) Code.empty else JsonModelObject.prepareLibraryModel()
+  }
+
   private object HelloServerEndpoint {
     def bodyTemplate(serverKind: String, pureEffectFn: String): String =
       s"""  val $helloServerEndpoint: $serverKind = $helloEndpoint.serverLogicSuccess(user =>
@@ -61,31 +65,36 @@ object EndpointsView {
       starterDetails.jsonImplementation match {
         case JsonImplementation.WithoutJson => Code.empty
         case _ =>
-          List(prepareModel(), prepareBookListing(starterDetails), prepareBookListingServerLogic(starterDetails))
+          List(prepareBookListing(starterDetails), prepareBookListingServerLogic(starterDetails))
             .reduce((a, b) => Code(a.body + System.lineSeparator() + b.body, a.imports ++ b.imports))
       }
     }
 
-    private def prepareModel(): Code = Code(
-      """  case class Author(name: String)
+    def prepareLibraryModel(): Code = Code(
+      """object Library {
+        |  case class Author(name: String)
         |  case class Book(title: String, year: Int, author: Author)
-
+        |
         |  val books = new AtomicReference(
-        |    Vector(
+        |    List(
         |      Book("The Sorrows of Young Werther", 1774, Author("Johann Wolfgang von Goethe")),
         |      Book("Nad Niemnem", 1888, Author("Eliza Orzeszkowa")),
         |      Book("The Art of Computer Programming", 1968, Author("Donald Knuth")),
         |      Book("Pharaoh", 1897, Author("Boleslaw Prus"))
         |    )
-        |  )""".stripMargin,
-      Set(Import("java.util.concurrent.atomic.AtomicReference"))
+        |  )
+        |}""".stripMargin,
+      Set(
+        Import("java.util.concurrent.atomic.AtomicReference"),
+        Import("Library._")
+      )
     )
 
     private def prepareBookListing(starterDetails: StarterDetails): Code = {
       def prepareBookListing: String = {
-        s"""  val $bookListing: PublicEndpoint[Unit, Unit, Vector[Book], Any] = endpoint.get
+        s"""  val $bookListing: PublicEndpoint[Unit, Unit, List[Book], Any] = endpoint.get
            |    .in("books" / "list" / "all")
-           |    .out(jsonBody[Vector[Book]])""".stripMargin
+           |    .out(jsonBody[List[Book]])""".stripMargin
       }
 
       starterDetails.jsonImplementation match {
@@ -100,7 +109,7 @@ object EndpointsView {
             )
           )
         case JsonImplementation.Jsoniter =>
-          val codecs = "implicit val codecBooks: JsonValueCodec[Vector[Book]] = JsonCodecMaker.make"
+          val codecs = "implicit val codecBooks: JsonValueCodec[List[Book]] = JsonCodecMaker.make"
 
           Code(
             codecs + System.lineSeparator() + prepareBookListing,
@@ -113,7 +122,7 @@ object EndpointsView {
           )
         case JsonImplementation.ZIOJson =>
           val codecs =
-            """   implicit val authorZioEncoder: zio.json.JsonEncoder[Author] = DeriveJsonEncoder.gen[Author]
+            """  implicit val authorZioEncoder: zio.json.JsonEncoder[Author] = DeriveJsonEncoder.gen[Author]
               |  implicit val authorZioDecoder: zio.json.JsonDecoder[Author] = DeriveJsonDecoder.gen[Author]
               |  implicit val bookZioEncoder: zio.json.JsonEncoder[Book] = DeriveJsonEncoder.gen[Book]
               |  implicit val bookZioDecoder: zio.json.JsonDecoder[Book] = DeriveJsonDecoder.gen[Book]""".stripMargin
