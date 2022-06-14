@@ -5,24 +5,18 @@ import sttp.tapir.server.ziohttp.ZioHttpInterpreter
 import zhttp.http.HttpApp
 import zhttp.service.server.ServerChannelFactory
 import zhttp.service.{EventLoopGroup, Server}
-import zio.{Scope, ZIO, ZIOAppArgs, ZIOAppDefault}
-
-import scala.io.StdIn
+import zio.{Console, Scope, ZIO, ZIOAppArgs, ZIOAppDefault}
 
 object Main extends ZIOAppDefault {
 
   override def run: ZIO[Any with ZIOAppArgs with Scope, Any, Any] = {
     val app: HttpApp[Any, Throwable] = ZioHttpInterpreter().toHttp(Endpoints.all)
 
-    Server(app)
-      .withPort(8080)
-      .make
-      .flatMap(start =>
-        ZIO.succeedBlocking {
-          @if(addDocumentation){println("Go to http://localhost:8080/docs to open SwaggerUI. Press any key to exit.")}else{println("Server started at http://localhost:8080. Press any key to exit.")}
-          StdIn.readLine()
-        }
-      )
+    (for {
+      serverStart <- Server(app).withPort(8080).make
+      _ <- Console.printLine(@if(addDocumentation){"Go to http://localhost:8080/docs to open SwaggerUI. Press any key to exit."}else{"Server started at http://localhost:8080. Press any key to exit."})
+      _ <- Console.readLine
+    } yield serverStart)
       .provideSomeLayer(EventLoopGroup.auto(0) ++ ServerChannelFactory.auto ++ Scope.default)
       .exitCode
   }
