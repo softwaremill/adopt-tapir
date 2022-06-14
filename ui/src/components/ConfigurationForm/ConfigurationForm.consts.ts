@@ -15,6 +15,13 @@ export const TAPIR_VERSION_OPTIONS: FormSelectOption<string>[] = [
   },
 ];
 
+export const SCALA_VERSION_OPTIONS: FormSelectOption<string>[] = [
+  {
+    label: '',
+    value: '',
+  },
+];
+
 export const EFFECT_TYPE_OPTIONS: FormSelectOption<EffectType>[] = [
   {
     label: 'Future',
@@ -94,69 +101,90 @@ const getEffectImplementationFieldMessage = (effectType: EffectType): string =>
 
 const REQUIRED_FIELD_MESSAGE = 'This field is required';
 
-export const starterValidationSchema = yup
-  .object({
-    projectName: yup
-      .string()
-      .strict()
-      .matches(/^[a-z0-9]+$/, 'Project name can consists of only lowercase characters and numbers')
-      .required(REQUIRED_FIELD_MESSAGE),
-    groupId: yup
-      .string()
-      .strict()
-      .matches(
-        /(?:^[a-z][a-z0-9_]*|[a-z][a-z0-9_]*\.[a-z0-9_]+)+$/,
-        'Group ID should follow Java package naming convention'
-      )
-      .max(256, 'Group ID length should be smaller than 256 characters')
-      .required(REQUIRED_FIELD_MESSAGE),
-    tapirVersion: yup.string().required(REQUIRED_FIELD_MESSAGE),
-    effect: yup
-      .mixed()
-      .oneOf(
-        EFFECT_TYPE_OPTIONS.map(valueGetter),
-        `Effect type must be one of the following values: ${EFFECT_TYPE_OPTIONS.map(labelGetter).join(', ')}`
-      )
-      .required(REQUIRED_FIELD_MESSAGE),
-    // NOTE: unfortunately this is the only way of multiple .when cases in yup :shrug-emoji:
-    implementation: yup
-      .mixed()
-      .when('effect', {
-        is: EffectType.Future,
-        then: schema =>
-          schema.oneOf(
-            mapEffectTypeToEffectImplementation(EffectType.Future),
-            getEffectImplementationFieldMessage(EffectType.Future)
-          ),
-        otherwise: schema =>
-          schema.when('effect', {
-            is: EffectType.IO,
-            then: schema =>
-              schema.oneOf(
-                mapEffectTypeToEffectImplementation(EffectType.IO),
-                getEffectImplementationFieldMessage(EffectType.IO)
-              ),
-            otherwise: schema =>
-              schema.when('effect', {
-                is: EffectType.ZIO,
-                then: schema =>
-                  schema.oneOf(
-                    mapEffectTypeToEffectImplementation(EffectType.ZIO),
-                    getEffectImplementationFieldMessage(EffectType.ZIO)
-                  ),
-              }),
-          }),
-      })
-      .required(REQUIRED_FIELD_MESSAGE),
-    addDocumentation: yup.boolean().required(REQUIRED_FIELD_MESSAGE),
-    json: yup
-      .mixed()
-      .when('effect', {
-        is: (effect: EffectType) => effect !== EffectType.ZIO,
-        // NOTE: any effect type besides ZIO will work here as an argument
-        then: schema => schema.oneOf(mapEffectTypeToJSONImplementation(EffectType.Future)),
-        otherwise: schema => schema.oneOf(mapEffectTypeToJSONImplementation(EffectType.ZIO)),
-      })
-      .required(REQUIRED_FIELD_MESSAGE),
-  })
-  .required();
+export const createStarterValidationSchema = (
+  isScalaVersionFieldVisible: boolean,
+  isMetricsEndpointsFieldVisible: boolean
+) => {
+  const baseSchema = yup
+    .object({
+      projectName: yup
+        .string()
+        .strict()
+        .matches(/^[a-z0-9]+$/, 'Project name can consists of only lowercase characters and numbers')
+        .required(REQUIRED_FIELD_MESSAGE),
+      groupId: yup
+        .string()
+        .strict()
+        .matches(
+          /(?:^[a-z][a-z0-9_]*|[a-z][a-z0-9_]*\.[a-z0-9_]+)+$/,
+          'Group ID should follow Java package naming convention'
+        )
+        .max(256, 'Group ID length should be smaller than 256 characters')
+        .required(REQUIRED_FIELD_MESSAGE),
+      tapirVersion: yup.string().required(REQUIRED_FIELD_MESSAGE),
+      effect: yup
+        .mixed()
+        .oneOf(
+          EFFECT_TYPE_OPTIONS.map(valueGetter),
+          `Effect type must be one of the following values: ${EFFECT_TYPE_OPTIONS.map(labelGetter).join(', ')}`
+        )
+        .required(REQUIRED_FIELD_MESSAGE),
+      // NOTE: unfortunately this is the only way of multiple .when cases in yup :shrug-emoji:
+      implementation: yup
+        .mixed()
+        .when('effect', {
+          is: EffectType.Future,
+          then: schema =>
+            schema.oneOf(
+              mapEffectTypeToEffectImplementation(EffectType.Future),
+              getEffectImplementationFieldMessage(EffectType.Future)
+            ),
+          otherwise: schema =>
+            schema.when('effect', {
+              is: EffectType.IO,
+              then: schema =>
+                schema.oneOf(
+                  mapEffectTypeToEffectImplementation(EffectType.IO),
+                  getEffectImplementationFieldMessage(EffectType.IO)
+                ),
+              otherwise: schema =>
+                schema.when('effect', {
+                  is: EffectType.ZIO,
+                  then: schema =>
+                    schema.oneOf(
+                      mapEffectTypeToEffectImplementation(EffectType.ZIO),
+                      getEffectImplementationFieldMessage(EffectType.ZIO)
+                    ),
+                }),
+            }),
+        })
+        .required(REQUIRED_FIELD_MESSAGE),
+      addDocumentation: yup.boolean().required(REQUIRED_FIELD_MESSAGE),
+      json: yup
+        .mixed()
+        .when('effect', {
+          is: (effect: EffectType) => effect !== EffectType.ZIO,
+          // NOTE: any effect type besides ZIO will work here as an argument
+          then: schema => schema.oneOf(mapEffectTypeToJSONImplementation(EffectType.Future)),
+          otherwise: schema => schema.oneOf(mapEffectTypeToJSONImplementation(EffectType.ZIO)),
+        })
+        .required(REQUIRED_FIELD_MESSAGE),
+    })
+    .required();
+
+  return baseSchema
+    .concat(
+      isScalaVersionFieldVisible
+        ? yup.object({
+            scalaVersion: yup.string().required(REQUIRED_FIELD_MESSAGE),
+          })
+        : yup.object({})
+    )
+    .concat(
+      isMetricsEndpointsFieldVisible
+        ? yup.object({
+            addMetrics: yup.boolean().required(REQUIRED_FIELD_MESSAGE),
+          })
+        : yup.object({})
+    );
+};

@@ -6,12 +6,6 @@ import { Footer } from 'components/Footer';
 
 import { useStyles } from './App.styles';
 
-// TODO LIST:
-// feature flags to hide some specific fields
-
-// NICE TO HAVE:
-// shrink sidebar button <- similar to navbars
-
 export const App: React.FC = () => {
   const { classes } = useStyles();
 
@@ -44,7 +38,7 @@ export const App: React.FC = () => {
           }
         />
 
-        <Route path="/embedded-form" element={<ConfigurationForm />} />
+        <Route path="/embedded-form" element={<ConfigurationForm showHeader={false} />} />
       </Routes>
     </BrowserRouter>
   );
