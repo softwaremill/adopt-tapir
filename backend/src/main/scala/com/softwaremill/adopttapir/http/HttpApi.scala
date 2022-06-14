@@ -3,12 +3,14 @@ package com.softwaremill.adopttapir.http
 import cats.effect.{IO, Resource}
 import com.softwaremill.adopttapir.infrastructure.CorrelationIdInterceptor
 import com.softwaremill.adopttapir.logging.FLogger
-import com.softwaremill.adopttapir.util.ServerEndpoints
+import com.softwaremill.adopttapir.util.{ServerEndpoints, constantTimeEquals}
 import com.typesafe.scalalogging.StrictLogging
 import org.http4s.HttpRoutes
 import org.http4s.blaze.server.BlazeServerBuilder
 import sttp.capabilities.fs2.Fs2Streams
+import sttp.model.StatusCode
 import sttp.tapir._
+import sttp.tapir.model.UsernamePassword
 import sttp.tapir.server.ServerEndpoint
 import sttp.tapir.server.http4s.{Http4sServerInterpreter, Http4sServerOptions}
 import sttp.tapir.server.interceptor.cors.CORSInterceptor
@@ -66,7 +68,10 @@ class HttpApi(
     val apiEndpoints =
       (mainEndpoints ++ docsEndpoints).map(se => se.prependSecurityIn(apiContextPath.foldLeft(emptyInput: EndpointInput[Unit])(_ / _)))
 
-    val allAdminEndpoints = (adminEndpoints ++ List(prometheusMetrics.metricsEndpoint)).map(_.prependSecurityIn("admin"))
+    val allAdminEndpoints = (adminEndpoints ++ List(prometheusMetrics.metricsEndpoint))
+      .map(
+        _.prependSecurity("admin".and(auth.basic[UsernamePassword]()), statusCode(StatusCode.Unauthorized))(checkAdminPassword)
+      )
 
     // for all other requests, first trying getting existing webapp resource (html, js, css files), from the /webapp
     // directory on the classpath; otherwise, returning index.html; this is needed to support paths in the frontend
@@ -86,4 +91,9 @@ class HttpApi(
     .bindHttp(config.port, config.host)
     .withHttpApp(routes.orNotFound)
     .resource
+
+  private val checkAdminPassword: UsernamePassword => IO[Either[Unit, Unit]] = credentials =>
+    IO.pure {
+      if (constantTimeEquals(credentials.password.getOrElse(""), config.adminPassword)) Right(()) else Left(())
+    }
 }
