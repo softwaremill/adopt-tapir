@@ -26,6 +26,27 @@ object EndpointsView {
     if (starterDetails.jsonImplementation == JsonImplementation.WithoutJson) Code.empty else JsonModelObject.prepareLibraryModel()
   }
 
+  def getAllEndpoints(starterDetails: StarterDetails): Code = {
+    val serverKind = starterDetails.serverEffect match {
+      case ServerEffect.FutureEffect => "List[ServerEndpoint[Any, Future]]"
+      case ServerEffect.IOEffect     => "List[ServerEndpoint[Any, IO]]"
+      case ServerEffect.ZIOEffect    => "List[ZServerEndpoint[Any, Any]]"
+    }
+
+    val hasBooksListingEndpoint = starterDetails.jsonImplementation match {
+      case JsonImplementation.WithoutJson => false
+      case _                              => true
+    }
+
+    def bodyTemplate(serverKind: String, hasJson: Boolean, hasDocumentation: Boolean): String = {
+      s"val ${Constants.all}: $serverKind = List($helloServerEndpoint${if (hasJson) s", $booksListingServerEndpoint" else ""})${if (hasDocumentation)
+          s" ++ $docEndpoints"
+        else ""}"
+    }
+
+    Code(bodyTemplate(serverKind, hasBooksListingEndpoint, starterDetails.addDocumentation))
+  }
+
   private object HelloServerEndpoint {
     def bodyTemplate(serverKind: String, pureEffectFn: String): String =
       s"""  val $helloServerEndpoint: $serverKind = $helloEndpoint.serverLogicSuccess(user =>
@@ -187,5 +208,6 @@ object EndpointsView {
     val bookListing = "booksListing"
     val booksListingServerEndpoint = "booksListingServerEndpoint"
     val docEndpoints = "docEndpoints"
+    val all = "all"
   }
 }

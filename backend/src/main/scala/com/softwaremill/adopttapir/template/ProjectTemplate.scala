@@ -54,17 +54,21 @@ class ProjectTemplate(config: StarterConfig) {
     val docEndpoints = EndpointsView.getDocEndpoints(starterDetails)
     val jsonEndpoint = EndpointsView.getJsonOutModel(starterDetails)
     val library = EndpointsView.getJsonLibrary(starterDetails)
+    val allEndpoints = EndpointsView.getAllEndpoints(starterDetails)
 
     GeneratedFile(
       pathUnderPackage("src/main/scala", groupId, "Endpoints.scala"),
       txt
         .Endpoints(
           starterDetails,
-          toSortedList(helloServerEndpoint.imports ++ docEndpoints.imports ++ jsonEndpoint.imports ++ library.imports),
+          toSortedList(
+            helloServerEndpoint.imports ++ docEndpoints.imports ++ jsonEndpoint.imports ++ library.imports ++ allEndpoints.imports
+          ),
           helloServerEndpoint.body,
           docEndpoints.body,
           jsonEndpoint = jsonEndpoint.body,
-          library.body
+          library.body,
+          allEndpoints.body
         )
         .toString()
     )

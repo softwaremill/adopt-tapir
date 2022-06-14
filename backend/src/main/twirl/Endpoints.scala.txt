@@ -4,7 +4,8 @@ additionalImports: List[com.softwaremill.adopttapir.template.scala.Import],
 helloEndpointServer: String,
 docEndpoints: String,
 jsonEndpoint: String,
-library: String
+library: String,
+allEndpoints: String
 )
 package @{starterDetails.groupId}
 
@@ -14,7 +15,6 @@ import sttp.tapir.{PublicEndpoint, endpoint, query, stringBody}
 
 object Endpoints {
   case class User(name: String) extends AnyVal
-
   val helloEndpoint: PublicEndpoint[User, Unit, String, Any] = endpoint.get
     .in("hello")
     .in(query[User]("name"))
@@ -25,7 +25,7 @@ object Endpoints {
 
 @docEndpoints
 
-  val all = List(helloServerEndpoint@if(jsonEndpoint.nonEmpty){, booksListingServerEndpoint}) @if(docEndpoints.nonEmpty){++ docEndpoints}
+@allEndpoints
 }
 
 @library
