@@ -1,4 +1,4 @@
-@(groupId: String)
+@(groupId: String, addDocumentation: Boolean)
 package @groupId
 
 import sttp.tapir.server.netty.NettyFutureServer
@@ -13,7 +13,10 @@ object Main {
   def main(args: Array[String]): Unit = {
     val program = for {
       binding <- NettyFutureServer().port(8080).addEndpoints(Endpoints.all).start()
-      _ <- Future(StdIn.readLine())
+      _ <- Future {
+        @if(addDocumentation){println("Go to http://localhost:8080/docs to open SwaggerUI. Press any key to exit.")}else{println("Server started at http://localhost:8080. Press any key to exit.")}
+        StdIn.readLine()
+      }
       stop <- binding.stop()
     } yield stop
 

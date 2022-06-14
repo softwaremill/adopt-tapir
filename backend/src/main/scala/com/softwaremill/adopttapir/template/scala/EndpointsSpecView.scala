@@ -20,13 +20,13 @@ object EndpointsSpecView {
         stubBooks.addImports(
           Set(
             Import("io.circe.generic.auto._"),
-            Import("sttp.client3.circe._")
+            Import("sttp.client3.circe._"),
+            Import("Library._")
           )
         )
-      case JsonImplementation.Jsoniter => stubBooks.addImport(Import("sttp.client3.jsoniter._"))
-      case JsonImplementation.ZIOJson  => stubBooks.addImport(Import("sttp.client3.ziojson._"))
+      case JsonImplementation.Jsoniter => stubBooks.addImports(Set(Import("sttp.client3.jsoniter._"), Import("Library._")))
+      case JsonImplementation.ZIOJson  => stubBooks.addImports(Set(Import("sttp.client3.ziojson._"), Import("Library._")))
     }
-
   }
 
   private object Stub {

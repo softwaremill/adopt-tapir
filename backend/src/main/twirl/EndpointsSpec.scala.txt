@@ -39,11 +39,11 @@ class EndpointsSpec extends AnyFlatSpec with Matchers with EitherValues{
     // when
     val response = basicRequest
       .get(uri"http://test.com/books/list/all")
-      .response(asJson[Vector[Book]])
+      .response(asJson[List[Book]])
       .send(backendStub)
 
     // then
-    response.map(_.body.value shouldBe Endpoints.books.get()).unwrap
+    response.map(_.body.value shouldBe books.get()).unwrap
   }
 }
   @unwrapper
