@@ -96,7 +96,7 @@ sealed trait FormValidator {
   }
 
   private def validateProjectName(projectName: String): ValidationResult[String] = {
-    val projectNameRgx = "^[a-z0-9]+$"
+    val projectNameRgx = "^[a-z0-9_]+$"
 
     if (projectName.matches(projectNameRgx))
       projectName.validNec

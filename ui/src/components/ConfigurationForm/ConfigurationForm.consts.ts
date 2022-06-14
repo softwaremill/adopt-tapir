@@ -110,7 +110,7 @@ export const createStarterValidationSchema = (
       projectName: yup
         .string()
         .strict()
-        .matches(/^[a-z0-9]+$/, 'Project name can consists of only lowercase characters and numbers')
+        .matches(/^[a-z0-9_]+$/, 'Project name can consists of only lowercase characters, numbers and underscores')
         .required(REQUIRED_FIELD_MESSAGE),
       groupId: yup
         .string()
