@@ -3,13 +3,15 @@ import { Box, Button, Typography, CircularProgress, Backdrop, Snackbar, Alert } 
 import { useForm, FormProvider } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { StarterRequest, JSONImplementation } from 'api/starter';
+import { useFeatureFlag } from '../../hooks/useFeatureFlag';
 import { FormTextField } from '../FormTextField';
 import { FormSelect } from '../FormSelect';
 import { FormRadioGroup } from '../FormRadioGroup';
 import { useStyles } from './ConfigurationForm.styles';
 import {
-  starterValidationSchema,
+  createStarterValidationSchema,
   TAPIR_VERSION_OPTIONS,
+  SCALA_VERSION_OPTIONS,
   EFFECT_TYPE_OPTIONS,
   ENDPOINTS_OPTIONS,
 } from './ConfigurationForm.consts';
@@ -20,14 +22,19 @@ import {
   getJSONImplementationOptions,
 } from './ConfigurationForm.helpers';
 
-export const ConfigurationForm: React.FC = () => {
+interface ConfigurationFormProps {
+  showHeader?: boolean;
+}
+
+export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ showHeader = true }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const { isScalaVersionFieldVisible, isMetricsEndpointsFieldVisible } = useFeatureFlag();
 
   const { classes, cx } = useStyles();
   const form = useForm<StarterRequest>({
     mode: 'onBlur',
-    resolver: yupResolver(starterValidationSchema),
+    resolver: yupResolver(createStarterValidationSchema(isScalaVersionFieldVisible, isMetricsEndpointsFieldVisible)),
     defaultValues: {
       tapirVersion: TAPIR_VERSION_OPTIONS[0].value,
       addDocumentation: false,
@@ -102,9 +109,11 @@ export const ConfigurationForm: React.FC = () => {
 
   return (
     <Box>
-      <Typography variant="h3" component="h3" fontWeight={300} gutterBottom>
-        Generate tapir project
-      </Typography>
+      {showHeader && (
+        <Typography variant="h3" component="h3" fontWeight={300} gutterBottom>
+          Generate tapir project
+        </Typography>
+      )}
       <FormProvider {...form}>
         <form className={classes.formContainer} noValidate onSubmit={form.handleSubmit(handleFormSubmit)}>
           <FormTextField
@@ -126,6 +135,15 @@ export const ConfigurationForm: React.FC = () => {
             label="Tapir version"
             options={TAPIR_VERSION_OPTIONS}
           />
+
+          {isScalaVersionFieldVisible && (
+            <FormSelect
+              className={classes.formVersionsRow}
+              name="scalaVersion"
+              label="Scala version"
+              options={SCALA_VERSION_OPTIONS}
+            />
+          )}
 
           <FormSelect
             className={classes.formEffectsRow}
@@ -154,6 +172,15 @@ export const ConfigurationForm: React.FC = () => {
             label="Add JSON endpoint using"
             options={getJSONImplementationOptions(effectType)}
           />
+
+          {isMetricsEndpointsFieldVisible && (
+            <FormRadioGroup
+              className={classes.formEndpoints2ndRow}
+              name="addMetrics"
+              label="Add metrics endpoints"
+              options={ENDPOINTS_OPTIONS}
+            />
+          )}
 
           <div className={cx(classes.actionsContainer, classes.formActionsRow)}>
             <Button variant="contained" color="secondary" size="medium" onClick={handleFormReset} disableElevation>

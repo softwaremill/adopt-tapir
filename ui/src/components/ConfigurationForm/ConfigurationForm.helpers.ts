@@ -27,7 +27,11 @@ export const getEffectImplementationOptions = (effectType: EffectType): FormSele
  * Effect type to json implementation mapping
  */
 
-const commonJSONImplementations = [JSONImplementation.No, JSONImplementation.Circe, JSONImplementation.Jsoniter];
+const commonJSONImplementations: JSONImplementation[] = [
+  JSONImplementation.No,
+  JSONImplementation.Circe,
+  JSONImplementation.Jsoniter,
+];
 
 const effectTypeJsonImplementationMap: Record<EffectType, JSONImplementation[]> = {
   [EffectType.Future]: commonJSONImplementations,
