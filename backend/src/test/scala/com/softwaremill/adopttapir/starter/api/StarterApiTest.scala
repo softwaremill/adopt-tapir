@@ -3,6 +3,7 @@ package com.softwaremill.adopttapir.starter.api
 import better.files.File
 import cats.effect.{IO, Resource}
 import com.softwaremill.adopttapir.http.Error_OUT
+import com.softwaremill.adopttapir.infrastructure.Json._
 import com.softwaremill.adopttapir.starter.StarterDetails.defaultTapirVersion
 import com.softwaremill.adopttapir.starter.api.EffectRequest.FutureEffect
 import com.softwaremill.adopttapir.starter.api.JsonImplementationRequest.Jsoniter
@@ -11,7 +12,6 @@ import com.softwaremill.adopttapir.starter.api.StarterApiTest.{mainPath, validRe
 import com.softwaremill.adopttapir.test.Rich.RichIO
 import com.softwaremill.adopttapir.test.{BaseTest, TestDependencies}
 import fs2.io.file.Files
-import com.softwaremill.adopttapir.infrastructure.Json._
 import io.circe.jawn
 import org.scalatest.Assertion
 import sttp.client3.{HttpError, Response}
@@ -90,7 +90,7 @@ class StarterApiTest extends BaseTest with TestDependencies {
     // then
     ex.statusCode.code shouldBe 400
     jawn.decode[Error_OUT](ex.body).value.error should include(
-      "Project name: `Uppercase` should match regex: `^[a-z0-9]+$`"
+      "Project name: `Uppercase` should match regex: `^[a-z0-9_]+$`"
     )
   }
 
