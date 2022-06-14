@@ -1,16 +1,29 @@
-@(groupId: String)
+@(groupId: String, addDocumentation: Boolean)
 package @groupId
 
 import sttp.tapir.server.ziohttp.ZioHttpInterpreter
 import zhttp.http.HttpApp
-import zhttp.service.Server
+import zhttp.service.server.ServerChannelFactory
+import zhttp.service.{EventLoopGroup, Server}
 import zio.{Scope, ZIO, ZIOAppArgs, ZIOAppDefault}
+
+import scala.io.StdIn
 
 object Main extends ZIOAppDefault {
 
   override def run: ZIO[Any with ZIOAppArgs with Scope, Any, Any] = {
     val app: HttpApp[Any, Throwable] = ZioHttpInterpreter().toHttp(Endpoints.all)
 
-    Server.start(8080, app).exitCode
+    Server(app)
+      .withPort(8080)
+      .make
+      .flatMap(start =>
+        ZIO.succeedBlocking {
+          @if(addDocumentation){println("Go to http://localhost:8080/docs to open SwaggerUI. Press any key to exit.")}else{println("Server started at http://localhost:8080. Press any key to exit.")}
+          StdIn.readLine()
+        }
+      )
+      .provideSomeLayer(EventLoopGroup.auto(0) ++ ServerChannelFactory.auto ++ Scope.default)
+      .exitCode
   }
 }

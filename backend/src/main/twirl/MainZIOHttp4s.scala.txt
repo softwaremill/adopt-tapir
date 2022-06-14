@@ -1,4 +1,4 @@
-@(groupId: String)
+@(groupId: String, addDocumentation: Boolean)
 package @groupId
 
 import org.http4s.blaze.server.BlazeServerBuilder
@@ -19,7 +19,12 @@ object Main extends ZIOAppDefault {
       .bindHttp(8080, "localhost")
       .withHttpApp(Router("/" -> (routes)).orNotFound)
       .resource
-      .use { _ => ZIO.succeedBlocking(StdIn.readLine()) }
+      .use { _ =>
+        ZIO.succeedBlocking{
+          @if(addDocumentation){println("Go to http://localhost:8080/docs to open SwaggerUI. Press any key to exit.")}else{println("Server started at http://localhost:8080. Press any key to exit.")}
+          StdIn.readLine()
+        }
+      }
 
   }
 }

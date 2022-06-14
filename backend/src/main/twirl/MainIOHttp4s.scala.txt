@@ -1,4 +1,4 @@
-@(groupId: String)
+@(groupId: String, addDocumentation: Boolean)
 package @groupId
 
 import cats.effect.{ExitCode, IO, IOApp}
@@ -17,7 +17,11 @@ object Main extends IOApp {
       .bindHttp(8080, "localhost")
       .withHttpApp(Router("/" -> routes).orNotFound)
       .resource
-      .use { _ => IO(StdIn.readLine()) }
+      .use { _ => IO.blocking {
+         @if(addDocumentation){println("Go to http://localhost:8080/docs to open SwaggerUI. Press any key to exit.")}else{println("Server started at http://localhost:8080. Press any key to exit.")}
+         StdIn.readLine()
+         }
+      }
       .as(ExitCode.Success)
   }
 }

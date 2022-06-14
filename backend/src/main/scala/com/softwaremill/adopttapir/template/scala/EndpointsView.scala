@@ -161,7 +161,7 @@ object EndpointsView {
       }
       s"""  val $docEndpoints: List[${effectStr._1}] = SwaggerInterpreter().fromEndpoints[${effectStr._2}](List(${endpoints.mkString(
           ","
-        )}), "${projectName}", "1.0.0")""".stripMargin
+        )}), "$projectName", "1.0.0")""".stripMargin
     }
 
     def prepareImports(serverEffect: ServerEffect): Set[Import] = {
