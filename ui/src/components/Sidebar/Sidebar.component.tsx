@@ -12,13 +12,13 @@ export const Sidebar = () => {
         <figure className={classes.figure}>
           <TapirLogo />
           <Typography className={classes.figcaption} component="figcaption">
-            tAPIr
+            tapir
           </Typography>
         </figure>
 
         <Typography className={classes.infoText} variant="subtitle1">
-          With tapir, you can describe HTTP API endpoints as immutable Scala values. Each endpoint can contain a number
-          of input and output parameters.
+          Tapir provides a programmer-friendly, reasonably type-safe API to expose, consume and document HTTP endpoints,
+          using the Scala language.
         </Typography>
       </div>
 
