@@ -28,7 +28,7 @@ export const EFFECT_TYPE_OPTIONS: FormSelectOption<EffectType>[] = [
     value: EffectType.Future,
   },
   {
-    label: 'cats-effect',
+    label: 'IO (cats-effect)',
     value: EffectType.IO,
   },
   {
