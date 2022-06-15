@@ -94,6 +94,6 @@ class HttpApi(
 
   private val checkAdminPassword: UsernamePassword => IO[Either[Unit, Unit]] = credentials =>
     IO.pure {
-      if (constantTimeEquals(credentials.password.getOrElse(""), config.adminPassword)) Right(()) else Left(())
+      if (constantTimeEquals(credentials.password.getOrElse(""), config.adminPassword.value)) Right(()) else Left(())
     }
 }

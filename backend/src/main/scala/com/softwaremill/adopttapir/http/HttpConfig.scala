@@ -1,3 +1,5 @@
 package com.softwaremill.adopttapir.http
 
-case class HttpConfig(host: String, port: Int, adminPassword: String)
+import com.softwaremill.adopttapir.config.Sensitive
+
+case class HttpConfig(host: String, port: Int, adminPassword: Sensitive)
