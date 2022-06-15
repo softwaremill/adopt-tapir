@@ -1,8 +1,9 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { CssBaseline, Grid, Paper, Box } from '@mui/material';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { CssBaseline, Grid, Paper, Box, Container, ThemeProvider } from '@mui/material';
 import { Sidebar } from 'components/Sidebar';
 import { ConfigurationForm } from 'components/ConfigurationForm';
 import { Footer } from 'components/Footer';
+import { embeddedTheme } from './theme';
 
 import { useStyles } from './App.styles';
 
@@ -18,16 +19,18 @@ export const App: React.FC = () => {
             <main>
               <CssBaseline />
 
-              <Grid container sx={{ height: '100vh' }}>
-                <Grid item xs={3}>
+              <Grid className={classes.gridContainer} container>
+                <Grid item xs={12} md={3}>
                   <Sidebar />
                 </Grid>
 
-                <Grid item xs={9}>
+                <Grid item xs={12} md={9}>
                   <Box className={classes.configurationWrapper}>
-                    <Paper variant="outlined" sx={{ padding: 3 }}>
-                      <ConfigurationForm />
-                    </Paper>
+                    <Container maxWidth="lg" disableGutters>
+                      <Paper className={classes.configurationPaper} variant="outlined">
+                        <ConfigurationForm />
+                      </Paper>
+                    </Container>
                   </Box>
                   <Box className={classes.footerWrapper}>
                     <Footer />
@@ -38,7 +41,17 @@ export const App: React.FC = () => {
           }
         />
 
-        <Route path="/embedded-form" element={<ConfigurationForm showHeader={false} />} />
+        <Route
+          path="/embedded-form"
+          element={
+            <ThemeProvider theme={embeddedTheme}>
+              <CssBaseline />
+              <ConfigurationForm isEmbedded />
+            </ThemeProvider>
+          }
+        />
+
+        <Route path="*" element={<Navigate to="/" replace={true} />} />
       </Routes>
     </BrowserRouter>
   );
