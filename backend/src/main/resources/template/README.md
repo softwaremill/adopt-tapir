@@ -2,14 +2,6 @@
 
 If you don't have already installed `sbt` you can use already provided wrapper script:
 
-1) change file permissions to execute
-
-```shell
-chmod 0755 sbtx # set build script executable
-```
-
-2) Run basic sbt commands:
-
 ```shell
 ./sbtx compile #builds project
 

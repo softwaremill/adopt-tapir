@@ -5,9 +5,9 @@ import better.files.{FileExtensions, File => BFile}
 import cats.effect.IO
 import com.softwaremill.adopttapir.logging.FLogging
 import com.softwaremill.adopttapir.template.{GeneratedFile, ProjectTemplate}
+import com.softwaremill.adopttapir.util.ZipArchiver
 
 import java.io.File
-import java.util.zip.Deflater
 import scala.reflect.io.Directory
 
 class StarterService(
@@ -54,9 +54,9 @@ class StarterService(
   }
 
   private def zipDirectory(directoryFile: File): IO[File] = IO.blocking {
-    directoryFile.toScala
-      .zipTo(destination = BFile.newTemporaryFile(prefix = directoryFile.getName + "_", suffix = ".zip"), Deflater.BEST_SPEED)
-      .toJava
+    val destination = BFile.newTemporaryFile(prefix = directoryFile.getName + "_", suffix = ".zip")
+    ZipArchiver().create(destination.path, directoryFile.toPath)
+    destination.toJava
   }
 
   private def deleteRecursively(tempDir: File): IO[Unit] = IO.blocking {
