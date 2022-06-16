@@ -8,9 +8,12 @@ export const useStyles = makeStyles()(theme => ({
     alignItems: 'center',
     height: '100%',
     backgroundColor: theme.palette.secondary.main,
-    borderRightWidth: '2px',
-    borderRightStyle: 'solid',
-    borderRightColor: theme.palette.primary.main,
+
+    [theme.breakpoints.up('md')]: {
+      borderRightWidth: '2px',
+      borderRightStyle: 'solid',
+      borderRightColor: theme.palette.primary.main,
+    },
   },
 
   figureWrapper: {
@@ -26,9 +29,9 @@ export const useStyles = makeStyles()(theme => ({
   },
 
   figure: {
-    width: '50%',
+    width: '100%',
+    maxWidth: 260,
     marginTop: theme.spacing(8),
-    pointerEvents: 'none',
   },
 
   figcaption: {

@@ -23,15 +23,15 @@ import {
 } from './ConfigurationForm.helpers';
 
 interface ConfigurationFormProps {
-  showHeader?: boolean;
+  isEmbedded?: boolean;
 }
 
-export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ showHeader = true }) => {
+export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded = false }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const { isScalaVersionFieldVisible, isMetricsEndpointsFieldVisible } = useFeatureFlag();
 
-  const { classes, cx } = useStyles();
+  const { classes, cx } = useStyles({ isEmbedded });
   const form = useForm<StarterRequest>({
     mode: 'onBlur',
     resolver: yupResolver(createStarterValidationSchema(isScalaVersionFieldVisible, isMetricsEndpointsFieldVisible)),
@@ -109,7 +109,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ showHeader
 
   return (
     <Box>
-      {showHeader && (
+      {!isEmbedded && (
         <Typography variant="h3" component="h3" fontWeight={300} gutterBottom>
           Generate tapir project
         </Typography>
@@ -187,7 +187,14 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ showHeader
               Reset
             </Button>
 
-            <Button variant="contained" color="primary" size="medium" type="submit" disableElevation>
+            <Button
+              className={classes.submitButton}
+              variant="contained"
+              color="primary"
+              size="medium"
+              type="submit"
+              disableElevation
+            >
               Generate .zip
             </Button>
           </div>

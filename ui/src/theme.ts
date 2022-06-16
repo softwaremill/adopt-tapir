@@ -1,6 +1,6 @@
-import { createTheme } from '@mui/material/styles';
+import { createTheme, responsiveFontSizes } from '@mui/material/styles';
 
-export const theme = createTheme({
+const baseTheme = createTheme({
   palette: {
     primary: {
       main: '#f3705e',
@@ -13,6 +13,16 @@ export const theme = createTheme({
     },
     neutral: {
       main: '#f5f5f5',
+    },
+  },
+});
+
+export const theme = responsiveFontSizes(baseTheme);
+
+export const embeddedTheme = createTheme(theme, {
+  palette: {
+    background: {
+      default: 'initial',
     },
   },
 });

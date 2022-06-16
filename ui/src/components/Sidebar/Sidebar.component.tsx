@@ -16,7 +16,7 @@ export const Sidebar = () => {
           </Typography>
         </figure>
 
-        <Typography className={classes.infoText} variant="subtitle1">
+        <Typography className={classes.infoText} variant="subtitle1" component="h1">
           Tapir provides a programmer-friendly, reasonably type-safe API to expose, consume and document HTTP endpoints,
           using the Scala language.
         </Typography>
