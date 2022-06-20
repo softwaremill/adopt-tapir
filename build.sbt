@@ -50,7 +50,8 @@ val loggingDependencies = Seq(
 )
 
 val fileDependencies = Seq(
-  "com.github.pathikrit" %% "better-files" % "3.9.1"
+  "com.github.pathikrit" %% "better-files" % "3.9.1",
+  "org.apache.commons" % "commons-compress" % "1.21"
 )
 
 val configDependencies = Seq(

@@ -35,7 +35,9 @@ class StarterApiTest extends BaseTest with TestDependencies {
         "build.sbt",
         "EndpointsSpec.scala",
         "Endpoints.scala",
-        "Main.scala"
+        "Main.scala",
+        "sbtx",
+        "README.md"
       )
     }
   }
