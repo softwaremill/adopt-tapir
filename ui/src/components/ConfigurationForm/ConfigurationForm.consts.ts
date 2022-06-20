@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 import { EffectType, EffectImplementation, JSONImplementation } from 'api/starter';
-import type { FormSelectOption } from '../FormSelect';
-import type { FormRadioOption } from '../FormRadioGroup';
+import type {FormSelectOption} from '../FormSelect';
+import type {FormRadioOption} from '../FormRadioGroup';
 import {
   mapEffectTypeToEffectImplementation,
   mapEffectTypeToJSONImplementation,
@@ -110,7 +110,7 @@ export const createStarterValidationSchema = (
       projectName: yup
         .string()
         .strict()
-        .matches(/^[a-z0-9_]+$/, 'Project name can consists of only lowercase characters, numbers and underscores')
+        .matches(/^[a-z0-9_]$|^[a-z0-9_]+[a-z0-9_-]*[a-z0-9_]+$/, 'Project name can consists of only lowercase characters, numbers, underscores and dashes (not at the beginning or end).')
         .required(REQUIRED_FIELD_MESSAGE),
       groupId: yup
         .string()
@@ -176,15 +176,15 @@ export const createStarterValidationSchema = (
     .concat(
       isScalaVersionFieldVisible
         ? yup.object({
-            scalaVersion: yup.string().required(REQUIRED_FIELD_MESSAGE),
-          })
+          scalaVersion: yup.string().required(REQUIRED_FIELD_MESSAGE),
+        })
         : yup.object({})
     )
     .concat(
       isMetricsEndpointsFieldVisible
         ? yup.object({
-            addMetrics: yup.boolean().required(REQUIRED_FIELD_MESSAGE),
-          })
+          addMetrics: yup.boolean().required(REQUIRED_FIELD_MESSAGE),
+        })
         : yup.object({})
     );
 };

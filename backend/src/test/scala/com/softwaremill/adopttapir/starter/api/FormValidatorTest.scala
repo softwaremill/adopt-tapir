@@ -18,7 +18,9 @@ class FormValidatorTest extends BaseTest {
     val result = FormValidator.validate(starterRequest)
 
     // then
-    result.left.value.msg should include(s"Project name: `${starterRequest.projectName}` should match regex: `^[a-z0-9_]+$$`")
+    result.left.value.msg should include(
+      s"Project name: `${starterRequest.projectName}` should match regex: `^[a-z0-9_]$$|^[a-z0-9_]+[a-z0-9_-]*[a-z0-9_]+$$`"
+    )
   }
 
   it should "raise a problem with groupId when it not follow Java naming package" in {
