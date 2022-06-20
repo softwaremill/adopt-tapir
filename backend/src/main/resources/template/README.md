@@ -2,7 +2,11 @@
 
 If you don't have [sbt](https://www.scala-sbt.org) installed already, you can use the provided wrapper script:
 
+As it is a wrapper, check [sbtx usage](https://github.com/dwijnand/sbt-extras#sbt--h), as there are some changes
+for input parametrization.
+
 ```shell
+./sbtx -h # shows an usage of a wrapper script
 ./sbtx compile # build the project
 ./sbtx test # run the tests
 ./sbtx run # run the application (Main)

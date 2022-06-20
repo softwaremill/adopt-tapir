@@ -1,7 +1,7 @@
 package com.softwaremill.adopttapir.starter
 
 import better.files.File.newTemporaryDirectory
-import better.files.{FileExtensions, File => BFile}
+import better.files.{File => BFile}
 import cats.effect.IO
 import com.softwaremill.adopttapir.logging.FLogging
 import com.softwaremill.adopttapir.template.{GeneratedFile, ProjectTemplate}
