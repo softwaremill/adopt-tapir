@@ -2,9 +2,6 @@
 
 If you don't have [sbt](https://www.scala-sbt.org) installed already, you can use the provided wrapper script:
 
-As it is a wrapper, check [sbtx usage](https://github.com/dwijnand/sbt-extras#sbt--h), as there are some changes
-for input parametrization.
-
 ```shell
 ./sbtx -h # shows an usage of a wrapper script
 ./sbtx compile # build the project
@@ -12,7 +9,9 @@ for input parametrization.
 ./sbtx run # run the application (Main)
 ```
 
-Otherwise, if sbt is already installed, use standard sbt commands:
+For more details check the [sbtx usage](https://github.com/dwijnand/sbt-extras#sbt--h) page.
+
+Otherwise, if sbt is already installed, you can use the standard commands:
 
 ```shell
 sbt compile # build the project
