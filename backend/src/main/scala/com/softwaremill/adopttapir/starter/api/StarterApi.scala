@@ -16,11 +16,11 @@ import sttp.tapir.CodecFormat
 class StarterApi(http: Http, starterService: StarterService) {
 
   type ContentDispositionValue = String
+  type ContentLengthValue = Long
 
   import http._
 
   private val starterPath = "starter.zip"
-  private val zippedFileNameHeader = "Content-Disposition"
 
   private val starterEndpoint = {
     val zippedFileStream = streamBinaryBody(Fs2Streams[IO])(CodecFormat.Zip())
@@ -29,11 +29,11 @@ class StarterApi(http: Http, starterService: StarterService) {
       .in(starterPath)
       .in(jsonBody[StarterRequest])
       .out(zippedFileStream)
-      .out(header(HeaderNames.AccessControlExposeHeaders, zippedFileNameHeader))
-      .out(header[ContentDispositionValue](zippedFileNameHeader))
-      .out(header[Long](HeaderNames.ContentLength))
+      .out(header(HeaderNames.AccessControlExposeHeaders, HeaderNames.ContentDisposition))
+      .out(header[ContentDispositionValue](HeaderNames.ContentDisposition))
+      .out(header[ContentLengthValue](HeaderNames.ContentLength))
       .serverLogic[IO] { request =>
-        val logicFlow: EitherT[IO, Fail, (fs2.Stream[IO, Byte], ContentDispositionValue, Long)] = for {
+        val logicFlow: EitherT[IO, Fail, (fs2.Stream[IO, Byte], ContentDispositionValue, ContentLengthValue)] = for {
           det <- EitherT(IO.pure(FormValidator.validate(request)))
           result <- EitherT.liftF(
             starterService
