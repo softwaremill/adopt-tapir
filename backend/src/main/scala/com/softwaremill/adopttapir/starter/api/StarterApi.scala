@@ -29,6 +29,7 @@ class StarterApi(http: Http, starterService: StarterService) {
       .in(starterPath)
       .in(jsonBody[StarterRequest])
       .out(zippedFileStream)
+      .out(header(HeaderNames.AccessControlExposeHeaders, zippedFileNameHeader))
       .out(header[ContentDispositionValue](zippedFileNameHeader))
       .out(header[Long](HeaderNames.ContentLength))
       .serverLogic[IO] { request =>
