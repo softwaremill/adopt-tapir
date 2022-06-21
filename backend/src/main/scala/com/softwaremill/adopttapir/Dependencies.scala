@@ -7,8 +7,6 @@ import com.softwaremill.adopttapir.http.{Http, HttpApi, HttpConfig}
 import com.softwaremill.adopttapir.metrics.VersionApi
 import com.softwaremill.adopttapir.starter.api.StarterApi
 import com.softwaremill.macwire.autocats.autowire
-import io.prometheus.client.CollectorRegistry
-import io.prometheus.client.hotspot.DefaultExports
 import sttp.tapir.server.metrics.prometheus.PrometheusMetrics
 
 case class Dependencies(api: HttpApi)
@@ -23,9 +21,7 @@ object Dependencies {
         versionApi: VersionApi,
         cfg: HttpConfig
     ) = {
-      val registry = new CollectorRegistry()
-      DefaultExports.register(registry)
-      val prometheusMetrics = PrometheusMetrics.default[IO](registry = registry)
+      val prometheusMetrics = PrometheusMetrics.default[IO]("adopt_tapir")
       new HttpApi(
         http,
         userApi.endpoints,
