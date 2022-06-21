@@ -1,4 +1,4 @@
-POST {{url}}/starter.zip
+POST {{url}}/api/v1/starter.zip
 Accept: application/zip
 Content-Type: application/json
 
@@ -11,5 +11,3 @@ Content-Type: application/json
   "addDocumentation": true,
   "json": "Jsoniter"
 }
-
-###
