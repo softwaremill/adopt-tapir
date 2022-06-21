@@ -48,7 +48,6 @@ class StarterApi(http: Http, starterService: StarterService) {
   }
 
   private def defineZipFileName(projectName: String): ContentDispositionValue = {
-    // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition
     s"attachment; filename=\"$projectName-tapir-starter.zip\""
   }
 
