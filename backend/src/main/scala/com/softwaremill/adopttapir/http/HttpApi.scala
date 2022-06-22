@@ -8,9 +8,7 @@ import com.typesafe.scalalogging.StrictLogging
 import org.http4s.HttpRoutes
 import org.http4s.blaze.server.BlazeServerBuilder
 import sttp.capabilities.fs2.Fs2Streams
-import sttp.model.StatusCode
 import sttp.tapir._
-import sttp.tapir.model.UsernamePassword
 import sttp.tapir.server.ServerEndpoint
 import sttp.tapir.server.http4s.{Http4sServerInterpreter, Http4sServerOptions}
 import sttp.tapir.server.interceptor.cors.CORSInterceptor
@@ -37,7 +35,7 @@ class HttpApi(
 ) extends StrictLogging {
   private val apiContextPath = List("api", "v1")
 
-  val serverOptions: Http4sServerOptions[IO] = Http4sServerOptions
+  private val serverOptions: Http4sServerOptions[IO] = Http4sServerOptions
     .customiseInterceptors[IO]
     .prependInterceptor(CorrelationIdInterceptor)
     // all errors are formatted as json, and there are no other additional http4s routes
@@ -56,9 +54,10 @@ class HttpApi(
     .metricsInterceptor(prometheusMetrics.metricsInterceptor())
     .options
 
-  lazy val routes: HttpRoutes[IO] = Http4sServerInterpreter(serverOptions).toRoutes(allEndpoints)
+  private lazy val publicRoutes: HttpRoutes[IO] = Http4sServerInterpreter(serverOptions).toRoutes(allPublicEndpoints)
+  private lazy val adminRoutes: HttpRoutes[IO] = Http4sServerInterpreter(serverOptions).toRoutes(allAdminEndpoints)
 
-  lazy val allEndpoints: List[ServerEndpoint[Any with Fs2Streams[IO], IO]] = {
+  lazy val allPublicEndpoints: List[ServerEndpoint[Any with Fs2Streams[IO], IO]] = {
     // creating the documentation using `mainEndpoints` without the /api/v1 context path; instead, a server will be added
     // with the appropriate suffix
     val docsEndpoints = SwaggerInterpreter(swaggerUIOptions = SwaggerUIOptions.default.copy(contextPath = apiContextPath))
@@ -67,11 +66,6 @@ class HttpApi(
     // for /api/v1 requests, first trying the API; then the docs
     val apiEndpoints =
       (mainEndpoints ++ docsEndpoints).map(se => se.prependSecurityIn(apiContextPath.foldLeft(emptyInput: EndpointInput[Unit])(_ / _)))
-
-    val allAdminEndpoints = (adminEndpoints ++ List(prometheusMetrics.metricsEndpoint))
-      .map(
-        _.prependSecurity("admin".and(auth.basic[UsernamePassword]()), statusCode(StatusCode.Unauthorized))(checkAdminPassword)
-      )
 
     // for all other requests, first trying getting existing webapp resource (html, js, css files), from the /webapp
     // directory on the classpath; otherwise, returning index.html; this is needed to support paths in the frontend
@@ -83,17 +77,23 @@ class HttpApi(
         ResourcesOptions.default.defaultResource(List("index.html"))
       )
     )
-    apiEndpoints.toList ++ allAdminEndpoints.toList ++ webappEndpoints
+    apiEndpoints.toList ++ webappEndpoints
   }
 
-  /** The resource describing the HTTP server; binds when the resource is allocated. */
-  lazy val resource: Resource[IO, org.http4s.server.Server] = BlazeServerBuilder[IO]
-    .bindHttp(config.port, config.host)
-    .withHttpApp(routes.orNotFound)
-    .resource
+  private lazy val allAdminEndpoints: List[ServerEndpoint[Any with Fs2Streams[IO], IO]] =
+    (adminEndpoints ++ List(prometheusMetrics.metricsEndpoint)).toList
 
-  private val checkAdminPassword: UsernamePassword => IO[Either[Unit, Unit]] = credentials =>
-    IO.pure {
-      if (constantTimeEquals(credentials.password.getOrElse(""), config.adminPassword.value)) Right(()) else Left(())
-    }
+  /** The resource describing the HTTP server; binds when the resource is allocated. */
+  lazy val resource: Resource[IO, (org.http4s.server.Server, org.http4s.server.Server)] = {
+    def resource(routes: HttpRoutes[IO], port: Int) =
+      BlazeServerBuilder[IO]
+        .bindHttp(port, config.host)
+        .withHttpApp(routes.orNotFound)
+        .resource
+
+    for {
+      public <- resource(publicRoutes, config.port)
+      admin <- resource(adminRoutes, config.adminPort)
+    } yield (public, admin)
+  }
 }
