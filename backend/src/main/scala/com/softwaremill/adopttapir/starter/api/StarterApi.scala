@@ -5,10 +5,10 @@ import cats.effect.IO
 import cats.implicits.toBifunctorOps
 import com.softwaremill.adopttapir.Fail
 import com.softwaremill.adopttapir.http.Http
+import com.softwaremill.adopttapir.infrastructure.Json._
 import com.softwaremill.adopttapir.starter._
 import com.softwaremill.adopttapir.util.ServerEndpoints
 import fs2.io.file.Files
-import com.softwaremill.adopttapir.infrastructure.Json._
 import sttp.capabilities.fs2.Fs2Streams
 import sttp.tapir.CodecFormat
 
