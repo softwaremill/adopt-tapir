@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Box, Button, Typography, CircularProgress, Backdrop, Snackbar, Alert } from '@mui/material';
-import { useForm, FormProvider } from 'react-hook-form';
+import { Alert, Backdrop, Box, Button, CircularProgress, Snackbar, Typography } from '@mui/material';
+import { FormProvider, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { StarterRequest, JSONImplementation } from 'api/starter';
+import { saveAs } from 'file-saver';
+import { JSONImplementation, StarterRequest } from 'api/starter';
 import { useFeatureFlag } from '../../hooks/useFeatureFlag';
 import { FormTextField } from '../FormTextField';
 import { FormSelect } from '../FormSelect';
@@ -10,16 +11,16 @@ import { FormRadioGroup } from '../FormRadioGroup';
 import { useStyles } from './ConfigurationForm.styles';
 import {
   createStarterValidationSchema,
-  TAPIR_VERSION_OPTIONS,
-  SCALA_VERSION_OPTIONS,
   EFFECT_TYPE_OPTIONS,
   ENDPOINTS_OPTIONS,
+  SCALA_VERSION_OPTIONS,
+  TAPIR_VERSION_OPTIONS,
 } from './ConfigurationForm.consts';
 import {
-  mapEffectTypeToEffectImplementation,
-  mapEffectTypeToJSONImplementation,
   getEffectImplementationOptions,
   getJSONImplementationOptions,
+  mapEffectTypeToEffectImplementation,
+  mapEffectTypeToJSONImplementation,
 } from './ConfigurationForm.helpers';
 
 interface ConfigurationFormProps {
@@ -77,17 +78,17 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
         body: JSON.stringify(formData),
       });
 
-      if (response.ok) {
-        const blob = await response.blob();
-        const file = URL.createObjectURL(blob);
-
-        // download starter zip file
-        window.location.assign(file);
-      } else {
+      if (!response.ok) {
         const json = await response.json();
 
         throw new Error(json.error || 'Something went wrong, please try again later.');
       }
+
+      const blob = await response.blob();
+      const filename = response.headers.get('Content-Disposition')?.split('filename=')[1].replaceAll('"', '');
+
+      // download starter zip file
+      saveAs(blob, filename ?? 'starter.zip');
     } catch (error) {
       if (error instanceof Error) {
         setErrorMessage(error.message);
