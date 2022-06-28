@@ -5,6 +5,7 @@ import better.files.{File => BFile}
 import cats.effect.IO
 import com.softwaremill.adopttapir.logging.FLogging
 import com.softwaremill.adopttapir.metrics.Metrics.generatedStarterCounter
+import com.softwaremill.adopttapir.template.ProjectTemplate.legalizeGroupId
 import com.softwaremill.adopttapir.template.{GeneratedFile, ProjectTemplate}
 import com.softwaremill.adopttapir.util.ZipArchiver
 
@@ -37,9 +38,9 @@ class StarterService(
     List(
       template.getBuildSbt(starterDetails),
       template.getBuildProperties,
-      template.getMain(starterDetails),
-      template.getEndpoints(starterDetails),
-      template.getEndpointsSpec(starterDetails),
+      template.getMain(legalizeGroupId(starterDetails)),
+      template.getEndpoints(legalizeGroupId(starterDetails)),
+      template.getEndpointsSpec(legalizeGroupId(starterDetails)),
       template.pluginsSbt,
       template.scalafmtConf,
       template.sbtx,

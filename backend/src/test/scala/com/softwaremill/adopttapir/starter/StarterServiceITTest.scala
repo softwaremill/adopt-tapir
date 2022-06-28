@@ -41,7 +41,7 @@ class StarterServiceITTest extends BaseTest with ParallelTestExecution {
             zipFile.unzipTo(tempDir)
             zipFile.delete()
           }
-          _ <- IO.blocking(os.proc("sbt", ";compile ;test").call(cwd = os.Path((tempDir.toJava))).exitCode shouldBe 0)
+          _ <- IO.blocking(os.proc("sbt", ";compile ;test").call(cwd = os.Path(tempDir.toJava)).exitCode shouldBe 0)
 
         } yield zipFile
 
