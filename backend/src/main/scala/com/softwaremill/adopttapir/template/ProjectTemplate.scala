@@ -2,7 +2,7 @@ package com.softwaremill.adopttapir.template
 
 import better.files.Resource
 import com.softwaremill.adopttapir.starter.{StarterConfig, StarterDetails}
-import com.softwaremill.adopttapir.template.ProjectTemplate.{ScalafmtConfigFile, readMeFile, sbtxFile, toSortedList}
+import com.softwaremill.adopttapir.template.ProjectTemplate._
 import com.softwaremill.adopttapir.template.sbt.BuildSbtView
 import com.softwaremill.adopttapir.template.scala.{EndpointsSpecView, EndpointsView, Import, MainView}
 
@@ -114,6 +114,22 @@ object ProjectTemplate {
   val ScalafmtConfigFile = ".scalafmt.conf"
   val sbtxFile = "sbtx"
   val readMeFile = "README.md"
+
+  def legalizeGroupId(starterDetails: StarterDetails): StarterDetails = {
+    def legalize(packageNameSection: String): String = {
+      val startsWithNumberRgx = "^\\d+.*$"
+
+      if (packageNameSection.matches(startsWithNumberRgx)) {
+        "_" + packageNameSection
+      } else {
+        packageNameSection
+      }
+    }
+
+    def legalizeGroupId(groupId: String): String = groupId.split('.').map(legalize).mkString(".")
+
+    starterDetails.copy(groupId = legalizeGroupId(starterDetails.groupId))
+  }
 
   def toSortedList(set: Set[Import]): List[Import] = set.toList.sortBy(_.fullName)
 }
