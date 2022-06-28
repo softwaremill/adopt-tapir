@@ -4,6 +4,7 @@ import better.files.File.newTemporaryDirectory
 import better.files.{File => BFile}
 import cats.effect.IO
 import com.softwaremill.adopttapir.logging.FLogging
+import com.softwaremill.adopttapir.metrics.Metrics
 import com.softwaremill.adopttapir.metrics.Metrics.generatedStarterCounter
 import com.softwaremill.adopttapir.template.ProjectTemplate.legalizeGroupId
 import com.softwaremill.adopttapir.template.{GeneratedFile, ProjectTemplate}
@@ -63,7 +64,11 @@ class StarterService(
   }
 
   private def increaseMetricCounter(details: StarterDetails): IO[Unit] = {
-    val labelValues = details.productIterator.toList.map(_.toString)
+    val labelValues = details.productElementNames
+      .zip(details.productIterator.toList)
+      .filterNot { case (name, _) => Metrics.excludedStarterDetailsFields.contains(name) }
+      .map(_._2.toString)
+      .toList
 
     IO(
       generatedStarterCounter

@@ -1,5 +1,8 @@
 package com.softwaremill.adopttapir.starter
 
+/** In case of modifying [[StarterDetails.projectName]] or [[StarterDetails.groupId]] update also
+  * [[com.softwaremill.adopttapir.metrics.Metrics.excludedStarterDetailsFields]]
+  */
 case class StarterDetails(
     projectName: String,
     groupId: String,

@@ -8,18 +8,27 @@ object Metrics {
     Counter
       .build()
       .name(s"adopt_tapir_starter_generated_total")
-      .labelNames(starterDetailsFieldNames: _*)
+      .labelNames(starterDetailsLabels: _*)
       .help(
-        s"""Total generated starters with given parameters ${starterDetailsFieldNames.map(n => s"\"$n\"").mkString(", ")}"""
+        s"""Total generated starters with given parameters ${starterDetailsLabels.map(n => s"\"$n\"").mkString(", ")}"""
       )
       .register()
 
   def init(): Unit = hotspot.DefaultExports.initialize()
 
-  private val starterDetailsFieldNames: Array[String] = {
+  val excludedStarterDetailsFields: Set[String] = Set("projectName", "groupId")
+
+  private val starterDetailsLabels: Array[String] = {
     val fakeInstance: StarterDetails =
       StarterDetails("", "", ServerEffect.IOEffect, ServerImplementation.Akka, "", true, JsonImplementation.WithoutJson)
 
-    fakeInstance.productElementNames.toArray
+    val names = fakeInstance.productElementNames.toArray.filterNot(excludedStarterDetailsFields.contains)
+    require(
+      names.length == fakeInstance.productElementNames.length - excludedStarterDetailsFields.size,
+      s"One of fields $excludedStarterDetailsFields no longer exists in ${fakeInstance.productElementNames.toList
+          .mkString("StarterDetails(", ",", ")")}"
+    )
+
+    names
   }
 }
