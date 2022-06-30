@@ -1,0 +1,47 @@
+@(
+starterDetails: com.softwaremill.adopttapir.starter.StarterDetails,
+additionalImports: List[com.softwaremill.adopttapir.template.scala.Import],
+helloStub: String,
+booksStub: String
+)
+package @{starterDetails.groupId}
+import @{starterDetails.groupId}.Endpoints._
+import sttp.client3.testing.SttpBackendStub
+import sttp.client3.{UriContext, basicRequest}
+import sttp.tapir.server.stub.TapirStubInterpreter
+import zio.test.Assertion._
+import zio.test.{ZIOSpecDefault, assertZIO}
+@for(additionalImport <- additionalImports) {
+@{additionalImport.asScalaImport()}}
+
+object EndpointsSpec extends ZIOSpecDefault {
+  def spec = suite("Endpoints spec")(
+    test("return hello message") {
+    //given
+    @helloStub
+
+    //when
+    val response = basicRequest
+      .get(uri"http://test.com/hello?name=adam")
+      .send(backendStub)
+
+    // then
+    assertZIO(response.map(_.body))(isRight(equalTo("Hello adam")))
+    }
+@if(booksStub.nonEmpty){
+    ,test("list available books") {
+      // given
+      @booksStub
+
+      // when
+      val response = basicRequest
+        .get(uri"http://test.com/books/list/all")
+        .response(asJson[List[Book]])
+        .send(backendStub)
+
+      // then
+      assertZIO(response.map(_.body))(isRight(equalTo(books.get())))
+    }
+}
+  )
+}

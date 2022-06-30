@@ -3,7 +3,8 @@ name: String,
 groupId: String,
 scalaVersion: String,
 tapirVersion: String,
-dependencies: String
+dependencies: String,
+isZIO: Boolean
 )
 val tapirVersion = "@tapirVersion"
 
@@ -15,6 +16,8 @@ lazy val rootProject = (project in file(".")).settings(
     scalaVersion := "@scalaVersion",
     libraryDependencies ++= Seq(
 @dependencies
-    )
+    )@if(isZIO){,
+    testFrameworks := Seq(new TestFramework("zio.test.sbt.ZTestFramework"))
+    }
   )
 )
