@@ -26,6 +26,7 @@ class ProjectTemplate(config: StarterConfig) {
         starterDetails.projectName,
         starterDetails.groupId,
         config.scalaVersion,
+        // TODO: use build time tapir version
         starterDetails.tapirVersion,
         (BuildSbtView.getDependencies _).andThen(BuildSbtView.format)(starterDetails),
         starterDetails.serverEffect == ZIOEffect

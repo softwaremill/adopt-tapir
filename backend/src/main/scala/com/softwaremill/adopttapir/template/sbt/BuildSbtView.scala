@@ -4,6 +4,8 @@ import com.softwaremill.adopttapir.starter.ServerEffect._
 import com.softwaremill.adopttapir.starter.ServerImplementation.{Akka, Http4s, Netty, ZIOHttp}
 import com.softwaremill.adopttapir.starter.{JsonImplementation, ServerEffect, StarterDetails}
 import com.softwaremill.adopttapir.template.sbt.Dependency._
+import com.softwaremill.adopttapir.version.TemplateDependencyInfo
+import com.softwaremill.adopttapir.version.TemplateDependencyInfo._
 
 object BuildSbtView {
 
@@ -33,11 +35,11 @@ object BuildSbtView {
   }
 
   private def getTestDependencies(effect: ServerEffect): List[ScalaTestDependency] = {
-    if (effect != ServerEffect.ZIOEffect) List(ScalaTestDependency("org.scalatest", "scalatest", scalatestVersion))
+    if (effect != ServerEffect.ZIOEffect) List(ScalaTestDependency("org.scalatest", "scalatest", TemplateDependencyInfo.scalaTestVersion))
     else
       List(
-        ScalaTestDependency("dev.zio", "zio-test", zioTestVersion),
-        ScalaTestDependency("dev.zio", "zio-test-sbt", zioTestVersion)
+        ScalaTestDependency("dev.zio", "zio-test", TemplateDependencyInfo.zioTestVersion),
+        ScalaTestDependency("dev.zio", "zio-test-sbt", TemplateDependencyInfo.zioTestVersion)
       )
   }
 
@@ -111,7 +113,7 @@ object BuildSbtView {
 
     def http4s(): List[ScalaDependency] = List(
       ScalaDependency("com.softwaremill.sttp.tapir", "tapir-http4s-server", constantTapirVersion),
-      ScalaDependency("org.http4s", "http4s-blaze-server", http4sBlazeServerVersion)
+      ScalaDependency("org.http4s", "http4s-blaze-server", TemplateDependencyInfo.http4sBlazeServerVersion)
     )
 
     def http4sZIO(): List[ScalaDependency] =
