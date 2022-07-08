@@ -19,6 +19,7 @@ object StarterRequestGenerators {
       effect <- Gen.oneOf(EffectRequest.values)
       serverImplementation <- Gen.oneOf(ServerImplementationRequest.values)
       documentationAdded <- Gen.oneOf(true, false)
+      metricsAdded <- Gen.oneOf(true, false)
       json <- Gen.oneOf(JsonImplementationRequest.values)
     } yield StarterRequest(
       projectName,
@@ -27,6 +28,7 @@ object StarterRequestGenerators {
       implementation = serverImplementation,
       StarterDetails.defaultTapirVersion,
       documentationAdded,
+      metricsAdded,
       json
     )
   }

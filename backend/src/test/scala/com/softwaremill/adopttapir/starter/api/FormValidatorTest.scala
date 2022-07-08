@@ -77,7 +77,7 @@ class FormValidatorTest extends BaseTest {
   }
 
   it should "not raise a problem with Effect and Implementation" in {
-    val request = StarterRequest("project", "com.softwaremill", FutureEffect, Akka, tapirVersion = "1.0.0-RC1", addDocumentation = true, No)
+    val request = defaultRequest()
     val request1 = request.copy(effect = FutureEffect, implementation = Netty)
     val request2 = request.copy(effect = IOEffect, implementation = Netty)
     val request3 = request.copy(effect = IOEffect, implementation = Http4s)
@@ -91,6 +91,7 @@ class FormValidatorTest extends BaseTest {
       ServerImplementation.Akka,
       request.tapirVersion,
       addDocumentation = true,
+      false,
       WithoutJson
     )
     FormValidator.validate(request1).value shouldBe StarterDetails(
@@ -100,6 +101,7 @@ class FormValidatorTest extends BaseTest {
       ServerImplementation.Netty,
       request1.tapirVersion,
       addDocumentation = true,
+      false,
       WithoutJson
     )
     FormValidator.validate(request2).value shouldBe StarterDetails(
@@ -109,6 +111,7 @@ class FormValidatorTest extends BaseTest {
       ServerImplementation.Netty,
       request2.tapirVersion,
       addDocumentation = true,
+      false,
       WithoutJson
     )
     FormValidator.validate(request3).value shouldBe StarterDetails(
@@ -118,6 +121,7 @@ class FormValidatorTest extends BaseTest {
       ServerImplementation.Http4s,
       request3.tapirVersion,
       addDocumentation = true,
+      false,
       WithoutJson
     )
     FormValidator.validate(request4).value shouldBe StarterDetails(
@@ -127,6 +131,7 @@ class FormValidatorTest extends BaseTest {
       ServerImplementation.Http4s,
       request4.tapirVersion,
       addDocumentation = true,
+      false,
       WithoutJson
     )
     FormValidator.validate(request5).value shouldBe StarterDetails(
@@ -136,7 +141,39 @@ class FormValidatorTest extends BaseTest {
       ServerImplementation.ZIOHttp,
       request5.tapirVersion,
       addDocumentation = true,
+      false,
       WithoutJson
     )
   }
+
+  it should "not raise a problem with metrics for Future Akka implementation" in {
+    val request = defaultRequest().copy(addMetrics = true)
+    FormValidator.validate(request).value shouldBe StarterDetails(
+      request.projectName,
+      request.groupId,
+      ServerEffect.FutureEffect,
+      ServerImplementation.Akka,
+      request.tapirVersion,
+      addDocumentation = true,
+      true,
+      WithoutJson
+    )
+  }
+
+  it should "raise a problem when metrics are enabled for anything but Future Akka implementation" in {
+    val request = defaultRequest().copy(addMetrics = true)
+    FormValidator.validate(request.copy(effect = FutureEffect, implementation = Netty)).left.value.msg should
+      include("Picked FutureEffect with Netty - Metrics are supported for FutureEffect and Akka implementation only")
+    FormValidator.validate(request.copy(effect = IOEffect, implementation = Netty)).left.value.msg should
+      include("Picked IOEffect with Netty - Metrics are supported for FutureEffect and Akka implementation only")
+    FormValidator.validate(request.copy(effect = IOEffect, implementation = Http4s)).left.value.msg should
+      include("Picked IOEffect with Http4s - Metrics are supported for FutureEffect and Akka implementation only")
+    FormValidator.validate(request.copy(effect = ZIOEffect, implementation = Http4s)).left.value.msg should
+      include("Picked ZIOEffect with Http4s - Metrics are supported for FutureEffect and Akka implementation only")
+    FormValidator.validate(request.copy(effect = ZIOEffect, implementation = ZIOHttp)).left.value.msg should
+      include("Picked ZIOEffect with ZIOHttp - Metrics are supported for FutureEffect and Akka implementation only")
+  }
+
+  private def defaultRequest(): StarterRequest =
+    StarterRequest("project", "com.softwaremill", FutureEffect, Akka, tapirVersion = "1.0.0", addDocumentation = true, false, No)
 }

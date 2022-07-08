@@ -20,7 +20,7 @@ object Metrics {
 
   private val starterDetailsLabels: Array[String] = {
     val fakeInstance: StarterDetails =
-      StarterDetails("", "", ServerEffect.IOEffect, ServerImplementation.Akka, "", true, JsonImplementation.WithoutJson)
+      StarterDetails("", "", ServerEffect.IOEffect, ServerImplementation.Akka, "", true, false, JsonImplementation.WithoutJson)
 
     val names = fakeInstance.productElementNames.toArray.filterNot(excludedStarterDetailsFields.contains)
     require(

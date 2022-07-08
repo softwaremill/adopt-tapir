@@ -10,6 +10,7 @@ case class StarterDetails(
     serverImplementation: ServerImplementation,
     tapirVersion: String,
     addDocumentation: Boolean,
+    addMetrics: Boolean,
     jsonImplementation: JsonImplementation
 )
 

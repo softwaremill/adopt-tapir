@@ -128,6 +128,7 @@ object StarterApiTest {
     implementation = ServerImplementationRequest.Akka,
     defaultTapirVersion,
     addDocumentation = true,
+    addMetrics = false,
     json = Jsoniter
   )
 

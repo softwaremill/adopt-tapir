@@ -17,11 +17,13 @@ class StarterServiceITTest extends BaseTest with ParallelTestExecution {
     effect <- EffectRequest.values
     server <- ServerImplementationRequest.values
     docs <- List(true, false)
+    metrics <- List(true, false)
     json <- JsonImplementationRequest.values
-    starterRequest = StarterRequest("myproject", "com.softwaremill", effect, server, defaultTapirVersion, addDocumentation = docs, json)
+    starterRequest = StarterRequest("myproject", "com.softwaremill", effect, server, defaultTapirVersion,
+      addDocumentation = docs, addMetrics = metrics, json)
     starterDetails <- FormValidator.validate(starterRequest).toSeq
   } {
-    it should s"return zip file containing working sbt folder with: $effect/$server/docs=$docs/$json" in {
+    it should s"return zip file containing working sbt folder with: $effect/$server/docs=$docs/metrics=$metrics/$json" in {
       val service = createStarterService
       sbtCompileTest(service.generateZipFile(starterDetails))
     }

@@ -52,6 +52,7 @@ class ProjectTemplate(config: StarterConfig) {
 
     val helloServerEndpoint = EndpointsView.getHelloServerEndpoint(starterDetails)
     val docEndpoints = EndpointsView.getDocEndpoints(starterDetails)
+    val metricsEndpoint = EndpointsView.getMetricsEndpoint(starterDetails)
     val jsonEndpoint = EndpointsView.getJsonOutModel(starterDetails)
     val library = EndpointsView.getJsonLibrary(starterDetails)
     val allEndpoints = EndpointsView.getAllEndpoints(starterDetails)
@@ -62,9 +63,11 @@ class ProjectTemplate(config: StarterConfig) {
         .Endpoints(
           starterDetails,
           toSortedList(
-            helloServerEndpoint.imports ++ docEndpoints.imports ++ jsonEndpoint.imports ++ library.imports ++ allEndpoints.imports
+            helloServerEndpoint.imports ++ metricsEndpoint.imports ++ docEndpoints.imports
+              ++ jsonEndpoint.imports ++ library.imports ++ allEndpoints.imports
           ),
           helloServerEndpoint.body,
+          metricsEndpoint.body,
           docEndpoints.body,
           jsonEndpoint = jsonEndpoint.body,
           library.body,

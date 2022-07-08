@@ -25,6 +25,7 @@ object ProjectTemplateTest {
     ServerImplementation.ZIOHttp,
     "1.0.0",
     false,
+    false,
     JsonImplementation.WithoutJson
   )
 }

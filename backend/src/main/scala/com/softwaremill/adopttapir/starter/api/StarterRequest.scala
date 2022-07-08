@@ -10,6 +10,7 @@ case class StarterRequest(
     implementation: ServerImplementationRequest,
     tapirVersion: String,
     addDocumentation: Boolean,
+    addMetrics: Boolean,
     json: JsonImplementationRequest
 )
 
