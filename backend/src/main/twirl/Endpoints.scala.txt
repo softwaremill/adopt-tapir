@@ -2,6 +2,7 @@
 starterDetails: com.softwaremill.adopttapir.starter.StarterDetails,
 additionalImports: List[com.softwaremill.adopttapir.template.scala.Import],
 helloEndpointServer: String,
+metricsEndpoint: String,
 docEndpoints: String,
 jsonEndpoint: String,
 library: String,
@@ -22,6 +23,8 @@ object Endpoints {
 @helloEndpointServer
 
 @jsonEndpoint
+
+@metricsEndpoint
 
 @docEndpoints
 

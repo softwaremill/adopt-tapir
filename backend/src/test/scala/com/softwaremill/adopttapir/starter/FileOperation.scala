@@ -20,6 +20,7 @@ object FileOperation extends IOApp {
       ServerImplementation.ZIOHttp,
       defaultTapirVersion,
       true,
+      false,
       WithoutJson
     )
 

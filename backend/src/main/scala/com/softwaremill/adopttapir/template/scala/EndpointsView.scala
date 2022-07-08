@@ -11,9 +11,12 @@ object EndpointsView {
     case ServerEffect.ZIOEffect    => HelloServerEndpoint.zio
   }
 
+  def getMetricsEndpoint(starterDetails: StarterDetails): Code =
+    if (starterDetails.addMetrics) MetricsEndpoint.prepareMetricsEndpoint else Code.empty
+
   def getDocEndpoints(starterDetails: StarterDetails): Code = {
     if (starterDetails.addDocumentation) {
-      DocumentationEndpoint.prepareDocEndpoints(starterDetails.projectName, starterDetails.serverEffect, starterDetails.jsonImplementation)
+      DocumentationEndpoint.prepareDocEndpoints(starterDetails.projectName, starterDetails.serverEffect, starterDetails.addMetrics, starterDetails.jsonImplementation)
     } else
       Code.empty
   }
@@ -38,13 +41,15 @@ object EndpointsView {
       case _                              => true
     }
 
-    def bodyTemplate(serverKind: String, hasJson: Boolean, hasDocumentation: Boolean): String = {
-      s"val ${Constants.all}: $serverKind = List($helloServerEndpoint${if (hasJson) s", $booksListingServerEndpoint" else ""})${if (hasDocumentation)
-          s" ++ $docEndpoints"
-        else ""}"
+    def bodyTemplate(serverKind: String, hasJson: Boolean, addMetrics: Boolean, hasDocumentation: Boolean): String = {
+      s"val ${Constants.all}: $serverKind = List($helloServerEndpoint" +
+        s"${if (hasJson) s", $booksListingServerEndpoint" else ""}" +
+        s"${if (addMetrics) s", $metricsEndpoint" else ""}" +
+        ")" +
+        s"${if (hasDocumentation)s" ++ $docEndpoints"else ""}"
     }
 
-    Code(bodyTemplate(serverKind, hasBooksListingEndpoint, starterDetails.addDocumentation))
+    Code(bodyTemplate(serverKind, hasBooksListingEndpoint, starterDetails.addMetrics, starterDetails.addDocumentation))
   }
 
   private object HelloServerEndpoint {
@@ -173,12 +178,25 @@ object EndpointsView {
 
   }
 
+  private object MetricsEndpoint {
+    def prepareMetricsEndpoint: Code = {
+      Code(
+        s"""  val prometheusMetrics: PrometheusMetrics[Future] = PrometheusMetrics.default[Future]()
+           |  val metricsEndpoint: ServerEndpoint[Any, Future] = prometheusMetrics.metricsEndpoint""".stripMargin,
+        Set(
+          Import("sttp.tapir.server.metrics.prometheus.PrometheusMetrics")
+        )
+      )
+    }
+  }
+
   private object DocumentationEndpoint {
 
-    def prepareDocEndpoints(projectName: String, serverEffect: ServerEffect, jsonImplementation: JsonImplementation): Code = {
+    def prepareDocEndpoints(projectName: String, serverEffect: ServerEffect, addMetrics: Boolean, jsonImplementation: JsonImplementation): Code = {
 
+      val metricsEndpoint = if (addMetrics) List(docMetricsEndpoint) else Nil
       val jsonEndpoint = if (jsonImplementation == JsonImplementation.WithoutJson) Nil else List(bookListing)
-      val endpoints: List[String] = List(helloEndpoint) ++ jsonEndpoint
+      val endpoints: List[String] = List(helloEndpoint) ++ metricsEndpoint ++ jsonEndpoint
 
       Code(prepareCode(projectName, serverEffect, endpoints), prepareImports(serverEffect))
     }
@@ -207,6 +225,8 @@ object EndpointsView {
     val helloServerEndpoint = "helloServerEndpoint"
     val bookListing = "booksListing"
     val booksListingServerEndpoint = "booksListingServerEndpoint"
+    val metricsEndpoint = "metricsEndpoint"
+    val docMetricsEndpoint = "metricsEndpoint.endpoint"
     val docEndpoints = "docEndpoints"
     val all = "all"
   }
