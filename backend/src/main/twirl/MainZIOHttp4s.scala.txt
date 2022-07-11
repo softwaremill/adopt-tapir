@@ -1,8 +1,9 @@
-@(groupId: String, addDocumentation: Boolean)
+@(groupId: String, addDocumentation: Boolean, addMetrics: Boolean)
 package @groupId
 
 import org.http4s.blaze.server.BlazeServerBuilder
-import org.http4s.server.Router
+import org.http4s.server.Router@if(addMetrics){
+import sttp.tapir.server.http4s.Http4sServerOptions}
 import sttp.tapir.server.http4s.ztapir.ZHttp4sServerInterpreter
 import zio.interop.catz._
 import zio.{Scope, Task, ZIO, ZIOAppArgs, ZIOAppDefault}
@@ -11,8 +12,15 @@ import scala.io.StdIn
 object Main extends ZIOAppDefault {
 
   override def run: ZIO[Any with ZIOAppArgs with Scope, Any, Any] = {
-
+    @if(addMetrics) {
+    val serverOptions: Http4sServerOptions[Task] =
+      Http4sServerOptions.customiseInterceptors[Task]
+        .metricsInterceptor(Endpoints.prometheusMetrics.metricsInterceptor())
+        .options
+    val routes = ZHttp4sServerInterpreter(serverOptions).from(Endpoints.all).toRoutes
+    } else {
     val routes = ZHttp4sServerInterpreter().from(Endpoints.all).toRoutes
+    }
 
     BlazeServerBuilder[Task]
       .withExecutionContext(runtime.executor.asExecutionContext)

@@ -58,11 +58,10 @@ object RequestValidation {
     override val errMessage: String = s"$prefixMessage ZIO effect will work only with Http4s and ZIOHttp"
   }
 
-  case class MetricsWorkOnlyWithFutureEffectAndAkkaImplementation(effect: EffectRequest, implementation: ServerImplementationRequest)
+  case class MetricsNotSupportedForNettyServerImplementation(effect: EffectRequest, implementation: ServerImplementationRequest)
     extends EffectValidation
       with RequestValidation {
-    override val errMessage: String = s"$prefixMessage Metrics are supported for ${EffectRequest.FutureEffect}" +
-      s" and ${ServerImplementationRequest.Akka} implementation only"
+    override val errMessage: String = s"$prefixMessage Metrics not supported for ${ServerImplementationRequest.Netty} server implementation"
   }
 
   case class ZIOJsonWillWorkOnlyWithZIOEffect() extends RequestValidation {
@@ -79,9 +78,9 @@ sealed trait FormValidator {
       validateProjectName(r.projectName),
       validateGroupId(r.groupId),
       validateEffectWithImplementation(r.effect, r.implementation),
-      validateEffectImplementationWithMetrics(r.effect, r.implementation, r.addMetrics),
+      validateMetrics(r.effect, r.implementation, r.addMetrics),
       validateEffectWithJson(r.effect, r.json)
-    ).mapN { case (tapirVersion, projectName, groupId, (effect, serverImplementation), _, json) =>
+    ).mapN { case (tapirVersion, projectName, groupId, (effect, serverImplementation), addMetrics, json) =>
       StarterDetails(
         projectName,
         groupId,
@@ -89,7 +88,7 @@ sealed trait FormValidator {
         serverImplementation.toModel,
         tapirVersion,
         r.addDocumentation,
-        r.addMetrics,
+        addMetrics,
         json.toModel
       )
     }.leftMap(errors => IncorrectInput(errors.toNonEmptyList.map(_.errMessage).toList.mkString(System.lineSeparator())))
@@ -134,15 +133,15 @@ sealed trait FormValidator {
     }
   }
 
-  private def validateEffectImplementationWithMetrics(
+  private def validateMetrics(
      effect: EffectRequest,
      serverImplementation: ServerImplementationRequest,
      addMetrics: Boolean
-  ): ValidatedNec[RequestValidation, (EffectRequest, ServerImplementationRequest, Boolean)] = {
+  ): ValidatedNec[RequestValidation, Boolean] = {
     (effect, serverImplementation, addMetrics) match {
-      case t @ (FutureEffect, Akka, true)  => t.validNec
-      case t @ (_, _, false)  => t.validNec
-      case (_, _, true)  => RequestValidation.MetricsWorkOnlyWithFutureEffectAndAkkaImplementation(effect, serverImplementation).invalidNec
+      case t @ (_, Akka | Http4s | ZIOHttp, _)  => t._3.validNec
+      case t @ (_, Netty, false)  => t._3.validNec
+      case (_, Netty, true)  => RequestValidation.MetricsNotSupportedForNettyServerImplementation(effect, serverImplementation).invalidNec
     }
   }
 
