@@ -25,5 +25,6 @@ export type StarterRequest = {
   implementation: EffectImplementation;
   tapirVersion: string;
   addDocumentation: boolean;
+  addMetrics: boolean;
   json: JSONImplementation;
 };
