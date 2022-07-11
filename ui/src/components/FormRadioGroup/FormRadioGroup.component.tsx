@@ -11,12 +11,20 @@ interface FormRadioGroupProps {
   name: string;
   label: string;
   options: FormRadioOption[];
+  disabled?: boolean;
   defaultValue?: FormRadioOption['value'];
 }
 
 // NOTE: if radio group would need to show some error we would have to add a FormHelperText component here
 
-export const FormRadioGroup: React.FC<FormRadioGroupProps> = ({ className, name, label, options, defaultValue }) => {
+export const FormRadioGroup: React.FC<FormRadioGroupProps> = ({
+  className,
+  name,
+  label,
+  options,
+  disabled,
+  defaultValue,
+}) => {
   const { control } = useFormContext();
 
   return (
@@ -25,7 +33,13 @@ export const FormRadioGroup: React.FC<FormRadioGroupProps> = ({ className, name,
       control={control}
       defaultValue={defaultValue}
       render={({ field, fieldState }) => (
-        <FormControl className={className} error={Boolean(fieldState.error)} color="secondary" margin="normal">
+        <FormControl
+          className={className}
+          error={Boolean(fieldState.error)}
+          color="secondary"
+          margin="normal"
+          disabled={disabled}
+        >
           <FormLabel>{label}</FormLabel>
           <RadioGroup row {...field}>
             {options.map((option, index) => (

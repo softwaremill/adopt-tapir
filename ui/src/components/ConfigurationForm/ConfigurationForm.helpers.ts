@@ -24,6 +24,14 @@ export const getEffectImplementationOptions = (effectType: EffectType): FormSele
 };
 
 /**
+ * Effect implementation to metrics supported
+ */
+
+export const isAddMetricsSupported = (effectImplementation: EffectImplementation): boolean => {
+  return Boolean(effectImplementation) && effectImplementation !== EffectImplementation.Netty;
+};
+
+/**
  * Effect type to json implementation mapping
  */
 
