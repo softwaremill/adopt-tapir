@@ -12,7 +12,11 @@ object EndpointsView {
   }
 
   def getMetricsEndpoint(starterDetails: StarterDetails): Code =
-    if (starterDetails.addMetrics) MetricsEndpoint.prepareMetricsEndpoint else Code.empty
+    if (starterDetails.addMetrics) {
+      MetricsEndpoint.prepareMetricsEndpoint(starterDetails.serverEffect)
+    } else {
+      Code.empty
+    }
 
   def getDocEndpoints(starterDetails: StarterDetails): Code = {
     if (starterDetails.addDocumentation) {
@@ -179,13 +183,12 @@ object EndpointsView {
   }
 
   private object MetricsEndpoint {
-    def prepareMetricsEndpoint: Code = {
+    def prepareMetricsEndpoint(serverEffect: ServerEffect): Code = {
+      val (effect, endpoint) = serverEffectToEffectAndEndpoint(serverEffect)
       Code(
-        s"""  val prometheusMetrics: PrometheusMetrics[Future] = PrometheusMetrics.default[Future]()
-           |  val metricsEndpoint: ServerEndpoint[Any, Future] = prometheusMetrics.metricsEndpoint""".stripMargin,
-        Set(
-          Import("sttp.tapir.server.metrics.prometheus.PrometheusMetrics")
-        )
+        s"""  val prometheusMetrics: PrometheusMetrics[${effect}] = PrometheusMetrics.default[${effect}]()
+           |  val metricsEndpoint: ${endpoint} = prometheusMetrics.metricsEndpoint""".stripMargin,
+        serverEffectImports(serverEffect) + Import("sttp.tapir.server.metrics.prometheus.PrometheusMetrics")
       )
     }
   }
@@ -202,21 +205,29 @@ object EndpointsView {
     }
 
     private def prepareCode(projectName: String, serverEffect: ServerEffect, endpoints: List[String]): String = {
-      val effectStr = serverEffect match {
-        case ServerEffect.FutureEffect => ("ServerEndpoint[Any, Future]", "Future")
-        case ServerEffect.IOEffect     => ("ServerEndpoint[Any, IO]", "IO")
-        case ServerEffect.ZIOEffect    => ("ZServerEndpoint[Any, Any]", "Task")
-      }
-      s"""  val $docEndpoints: List[${effectStr._1}] = SwaggerInterpreter().fromEndpoints[${effectStr._2}](List(${endpoints.mkString(
+      val (effect, endpoint) = serverEffectToEffectAndEndpoint(serverEffect)
+      s"""  val $docEndpoints: List[${endpoint}] = SwaggerInterpreter().fromEndpoints[${effect}](List(${endpoints.mkString(
           ","
         )}), "$projectName", "1.0.0")""".stripMargin
     }
 
     def prepareImports(serverEffect: ServerEffect): Set[Import] = {
-      (serverEffect match {
-        case ServerEffect.ZIOEffect => Set(Import("zio.Task"))
-        case _                      => Set.empty[Import]
-      }) + Import("sttp.tapir.swagger.bundle.SwaggerInterpreter")
+      serverEffectImports(serverEffect) + Import("sttp.tapir.swagger.bundle.SwaggerInterpreter")
+    }
+  }
+
+  private def serverEffectToEffectAndEndpoint(serverEffect: ServerEffect): (String, String) = {
+    serverEffect match {
+      case ServerEffect.FutureEffect => ("Future", "ServerEndpoint[Any, Future]")
+      case ServerEffect.IOEffect => ("IO", "ServerEndpoint[Any, IO]")
+      case ServerEffect.ZIOEffect => ("Task", "ZServerEndpoint[Any, Any]")
+    }
+  }
+
+  private def serverEffectImports(serverEffect: ServerEffect): Set[Import] = {
+    serverEffect match {
+      case ServerEffect.ZIOEffect => Set(Import("zio.Task"))
+      case _ => Set.empty[Import]
     }
   }
 
