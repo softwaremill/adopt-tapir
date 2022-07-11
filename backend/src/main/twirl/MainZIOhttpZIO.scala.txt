@@ -1,7 +1,7 @@
-@(groupId: String, addDocumentation: Boolean)
+@(groupId: String, addDocumentation: Boolean, addMetrics: Boolean)
 package @groupId
 
-import sttp.tapir.server.ziohttp.ZioHttpInterpreter
+import sttp.tapir.server.ziohttp.@if(addMetrics){{ZioHttpInterpreter, ZioHttpServerOptions}}else{ZioHttpInterpreter}
 import zhttp.http.HttpApp
 import zhttp.service.server.ServerChannelFactory
 import zhttp.service.{EventLoopGroup, Server}
@@ -10,7 +10,15 @@ import zio.{Console, Scope, ZIO, ZIOAppArgs, ZIOAppDefault}
 object Main extends ZIOAppDefault {
 
   override def run: ZIO[Any with ZIOAppArgs with Scope, Any, Any] = {
+    @if(addMetrics) {
+    val serverOptions: ZioHttpServerOptions[Any] =
+      ZioHttpServerOptions.customiseInterceptors
+        .metricsInterceptor(Endpoints.prometheusMetrics.metricsInterceptor())
+        .options
+    val app: HttpApp[Any, Throwable] = ZioHttpInterpreter(serverOptions).toHttp(Endpoints.all)
+    } else {
     val app: HttpApp[Any, Throwable] = ZioHttpInterpreter().toHttp(Endpoints.all)
+    }
 
     (for {
       serverStart <- Server(app).withPort(8080).make
