@@ -101,10 +101,7 @@ const getEffectImplementationFieldMessage = (effectType: EffectType): string =>
 
 const REQUIRED_FIELD_MESSAGE = 'This field is required';
 
-export const createStarterValidationSchema = (
-  isScalaVersionFieldVisible: boolean,
-  isMetricsEndpointsFieldVisible: boolean
-) => {
+export const createStarterValidationSchema = (isScalaVersionFieldVisible: boolean) => {
   const baseSchema = yup
     .object({
       projectName: yup
@@ -172,22 +169,15 @@ export const createStarterValidationSchema = (
           otherwise: schema => schema.oneOf(mapEffectTypeToJSONImplementation(EffectType.ZIO)),
         })
         .required(REQUIRED_FIELD_MESSAGE),
+      addMetrics: yup.boolean().required(REQUIRED_FIELD_MESSAGE),
     })
     .required();
 
-  return baseSchema
-    .concat(
-      isScalaVersionFieldVisible
-        ? yup.object({
-            scalaVersion: yup.string().required(REQUIRED_FIELD_MESSAGE),
-          })
-        : yup.object({})
-    )
-    .concat(
-      isMetricsEndpointsFieldVisible
-        ? yup.object({
-            addMetrics: yup.boolean().required(REQUIRED_FIELD_MESSAGE),
-          })
-        : yup.object({})
-    );
+  return baseSchema.concat(
+    isScalaVersionFieldVisible
+      ? yup.object({
+          scalaVersion: yup.string().required(REQUIRED_FIELD_MESSAGE),
+        })
+      : yup.object({})
+  );
 };

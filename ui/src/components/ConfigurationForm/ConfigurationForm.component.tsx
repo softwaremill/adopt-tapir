@@ -21,6 +21,7 @@ import {
   getJSONImplementationOptions,
   mapEffectTypeToEffectImplementation,
   mapEffectTypeToJSONImplementation,
+  isAddMetricsSupported,
 } from './ConfigurationForm.helpers';
 
 interface ConfigurationFormProps {
@@ -30,15 +31,16 @@ interface ConfigurationFormProps {
 export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded = false }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const { isScalaVersionFieldVisible, isMetricsEndpointsFieldVisible } = useFeatureFlag();
+  const { isScalaVersionFieldVisible } = useFeatureFlag();
 
   const { classes, cx } = useStyles({ isEmbedded });
   const form = useForm<StarterRequest>({
     mode: 'onBlur',
-    resolver: yupResolver(createStarterValidationSchema(isScalaVersionFieldVisible, isMetricsEndpointsFieldVisible)),
+    resolver: yupResolver(createStarterValidationSchema(isScalaVersionFieldVisible)),
     defaultValues: {
       tapirVersion: TAPIR_VERSION_OPTIONS[0].value,
       addDocumentation: false,
+      addMetrics: false,
       json: JSONImplementation.No,
     },
   });
@@ -63,6 +65,11 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
       !mapEffectTypeToJSONImplementation(effectType).includes(jsonImplementation)
     ) {
       form.resetField('json');
+    }
+
+    // NOTE: reset addMetrics field value if metrics are not supported
+    if (!isAddMetricsSupported(effectImplementation)) {
+      form.resetField('addMetrics');
     }
   }, [effectType, effectImplementation, jsonImplementation, form]);
 
@@ -174,14 +181,13 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
             options={getJSONImplementationOptions(effectType)}
           />
 
-          {isMetricsEndpointsFieldVisible && (
-            <FormRadioGroup
-              className={classes.formEndpoints2ndRow}
-              name="addMetrics"
-              label="Add metrics endpoints"
-              options={ENDPOINTS_OPTIONS}
-            />
-          )}
+          <FormRadioGroup
+            className={classes.formEndpoints2ndRow}
+            name="addMetrics"
+            label="Add metrics endpoints"
+            disabled={!isAddMetricsSupported(effectImplementation)}
+            options={ENDPOINTS_OPTIONS}
+          />
 
           <div className={cx(classes.actionsContainer, classes.formActionsRow)}>
             <Button variant="contained" color="secondary" size="medium" onClick={handleFormReset} disableElevation>
