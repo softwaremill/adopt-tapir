@@ -14,7 +14,7 @@ val http4sVersion = "0.23.11"
 val circeVersion = "0.14.1"
 val tsecVersion = "0.4.0"
 val sttpVersion = "3.6.1"
-val prometheusVersion = "0.15.0"
+val prometheusVersion = "0.16.0"
 val macwireVersion = "2.5.7"
 
 val scalafmtVersion = "3.5.7"
