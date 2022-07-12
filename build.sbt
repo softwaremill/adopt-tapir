@@ -18,7 +18,7 @@ val prometheusVersion = "0.15.0"
 val macwireVersion = "2.5.7"
 
 val scalafmtVersion = "3.5.7"
-val scalaLoggingVersion = "3.9.4"
+val scalaLoggingVersion = "3.9.5"
 val logbackClassicVersion = "1.2.11"
 val scalaTestVersion = "3.2.12"
 
