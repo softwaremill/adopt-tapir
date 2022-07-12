@@ -2,7 +2,7 @@ package com.softwaremill.adopttapir.template.sbt
 
 import com.softwaremill.adopttapir.starter.ServerEffect._
 import com.softwaremill.adopttapir.starter.ServerImplementation.{Akka, Http4s, Netty, ZIOHttp}
-import com.softwaremill.adopttapir.starter.{JsonImplementation, StarterDetails}
+import com.softwaremill.adopttapir.starter.{JsonImplementation, ServerEffect, StarterDetails}
 import com.softwaremill.adopttapir.template.sbt.Dependency._
 
 object BuildSbtView {
@@ -23,15 +23,22 @@ object BuildSbtView {
     val docsDepenedencies = getDocsDependencies(starterDetails)
     val metricsDependencies = getMetricsDependencies(starterDetails)
     val baseDependencies = List(
-      ScalaDependency("com.typesafe.scala-logging", "scala-logging", "3.9.4"),
-      JavaDependency("ch.qos.logback", "logback-classic", "1.2.11")
+      ScalaDependency("com.typesafe.scala-logging", "scala-logging", scalaLoggingVersion),
+      JavaDependency("ch.qos.logback", "logback-classic", logbackClassicVersion)
     )
-    val testDependencies = List(
-      ScalaTestDependency("com.softwaremill.sttp.tapir", "tapir-sttp-stub-server", constantTapirVersion),
-      ScalaTestDependency("org.scalatest", "scalatest", "3.2.12")
-    ) ++ getJsonTestDependencies(starterDetails)
+    val testDependencies = ScalaTestDependency("com.softwaremill.sttp.tapir", "tapir-sttp-stub-server", constantTapirVersion) ::
+      getTestDependencies(starterDetails.serverEffect) ++ getJsonTestDependencies(starterDetails)
 
     httpDependencies ++ metricsDependencies ++ docsDepenedencies ++ monitoringDependencies ++ jsonDependencies ++ baseDependencies ++ testDependencies
+  }
+
+  private def getTestDependencies(effect: ServerEffect): List[ScalaTestDependency] = {
+    if (effect != ServerEffect.ZIOEffect) List(ScalaTestDependency("org.scalatest", "scalatest", scalatestVersion))
+    else
+      List(
+        ScalaTestDependency("dev.zio", "zio-test", zioTestVersion),
+        ScalaTestDependency("dev.zio", "zio-test-sbt", zioTestVersion)
+      )
   }
 
   private def getDocsDependencies(starterDetails: StarterDetails): List[ScalaDependency] = {
@@ -104,7 +111,7 @@ object BuildSbtView {
 
     def http4s(): List[ScalaDependency] = List(
       ScalaDependency("com.softwaremill.sttp.tapir", "tapir-http4s-server", constantTapirVersion),
-      ScalaDependency("org.http4s", "http4s-blaze-server", "0.23.11")
+      ScalaDependency("org.http4s", "http4s-blaze-server", http4sBlazeServerVersion)
     )
 
     def http4sZIO(): List[ScalaDependency] =

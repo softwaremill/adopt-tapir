@@ -30,6 +30,11 @@ object Dependency {
   val constantTapirVersion = "tapirVersion"
   val sttpClientVersion = "3.6.2"
   val plokhotnyukJsoniterVersion = "2.13.26"
+  val scalaLoggingVersion = "3.9.4"
+  val logbackClassicVersion = "1.2.11"
+  val scalatestVersion = "3.2.12"
+  val zioTestVersion = "2.0.0"
+  val http4sBlazeServerVersion = "0.23.11"
 
   case class ScalaDependency(groupId: String, artifactId: String, version: String) extends Dependency with ScalaFormat
   case class ScalaTestDependency(groupId: String, artifactId: String, version: String) extends Dependency with TestFormat

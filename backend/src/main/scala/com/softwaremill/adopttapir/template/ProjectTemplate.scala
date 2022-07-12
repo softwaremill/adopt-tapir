@@ -1,6 +1,7 @@
 package com.softwaremill.adopttapir.template
 
 import better.files.Resource
+import com.softwaremill.adopttapir.starter.ServerEffect.ZIOEffect
 import com.softwaremill.adopttapir.starter.{StarterConfig, StarterDetails}
 import com.softwaremill.adopttapir.template.ProjectTemplate._
 import com.softwaremill.adopttapir.template.sbt.BuildSbtView
@@ -26,7 +27,8 @@ class ProjectTemplate(config: StarterConfig) {
         starterDetails.groupId,
         config.scalaVersion,
         starterDetails.tapirVersion,
-        (BuildSbtView.getDependencies _).andThen(BuildSbtView.format)(starterDetails)
+        (BuildSbtView.getDependencies _).andThen(BuildSbtView.format)(starterDetails),
+        starterDetails.serverEffect == ZIOEffect
       )
       .toString()
 
@@ -84,17 +86,30 @@ class ProjectTemplate(config: StarterConfig) {
     val booksServerStub = EndpointsSpecView.getBookServerStub(starterDetails)
     val unwrapper = EndpointsSpecView.Unwrapper.prepareUnwrapper(starterDetails.serverEffect)
 
+    val fileContent =
+      if (starterDetails.serverEffect == ZIOEffect)
+        txt
+          .EndpointsSpecZIO(
+            starterDetails,
+            toSortedList(helloServerStub.imports ++ booksServerStub.imports),
+            helloServerStub.body,
+            booksServerStub.body
+          )
+          .toString()
+      else
+        txt
+          .EndpointsSpec(
+            starterDetails,
+            toSortedList(helloServerStub.imports ++ booksServerStub.imports ++ unwrapper.imports),
+            helloServerStub.body,
+            unwrapper.body,
+            booksServerStub.body
+          )
+          .toString()
+
     GeneratedFile(
       pathUnderPackage("src/test/scala", groupId, "EndpointsSpec.scala"),
-      txt
-        .EndpointsSpec(
-          starterDetails,
-          toSortedList(helloServerStub.imports ++ unwrapper.imports ++ booksServerStub.imports),
-          helloServerStub.body,
-          unwrapper.body,
-          booksServerStub.body
-        )
-        .toString()
+      fileContent
     )
   }
 
