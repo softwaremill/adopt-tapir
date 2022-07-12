@@ -1,7 +1,7 @@
 package com.softwaremill.adopttapir.template.scala
 
 import com.softwaremill.adopttapir.starter.{JsonImplementation, ServerEffect, StarterDetails}
-import com.softwaremill.adopttapir.template.scala.EndpointsView.Constants.{booksListingServerEndpoint, helloServerEndpoint}
+import com.softwaremill.adopttapir.template.scala.EndpointsView.Constants.{booksListingServerEndpoint, helloServerEndpoint, metricsEndpoint}
 
 object EndpointsSpecView {
 
@@ -27,6 +27,10 @@ object EndpointsSpecView {
       case JsonImplementation.Jsoniter => stubBooks.addImports(Set(Import("sttp.client3.jsoniter._"), Import("Library._")))
       case JsonImplementation.ZIOJson  => stubBooks.addImports(Set(Import("sttp.client3.ziojson._"), Import("Library._")))
     }
+  }
+
+  def getMetricsServerStub(starterDetails: StarterDetails): Code = {
+    if (starterDetails.addMetrics)  Stub.prepareBackendStub(metricsEndpoint, starterDetails.serverEffect) else Code.empty
   }
 
   private object Stub {

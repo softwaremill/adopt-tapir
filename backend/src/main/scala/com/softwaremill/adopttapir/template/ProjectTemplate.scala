@@ -84,6 +84,7 @@ class ProjectTemplate(config: StarterConfig) {
 
     val helloServerStub = EndpointsSpecView.getHelloServerStub(starterDetails)
     val booksServerStub = EndpointsSpecView.getBookServerStub(starterDetails)
+    val metricsServerStup = EndpointsSpecView.getMetricsServerStub(starterDetails)
     val unwrapper = EndpointsSpecView.Unwrapper.prepareUnwrapper(starterDetails.serverEffect)
 
     val fileContent =
@@ -93,7 +94,8 @@ class ProjectTemplate(config: StarterConfig) {
             starterDetails,
             toSortedList(helloServerStub.imports ++ booksServerStub.imports),
             helloServerStub.body,
-            booksServerStub.body
+            booksServerStub.body,
+            metricsServerStup.body
           )
           .toString()
       else
@@ -103,7 +105,8 @@ class ProjectTemplate(config: StarterConfig) {
             toSortedList(helloServerStub.imports ++ booksServerStub.imports ++ unwrapper.imports),
             helloServerStub.body,
             unwrapper.body,
-            booksServerStub.body
+            booksServerStub.body,
+            metricsServerStup.body
           )
           .toString()
 

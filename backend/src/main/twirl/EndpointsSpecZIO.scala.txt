@@ -2,7 +2,8 @@
 starterDetails: com.softwaremill.adopttapir.starter.StarterDetails,
 additionalImports: List[com.softwaremill.adopttapir.template.scala.Import],
 helloStub: String,
-booksStub: String
+booksStub: String,
+metricsStub: String
 )
 package @{starterDetails.groupId}
 import @{starterDetails.groupId}.Endpoints._
@@ -41,6 +42,29 @@ object EndpointsSpec extends ZIOSpecDefault {
 
       // then
       assertZIO(response.map(_.body))(isRight(equalTo(books.get())))
+    }
+}
+@if(metricsStub.nonEmpty){
+    ,test("return metrics definition") {
+      // given
+      @metricsStub
+
+      // when
+      val response = basicRequest
+        .get(uri"http://test.com/metrics")
+        .send(backendStub)
+
+      // then
+      assertZIO(response.map(_.body))(
+        isRight(
+          containsString("# HELP tapir_request_active Active HTTP requests")
+            && containsString("# TYPE tapir_request_duration_seconds histogram")
+            && containsString("# HELP tapir_request_total Total HTTP requests")
+            && containsString("# TYPE tapir_request_total counter")
+            && containsString("# HELP tapir_request_active Active HTTP requests")
+            && containsString("# TYPE tapir_request_active gauge")
+        )
+      )
     }
 }
   )
