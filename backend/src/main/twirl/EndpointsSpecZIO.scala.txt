@@ -5,6 +5,7 @@ helloStub: String,
 booksStub: String
 )
 package @{starterDetails.groupId}
+
 import @{starterDetails.groupId}.Endpoints._
 import sttp.client3.testing.SttpBackendStub
 import sttp.client3.{UriContext, basicRequest}
