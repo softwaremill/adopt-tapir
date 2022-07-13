@@ -1,11 +1,11 @@
 import * as yup from 'yup';
-import {EffectImplementation, EffectType, JSONImplementation} from 'api/starter';
-import type {FormSelectOption} from '../FormSelect';
-import type {FormRadioOption} from '../FormRadioGroup';
+import { EffectType, EffectImplementation, JSONImplementation } from 'api/starter';
+import type { FormSelectOption } from '../FormSelect';
+import type { FormRadioOption } from '../FormRadioGroup';
 import {
-  getEffectImplementationOptions,
   mapEffectTypeToEffectImplementation,
   mapEffectTypeToJSONImplementation,
+  getEffectImplementationOptions,
 } from './ConfigurationForm.helpers';
 
 export const SCALA_VERSION_OPTIONS: FormSelectOption<string>[] = [
@@ -168,8 +168,8 @@ export const createStarterValidationSchema = (isScalaVersionFieldVisible: boolea
   return baseSchema.concat(
     isScalaVersionFieldVisible
       ? yup.object({
-        scalaVersion: yup.string().required(REQUIRED_FIELD_MESSAGE),
-      })
+          scalaVersion: yup.string().required(REQUIRED_FIELD_MESSAGE),
+        })
       : yup.object({})
   );
 };
