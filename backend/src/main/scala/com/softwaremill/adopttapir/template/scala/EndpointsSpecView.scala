@@ -29,7 +29,7 @@ object EndpointsSpecView {
     }
   }
 
-  private object Stub {
+  object Stub {
     def prepareBackendStub(endpoint: String, serverEffect: ServerEffect): Code = {
       val stub = serverEffect match {
         case ServerEffect.FutureEffect => "SttpBackendStub.asynchronousFuture"

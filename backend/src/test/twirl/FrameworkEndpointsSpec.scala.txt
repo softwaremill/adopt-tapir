@@ -1,0 +1,44 @@
+@(
+starterDetails: com.softwaremill.adopttapir.starter.StarterDetails,
+additionalImports: List[com.softwaremill.adopttapir.template.scala.Import],
+metricsStub: String,
+unwrapper: String,
+)
+package @{starterDetails.groupId}
+
+import @{starterDetails.groupId}.Endpoints._
+import org.scalatest.EitherValues
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
+import sttp.client3.testing.SttpBackendStub
+import sttp.client3.{UriContext, basicRequest}
+import sttp.tapir.server.stub.TapirStubInterpreter
+@for(additionalImport <- additionalImports) {
+@{additionalImport.asScalaImport()}}
+
+class FrameworkEndpointsSpec extends AnyFlatSpec with Matchers with EitherValues {
+@if(metricsStub.nonEmpty){
+  it should "return metrics definition" in {
+    // given
+    @metricsStub
+
+    // when
+    val response = basicRequest
+      .get(uri"http://test.com/metrics")
+      .send(backendStub)
+
+    // then
+    response
+      .map(
+        _.body.value should (include ("# HELP tapir_request_duration_seconds Duration of HTTP requests")
+          and include("# TYPE tapir_request_duration_seconds histogram")
+          and include("# HELP tapir_request_total Total HTTP requests")
+          and include("# TYPE tapir_request_total counter")
+          and include("# HELP tapir_request_active Active HTTP requests")
+          and include("# TYPE tapir_request_active gauge"))
+      )
+      .unwrap
+  }
+}
+  @unwrapper
+}

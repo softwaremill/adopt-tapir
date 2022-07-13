@@ -122,7 +122,7 @@ class ProjectTemplate(config: StarterConfig) {
   val README: GeneratedFile =
     GeneratedFile(readMeFile, templateResource(readMeFile))
 
-  private def pathUnderPackage(prefixDir: String, groupId: String, fileName: String): String =
+  protected def pathUnderPackage(prefixDir: String, groupId: String, fileName: String): String =
     prefixDir + "/" + groupId.split('.').mkString("/") + "/" + fileName
 
   private def templateResource(fileName: String): String = Resource.getAsString(s"template/$fileName")
