@@ -9,14 +9,18 @@ import sbtbuildinfo.{BuildInfoKey, BuildInfoOption}
 import scala.sys.process.Process
 import scala.util.Try
 
+val tapirVersion = "1.0.0"
 val http4sVersion = "0.23.11"
 val circeVersion = "0.14.1"
 val tsecVersion = "0.4.0"
 val sttpVersion = "3.6.1"
 val prometheusVersion = "0.15.0"
-val tapirVersion = "1.0.0"
 val macwireVersion = "2.5.7"
+
 val scalafmtVersion = "3.5.7"
+val scalaLoggingVersion = "3.9.4"
+val logbackClassicVersion = "1.2.11"
+val scalaTestVersion = "3.2.12"
 
 val httpDependencies = Seq(
   "org.http4s" %% "http4s-blaze-server" % http4sVersion,
@@ -45,8 +49,8 @@ val jsonDependencies = Seq(
 )
 
 val loggingDependencies = Seq(
-  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.4",
-  "ch.qos.logback" % "logback-classic" % "1.2.11"
+  "com.typesafe.scala-logging" %% "scala-logging" % scalaLoggingVersion,
+  "ch.qos.logback" % "logback-classic" % logbackClassicVersion
 )
 
 val fileDependencies = Seq(
@@ -82,7 +86,7 @@ val scalafmtStandaloneDependencies = Seq(
 )
 
 val unitTestingStack = Seq(
-  "org.scalatest" %% "scalatest" % "3.2.12" % Test,
+  "org.scalatest" %% "scalatest" % scalaTestVersion % Test,
   "org.scalacheck" %% "scalacheck" % "1.16.0" % Test,
   "com.lihaoyi" %% "os-lib" % "0.8.1" % Test
 )
@@ -211,13 +215,7 @@ lazy val backend: Project = (project in file("backend"))
   .enablePlugins(SbtTwirl)
   .settings(dockerSettings)
 
-val sttpClientVersion = "3.6.2"
 val plokhotnyukJsoniterVersion = "2.13.26"
-val templateTapirVersion = "1.0.0"
-val scalaLoggingVersion = "3.9.4"
-val logbackClassicVersion = "1.2.11"
-val scalaTestVersion = "3.2.12"
-val http4sBlazeServerVersion = "0.23.11"
 val zioTestVersion = "2.0.0"
 
 lazy val templateDependencies: Project = project
@@ -228,33 +226,34 @@ lazy val templateDependencies: Project = project
       "ch.qos.logback" % "logback-classic" % logbackClassicVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-sttp-stub-server" % tapirVersion % Provided,
       "org.scalatest" %% "scalatest" % scalaTestVersion % Provided,
-      "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-bundle" % templateTapirVersion % Provided,
-      "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % templateTapirVersion % Provided,
-      "com.softwaremill.sttp.tapir" %% "tapir-jsoniter-scala" % templateTapirVersion % Provided,
+      "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-bundle" % tapirVersion % Provided,
+      "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % tapirVersion % Provided,
+      "com.softwaremill.sttp.tapir" %% "tapir-jsoniter-scala" % tapirVersion % Provided,
       "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % plokhotnyukJsoniterVersion % Provided,
       "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % plokhotnyukJsoniterVersion % Provided,
-      "com.softwaremill.sttp.tapir" %% "tapir-json-zio" % templateTapirVersion % Provided,
-      "com.softwaremill.sttp.client3" %% "circe" % sttpClientVersion % Provided,
-      "com.softwaremill.sttp.client3" %% "jsoniter" % sttpClientVersion % Provided,
-      "com.softwaremill.sttp.client3" %% "zio-json" % sttpClientVersion % Provided,
-      "com.softwaremill.sttp.tapir" %% "tapir-akka-http-server" % templateTapirVersion % Provided,
-      "com.softwaremill.sttp.tapir" %% "tapir-netty-server" % templateTapirVersion % Provided,
-      "com.softwaremill.sttp.tapir" %% "tapir-cats" % templateTapirVersion % Provided,
-      "com.softwaremill.sttp.tapir" %% "tapir-netty-server-cats" % templateTapirVersion % Provided,
-      "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % templateTapirVersion % Provided,
-      "org.http4s" %% "http4s-blaze-server" % http4sBlazeServerVersion % Provided,
-      "com.softwaremill.sttp.tapir" %% "tapir-http4s-server-zio" % templateTapirVersion % Provided,
-      "com.softwaremill.sttp.tapir" %% "tapir-zio-http-server" % templateTapirVersion % Provided
+      "com.softwaremill.sttp.tapir" %% "tapir-json-zio" % tapirVersion % Provided,
+      "com.softwaremill.sttp.client3" %% "circe" % sttpVersion % Provided,
+      "com.softwaremill.sttp.client3" %% "jsoniter" % sttpVersion % Provided,
+      "com.softwaremill.sttp.client3" %% "zio-json" % sttpVersion % Provided,
+      "com.softwaremill.sttp.tapir" %% "tapir-akka-http-server" % tapirVersion % Provided,
+      "com.softwaremill.sttp.tapir" %% "tapir-netty-server" % tapirVersion % Provided,
+      "com.softwaremill.sttp.tapir" %% "tapir-cats" % tapirVersion % Provided,
+      "com.softwaremill.sttp.tapir" %% "tapir-netty-server-cats" % tapirVersion % Provided,
+      "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % tapirVersion % Provided,
+      "org.http4s" %% "http4s-blaze-server" % http4sVersion % Provided,
+      "com.softwaremill.sttp.tapir" %% "tapir-http4s-server-zio" % tapirVersion % Provided,
+      "com.softwaremill.sttp.tapir" %% "tapir-zio-http-server" % tapirVersion % Provided
     ),
     buildInfoKeys := Seq[BuildInfoKey](
-      "sttpClientVersion" -> sttpClientVersion,
+      "sttpVersion" -> sttpVersion,
       "plokhotnyukJsoniterVersion" -> plokhotnyukJsoniterVersion,
-      "templateTapirVersion" -> templateTapirVersion,
+      "tapirVersion" -> tapirVersion,
       "scalaLoggingVersion" -> scalaLoggingVersion,
       "logbackClassicVersion" -> logbackClassicVersion,
       "scalaTestVersion" -> scalaTestVersion,
-      "http4sBlazeServerVersion" -> http4sBlazeServerVersion,
-      "zioTestVersion" -> zioTestVersion
+      "http4sVersion" -> http4sVersion,
+      "zioTestVersion" -> zioTestVersion,
+      "scalafmtVersion" -> scalafmtVersion
     ),
     buildInfoOptions += BuildInfoOption.ToJson,
     buildInfoOptions += BuildInfoOption.ToMap,

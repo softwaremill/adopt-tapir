@@ -78,9 +78,9 @@ object BuildSbtView {
   private def getJsonTestDependencies(starterDetails: StarterDetails): List[ScalaTestDependency] = {
     starterDetails.jsonImplementation match {
       case JsonImplementation.WithoutJson => Nil
-      case JsonImplementation.Circe       => List(ScalaTestDependency("com.softwaremill.sttp.client3", "circe", sttpClientVersion))
-      case JsonImplementation.Jsoniter    => List(ScalaTestDependency("com.softwaremill.sttp.client3", "jsoniter", sttpClientVersion))
-      case JsonImplementation.ZIOJson     => List(ScalaTestDependency("com.softwaremill.sttp.client3", "zio-json", sttpClientVersion))
+      case JsonImplementation.Circe       => List(ScalaTestDependency("com.softwaremill.sttp.client3", "circe", sttpVersion))
+      case JsonImplementation.Jsoniter    => List(ScalaTestDependency("com.softwaremill.sttp.client3", "jsoniter", sttpVersion))
+      case JsonImplementation.ZIOJson     => List(ScalaTestDependency("com.softwaremill.sttp.client3", "zio-json", sttpVersion))
     }
   }
 
@@ -113,7 +113,7 @@ object BuildSbtView {
 
     def http4s(): List[ScalaDependency] = List(
       ScalaDependency("com.softwaremill.sttp.tapir", "tapir-http4s-server", constantTapirVersion),
-      ScalaDependency("org.http4s", "http4s-blaze-server", TemplateDependencyInfo.http4sBlazeServerVersion)
+      ScalaDependency("org.http4s", "http4s-blaze-server", TemplateDependencyInfo.http4sVersion)
     )
 
     def http4sZIO(): List[ScalaDependency] =
