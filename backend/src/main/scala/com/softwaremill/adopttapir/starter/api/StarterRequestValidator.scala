@@ -1,16 +1,12 @@
 package com.softwaremill.adopttapir.starter.api
 
 import cats.data.ValidatedNec
-import cats.implicits.{catsSyntaxTuple6Semigroupal, catsSyntaxValidatedId, catsSyntaxValidatedIdBinCompat0}
+import cats.implicits.{catsSyntaxTuple5Semigroupal, catsSyntaxValidatedIdBinCompat0}
 import com.softwaremill.adopttapir.Fail._
 import com.softwaremill.adopttapir.starter.StarterDetails
 import com.softwaremill.adopttapir.starter.api.EffectRequest.{FutureEffect, IOEffect, ZIOEffect}
 import com.softwaremill.adopttapir.starter.api.JsonImplementationRequest.ZIOJson
-import com.softwaremill.adopttapir.starter.api.RequestValidation.{
-  GroupIdShouldFollowJavaPackageConvention,
-  NotInSemverNotation,
-  ProjectNameShouldMatchRegex
-}
+import com.softwaremill.adopttapir.starter.api.RequestValidation.{GroupIdShouldFollowJavaPackageConvention, ProjectNameShouldMatchRegex}
 import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Akka, Http4s, Netty, ZIOHttp}
 
 sealed trait RequestValidation {
@@ -59,7 +55,7 @@ object RequestValidation {
   }
 
   case class MetricsNotSupportedForNettyServerImplementation(effect: EffectRequest, implementation: ServerImplementationRequest)
-    extends EffectValidation
+      extends EffectValidation
       with RequestValidation {
     override val errMessage: String = s"$prefixMessage Metrics not supported for ${ServerImplementationRequest.Netty} server implementation"
   }
@@ -74,34 +70,23 @@ sealed trait FormValidator {
 
   def validate(r: StarterRequest): Either[IncorrectInput, StarterDetails] =
     (
-      validateSemanticVersioning(r.tapirVersion),
       validateProjectName(r.projectName),
       validateGroupId(r.groupId),
       validateEffectWithImplementation(r.effect, r.implementation),
       validateMetrics(r.effect, r.implementation, r.addMetrics),
       validateEffectWithJson(r.effect, r.json)
-    ).mapN { case (tapirVersion, projectName, groupId, (effect, serverImplementation), addMetrics, json) =>
+    ).mapN { case (projectName, groupId, (effect, serverImplementation), addMetrics, json) =>
       StarterDetails(
         projectName,
         groupId,
         effect.toModel,
         serverImplementation.toModel,
-        tapirVersion,
         r.addDocumentation,
         addMetrics,
         json.toModel
       )
     }.leftMap(errors => IncorrectInput(errors.toNonEmptyList.map(_.errMessage).toList.mkString(System.lineSeparator())))
       .toEither
-
-  private def validateSemanticVersioning(version: String): ValidationResult[String] = {
-    // regex from: https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
-    val semverRgx =
-      "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
-    if (version.matches(semverRgx))
-      version.valid
-    else NotInSemverNotation(version).invalidNec
-  }
 
   private def validateProjectName(projectName: String): ValidationResult[String] = {
     val projectNameRgx = "^[a-z0-9_]$|^[a-z0-9_]+[a-z0-9_-]*[a-z0-9_]+$"
@@ -134,14 +119,14 @@ sealed trait FormValidator {
   }
 
   private def validateMetrics(
-     effect: EffectRequest,
-     serverImplementation: ServerImplementationRequest,
-     addMetrics: Boolean
+      effect: EffectRequest,
+      serverImplementation: ServerImplementationRequest,
+      addMetrics: Boolean
   ): ValidatedNec[RequestValidation, Boolean] = {
     (effect, serverImplementation, addMetrics) match {
-      case t @ (_, Akka | Http4s | ZIOHttp, _)  => t._3.validNec
-      case t @ (_, Netty, false)  => t._3.validNec
-      case (_, Netty, true)  => RequestValidation.MetricsNotSupportedForNettyServerImplementation(effect, serverImplementation).invalidNec
+      case t @ (_, Akka | Http4s | ZIOHttp, _) => t._3.validNec
+      case t @ (_, Netty, false)               => t._3.validNec
+      case (_, Netty, true) => RequestValidation.MetricsNotSupportedForNettyServerImplementation(effect, serverImplementation).invalidNec
     }
   }
 

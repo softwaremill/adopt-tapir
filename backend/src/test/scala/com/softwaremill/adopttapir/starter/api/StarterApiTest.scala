@@ -4,7 +4,6 @@ import better.files.File
 import cats.effect.{IO, Resource}
 import com.softwaremill.adopttapir.http.Error_OUT
 import com.softwaremill.adopttapir.infrastructure.Json._
-import com.softwaremill.adopttapir.starter.StarterDetails.defaultTapirVersion
 import com.softwaremill.adopttapir.starter.api.EffectRequest.FutureEffect
 import com.softwaremill.adopttapir.starter.api.JsonImplementationRequest.Jsoniter
 import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Akka, ZIOHttp}
@@ -126,7 +125,6 @@ object StarterApiTest {
     groupId = "com.softwaremill",
     effect = FutureEffect,
     implementation = ServerImplementationRequest.Akka,
-    defaultTapirVersion,
     addDocumentation = true,
     addMetrics = false,
     json = Jsoniter

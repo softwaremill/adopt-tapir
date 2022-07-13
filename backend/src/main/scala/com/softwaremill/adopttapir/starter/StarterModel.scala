@@ -8,15 +8,10 @@ case class StarterDetails(
     groupId: String,
     serverEffect: ServerEffect,
     serverImplementation: ServerImplementation,
-    tapirVersion: String,
     addDocumentation: Boolean,
     addMetrics: Boolean,
     jsonImplementation: JsonImplementation
 )
-
-object StarterDetails {
-  val defaultTapirVersion = "1.0.0"
-}
 
 sealed trait ServerImplementation
 

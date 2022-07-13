@@ -1,44 +1,42 @@
-import { useEffect, useState } from 'react';
-import { Alert, Backdrop, Box, Button, CircularProgress, Snackbar, Typography } from '@mui/material';
-import { FormProvider, useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { saveAs } from 'file-saver';
-import { JSONImplementation, StarterRequest } from 'api/starter';
-import { useFeatureFlag } from '../../hooks/useFeatureFlag';
-import { FormTextField } from '../FormTextField';
-import { FormSelect } from '../FormSelect';
-import { FormRadioGroup } from '../FormRadioGroup';
-import { useStyles } from './ConfigurationForm.styles';
+import {useEffect, useState} from 'react';
+import {Alert, Backdrop, Box, Button, CircularProgress, Snackbar, Typography} from '@mui/material';
+import {FormProvider, useForm} from 'react-hook-form';
+import {yupResolver} from '@hookform/resolvers/yup';
+import {saveAs} from 'file-saver';
+import {JSONImplementation, StarterRequest} from 'api/starter';
+import {useFeatureFlag} from '../../hooks/useFeatureFlag';
+import {FormTextField} from '../FormTextField';
+import {FormSelect} from '../FormSelect';
+import {FormRadioGroup} from '../FormRadioGroup';
+import {useStyles} from './ConfigurationForm.styles';
 import {
   createStarterValidationSchema,
   EFFECT_TYPE_OPTIONS,
   ENDPOINTS_OPTIONS,
   SCALA_VERSION_OPTIONS,
-  TAPIR_VERSION_OPTIONS,
 } from './ConfigurationForm.consts';
 import {
   getEffectImplementationOptions,
   getJSONImplementationOptions,
+  isAddMetricsSupported,
   mapEffectTypeToEffectImplementation,
   mapEffectTypeToJSONImplementation,
-  isAddMetricsSupported,
 } from './ConfigurationForm.helpers';
 
 interface ConfigurationFormProps {
   isEmbedded?: boolean;
 }
 
-export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded = false }) => {
+export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({isEmbedded = false}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const { isScalaVersionFieldVisible } = useFeatureFlag();
+  const {isScalaVersionFieldVisible} = useFeatureFlag();
 
-  const { classes, cx } = useStyles({ isEmbedded });
+  const {classes, cx} = useStyles({isEmbedded});
   const form = useForm<StarterRequest>({
     mode: 'onBlur',
     resolver: yupResolver(createStarterValidationSchema(isScalaVersionFieldVisible)),
     defaultValues: {
-      tapirVersion: TAPIR_VERSION_OPTIONS[0].value,
       addDocumentation: false,
       addMetrics: false,
       json: JSONImplementation.No,
@@ -137,13 +135,6 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
             placeholder="com.softwaremill"
           />
 
-          <FormSelect
-            className={classes.formVersionsRow}
-            name="tapirVersion"
-            label="Tapir version"
-            options={TAPIR_VERSION_OPTIONS}
-          />
-
           {isScalaVersionFieldVisible && (
             <FormSelect
               className={classes.formVersionsRow}
@@ -209,11 +200,11 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
       </FormProvider>
 
       <Backdrop open={isLoading}>
-        <CircularProgress />
+        <CircularProgress/>
       </Backdrop>
       <Snackbar
         open={Boolean(errorMessage)}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        anchorOrigin={{vertical: 'top', horizontal: 'right'}}
         autoHideDuration={5000}
         onClose={handleCloseAlert}
       >

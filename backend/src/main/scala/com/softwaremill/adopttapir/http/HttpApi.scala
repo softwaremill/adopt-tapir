@@ -3,7 +3,7 @@ package com.softwaremill.adopttapir.http
 import cats.effect.{IO, Resource}
 import com.softwaremill.adopttapir.infrastructure.CorrelationIdInterceptor
 import com.softwaremill.adopttapir.logging.FLogger
-import com.softwaremill.adopttapir.util.{ServerEndpoints, constantTimeEquals}
+import com.softwaremill.adopttapir.util.ServerEndpoints
 import com.typesafe.scalalogging.StrictLogging
 import org.http4s.HttpRoutes
 import org.http4s.blaze.server.BlazeServerBuilder

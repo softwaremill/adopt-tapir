@@ -6,6 +6,7 @@ import com.softwaremill.adopttapir.starter.{StarterConfig, StarterDetails}
 import com.softwaremill.adopttapir.template.ProjectTemplate._
 import com.softwaremill.adopttapir.template.sbt.BuildSbtView
 import com.softwaremill.adopttapir.template.scala.{EndpointsSpecView, EndpointsView, Import, MainView}
+import com.softwaremill.adopttapir.version.TemplateDependencyInfo
 
 case class GeneratedFile(
     relativePath: String,
@@ -26,8 +27,7 @@ class ProjectTemplate(config: StarterConfig) {
         starterDetails.projectName,
         starterDetails.groupId,
         config.scalaVersion,
-        // TODO: use build time tapir version
-        starterDetails.tapirVersion,
+        TemplateDependencyInfo.tapirVersion,
         (BuildSbtView.getDependencies _).andThen(BuildSbtView.format)(starterDetails),
         starterDetails.serverEffect == ZIOEffect
       )

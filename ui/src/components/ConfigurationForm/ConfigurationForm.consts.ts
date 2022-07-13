@@ -1,19 +1,12 @@
 import * as yup from 'yup';
-import { EffectType, EffectImplementation, JSONImplementation } from 'api/starter';
-import type { FormSelectOption } from '../FormSelect';
-import type { FormRadioOption } from '../FormRadioGroup';
+import {EffectImplementation, EffectType, JSONImplementation} from 'api/starter';
+import type {FormSelectOption} from '../FormSelect';
+import type {FormRadioOption} from '../FormRadioGroup';
 import {
+  getEffectImplementationOptions,
   mapEffectTypeToEffectImplementation,
   mapEffectTypeToJSONImplementation,
-  getEffectImplementationOptions,
 } from './ConfigurationForm.helpers';
-
-export const TAPIR_VERSION_OPTIONS: FormSelectOption<string>[] = [
-  {
-    label: '1.0.0',
-    value: '1.0.0',
-  },
-];
 
 export const SCALA_VERSION_OPTIONS: FormSelectOption<string>[] = [
   {
@@ -121,7 +114,6 @@ export const createStarterValidationSchema = (isScalaVersionFieldVisible: boolea
         )
         .max(256, 'Group ID length should be smaller than 256 characters')
         .required(REQUIRED_FIELD_MESSAGE),
-      tapirVersion: yup.string().required(REQUIRED_FIELD_MESSAGE),
       effect: yup
         .mixed()
         .oneOf(
@@ -176,8 +168,8 @@ export const createStarterValidationSchema = (isScalaVersionFieldVisible: boolea
   return baseSchema.concat(
     isScalaVersionFieldVisible
       ? yup.object({
-          scalaVersion: yup.string().required(REQUIRED_FIELD_MESSAGE),
-        })
+        scalaVersion: yup.string().required(REQUIRED_FIELD_MESSAGE),
+      })
       : yup.object({})
   );
 };

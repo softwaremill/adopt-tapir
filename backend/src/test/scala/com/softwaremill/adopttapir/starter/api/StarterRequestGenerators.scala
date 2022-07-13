@@ -1,6 +1,5 @@
 package com.softwaremill.adopttapir.starter.api
 
-import com.softwaremill.adopttapir.starter.StarterDetails
 import org.scalacheck.Gen
 
 object StarterRequestGenerators {
@@ -26,7 +25,6 @@ object StarterRequestGenerators {
       groupId,
       effect,
       implementation = serverImplementation,
-      StarterDetails.defaultTapirVersion,
       documentationAdded,
       metricsAdded,
       json
