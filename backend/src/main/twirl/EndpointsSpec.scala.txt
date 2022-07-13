@@ -6,6 +6,7 @@ unwrapper: String,
 booksStub: String
 )
 package @{starterDetails.groupId}
+
 import @{starterDetails.groupId}.Endpoints._
 import org.scalatest.EitherValues
 import org.scalatest.flatspec.AnyFlatSpec

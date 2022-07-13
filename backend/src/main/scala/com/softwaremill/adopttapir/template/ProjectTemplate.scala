@@ -84,10 +84,9 @@ class ProjectTemplate(config: StarterConfig) {
 
     val helloServerStub = EndpointsSpecView.getHelloServerStub(starterDetails)
     val booksServerStub = EndpointsSpecView.getBookServerStub(starterDetails)
-    val unwrapper = EndpointsSpecView.Unwrapper.prepareUnwrapper(starterDetails.serverEffect)
 
     val fileContent =
-      if (starterDetails.serverEffect == ZIOEffect)
+      if (starterDetails.serverEffect == ZIOEffect) {
         txt
           .EndpointsSpecZIO(
             starterDetails,
@@ -95,8 +94,8 @@ class ProjectTemplate(config: StarterConfig) {
             helloServerStub.body,
             booksServerStub.body
           )
-          .toString()
-      else
+      } else {
+        val unwrapper = EndpointsSpecView.Unwrapper.prepareUnwrapper(starterDetails.serverEffect)
         txt
           .EndpointsSpec(
             starterDetails,
@@ -105,11 +104,11 @@ class ProjectTemplate(config: StarterConfig) {
             unwrapper.body,
             booksServerStub.body
           )
-          .toString()
+      }
 
     GeneratedFile(
       pathUnderPackage("src/test/scala", groupId, "EndpointsSpec.scala"),
-      fileContent
+      fileContent.toString
     )
   }
 
