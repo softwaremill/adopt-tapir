@@ -4,13 +4,13 @@ import cats.effect.{ExitCode, IO, IOApp}
 import com.softwaremill.adopttapir.config.Config
 import com.softwaremill.adopttapir.starter.JsonImplementation.WithoutJson
 import com.softwaremill.adopttapir.starter.StarterDetails.defaultTapirVersion
-import com.softwaremill.adopttapir.template.ProjectTemplate
+import com.softwaremill.adopttapir.template.ProjectTemplateInTests
 
 @deprecated("Only for development purpose")
 object FileOperation extends IOApp {
 
   private val cfg = Config.read.starter
-  val service = new StarterService(cfg.copy(deleteTempFolder = false), new ProjectTemplate(cfg))
+  val service = new StarterServiceInTests(cfg.copy(deleteTempFolder = false), new ProjectTemplateInTests(cfg))
 
   override def run(args: List[String]): IO[ExitCode] = {
     val details = StarterDetails(
@@ -20,7 +20,7 @@ object FileOperation extends IOApp {
       ServerImplementation.ZIOHttp,
       defaultTapirVersion,
       true,
-      false,
+      true,
       WithoutJson
     )
 

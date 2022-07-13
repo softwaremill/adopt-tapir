@@ -5,7 +5,7 @@ import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import com.softwaremill.adopttapir.starter.StarterDetails.defaultTapirVersion
 import com.softwaremill.adopttapir.starter.api._
-import com.softwaremill.adopttapir.template.ProjectTemplate
+import com.softwaremill.adopttapir.template.ProjectTemplateInTests
 import com.softwaremill.adopttapir.test.BaseTest
 import org.scalatest.ParallelTestExecution
 
@@ -31,7 +31,7 @@ class StarterServiceITTest extends BaseTest with ParallelTestExecution {
 
   private def createStarterService = {
     val config = StarterConfig(deleteTempFolder = true, tempPrefix = "sbtService", sbtVersion = "1.6.2", scalaVersion = "2.13.8")
-    new StarterService(config, new ProjectTemplate(config))
+    new StarterServiceInTests(config, new ProjectTemplateInTests(config))
   }
 
   private def sbtCompileTest(file: IO[File]): Unit = {

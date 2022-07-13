@@ -35,7 +35,7 @@ class StarterService(
 
   }
 
-  private def generateFiles(starterDetails: StarterDetails): List[GeneratedFile] = {
+  protected def generateFiles(starterDetails: StarterDetails): List[GeneratedFile] = {
     List(
       template.getBuildSbt(starterDetails),
       template.getBuildProperties,
