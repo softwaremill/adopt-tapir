@@ -113,7 +113,9 @@ lazy val commonSettings = commonSmlBuildSettings ++ Seq(
     val taskName = spaceDelimited("<arg>").parsed.mkString(" ")
     updateYarn.value
     val localYarnCommand = "yarn " + taskName
+
     def runYarnTask() = Process(localYarnCommand, uiDirectory.value).!
+
     streams.value.log("Running yarn task: " + taskName)
     haltOnCmdResultError(runYarnTask())
   }
@@ -253,7 +255,8 @@ lazy val templateDependencies: Project = project
       "scalaTestVersion" -> scalaTestVersion,
       "http4sVersion" -> http4sVersion,
       "zioTestVersion" -> zioTestVersion,
-      "scalafmtVersion" -> scalafmtVersion
+      "scalafmtVersion" -> scalafmtVersion,
+      "sbtVersion" -> sbtVersion.value
     ),
     buildInfoOptions += BuildInfoOption.ToJson,
     buildInfoOptions += BuildInfoOption.ToMap,

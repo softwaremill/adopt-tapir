@@ -28,7 +28,7 @@ class StarterServiceITTest extends BaseTest with ParallelTestExecution {
   }
 
   private def createStarterService = {
-    val config = StarterConfig(deleteTempFolder = true, tempPrefix = "sbtService", sbtVersion = "1.6.2", scalaVersion = "2.13.8")
+    val config = StarterConfig(deleteTempFolder = true, tempPrefix = "sbtService", scalaVersion = "2.13.8")
     new StarterServiceInTests(config, new ProjectTemplateInTests(config))
   }
 
