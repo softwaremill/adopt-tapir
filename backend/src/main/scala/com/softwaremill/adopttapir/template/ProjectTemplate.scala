@@ -115,7 +115,7 @@ class ProjectTemplate(config: StarterConfig) {
 
   val pluginsSbt: GeneratedFile = GeneratedFile("project/plugins.sbt", templateResource("plugins.sbt"))
 
-  val scalafmtConf: GeneratedFile = GeneratedFile(ScalafmtConfigFile, templateResource("scalafmt.conf"))
+  val scalafmtConf: GeneratedFile = GeneratedFile(ScalafmtConfigFile, txt.scalafmt(TemplateDependencyInfo.scalafmtVersion).toString())
 
   val sbtx: GeneratedFile =
     GeneratedFile(sbtxFile, templateResource(sbtxFile))
