@@ -10,14 +10,14 @@ import scala.sys.process.Process
 import scala.util.Try
 
 val tapirVersion = "1.0.1"
-val http4sVersion = "0.23.11"
+val http4sVersion = "0.23.12"
 val circeVersion = "0.14.1"
 val tsecVersion = "0.4.0"
 val sttpVersion = "3.6.2"
-val prometheusVersion = "0.15.0"
+val prometheusVersion = "0.16.0"
 val macwireVersion = "2.5.7"
 
-val scalafmtVersion = "3.5.7"
+val scalafmtVersion = "3.5.8"
 val scalaLoggingVersion = "3.9.4"
 val logbackClassicVersion = "1.2.11"
 val scalaTestVersion = "3.2.12"
@@ -63,7 +63,7 @@ val configDependencies = Seq(
 )
 
 val baseDependencies = Seq(
-  "org.typelevel" %% "cats-effect" % "3.3.11",
+  "org.typelevel" %% "cats-effect" % "3.3.14",
   "com.softwaremill.common" %% "tagging" % "2.3.3",
   "com.softwaremill.quicklens" %% "quicklens" % "1.8.8"
 )
@@ -217,7 +217,7 @@ lazy val backend: Project = (project in file("backend"))
   .enablePlugins(SbtTwirl)
   .settings(dockerSettings)
 
-val plokhotnyukJsoniterVersion = "2.13.26"
+val plokhotnyukJsoniterVersion = "2.13.36"
 val zioTestVersion = "2.0.0"
 
 lazy val templateDependencies: Project = project
