@@ -123,7 +123,7 @@ object BuildSbtView {
 
     def http4s(): List[ScalaDependency] = List(
       ScalaDependency("com.softwaremill.sttp.tapir", "tapir-http4s-server", constantTapirVersion),
-      ScalaDependency("org.http4s", "http4s-blaze-server", TemplateDependencyInfo.http4sVersion)
+      ScalaDependency("org.http4s", "http4s-blaze-server", TemplateDependencyInfo.http4sBlazeServerVersion)
     )
 
     def http4sZIO(): List[ScalaDependency] =

@@ -11,7 +11,8 @@ import scala.util.Try
 
 val tapirVersion = "1.0.1"
 
-val http4sVersion = "0.23.12"
+val http4sBlazeServerVersion = "0.23.12"
+val http4sCirceVersion = "0.23.13"
 val circeVersion = "0.14.2"
 val tsecVersion = "0.4.0"
 val sttpVersion = "3.6.2"
@@ -24,8 +25,8 @@ val logbackClassicVersion = "1.2.11"
 val scalaTestVersion = "3.2.12"
 
 val httpDependencies = Seq(
-  "org.http4s" %% "http4s-blaze-server" % http4sVersion,
-  "org.http4s" %% "http4s-circe" % http4sVersion,
+  "org.http4s" %% "http4s-blaze-server" % http4sBlazeServerVersion,
+  "org.http4s" %% "http4s-circe" % http4sCirceVersion,
   "com.softwaremill.sttp.client3" %% "async-http-client-backend-fs2" % sttpVersion,
   "com.softwaremill.sttp.client3" %% "slf4j-backend" % sttpVersion,
   "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % tapirVersion,
@@ -243,7 +244,7 @@ lazy val templateDependencies: Project = project
       "com.softwaremill.sttp.tapir" %% "tapir-cats" % tapirVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-netty-server-cats" % tapirVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % tapirVersion % Provided,
-      "org.http4s" %% "http4s-blaze-server" % http4sVersion % Provided,
+      "org.http4s" %% "http4s-blaze-server" % http4sBlazeServerVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-http4s-server-zio" % tapirVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-zio-http-server" % tapirVersion % Provided
     ),
@@ -254,7 +255,7 @@ lazy val templateDependencies: Project = project
       "scalaLoggingVersion" -> scalaLoggingVersion,
       "logbackClassicVersion" -> logbackClassicVersion,
       "scalaTestVersion" -> scalaTestVersion,
-      "http4sVersion" -> http4sVersion,
+      "http4sBlazeServerVersion" -> http4sBlazeServerVersion,
       "zioTestVersion" -> zioTestVersion,
       "scalafmtVersion" -> scalafmtVersion,
       "sbtVersion" -> sbtVersion.value
