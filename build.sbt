@@ -10,8 +10,9 @@ import scala.sys.process.Process
 import scala.util.Try
 
 val tapirVersion = "1.0.1"
+
 val http4sVersion = "0.23.12"
-val circeVersion = "0.14.1"
+val circeVersion = "0.14.2"
 val tsecVersion = "0.4.0"
 val sttpVersion = "3.6.1"
 val prometheusVersion = "0.16.0"
