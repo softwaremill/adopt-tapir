@@ -5,7 +5,6 @@ import com.softwaremill.adopttapir.starter.ServerImplementation.{Akka, Http4s, N
 import com.softwaremill.adopttapir.starter.{JsonImplementation, ServerEffect, StarterDetails}
 import com.softwaremill.adopttapir.template.sbt.Dependency._
 import com.softwaremill.adopttapir.version.TemplateDependencyInfo
-import com.softwaremill.adopttapir.version.TemplateDependencyInfo._
 
 object BuildSbtView {
 
@@ -25,8 +24,8 @@ object BuildSbtView {
     val docsDepenedencies = getDocsDependencies(starterDetails)
     val metricsDependencies = getMetricsDependencies(starterDetails)
     val baseDependencies = List(
-      ScalaDependency("com.typesafe.scala-logging", "scala-logging", scalaLoggingVersion),
-      JavaDependency("ch.qos.logback", "logback-classic", logbackClassicVersion)
+      ScalaDependency("com.typesafe.scala-logging", "scala-logging", TemplateDependencyInfo.scalaLoggingVersion),
+      JavaDependency("ch.qos.logback", "logback-classic", TemplateDependencyInfo.logbackClassicVersion)
     )
     val testDependencies = ScalaTestDependency("com.softwaremill.sttp.tapir", "tapir-sttp-stub-server", constantTapirVersion) ::
       getTestDependencies(starterDetails.serverEffect) ++ getJsonTestDependencies(starterDetails)
@@ -65,8 +64,16 @@ object BuildSbtView {
       case JsonImplementation.Jsoniter =>
         List(
           ScalaDependency("com.softwaremill.sttp.tapir", "tapir-jsoniter-scala", constantTapirVersion),
-          ScalaDependency("com.github.plokhotnyuk.jsoniter-scala", "jsoniter-scala-core", plokhotnyukJsoniterVersion),
-          ScalaDependency("com.github.plokhotnyuk.jsoniter-scala", "jsoniter-scala-macros", plokhotnyukJsoniterVersion)
+          ScalaDependency(
+            "com.github.plokhotnyuk.jsoniter-scala",
+            "jsoniter-scala-core",
+            TemplateDependencyInfo.plokhotnyukJsoniterVersion
+          ),
+          ScalaDependency(
+            "com.github.plokhotnyuk.jsoniter-scala",
+            "jsoniter-scala-macros",
+            TemplateDependencyInfo.plokhotnyukJsoniterVersion
+          )
         )
       case JsonImplementation.ZIOJson =>
         List(
@@ -78,9 +85,12 @@ object BuildSbtView {
   private def getJsonTestDependencies(starterDetails: StarterDetails): List[ScalaTestDependency] = {
     starterDetails.jsonImplementation match {
       case JsonImplementation.WithoutJson => Nil
-      case JsonImplementation.Circe       => List(ScalaTestDependency("com.softwaremill.sttp.client3", "circe", sttpVersion))
-      case JsonImplementation.Jsoniter    => List(ScalaTestDependency("com.softwaremill.sttp.client3", "jsoniter", sttpVersion))
-      case JsonImplementation.ZIOJson     => List(ScalaTestDependency("com.softwaremill.sttp.client3", "zio-json", sttpVersion))
+      case JsonImplementation.Circe =>
+        List(ScalaTestDependency("com.softwaremill.sttp.client3", "circe", TemplateDependencyInfo.sttpVersion))
+      case JsonImplementation.Jsoniter =>
+        List(ScalaTestDependency("com.softwaremill.sttp.client3", "jsoniter", TemplateDependencyInfo.sttpVersion))
+      case JsonImplementation.ZIOJson =>
+        List(ScalaTestDependency("com.softwaremill.sttp.client3", "zio-json", TemplateDependencyInfo.sttpVersion))
     }
   }
 
