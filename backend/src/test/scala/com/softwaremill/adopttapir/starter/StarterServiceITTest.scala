@@ -3,7 +3,6 @@ package com.softwaremill.adopttapir.starter
 import better.files.{FileExtensions, File => BFile}
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
-import com.softwaremill.adopttapir.starter.StarterDetails.defaultTapirVersion
 import com.softwaremill.adopttapir.starter.api._
 import com.softwaremill.adopttapir.template.ProjectTemplateInTests
 import com.softwaremill.adopttapir.test.BaseTest
@@ -19,8 +18,7 @@ class StarterServiceITTest extends BaseTest with ParallelTestExecution {
     docs <- List(true, false)
     metrics <- List(true, false)
     json <- JsonImplementationRequest.values
-    starterRequest = StarterRequest("myproject", "com.softwaremill", effect, server, defaultTapirVersion,
-      addDocumentation = docs, addMetrics = metrics, json)
+    starterRequest = StarterRequest("myproject", "com.softwaremill", effect, server, addDocumentation = docs, addMetrics = metrics, json)
     starterDetails <- FormValidator.validate(starterRequest).toSeq
   } {
     it should s"return zip file containing working sbt folder with: $effect/$server/docs=$docs/metrics=$metrics/$json" in {
@@ -30,7 +28,7 @@ class StarterServiceITTest extends BaseTest with ParallelTestExecution {
   }
 
   private def createStarterService = {
-    val config = StarterConfig(deleteTempFolder = true, tempPrefix = "sbtService", sbtVersion = "1.6.2", scalaVersion = "2.13.8")
+    val config = StarterConfig(deleteTempFolder = true, tempPrefix = "sbtService", scalaVersion = "2.13.8")
     new StarterServiceInTests(config, new ProjectTemplateInTests(config))
   }
 

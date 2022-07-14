@@ -14,14 +14,13 @@ import {
   EFFECT_TYPE_OPTIONS,
   ENDPOINTS_OPTIONS,
   SCALA_VERSION_OPTIONS,
-  TAPIR_VERSION_OPTIONS,
 } from './ConfigurationForm.consts';
 import {
   getEffectImplementationOptions,
   getJSONImplementationOptions,
+  isAddMetricsSupported,
   mapEffectTypeToEffectImplementation,
   mapEffectTypeToJSONImplementation,
-  isAddMetricsSupported,
 } from './ConfigurationForm.helpers';
 
 interface ConfigurationFormProps {
@@ -38,7 +37,6 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
     mode: 'onBlur',
     resolver: yupResolver(createStarterValidationSchema(isScalaVersionFieldVisible)),
     defaultValues: {
-      tapirVersion: TAPIR_VERSION_OPTIONS[0].value,
       addDocumentation: false,
       addMetrics: false,
       json: JSONImplementation.No,
@@ -135,13 +133,6 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
             name="groupId"
             label="Group ID"
             placeholder="com.softwaremill"
-          />
-
-          <FormSelect
-            className={classes.formVersionsRow}
-            name="tapirVersion"
-            label="Tapir version"
-            options={TAPIR_VERSION_OPTIONS}
           />
 
           {isScalaVersionFieldVisible && (

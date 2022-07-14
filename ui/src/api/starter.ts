@@ -23,7 +23,6 @@ export type StarterRequest = {
   groupId: string;
   effect: EffectType;
   implementation: EffectImplementation;
-  tapirVersion: string;
   addDocumentation: boolean;
   addMetrics: boolean;
   json: JSONImplementation;

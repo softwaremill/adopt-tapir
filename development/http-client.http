@@ -7,7 +7,6 @@ Content-Type: application/json
   "groupId": "com.softwaremill",
   "effect": "FutureEffect",
   "implementation": "Akka",
-  "tapirVersion": "1.0.0",
   "addDocumentation": true,
   "addMetrics": true,
   "json": "Jsoniter"

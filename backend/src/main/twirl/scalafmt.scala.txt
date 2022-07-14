@@ -1,0 +1,4 @@
+@(fmtVersion: String)
+version = @fmtVersion
+maxColumn = 140
+runner.dialect = scala213

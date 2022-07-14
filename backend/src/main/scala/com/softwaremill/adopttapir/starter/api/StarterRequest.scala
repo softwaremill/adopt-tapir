@@ -8,7 +8,6 @@ case class StarterRequest(
     groupId: String,
     effect: EffectRequest,
     implementation: ServerImplementationRequest,
-    tapirVersion: String,
     addDocumentation: Boolean,
     addMetrics: Boolean,
     json: JsonImplementationRequest

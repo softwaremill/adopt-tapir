@@ -8,13 +8,6 @@ import {
   getEffectImplementationOptions,
 } from './ConfigurationForm.helpers';
 
-export const TAPIR_VERSION_OPTIONS: FormSelectOption<string>[] = [
-  {
-    label: '1.0.0',
-    value: '1.0.0',
-  },
-];
-
 export const SCALA_VERSION_OPTIONS: FormSelectOption<string>[] = [
   {
     label: '',
@@ -121,7 +114,6 @@ export const createStarterValidationSchema = (isScalaVersionFieldVisible: boolea
         )
         .max(256, 'Group ID length should be smaller than 256 characters')
         .required(REQUIRED_FIELD_MESSAGE),
-      tapirVersion: yup.string().required(REQUIRED_FIELD_MESSAGE),
       effect: yup
         .mixed()
         .oneOf(

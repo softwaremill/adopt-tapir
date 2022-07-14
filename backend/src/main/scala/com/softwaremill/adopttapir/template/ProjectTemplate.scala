@@ -6,6 +6,7 @@ import com.softwaremill.adopttapir.starter.{StarterConfig, StarterDetails}
 import com.softwaremill.adopttapir.template.ProjectTemplate._
 import com.softwaremill.adopttapir.template.sbt.BuildSbtView
 import com.softwaremill.adopttapir.template.scala.{EndpointsSpecView, EndpointsView, Import, MainView}
+import com.softwaremill.adopttapir.version.TemplateDependencyInfo
 
 case class GeneratedFile(
     relativePath: String,
@@ -26,7 +27,7 @@ class ProjectTemplate(config: StarterConfig) {
         starterDetails.projectName,
         starterDetails.groupId,
         config.scalaVersion,
-        starterDetails.tapirVersion,
+        TemplateDependencyInfo.tapirVersion,
         (BuildSbtView.getDependencies _).andThen(BuildSbtView.format)(starterDetails),
         starterDetails.serverEffect == ZIOEffect
       )
@@ -37,7 +38,7 @@ class ProjectTemplate(config: StarterConfig) {
 
   def getBuildProperties: GeneratedFile = GeneratedFile(
     "project/build.properties",
-    txt.buildProperties(config.sbtVersion).toString()
+    txt.buildProperties(TemplateDependencyInfo.sbtVersion).toString()
   )
 
   def getMain(starterDetails: StarterDetails): GeneratedFile = {
@@ -114,7 +115,7 @@ class ProjectTemplate(config: StarterConfig) {
 
   val pluginsSbt: GeneratedFile = GeneratedFile("project/plugins.sbt", templateResource("plugins.sbt"))
 
-  val scalafmtConf: GeneratedFile = GeneratedFile(ScalafmtConfigFile, templateResource("scalafmt.conf"))
+  val scalafmtConf: GeneratedFile = GeneratedFile(ScalafmtConfigFile, txt.scalafmt(TemplateDependencyInfo.scalafmtVersion).toString())
 
   val sbtx: GeneratedFile =
     GeneratedFile(sbtxFile, templateResource(sbtxFile))

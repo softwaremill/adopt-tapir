@@ -1,22 +1,26 @@
 import com.softwaremill.SbtSoftwareMillCommon.commonSmlBuildSettings
 import sbt.Keys._
 import sbt._
+import complete.DefaultParsers._
 import sbtbuildinfo.BuildInfoKey.action
 import sbtbuildinfo.BuildInfoKeys.{buildInfoKeys, buildInfoOptions, buildInfoPackage}
 import sbtbuildinfo.{BuildInfoKey, BuildInfoOption}
 
-import scala.util.Try
 import scala.sys.process.Process
-import complete.DefaultParsers._
+import scala.util.Try
 
+val tapirVersion = "1.0.1"
 val http4sVersion = "0.23.11"
 val circeVersion = "0.14.1"
 val tsecVersion = "0.4.0"
 val sttpVersion = "3.6.1"
 val prometheusVersion = "0.15.0"
-val tapirVersion = "1.0.0"
 val macwireVersion = "2.5.7"
+
 val scalafmtVersion = "3.5.7"
+val scalaLoggingVersion = "3.9.4"
+val logbackClassicVersion = "1.2.11"
+val scalaTestVersion = "3.2.12"
 
 val httpDependencies = Seq(
   "org.http4s" %% "http4s-blaze-server" % http4sVersion,
@@ -45,8 +49,8 @@ val jsonDependencies = Seq(
 )
 
 val loggingDependencies = Seq(
-  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.4",
-  "ch.qos.logback" % "logback-classic" % "1.2.11"
+  "com.typesafe.scala-logging" %% "scala-logging" % scalaLoggingVersion,
+  "ch.qos.logback" % "logback-classic" % logbackClassicVersion
 )
 
 val fileDependencies = Seq(
@@ -82,7 +86,7 @@ val scalafmtStandaloneDependencies = Seq(
 )
 
 val unitTestingStack = Seq(
-  "org.scalatest" %% "scalatest" % "3.2.12" % Test,
+  "org.scalatest" %% "scalatest" % scalaTestVersion % Test,
   "org.scalacheck" %% "scalacheck" % "1.16.0" % Test,
   "com.lihaoyi" %% "os-lib" % "0.8.1" % Test
 )
@@ -109,7 +113,9 @@ lazy val commonSettings = commonSmlBuildSettings ++ Seq(
     val taskName = spaceDelimited("<arg>").parsed.mkString(" ")
     updateYarn.value
     val localYarnCommand = "yarn " + taskName
+
     def runYarnTask() = Process(localYarnCommand, uiDirectory.value).!
+
     streams.value.log("Running yarn task: " + taskName)
     haltOnCmdResultError(runYarnTask())
   }
@@ -183,11 +189,9 @@ def now(): String = {
 lazy val rootProject = (project in file("."))
   .settings(commonSettings)
   .settings(
-    name := "adopt-tapir",
-    Compile / herokuFatJar := Some((backend / assembly / assemblyOutputPath).value),
-    Compile / deployHeroku := ((Compile / deployHeroku) dependsOn (backend / assembly)).value
+    name := "adopt-tapir"
   )
-  .aggregate(backend)
+  .aggregate(backend, templateDependencies)
 
 lazy val backend: Project = (project in file("backend"))
   .settings(
@@ -202,6 +206,7 @@ lazy val backend: Project = (project in file("backend"))
     copyWebapp := copyWebapp.dependsOn(yarnTask.toTask(" build")).value,
     Test / testOptions += Tests.Argument("-P" + java.lang.Runtime.getRuntime.availableProcessors())
   )
+  .dependsOn(templateDependencies)
   .enablePlugins(BuildInfoPlugin)
   .settings(commonSettings)
   .settings(Revolver.settings)
@@ -211,3 +216,52 @@ lazy val backend: Project = (project in file("backend"))
   .enablePlugins(JavaServerAppPackaging)
   .enablePlugins(SbtTwirl)
   .settings(dockerSettings)
+
+val plokhotnyukJsoniterVersion = "2.13.26"
+val zioTestVersion = "2.0.0"
+
+lazy val templateDependencies: Project = project
+  .settings(
+    name := "templateDependencies",
+    libraryDependencies ++= List(
+      "com.typesafe.scala-logging" %% "scala-logging" % scalaLoggingVersion % Provided,
+      "ch.qos.logback" % "logback-classic" % logbackClassicVersion % Provided,
+      "com.softwaremill.sttp.tapir" %% "tapir-sttp-stub-server" % tapirVersion % Provided,
+      "org.scalatest" %% "scalatest" % scalaTestVersion % Provided,
+      "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-bundle" % tapirVersion % Provided,
+      "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % tapirVersion % Provided,
+      "com.softwaremill.sttp.tapir" %% "tapir-jsoniter-scala" % tapirVersion % Provided,
+      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % plokhotnyukJsoniterVersion % Provided,
+      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % plokhotnyukJsoniterVersion % Provided,
+      "com.softwaremill.sttp.tapir" %% "tapir-json-zio" % tapirVersion % Provided,
+      "com.softwaremill.sttp.client3" %% "circe" % sttpVersion % Provided,
+      "com.softwaremill.sttp.client3" %% "jsoniter" % sttpVersion % Provided,
+      "com.softwaremill.sttp.client3" %% "zio-json" % sttpVersion % Provided,
+      "com.softwaremill.sttp.tapir" %% "tapir-akka-http-server" % tapirVersion % Provided,
+      "com.softwaremill.sttp.tapir" %% "tapir-netty-server" % tapirVersion % Provided,
+      "com.softwaremill.sttp.tapir" %% "tapir-cats" % tapirVersion % Provided,
+      "com.softwaremill.sttp.tapir" %% "tapir-netty-server-cats" % tapirVersion % Provided,
+      "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % tapirVersion % Provided,
+      "org.http4s" %% "http4s-blaze-server" % http4sVersion % Provided,
+      "com.softwaremill.sttp.tapir" %% "tapir-http4s-server-zio" % tapirVersion % Provided,
+      "com.softwaremill.sttp.tapir" %% "tapir-zio-http-server" % tapirVersion % Provided
+    ),
+    buildInfoKeys := Seq[BuildInfoKey](
+      "sttpVersion" -> sttpVersion,
+      "plokhotnyukJsoniterVersion" -> plokhotnyukJsoniterVersion,
+      "tapirVersion" -> tapirVersion,
+      "scalaLoggingVersion" -> scalaLoggingVersion,
+      "logbackClassicVersion" -> logbackClassicVersion,
+      "scalaTestVersion" -> scalaTestVersion,
+      "http4sVersion" -> http4sVersion,
+      "zioTestVersion" -> zioTestVersion,
+      "scalafmtVersion" -> scalafmtVersion,
+      "sbtVersion" -> sbtVersion.value
+    ),
+    buildInfoOptions += BuildInfoOption.ToJson,
+    buildInfoOptions += BuildInfoOption.ToMap,
+    buildInfoPackage := "com.softwaremill.adopttapir.version",
+    buildInfoObject := "TemplateDependencyInfo"
+  )
+  .enablePlugins(BuildInfoPlugin)
+  .settings(commonSettings)

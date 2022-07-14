@@ -4,6 +4,7 @@ import com.softwaremill.adopttapir.starter.ServerEffect._
 import com.softwaremill.adopttapir.starter.ServerImplementation.{Akka, Http4s, Netty, ZIOHttp}
 import com.softwaremill.adopttapir.starter.{JsonImplementation, ServerEffect, StarterDetails}
 import com.softwaremill.adopttapir.template.sbt.Dependency._
+import com.softwaremill.adopttapir.version.TemplateDependencyInfo
 
 object BuildSbtView {
 
@@ -23,8 +24,8 @@ object BuildSbtView {
     val docsDepenedencies = getDocsDependencies(starterDetails)
     val metricsDependencies = getMetricsDependencies(starterDetails)
     val baseDependencies = List(
-      ScalaDependency("com.typesafe.scala-logging", "scala-logging", scalaLoggingVersion),
-      JavaDependency("ch.qos.logback", "logback-classic", logbackClassicVersion)
+      ScalaDependency("com.typesafe.scala-logging", "scala-logging", TemplateDependencyInfo.scalaLoggingVersion),
+      JavaDependency("ch.qos.logback", "logback-classic", TemplateDependencyInfo.logbackClassicVersion)
     )
     val testDependencies = ScalaTestDependency("com.softwaremill.sttp.tapir", "tapir-sttp-stub-server", constantTapirVersion) ::
       getTestDependencies(starterDetails.serverEffect) ++ getJsonTestDependencies(starterDetails)
@@ -33,11 +34,11 @@ object BuildSbtView {
   }
 
   private def getTestDependencies(effect: ServerEffect): List[ScalaTestDependency] = {
-    if (effect != ServerEffect.ZIOEffect) List(ScalaTestDependency("org.scalatest", "scalatest", scalatestVersion))
+    if (effect != ServerEffect.ZIOEffect) List(ScalaTestDependency("org.scalatest", "scalatest", TemplateDependencyInfo.scalaTestVersion))
     else
       List(
-        ScalaTestDependency("dev.zio", "zio-test", zioTestVersion),
-        ScalaTestDependency("dev.zio", "zio-test-sbt", zioTestVersion)
+        ScalaTestDependency("dev.zio", "zio-test", TemplateDependencyInfo.zioTestVersion),
+        ScalaTestDependency("dev.zio", "zio-test-sbt", TemplateDependencyInfo.zioTestVersion)
       )
   }
 
@@ -63,8 +64,16 @@ object BuildSbtView {
       case JsonImplementation.Jsoniter =>
         List(
           ScalaDependency("com.softwaremill.sttp.tapir", "tapir-jsoniter-scala", constantTapirVersion),
-          ScalaDependency("com.github.plokhotnyuk.jsoniter-scala", "jsoniter-scala-core", plokhotnyukJsoniterVersion),
-          ScalaDependency("com.github.plokhotnyuk.jsoniter-scala", "jsoniter-scala-macros", plokhotnyukJsoniterVersion)
+          ScalaDependency(
+            "com.github.plokhotnyuk.jsoniter-scala",
+            "jsoniter-scala-core",
+            TemplateDependencyInfo.plokhotnyukJsoniterVersion
+          ),
+          ScalaDependency(
+            "com.github.plokhotnyuk.jsoniter-scala",
+            "jsoniter-scala-macros",
+            TemplateDependencyInfo.plokhotnyukJsoniterVersion
+          )
         )
       case JsonImplementation.ZIOJson =>
         List(
@@ -76,20 +85,23 @@ object BuildSbtView {
   private def getJsonTestDependencies(starterDetails: StarterDetails): List[ScalaTestDependency] = {
     starterDetails.jsonImplementation match {
       case JsonImplementation.WithoutJson => Nil
-      case JsonImplementation.Circe       => List(ScalaTestDependency("com.softwaremill.sttp.client3", "circe", sttpClientVersion))
-      case JsonImplementation.Jsoniter    => List(ScalaTestDependency("com.softwaremill.sttp.client3", "jsoniter", sttpClientVersion))
-      case JsonImplementation.ZIOJson     => List(ScalaTestDependency("com.softwaremill.sttp.client3", "zio-json", sttpClientVersion))
+      case JsonImplementation.Circe =>
+        List(ScalaTestDependency("com.softwaremill.sttp.client3", "circe", TemplateDependencyInfo.sttpVersion))
+      case JsonImplementation.Jsoniter =>
+        List(ScalaTestDependency("com.softwaremill.sttp.client3", "jsoniter", TemplateDependencyInfo.sttpVersion))
+      case JsonImplementation.ZIOJson =>
+        List(ScalaTestDependency("com.softwaremill.sttp.client3", "zio-json", TemplateDependencyInfo.sttpVersion))
     }
   }
 
   private def getHttpDependencies(starterDetails: StarterDetails): List[Dependency] = {
     starterDetails match {
-      case StarterDetails(_, _, FutureEffect, Akka, _, _, _, _)  => HttpDependencies.akka()
-      case StarterDetails(_, _, FutureEffect, Netty, _, _, _, _) => HttpDependencies.netty()
-      case StarterDetails(_, _, IOEffect, Http4s, _, _, _, _)    => HttpDependencies.http4s()
-      case StarterDetails(_, _, IOEffect, Netty, _, _, _, _)     => HttpDependencies.ioNetty()
-      case StarterDetails(_, _, ZIOEffect, Http4s, _, _, _, _)   => HttpDependencies.http4sZIO()
-      case StarterDetails(_, _, ZIOEffect, ZIOHttp, _, _, _, _)  => HttpDependencies.ZIOHttp()
+      case StarterDetails(_, _, FutureEffect, Akka, _, _, _)  => HttpDependencies.akka()
+      case StarterDetails(_, _, FutureEffect, Netty, _, _, _) => HttpDependencies.netty()
+      case StarterDetails(_, _, IOEffect, Http4s, _, _, _)    => HttpDependencies.http4s()
+      case StarterDetails(_, _, IOEffect, Netty, _, _, _)     => HttpDependencies.ioNetty()
+      case StarterDetails(_, _, ZIOEffect, Http4s, _, _, _)   => HttpDependencies.http4sZIO()
+      case StarterDetails(_, _, ZIOEffect, ZIOHttp, _, _, _)  => HttpDependencies.ZIOHttp()
       case other: StarterDetails => throw new UnsupportedOperationException(s"Cannot pick dependencies for $other")
     }
   }
@@ -111,7 +123,7 @@ object BuildSbtView {
 
     def http4s(): List[ScalaDependency] = List(
       ScalaDependency("com.softwaremill.sttp.tapir", "tapir-http4s-server", constantTapirVersion),
-      ScalaDependency("org.http4s", "http4s-blaze-server", http4sBlazeServerVersion)
+      ScalaDependency("org.http4s", "http4s-blaze-server", TemplateDependencyInfo.http4sVersion)
     )
 
     def http4sZIO(): List[ScalaDependency] =

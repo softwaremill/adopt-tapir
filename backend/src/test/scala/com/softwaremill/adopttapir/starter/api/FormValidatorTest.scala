@@ -34,18 +34,6 @@ class FormValidatorTest extends BaseTest {
     result.left.value.msg should include("GroupId: `Upper.Name.Package` should follow Java package convention")
   }
 
-  it should "raise  a problem with not valid semantic versioning notation for tapirVersion" in {
-    // given
-    val notValidTapirVersion = "1.0.0-alpha......1"
-    val request = randomStarterRequest().copy(tapirVersion = notValidTapirVersion)
-
-    // when
-    val result = FormValidator.validate(request)
-
-    // then
-    result.left.value.msg should include(s"Provided input: `$notValidTapirVersion` is not in semantic versioning notation")
-  }
-
   it should "raise a problem with picking ZIOJson for other effect than ZIO" in {
     // given
     val requestWithFutureEffect = randomStarterRequest().copy(json = JsonImplementationRequest.ZIOJson, effect = EffectRequest.FutureEffect)
@@ -89,7 +77,6 @@ class FormValidatorTest extends BaseTest {
       request.groupId,
       ServerEffect.FutureEffect,
       ServerImplementation.Akka,
-      request.tapirVersion,
       addDocumentation = true,
       false,
       WithoutJson
@@ -99,7 +86,6 @@ class FormValidatorTest extends BaseTest {
       request1.groupId,
       ServerEffect.FutureEffect,
       ServerImplementation.Netty,
-      request1.tapirVersion,
       addDocumentation = true,
       false,
       WithoutJson
@@ -109,7 +95,6 @@ class FormValidatorTest extends BaseTest {
       request2.groupId,
       ServerEffect.IOEffect,
       ServerImplementation.Netty,
-      request2.tapirVersion,
       addDocumentation = true,
       false,
       WithoutJson
@@ -119,7 +104,6 @@ class FormValidatorTest extends BaseTest {
       request3.groupId,
       ServerEffect.IOEffect,
       ServerImplementation.Http4s,
-      request3.tapirVersion,
       addDocumentation = true,
       false,
       WithoutJson
@@ -129,7 +113,6 @@ class FormValidatorTest extends BaseTest {
       request4.groupId,
       ServerEffect.ZIOEffect,
       ServerImplementation.Http4s,
-      request4.tapirVersion,
       addDocumentation = true,
       false,
       WithoutJson
@@ -139,7 +122,6 @@ class FormValidatorTest extends BaseTest {
       request5.groupId,
       ServerEffect.ZIOEffect,
       ServerImplementation.ZIOHttp,
-      request5.tapirVersion,
       addDocumentation = true,
       false,
       WithoutJson
@@ -157,7 +139,6 @@ class FormValidatorTest extends BaseTest {
       request.groupId,
       ServerEffect.FutureEffect,
       ServerImplementation.Akka,
-      request.tapirVersion,
       addDocumentation = true,
       true,
       WithoutJson
@@ -167,7 +148,6 @@ class FormValidatorTest extends BaseTest {
       request1.groupId,
       ServerEffect.IOEffect,
       ServerImplementation.Http4s,
-      request1.tapirVersion,
       addDocumentation = true,
       true,
       WithoutJson
@@ -177,7 +157,6 @@ class FormValidatorTest extends BaseTest {
       request2.groupId,
       ServerEffect.ZIOEffect,
       ServerImplementation.Http4s,
-      request2.tapirVersion,
       addDocumentation = true,
       true,
       WithoutJson
@@ -187,7 +166,6 @@ class FormValidatorTest extends BaseTest {
       request3.groupId,
       ServerEffect.ZIOEffect,
       ServerImplementation.ZIOHttp,
-      request3.tapirVersion,
       addDocumentation = true,
       true,
       WithoutJson
@@ -203,5 +181,5 @@ class FormValidatorTest extends BaseTest {
   }
 
   private def defaultRequest(): StarterRequest =
-    StarterRequest("project", "com.softwaremill", FutureEffect, Akka, tapirVersion = "1.0.0", addDocumentation = true, false, No)
+    StarterRequest("project", "com.softwaremill", FutureEffect, Akka, addDocumentation = true, false, No)
 }
