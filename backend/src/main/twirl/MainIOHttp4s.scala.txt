@@ -26,7 +26,7 @@ object Main extends IOApp {
       .withHttpApp(Router("/" -> routes).orNotFound)
       .resource
       .use { _ => IO.blocking {
-         @if(addDocumentation){println("Go to http://localhost:8080/docs to open SwaggerUI. Press any key to exit.")}else{println("Server started at http://localhost:8080. Press any key to exit.")}
+         println("@if(addDocumentation){Go to http://localhost:8080/docs to open SwaggerUI.}else{Server started at http://localhost:8080.} Press ENTER key to exit.")
          StdIn.readLine()
          }
       }
