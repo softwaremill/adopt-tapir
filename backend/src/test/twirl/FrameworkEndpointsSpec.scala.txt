@@ -2,6 +2,7 @@
 starterDetails: com.softwaremill.adopttapir.starter.StarterDetails,
 additionalImports: List[com.softwaremill.adopttapir.template.scala.Import],
 metricsStub: String,
+docsStub: String,
 unwrapper: String,
 )
 package @{starterDetails.groupId}
@@ -37,6 +38,22 @@ class FrameworkEndpointsSpec extends AnyFlatSpec with Matchers with EitherValues
           and include("# HELP tapir_request_active Active HTTP requests")
           and include("# TYPE tapir_request_active gauge"))
       )
+      .unwrap
+  }
+}
+@if(docsStub.nonEmpty){
+  it should "return docs document" in {
+    // given
+    @docsStub
+
+    // when
+    val response = basicRequest
+      .get(uri"http://localhost/docs/docs.yaml")
+      .send(backendStub)
+
+    // then
+    response
+      .map(_.body.value should include("paths:\n  /hello:"))
       .unwrap
   }
 }

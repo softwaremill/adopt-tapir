@@ -1,7 +1,8 @@
 @(
 starterDetails: com.softwaremill.adopttapir.starter.StarterDetails,
 additionalImports: List[com.softwaremill.adopttapir.template.scala.Import],
-metricsStub: String
+metricsStub: String,
+docsStub: String,
 )
 package @{starterDetails.groupId}
 
@@ -36,6 +37,21 @@ object FrameworkEndpointsSpec extends ZIOSpecDefault {
             && containsString("# HELP tapir_request_active Active HTTP requests")
             && containsString("# TYPE tapir_request_active gauge")
         )
+      )
+    }
+}@if(docsStub.nonEmpty){@if(metricsStub.nonEmpty){,}
+    test("return docs document") {
+      // given
+      @docsStub
+
+      // when
+      val response = basicRequest
+        .get(uri"http://localhost/docs/docs.yaml")
+        .send(backendStub)
+
+      // then
+      assertZIO(response.map(_.body))(
+        isRight(containsString("paths:\n  /hello:"))
       )
     }
 }
