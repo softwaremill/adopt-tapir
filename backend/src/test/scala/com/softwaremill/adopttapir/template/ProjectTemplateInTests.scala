@@ -10,22 +10,25 @@ class ProjectTemplateInTests(config: StarterConfig) extends ProjectTemplate(conf
     val groupId = starterDetails.groupId
 
     val metricsServerStub = FrameworkEndpointsSpecView.getMetricsServerStub(starterDetails)
+    val docsServerStub = FrameworkEndpointsSpecView.getDocsServerStub(starterDetails)
 
     val fileContent =
       if (starterDetails.serverEffect == ZIOEffect) {
         txt
           .FrameworkEndpointsSpecZIO(
             starterDetails,
-            toSortedList(metricsServerStub.imports),
-            metricsServerStub.body
+            toSortedList(metricsServerStub.imports ++ docsServerStub.imports),
+            metricsServerStub.body,
+            docsServerStub.body
           )
       } else {
         val unwrapper = EndpointsSpecView.Unwrapper.prepareUnwrapper(starterDetails.serverEffect)
         txt
           .FrameworkEndpointsSpec(
             starterDetails,
-            toSortedList(metricsServerStub.imports ++ unwrapper.imports),
+            toSortedList(metricsServerStub.imports ++ docsServerStub.imports ++ unwrapper.imports),
             metricsServerStub.body,
+            docsServerStub.body,
             unwrapper.body
           )
       }
