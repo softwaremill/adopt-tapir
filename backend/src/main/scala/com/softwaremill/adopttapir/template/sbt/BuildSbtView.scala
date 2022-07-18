@@ -24,7 +24,6 @@ object BuildSbtView {
     val docsDepenedencies = getDocsDependencies(starterDetails)
     val metricsDependencies = getMetricsDependencies(starterDetails)
     val baseDependencies = List(
-      ScalaDependency("com.typesafe.scala-logging", "scala-logging", TemplateDependencyInfo.scalaLoggingVersion),
       JavaDependency("ch.qos.logback", "logback-classic", TemplateDependencyInfo.logbackClassicVersion)
     )
     val testDependencies = ScalaTestDependency("com.softwaremill.sttp.tapir", "tapir-sttp-stub-server", constantTapirVersion) ::

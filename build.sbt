@@ -226,7 +226,6 @@ lazy val templateDependencies: Project = project
   .settings(
     name := "templateDependencies",
     libraryDependencies ++= List(
-      "com.typesafe.scala-logging" %% "scala-logging" % scalaLoggingVersion % Provided,
       "ch.qos.logback" % "logback-classic" % logbackClassicVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-sttp-stub-server" % tapirVersion % Provided,
       "org.scalatest" %% "scalatest" % scalaTestVersion % Provided,
@@ -252,7 +251,6 @@ lazy val templateDependencies: Project = project
       "sttpVersion" -> sttpVersion,
       "plokhotnyukJsoniterVersion" -> plokhotnyukJsoniterVersion,
       "tapirVersion" -> tapirVersion,
-      "scalaLoggingVersion" -> scalaLoggingVersion,
       "logbackClassicVersion" -> logbackClassicVersion,
       "scalaTestVersion" -> scalaTestVersion,
       "http4sBlazeServerVersion" -> http4sBlazeServerVersion,
