@@ -26,9 +26,11 @@ object Main extends ZIOAppDefault {
         .options
     val app: HttpApp[Any, Throwable] = ZioHttpInterpreter(serverOptions).toHttp(Endpoints.all)
 
+    val port = sys.env.get("http.port").map(_.toInt).getOrElse(8080)
+
     (for {
-      serverStart <- Server(app).withPort(8080).make
-      _ <- Console.printLine("@if(addDocumentation){Go to http://localhost:8080/docs to open SwaggerUI.}else{Server started at http://localhost:8080.} Press ENTER key to exit.")
+      serverStart <- Server(app).withPort(port).make
+      _ <- Console.printLine(s"@if(addDocumentation){Go to http://localhost:${serverStart.port}/docs to open SwaggerUI.}else{Server started at http://localhost:${serverStart.port}.} Press ENTER key to exit.")
       _ <- Console.readLine
     } yield serverStart)
       .provideSomeLayer(EventLoopGroup.auto(0) ++ ServerChannelFactory.auto ++ Scope.default)

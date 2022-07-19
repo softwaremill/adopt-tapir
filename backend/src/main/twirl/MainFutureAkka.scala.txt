@@ -24,11 +24,16 @@ object Main {
     val route = AkkaHttpServerInterpreter().toRoute(Endpoints.all)
     }
 
-    val bindingFuture = Http()
-      .newServerAt("localhost", 8080)
-      .bindFlow(route)
+    val port = sys.env.get("http.port").map(_.toInt).getOrElse(8080)
 
-    println("@if(addDocumentation){Go to http://localhost:8080/docs to open SwaggerUI.}else{Server started at http://localhost:8080.} Press ENTER key to exit.")
+    val bindingFuture = Http()
+      .newServerAt("localhost", port)
+      .bindFlow(route)
+      .map { binding =>
+         println(s"@if(addDocumentation){Go to http://localhost:${binding.localAddress.getPort}/docs to open SwaggerUI.}else{Server started at http://localhost:${binding.localAddress.getPort}.} Press ENTER key to exit.")
+         binding
+      }
+
     StdIn.readLine()
 
     bindingFuture.flatMap(_.unbind()).onComplete(_ => actorSystem.terminate())
