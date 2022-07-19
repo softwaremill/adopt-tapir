@@ -21,12 +21,14 @@ object Main extends IOApp {
     val routes = Http4sServerInterpreter[IO]().toRoutes(Endpoints.all)
     }
 
+    val port = sys.env.get("http.port").map(_.toInt).getOrElse(8080)
+
     BlazeServerBuilder[IO]
-      .bindHttp(8080, "localhost")
+      .bindHttp(port, "localhost")
       .withHttpApp(Router("/" -> routes).orNotFound)
       .resource
-      .use { _ => IO.blocking {
-         println("@if(addDocumentation){Go to http://localhost:8080/docs to open SwaggerUI.}else{Server started at http://localhost:8080.} Press ENTER key to exit.")
+      .use { server => IO.blocking {
+         println(s"@if(addDocumentation){Go to http://localhost:${server.address.getPort}/docs to open SwaggerUI.}else{Server started at http://localhost:${server.address.getPort}.} Press ENTER key to exit.")
          StdIn.readLine()
          }
       }
