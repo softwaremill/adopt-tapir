@@ -206,7 +206,8 @@ lazy val backend: Project = (project in file("backend"))
       IO.copyDirectory(source, target)
     },
     copyWebapp := copyWebapp.dependsOn(yarnTask.toTask(" build")).value,
-    Test / testOptions += Tests.Argument("-P" + java.lang.Runtime.getRuntime.availableProcessors())
+    Test / testOptions += Tests.Argument("-P" + java.lang.Runtime.getRuntime.availableProcessors()),
+    Test / logBuffered := false
   )
   .dependsOn(templateDependencies)
   .enablePlugins(BuildInfoPlugin)
