@@ -219,7 +219,7 @@ lazy val backend: Project = (project in file("backend"))
   .enablePlugins(SbtTwirl)
   .settings(dockerSettings)
 
-val plokhotnyukJsoniterVersion = "2.13.36"
+val plokhotnyukJsoniterVersion = "2.13.37"
 val zioTestVersion = "2.0.0"
 
 lazy val templateDependencies: Project = project
