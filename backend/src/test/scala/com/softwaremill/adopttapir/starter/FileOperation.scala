@@ -3,13 +3,13 @@ package com.softwaremill.adopttapir.starter
 import cats.effect.{ExitCode, IO, IOApp}
 import com.softwaremill.adopttapir.config.Config
 import com.softwaremill.adopttapir.starter.JsonImplementation.WithoutJson
-import com.softwaremill.adopttapir.template.ProjectTemplateInTests
+import com.softwaremill.adopttapir.template.ProjectTemplate
 
 @deprecated("Only for development purpose")
 object FileOperation extends IOApp {
 
   private val cfg = Config.read.starter
-  val service = new StarterServiceInTests(cfg.copy(deleteTempFolder = false), new ProjectTemplateInTests(cfg))
+  val service = new StarterService(cfg.copy(deleteTempFolder = false), new ProjectTemplate(cfg))
 
   override def run(args: List[String]): IO[ExitCode] = {
     val details = StarterDetails(

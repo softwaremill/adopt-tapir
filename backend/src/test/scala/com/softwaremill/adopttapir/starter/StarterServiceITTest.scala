@@ -6,7 +6,7 @@ import cats.effect.unsafe.implicits.global
 import cats.instances.list._
 import cats.syntax.parallel._
 import com.softwaremill.adopttapir.starter.api._
-import com.softwaremill.adopttapir.template.ProjectTemplateInTests
+import com.softwaremill.adopttapir.template.ProjectTemplate
 import com.softwaremill.adopttapir.test.BaseTest
 import org.scalatest.{Assertion, Assertions, ParallelTestExecution}
 import os.SubProcess
@@ -210,8 +210,8 @@ case class Service(tempDir: better.files.File) {
 }
 
 object ZipGenerator {
-  val service: StarterServiceInTests = {
+  val service: StarterService = {
     val config = StarterConfig(deleteTempFolder = true, tempPrefix = "sbtService", scalaVersion = "2.13.8")
-    new StarterServiceInTests(config, new ProjectTemplateInTests(config))
+    new StarterService(config, new ProjectTemplate(config))
   }
 }
