@@ -8,7 +8,6 @@ import sttp.tapir.server.http4s.ztapir.ZHttp4sServerInterpreter
 import zio.interop.catz._
 import zio.{Scope, Task, ZIO, ZIOAppArgs, ZIOAppDefault}
 import scala.io.StdIn
-import scala.concurrent.ExecutionContext.global
 
 object Main extends ZIOAppDefault {
 
@@ -23,17 +22,19 @@ object Main extends ZIOAppDefault {
     val routes = ZHttp4sServerInterpreter().from(Endpoints.all).toRoutes
     }
 
-    BlazeServerBuilder[Task]
-      .withExecutionContext(global)
-      .bindHttp(8080, "localhost")
-      .withHttpApp(Router("/" -> (routes)).orNotFound)
-      .resource
-      .use { _ =>
-        ZIO.succeedBlocking{
-          println("@if(addDocumentation){Go to http://localhost:8080/docs to open SwaggerUI.}else{Server started at http://localhost:8080.} Press ENTER key to exit.")
-          StdIn.readLine()
-        }
-      }
+    ZIO.executor.flatMap{ executor =>
+      BlazeServerBuilder[Task]
+        .withExecutionContext(executor.asExecutionContext)
+        .bindHttp(8080, "localhost")
+        .withHttpApp(Router("/" -> (routes)).orNotFound)
+        .resource
+        .use { _ =>
+          ZIO.succeedBlocking {
+            println("@if(addDocumentation){Go to http://localhost:8080/docs to open SwaggerUI.}else{Server started at http://localhost:8080.} Press ENTER key to exit.")
+            StdIn.readLine()
+          }
+        }.unit
+    }
 
   }
 }
