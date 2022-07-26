@@ -20,7 +20,7 @@ object Main extends ZIOAppDefault {
            doLogWhenHandled = (msg, error) => ZIO.succeed(error.fold(log.debug(msg))(err => log.debug(msg, err))),
            doLogAllDecodeFailures = (msg, error) => ZIO.succeed(error.fold(log.debug(msg))(err => log.debug(msg, err))),
            doLogExceptions = (msg: String, ex: Throwable) => ZIO.succeed(log.debug(msg, ex)),
-           noLog = ZIO.succeed()
+           noLog = ZIO.unit
         ))
         @if(addMetrics){.metricsInterceptor(Endpoints.prometheusMetrics.metricsInterceptor())}
         .options
