@@ -1,8 +1,10 @@
 package com.softwaremill.adopttapir.starter.api
 
 import com.softwaremill.adopttapir.starter.JsonImplementation.WithoutJson
+import com.softwaremill.adopttapir.starter.ScalaVersion.Scala2
 import com.softwaremill.adopttapir.starter.api.EffectRequest.{FutureEffect, IOEffect, ZIOEffect}
 import com.softwaremill.adopttapir.starter.api.JsonImplementationRequest.No
+import com.softwaremill.adopttapir.starter.api.ScalaVersionRequest.Scala3
 import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Akka, Http4s, Netty, ZIOHttp}
 import com.softwaremill.adopttapir.starter.api.StarterRequestGenerators.randomStarterRequest
 import com.softwaremill.adopttapir.starter.{ServerEffect, ServerImplementation, StarterDetails}
@@ -64,6 +66,11 @@ class FormValidatorTest extends BaseTest {
       include("Picked ZIOEffect with Netty - ZIO effect will work only with Http4s and ZIOHttp")
   }
 
+  it should "raise a problem when Akka implementation is requested with scala 3 project" in {
+    FormValidator.validate(randomStarterRequest().copy(implementation = Akka, scalaVersion = Scala3)).left.value.msg should
+      include("Scala3 version is not supported for Akka server implementation")
+  }
+
   it should "not raise a problem with Effect and Implementation" in {
     val request = defaultRequest()
     val request1 = request.copy(effect = FutureEffect, implementation = Netty)
@@ -79,7 +86,8 @@ class FormValidatorTest extends BaseTest {
       ServerImplementation.Akka,
       addDocumentation = true,
       false,
-      WithoutJson
+      WithoutJson,
+      Scala2
     )
     FormValidator.validate(request1).value shouldBe StarterDetails(
       request1.projectName,
@@ -88,7 +96,8 @@ class FormValidatorTest extends BaseTest {
       ServerImplementation.Netty,
       addDocumentation = true,
       false,
-      WithoutJson
+      WithoutJson,
+      Scala2
     )
     FormValidator.validate(request2).value shouldBe StarterDetails(
       request2.projectName,
@@ -97,7 +106,8 @@ class FormValidatorTest extends BaseTest {
       ServerImplementation.Netty,
       addDocumentation = true,
       false,
-      WithoutJson
+      WithoutJson,
+      Scala2
     )
     FormValidator.validate(request3).value shouldBe StarterDetails(
       request3.projectName,
@@ -106,7 +116,8 @@ class FormValidatorTest extends BaseTest {
       ServerImplementation.Http4s,
       addDocumentation = true,
       false,
-      WithoutJson
+      WithoutJson,
+      Scala2
     )
     FormValidator.validate(request4).value shouldBe StarterDetails(
       request4.projectName,
@@ -115,7 +126,8 @@ class FormValidatorTest extends BaseTest {
       ServerImplementation.Http4s,
       addDocumentation = true,
       false,
-      WithoutJson
+      WithoutJson,
+      Scala2
     )
     FormValidator.validate(request5).value shouldBe StarterDetails(
       request5.projectName,
@@ -124,7 +136,8 @@ class FormValidatorTest extends BaseTest {
       ServerImplementation.ZIOHttp,
       addDocumentation = true,
       false,
-      WithoutJson
+      WithoutJson,
+      Scala2
     )
   }
 
@@ -141,7 +154,8 @@ class FormValidatorTest extends BaseTest {
       ServerImplementation.Akka,
       addDocumentation = true,
       true,
-      WithoutJson
+      WithoutJson,
+      Scala2
     )
     FormValidator.validate(request1).value shouldBe StarterDetails(
       request1.projectName,
@@ -150,7 +164,8 @@ class FormValidatorTest extends BaseTest {
       ServerImplementation.Http4s,
       addDocumentation = true,
       true,
-      WithoutJson
+      WithoutJson,
+      Scala2
     )
     FormValidator.validate(request2).value shouldBe StarterDetails(
       request2.projectName,
@@ -159,7 +174,8 @@ class FormValidatorTest extends BaseTest {
       ServerImplementation.Http4s,
       addDocumentation = true,
       true,
-      WithoutJson
+      WithoutJson,
+      Scala2
     )
     FormValidator.validate(request3).value shouldBe StarterDetails(
       request3.projectName,
@@ -168,7 +184,8 @@ class FormValidatorTest extends BaseTest {
       ServerImplementation.ZIOHttp,
       addDocumentation = true,
       true,
-      WithoutJson
+      WithoutJson,
+      Scala2
     )
   }
 
@@ -181,5 +198,5 @@ class FormValidatorTest extends BaseTest {
   }
 
   private def defaultRequest(): StarterRequest =
-    StarterRequest("project", "com.softwaremill", FutureEffect, Akka, addDocumentation = true, false, No)
+    StarterRequest("project", "com.softwaremill", FutureEffect, Akka, addDocumentation = true, false, No, ScalaVersionRequest.Scala2)
 }

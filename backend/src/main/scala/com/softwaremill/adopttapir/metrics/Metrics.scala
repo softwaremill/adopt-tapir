@@ -1,5 +1,6 @@
 package com.softwaremill.adopttapir.metrics
 
+import com.softwaremill.adopttapir.starter.ScalaVersion._
 import com.softwaremill.adopttapir.starter.{JsonImplementation, ServerEffect, ServerImplementation, StarterDetails}
 import io.prometheus.client.{Counter, hotspot}
 
@@ -20,7 +21,7 @@ object Metrics {
 
   private val starterDetailsLabels: Array[String] = {
     val fakeInstance: StarterDetails =
-      StarterDetails("", "", ServerEffect.IOEffect, ServerImplementation.Akka, true, false, JsonImplementation.WithoutJson)
+      StarterDetails("", "", ServerEffect.IOEffect, ServerImplementation.Akka, true, false, JsonImplementation.WithoutJson, Scala2)
 
     val names = fakeInstance.productElementNames.toArray.filterNot(excludedStarterDetailsFields.contains)
     require(

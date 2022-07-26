@@ -28,13 +28,23 @@ object Setup {
     docs <- List(true, false)
     metrics <- List(true, false)
     json <- JsonImplementationRequest.values
-    starterRequest = StarterRequest("myproject", "com.softwaremill", effect, server, addDocumentation = docs, addMetrics = metrics, json)
+    scalaVersion <- ScalaVersionRequest.values
+    starterRequest = StarterRequest(
+      "myproject",
+      "com.softwaremill",
+      effect,
+      server,
+      addDocumentation = docs,
+      addMetrics = metrics,
+      json,
+      scalaVersion
+    )
     starterDetails <- FormValidator.validate(starterRequest).toSeq
   } yield starterDetails
 
   implicit class StarterDetailsWithDescribe(details: StarterDetails) {
     lazy val describe: String =
-      s"${details.serverEffect}/${details.serverImplementation}/docs=${details.addDocumentation}/metrics=${details.addMetrics}/${details.jsonImplementation}"
+      s"${details.serverEffect}/${details.serverImplementation}/docs=${details.addDocumentation}/metrics=${details.addMetrics}/json=${details.jsonImplementation}/scalaVersion=${details.scalaVersion}"
   }
 
   type TestFunction = Integer => IO[Unit]

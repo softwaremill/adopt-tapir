@@ -102,9 +102,10 @@ lazy val updateYarn = taskKey[Unit]("Update yarn")
 lazy val yarnTask = inputKey[Unit]("Run yarn with arguments")
 lazy val copyWebapp = taskKey[Unit]("Copy webapp")
 
+val scala2Version = "2.13.8"
 lazy val commonSettings = commonSmlBuildSettings ++ Seq(
   organization := "com.softwaremill.adopttapir",
-  scalaVersion := "2.13.8",
+  scalaVersion := scala2Version,
   libraryDependencies ++= commonDependencies,
   uiDirectory := (ThisBuild / baseDirectory).value / uiProjectName,
   updateYarn := {
@@ -230,12 +231,14 @@ lazy val backend: Project = (project in file("backend"))
   .enablePlugins(SbtTwirl)
   .settings(dockerSettings)
 
+val scala3Version = "3.1.1"
 val plokhotnyukJsoniterVersion = "2.13.39"
 val zioTestVersion = "2.0.0"
 
 lazy val templateDependencies: Project = project
   .settings(
     name := "templateDependencies",
+    scalaVersion := scala3Version,
     libraryDependencies ++= List(
       "ch.qos.logback" % "logback-classic" % logbackClassicVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-sttp-stub-server" % tapirVersion % Provided,
@@ -259,6 +262,8 @@ lazy val templateDependencies: Project = project
       "com.softwaremill.sttp.tapir" %% "tapir-zio-http-server" % tapirVersion % Provided
     ),
     buildInfoKeys := Seq[BuildInfoKey](
+      "scala2Version" -> scala2Version,
+      "scala3Version" -> scala3Version,
       "sttpVersion" -> sttpVersion,
       "plokhotnyukJsoniterVersion" -> plokhotnyukJsoniterVersion,
       "tapirVersion" -> tapirVersion,
