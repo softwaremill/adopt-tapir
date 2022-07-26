@@ -1,12 +1,13 @@
 package com.softwaremill.adopttapir.starter.api
 
 import cats.data.ValidatedNec
-import cats.implicits.{catsSyntaxTuple5Semigroupal, catsSyntaxValidatedIdBinCompat0}
+import cats.implicits.{catsSyntaxTuple6Semigroupal, catsSyntaxValidatedIdBinCompat0}
 import com.softwaremill.adopttapir.Fail._
 import com.softwaremill.adopttapir.starter.StarterDetails
 import com.softwaremill.adopttapir.starter.api.EffectRequest.{FutureEffect, IOEffect, ZIOEffect}
 import com.softwaremill.adopttapir.starter.api.JsonImplementationRequest.ZIOJson
 import com.softwaremill.adopttapir.starter.api.RequestValidation.{GroupIdShouldFollowJavaPackageConvention, ProjectNameShouldMatchRegex}
+import com.softwaremill.adopttapir.starter.api.ScalaVersionRequest.Scala3
 import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Akka, Http4s, Netty, ZIOHttp}
 
 sealed trait RequestValidation {
@@ -60,8 +61,12 @@ object RequestValidation {
     override val errMessage: String = s"$prefixMessage Metrics not supported for ${ServerImplementationRequest.Netty} server implementation"
   }
 
-  case class ZIOJsonWillWorkOnlyWithZIOEffect() extends RequestValidation {
+  case object ZIOJsonWillWorkOnlyWithZIOEffect extends RequestValidation {
     override val errMessage: String = s"ZIOJson will work only with ZIO effect"
+  }
+
+  case object AkkaImplementationIsNotSupportedWithScala3Project extends RequestValidation {
+    override def errMessage: String = s"$Scala3 version is not supported for $Akka server implementation"
   }
 }
 
@@ -74,8 +79,9 @@ sealed trait FormValidator {
       validateGroupId(r.groupId),
       validateEffectWithImplementation(r.effect, r.implementation),
       validateMetrics(r.effect, r.implementation, r.addMetrics),
-      validateEffectWithJson(r.effect, r.json)
-    ).mapN { case (projectName, groupId, (effect, serverImplementation), addMetrics, json) =>
+      validateEffectWithJson(r.effect, r.json),
+      validateScalaVersion(r.scalaVersion, r.implementation)
+    ).mapN { case (projectName, groupId, (effect, serverImplementation), addMetrics, json, scalaVersion) =>
       StarterDetails(
         projectName,
         groupId,
@@ -83,7 +89,8 @@ sealed trait FormValidator {
         serverImplementation.toModel,
         r.addDocumentation,
         addMetrics,
-        json.toModel
+        json.toModel,
+        scalaVersion.toModel
       )
     }.leftMap(errors => IncorrectInput(errors.toNonEmptyList.map(_.errMessage).toList.mkString(System.lineSeparator())))
       .toEither
@@ -136,8 +143,18 @@ sealed trait FormValidator {
   ): ValidatedNec[RequestValidation, JsonImplementationRequest] = {
     (effectRequest, json) match {
       case t @ (ZIOEffect, ZIOJson) => t._2.validNec
-      case (_, ZIOJson)             => RequestValidation.ZIOJsonWillWorkOnlyWithZIOEffect().invalidNec
+      case (_, ZIOJson)             => RequestValidation.ZIOJsonWillWorkOnlyWithZIOEffect.invalidNec
       case t                        => t._2.validNec
+    }
+  }
+
+  private def validateScalaVersion(
+      scalaVersion: ScalaVersionRequest,
+      implementation: ServerImplementationRequest
+  ): ValidatedNec[RequestValidation, ScalaVersionRequest] = {
+    (implementation, scalaVersion) match {
+      case (Akka, Scala3)    => RequestValidation.AkkaImplementationIsNotSupportedWithScala3Project.invalidNec
+      case (_, scalaVersion) => scalaVersion.validNec
     }
   }
 }
