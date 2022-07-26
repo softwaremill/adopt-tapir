@@ -56,17 +56,26 @@ class StarterServiceITTest extends BaseTest with ParallelTestExecution {
         }
       )
 
-      val docsEndpointTest: Option[TestFunction] = Option.when(details.addDocumentation)(_ =>
+      val docsEndpointTest: Option[TestFunction] = Option.when(details.addDocumentation)(port =>
         IO.blocking {
-          assert(true)
-          // TODO write some tests
+          val result: String =
+            basicRequest.response(asStringAlways).get(uri"http://localhost:$port/docs/docs.yaml").send(backend).body
+
+          result should include("paths:\n  /hello:")
         }
       )
 
-      val metricsEndpointTest: Option[TestFunction] = Option.when(details.addMetrics)(_ =>
+      val metricsEndpointTest: Option[TestFunction] = Option.when(details.addMetrics)(port =>
         IO.blocking {
-          assert(true)
-          // TODO write some tests
+          val result: String =
+            basicRequest.response(asStringAlways).get(uri"http://localhost:$port/metrics").send(backend).body
+
+          result should (include("# HELP tapir_request_duration_seconds Duration of HTTP requests")
+            and include("# TYPE tapir_request_duration_seconds histogram")
+            and include("# HELP tapir_request_total Total HTTP requests")
+            and include("# TYPE tapir_request_total counter")
+            and include("# HELP tapir_request_active Active HTTP requests")
+            and include("# TYPE tapir_request_active gauge"))
         }
       )
 
