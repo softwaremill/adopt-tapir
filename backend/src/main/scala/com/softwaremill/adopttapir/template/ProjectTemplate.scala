@@ -26,7 +26,7 @@ class ProjectTemplate(config: StarterConfig) {
       .sbtBuild(
         starterDetails.projectName,
         starterDetails.groupId,
-        config.scalaVersion,
+        starterDetails.scalaVersion.value,
         TemplateDependencyInfo.tapirVersion,
         (BuildSbtView.getDependencies _).andThen(BuildSbtView.format)(starterDetails),
         starterDetails.serverEffect == ZIOEffect

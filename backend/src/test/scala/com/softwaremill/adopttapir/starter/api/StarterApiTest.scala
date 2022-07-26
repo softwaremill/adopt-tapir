@@ -6,6 +6,7 @@ import com.softwaremill.adopttapir.http.Error_OUT
 import com.softwaremill.adopttapir.infrastructure.Json._
 import com.softwaremill.adopttapir.starter.api.EffectRequest.FutureEffect
 import com.softwaremill.adopttapir.starter.api.JsonImplementationRequest.Jsoniter
+import com.softwaremill.adopttapir.starter.api.ScalaVersionRequest.Scala2
 import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Akka, ZIOHttp}
 import com.softwaremill.adopttapir.starter.api.StarterApiTest.{mainPath, validRequest}
 import com.softwaremill.adopttapir.test.Rich.RichIO
@@ -127,7 +128,8 @@ object StarterApiTest {
     implementation = ServerImplementationRequest.Akka,
     addDocumentation = true,
     addMetrics = false,
-    json = Jsoniter
+    json = Jsoniter,
+    scalaVersion = Scala2
   )
 
   val mainPath = "src/main/scala"

@@ -18,10 +18,20 @@ class StarterServiceITTest extends BaseTest with ParallelTestExecution {
     docs <- List(true, false)
     metrics <- List(true, false)
     json <- JsonImplementationRequest.values
-    starterRequest = StarterRequest("myproject", "com.softwaremill", effect, server, addDocumentation = docs, addMetrics = metrics, json)
+    scalaVersion <- ScalaVersionRequest.values
+    starterRequest = StarterRequest(
+      "myproject",
+      "com.softwaremill",
+      effect,
+      server,
+      addDocumentation = docs,
+      addMetrics = metrics,
+      json,
+      scalaVersion
+    )
     starterDetails <- FormValidator.validate(starterRequest).toSeq
   } {
-    it should s"return zip file containing working sbt folder with: $effect/$server/docs=$docs/metrics=$metrics/$json" in {
+    it should s"return zip file containing working sbt folder with: $effect/$server/docs=$docs/metrics=$metrics/json=$json/scalaVersion=$scalaVersion" in {
       val service = createStarterService
       sbtCompileTest(service.generateZipFile(starterDetails))
     }
@@ -41,7 +51,7 @@ class StarterServiceITTest extends BaseTest with ParallelTestExecution {
             zipFile.unzipTo(tempDir)
             zipFile.delete()
           }
-          _ <- IO.blocking(os.proc("sbt", ";compile ;test").call(cwd = os.Path(tempDir.toJava)).exitCode shouldBe 0)
+          _ <- IO.blocking(os.proc("sbt", "compile").call(cwd = os.Path(tempDir.toJava)).exitCode shouldBe 0)
 
         } yield zipFile
 

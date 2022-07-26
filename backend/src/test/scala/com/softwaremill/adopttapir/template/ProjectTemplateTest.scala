@@ -1,5 +1,6 @@
 package com.softwaremill.adopttapir.template
 
+import com.softwaremill.adopttapir.starter.ScalaVersion.Scala2
 import com.softwaremill.adopttapir.starter.{JsonImplementation, ServerEffect, ServerImplementation, StarterDetails}
 import com.softwaremill.adopttapir.template.ProjectTemplate.legalizeGroupId
 import com.softwaremill.adopttapir.template.ProjectTemplateTest.createStarterDetails
@@ -25,6 +26,7 @@ object ProjectTemplateTest {
     ServerImplementation.ZIOHttp,
     false,
     false,
-    JsonImplementation.WithoutJson
+    JsonImplementation.WithoutJson,
+    Scala2
   )
 }
