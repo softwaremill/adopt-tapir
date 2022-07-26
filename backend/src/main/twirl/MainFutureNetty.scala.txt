@@ -6,10 +6,9 @@ import sttp.tapir.server.netty.NettyFutureServer
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.io.StdIn
+import ExecutionContext.Implicits.global
 
 object Main {
-  implicit val ec = ExecutionContext.global
-
   def main(args: Array[String]): Unit = {
     val program = for {
       binding <- NettyFutureServer().port(8080).addEndpoints(Endpoints.all).start()
