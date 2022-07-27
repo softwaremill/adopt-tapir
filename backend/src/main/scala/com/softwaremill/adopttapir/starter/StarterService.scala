@@ -43,7 +43,7 @@ class StarterService(
       template.getEndpoints(legalizeGroupId(starterDetails)),
       template.getEndpointsSpec(legalizeGroupId(starterDetails)),
       template.pluginsSbt,
-      template.scalafmtConf,
+      template.scalafmtConf(starterDetails.scalaVersion),
       template.sbtx,
       template.README
     )

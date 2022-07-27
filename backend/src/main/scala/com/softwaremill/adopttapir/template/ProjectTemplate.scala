@@ -2,7 +2,7 @@ package com.softwaremill.adopttapir.template
 
 import better.files.Resource
 import com.softwaremill.adopttapir.starter.ServerEffect.ZIOEffect
-import com.softwaremill.adopttapir.starter.{StarterConfig, StarterDetails}
+import com.softwaremill.adopttapir.starter.{ScalaVersion, StarterConfig, StarterDetails}
 import com.softwaremill.adopttapir.template.ProjectTemplate._
 import com.softwaremill.adopttapir.template.sbt.BuildSbtView
 import com.softwaremill.adopttapir.template.scala.{EndpointsSpecView, EndpointsView, Import, MainView}
@@ -21,7 +21,6 @@ case class GeneratedFile(
 class ProjectTemplate(config: StarterConfig) {
 
   def getBuildSbt(starterDetails: StarterDetails): GeneratedFile = {
-
     val content = txt
       .sbtBuild(
         starterDetails.projectName,
@@ -115,7 +114,8 @@ class ProjectTemplate(config: StarterConfig) {
 
   val pluginsSbt: GeneratedFile = GeneratedFile("project/plugins.sbt", templateResource("plugins.sbt"))
 
-  val scalafmtConf: GeneratedFile = GeneratedFile(ScalafmtConfigFile, txt.scalafmt(TemplateDependencyInfo.scalafmtVersion).toString())
+  val scalafmtConf: ScalaVersion => GeneratedFile = dialectVersion =>
+    GeneratedFile(ScalafmtConfigFile, txt.scalafmt(TemplateDependencyInfo.scalafmtVersion, dialectVersion).toString())
 
   val sbtx: GeneratedFile =
     GeneratedFile(sbtxFile, templateResource(sbtxFile))
