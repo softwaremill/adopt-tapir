@@ -1,0 +1,23 @@
+@(groupId: String, addDocumentation: Boolean)
+package @groupId
+
+import sttp.tapir.server.netty.NettyFutureServer
+
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.io.StdIn
+import ExecutionContext.Implicits.global
+
+object Main:
+  @@main def run(): Unit =
+    val program =
+      for
+        binding <- NettyFutureServer().port(8080).addEndpoints(Endpoints.all).start()
+        _ <- Future {
+          println("@if(addDocumentation){Go to http://localhost:8080/docs to open SwaggerUI.}else{Server started at http://localhost:8080.} Press ENTER key to exit.")
+          StdIn.readLine()
+        }
+        stop <- binding.stop()
+      yield stop
+
+    Await.result(program, Duration.Inf)

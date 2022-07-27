@@ -9,9 +9,9 @@ import zio.interop.catz._
 import zio.{Scope, Task, ZIO, ZIOAppArgs, ZIOAppDefault}
 import scala.io.StdIn
 
-object Main extends ZIOAppDefault {
+object Main extends ZIOAppDefault:
 
-  override def run: ZIO[Any with ZIOAppArgs with Scope, Any, Any] = {
+  override def run: ZIO[Any with ZIOAppArgs with Scope, Any, Any] =
     @if(addMetrics) {
     val serverOptions: Http4sServerOptions[Task] =
       Http4sServerOptions.customiseInterceptors[Task]
@@ -36,5 +36,3 @@ object Main extends ZIOAppDefault {
         }.unit
     }
 
-  }
-}

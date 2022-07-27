@@ -1,0 +1,28 @@
+@(groupId: String, addDocumentation: Boolean)
+package @groupId
+
+import cats.effect.{ExitCode, IO, IOApp}
+import sttp.tapir.server.netty.cats.NettyCatsServer
+
+import scala.io.StdIn
+
+object Main extends IOApp:
+
+  override def run(args: List[String]): IO[ExitCode] =
+    NettyCatsServer
+      .io()
+      .use { server =>
+        for
+          bind <- server
+            .port(8080)
+            .host("localhost")
+            .addEndpoints(Endpoints.all)
+            .start()
+          _ <- IO.blocking {
+            println("@if(addDocumentation){Go to http://localhost:8080/docs to open SwaggerUI.}else{Server started at http://localhost:8080.} Press ENTER key to exit.")
+            StdIn.readLine()
+          }
+          _ <- bind.stop()
+        yield bind
+      }
+      .as(ExitCode.Success)
