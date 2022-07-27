@@ -1,4 +1,4 @@
-@(fmtVersion: String)
+@(fmtVersion: String, scalaVersion: com.softwaremill.adopttapir.starter.ScalaVersion )
 version = @fmtVersion
 maxColumn = 140
-runner.dialect = scala213
+runner.dialect = @if(scalaVersion == com.softwaremill.adopttapir.starter.ScalaVersion.Scala2){scala213} else{scala3}
