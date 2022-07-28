@@ -13,6 +13,7 @@ import os.SubProcess
 import sttp.client3.{HttpURLConnectionBackend, Identity, SttpBackend, UriContext, asStringAlways, basicRequest}
 
 import java.io.{PrintWriter, StringWriter}
+import java.time.LocalDateTime
 import scala.annotation.tailrec
 import scala.collection.mutable
 import scala.concurrent.TimeoutException
@@ -193,7 +194,7 @@ case class Service(tempDir: better.files.File) {
       if (line == null) {
         -1
       } else {
-        stdOut.append("### process log <").append(line).append(">").append('\n')
+        stdOut.append("### process log <").append(new Timestamper).append(line).append(">").append('\n')
         portPattern.findFirstMatchIn(line) match {
           case Some(port) => port.group(1).toInt
           case None       => waitForPort(stdOut)
@@ -206,6 +207,12 @@ case class Service(tempDir: better.files.File) {
 
   def close(): IO[Unit] = IO.blocking {
     if (process.isAlive()) process.close()
+  }
+
+  private class Timestamper {
+    private val timestamp = LocalDateTime.now()
+
+    override def toString: String = s"[$timestamp]"
   }
 }
 
