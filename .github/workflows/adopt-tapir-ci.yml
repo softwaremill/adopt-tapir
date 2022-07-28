@@ -40,7 +40,7 @@ jobs:
 
       - name: Run tests
         id: run-tests
-        run: sbt test
+        run: sbt ';test ;ItTest / test'
 
   deploy:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'

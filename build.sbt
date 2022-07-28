@@ -195,8 +195,15 @@ lazy val rootProject = (project in file("."))
   )
   .aggregate(backend, templateDependencies)
 
+lazy val ItTest = config("ItTest") extend(Test)
+
+def itFilter(name: String): Boolean = name endsWith "ITTest"
+def unitFilter(name: String): Boolean = (name endsWith "Test") && !itFilter(name)
+
 lazy val backend: Project = (project in file("backend"))
+  .configs(ItTest)
   .settings(
+    inConfig(ItTest)(Defaults.testTasks),
     libraryDependencies ++= httpDependencies ++ jsonDependencies ++ apiDocsDependencies ++ monitoringDependencies ++ securityDependencies ++ macwireDependencies,
     Compile / mainClass := Some("com.softwaremill.adopttapir.Main"),
     copyWebapp := {
@@ -206,8 +213,9 @@ lazy val backend: Project = (project in file("backend"))
       IO.copyDirectory(source, target)
     },
     copyWebapp := copyWebapp.dependsOn(yarnTask.toTask(" build")).value,
-    Test / testOptions += Tests.Argument("-P" + java.lang.Runtime.getRuntime.availableProcessors()),
-    Test / logBuffered := false
+    Test / testOptions := Seq(Tests.Filter(unitFilter)) ++ Seq(Tests.Argument("-P" + java.lang.Runtime.getRuntime.availableProcessors())),
+    ItTest / testOptions := Seq(Tests.Filter(itFilter)) ++ Seq(Tests.Argument("-P" + java.lang.Math.min(java.lang.Runtime.getRuntime.availableProcessors(), 2))),
+    ItTest / logBuffered := false
   )
   .dependsOn(templateDependencies)
   .enablePlugins(BuildInfoPlugin)
