@@ -43,7 +43,7 @@ object Setup {
 class StarterServiceITTest extends BaseTest with ParallelTestExecution {
   import Setup._
 
-  for { details <- Setup.validConfigurations } {
+  for { details <- Setup.validConfigurations.take(10) } {
     it should s"return zip file containing working sbt folder with: ${details.describe}" in {
       val backend: SttpBackend[Identity, Any] = HttpURLConnectionBackend()
 
@@ -134,7 +134,7 @@ case class ServiceUnderTest(details: StarterDetails) {
     tests
       .map(_(port))
       .parSequence
-      .timeoutAndForget(30.seconds)
+      .timeoutAndForget(90.seconds)
       .onError(e =>
         Assertions.fail(
           s"Only the following test steps were finished for configuration '${details.describe}':$log\n${describe(e)}"
