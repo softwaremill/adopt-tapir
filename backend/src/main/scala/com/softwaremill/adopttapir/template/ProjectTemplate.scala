@@ -73,7 +73,8 @@ class ProjectTemplate(config: StarterConfig) {
           docEndpoints.body,
           jsonEndpoint = jsonEndpoint.body,
           library.body,
-          allEndpoints.body
+          allEndpoints.body,
+          starterDetails.scalaVersion
         )
         .toString()
     )

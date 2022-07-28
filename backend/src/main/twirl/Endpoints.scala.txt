@@ -6,7 +6,11 @@ metricsEndpoint: String,
 docEndpoints: String,
 jsonEndpoint: String,
 library: String,
-allEndpoints: String
+allEndpoints: String,
+scalaVersion: com.softwaremill.adopttapir.starter.ScalaVersion,
+indent: String = com.softwaremill.adopttapir.template.scala.EndpointsView.Constants.INDENT,
+leftBracket: Char = '{',
+rightBracket: Char = '}'
 )
 package @{starterDetails.groupId}
 
@@ -14,21 +18,21 @@ import sttp.tapir.{PublicEndpoint, endpoint, query, stringBody}
 @for(additionalImport <- additionalImports) {
 @{additionalImport.asScalaImport()}}
 
-object Endpoints {
-  case class User(name: String) extends AnyVal
-  val helloEndpoint: PublicEndpoint[User, Unit, String, Any] = endpoint.get
+object Endpoints@if(scalaVersion == com.softwaremill.adopttapir.starter.ScalaVersion.Scala2){ @leftBracket}else{:}
+@{indent}case class User(name: String) extends AnyVal
+@{indent}val helloEndpoint: PublicEndpoint[User, Unit, String, Any] = endpoint.get
     .in("hello")
     .in(query[User]("name"))
     .out(stringBody)
-@helloEndpointServer
+@{indent}@helloEndpointServer
 
-@jsonEndpoint
+@{indent}@jsonEndpoint
 
-@metricsEndpoint
+@{indent}@metricsEndpoint
 
-@docEndpoints
+@{indent}@docEndpoints
 
-@allEndpoints
-}
+@{indent}@allEndpoints
+@if(scalaVersion == com.softwaremill.adopttapir.starter.ScalaVersion.Scala2){@rightBracket}
 
 @library
