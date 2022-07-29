@@ -22,7 +22,7 @@ class ProjectTemplateInTests(config: StarterConfig) extends ProjectTemplate(conf
             docsServerStub.body
           )
       } else {
-        val unwrapper = EndpointsSpecView.Unwrapper.prepareUnwrapper(starterDetails.serverEffect)
+        val unwrapper = EndpointsSpecView.Unwrapper.prepareUnwrapper(starterDetails.serverEffect, starterDetails.scalaVersion)
         txt
           .FrameworkEndpointsSpec(
             starterDetails,
@@ -32,7 +32,6 @@ class ProjectTemplateInTests(config: StarterConfig) extends ProjectTemplate(conf
             unwrapper.body
           )
       }
-
 
     GeneratedFile(
       pathUnderPackage("src/test/scala", groupId, "FrameworkEndpointsSpec.scala"),

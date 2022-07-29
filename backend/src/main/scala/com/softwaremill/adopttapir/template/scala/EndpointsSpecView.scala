@@ -1,6 +1,6 @@
 package com.softwaremill.adopttapir.template.scala
 
-import com.softwaremill.adopttapir.starter.{JsonImplementation, ServerEffect, StarterDetails}
+import com.softwaremill.adopttapir.starter.{JsonImplementation, ScalaVersion, ServerEffect, StarterDetails}
 import com.softwaremill.adopttapir.template.scala.EndpointsView.Constants.{booksListingServerEndpoint, helloServerEndpoint}
 
 object EndpointsSpecView {
@@ -66,11 +66,22 @@ object EndpointsSpecView {
   }
 
   object Unwrapper {
-    def prepareUnwrapper(effect: ServerEffect): Code = {
-      def prepareBody(kind: String, unwrapFn: String): String =
-        s"""implicit class Unwrapper[T](t: $kind) {
-           |   def unwrap: T = $unwrapFn
-           |}""".stripMargin
+    def prepareUnwrapper(effect: ServerEffect, scalaVersion: ScalaVersion): Code = {
+      def prepareBody(kind: String, unwrapFn: String): String = {
+        case class ExtensionMethodVersion(prefix: String, codeBlockStart: String, codeBlockEnd: String)
+        val scala2Extension = ExtensionMethodVersion("implicit class Unwrapper", " {", "}")
+        val scala3Extension = ExtensionMethodVersion("extension", "", "")
+
+        val templateFn: ExtensionMethodVersion => String = v => s"""${v.prefix}[T](t: $kind)${v.codeBlockStart}
+             |   def unwrap: T = $unwrapFn
+             |${v.codeBlockEnd}""".stripMargin
+
+        scalaVersion match {
+          case ScalaVersion.Scala2 => templateFn(scala2Extension)
+          case ScalaVersion.Scala3 => templateFn(scala3Extension)
+        }
+
+      }
 
       effect match {
         case ServerEffect.FutureEffect =>
