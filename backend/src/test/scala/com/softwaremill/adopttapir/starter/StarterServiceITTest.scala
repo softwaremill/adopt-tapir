@@ -103,23 +103,23 @@ case class ServiceUnderTest(details: StarterDetails) {
   import Timeouts.waitForTestsTimeout
 
   def run(tests: List[TestFunction]): Unit = {
-    val log = new mutable.StringBuilder()
+    val logger = RunLogger()
     (for {
-      zipFile <- generateZipFile(details, log)
+      zipFile <- generateZipFile(details, logger)
       tempDir <- createTempDirectory()
     } yield (zipFile, tempDir))
       .use { case (zipFile, tempDir) =>
-        unzipFile(zipFile, tempDir, log) >> spawnService(tempDir).use(service =>
-          getPortFromService(service, log).flatMap(port => runTests(port, tests, log))
+        unzipFile(zipFile, tempDir, logger) >> spawnService(tempDir).use(service =>
+          getPortFromService(service, logger).flatMap(port => runTests(port, tests, logger))
         )
       }
       .unsafeRunSync()
   }
 
-  private def generateZipFile(details: StarterDetails, log: mutable.StringBuilder): Resource[IO, BFile] = {
+  private def generateZipFile(details: StarterDetails, logger: RunLogger): Resource[IO, BFile] = {
     Resource.make(for {
       zipFile <- ZipGenerator.service.generateZipFile(details).map(_.toScala)
-      _ <- logStep(log, "* zip file was generated")
+      _ <- logger.log("* zip file was generated")
     } yield zipFile)(zipFile => IO.blocking(zipFile.delete()))
   }
 
@@ -127,37 +127,32 @@ case class ServiceUnderTest(details: StarterDetails) {
     Resource.make(IO.blocking(BFile.newTemporaryDirectory("sbtTesting")))(tempDir => IO.blocking(tempDir.delete()))
   }
 
-  private def unzipFile(zipFile: BFile, tempDir: BFile, log: mutable.StringBuilder): IO[Unit] = {
-    IO.blocking(zipFile.unzipTo(tempDir)) >> logStep(log, "* zip file was unzipped")
+  private def unzipFile(zipFile: BFile, tempDir: BFile, logger: RunLogger): IO[Unit] = {
+    IO.blocking(zipFile.unzipTo(tempDir)) >> logger.log("* zip file was unzipped")
   }
 
   private def spawnService(tempDir: BFile): Resource[IO, Service] = {
     Resource.make(IO.blocking(Service(tempDir)))(_.close())
   }
 
-  private def getPortFromService(service: Service, log: mutable.StringBuilder): IO[Integer] = {
+  private def getPortFromService(service: Service, logger: RunLogger): IO[Integer] = {
     for {
       port <- service.port
-      _ <- logStep(log, s"* service compiled, tested & started on port $port")
+      _ <- logger.log(s"* service compiled, tested & started on port $port")
     } yield port
   }
 
-  private def runTests(port: Integer, tests: List[TestFunction], log: mutable.StringBuilder): IO[Unit] = {
+  private def runTests(port: Integer, tests: List[TestFunction], logger: RunLogger): IO[Unit] = {
     tests
       .map(_(port))
       .parSequence
       .timeoutAndForget(waitForTestsTimeout)
       .onError(e =>
         Assertions.fail(
-          s"Only the following test steps were finished for configuration '${details.describe}':$log\n${describe(e)}"
+          s"Only the following test steps were finished for configuration '${details.describe}':$logger\n${describe(e)}"
         )
-      ) >> logStep(
-      log,
-      s"* integration tests on port $port were finished"
-    )
+      ) >> logger.log(s"* integration tests on port $port were finished")
   }
-
-  private def logStep(steps: mutable.StringBuilder, step: String): IO[Unit] = IO { val _ = steps.append('\n').append(step) }
 
   private def describe(e: Throwable) = {
     Using.Manager { _ =>
@@ -235,4 +230,9 @@ object ZipGenerator {
     val config = StarterConfig(deleteTempFolder = true, tempPrefix = "sbtService", scalaVersion = "2.13.8")
     new StarterService(config, new ProjectTemplate(config))
   }
+}
+
+case class RunLogger(log: mutable.StringBuilder = new mutable.StringBuilder()) {
+  def log(l: String): IO[Unit] = IO(log.append('\n').append(l))
+  override def toString: String = log.toString()
 }
