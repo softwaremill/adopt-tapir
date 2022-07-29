@@ -1,17 +1,21 @@
 import * as yup from 'yup';
-import { EffectType, EffectImplementation, JSONImplementation } from 'api/starter';
+import { EffectImplementation, EffectType, JSONImplementation, ScalaVersion } from 'api/starter';
 import type { FormSelectOption } from '../FormSelect';
 import type { FormRadioOption } from '../FormRadioGroup';
 import {
+  getEffectImplementationOptions,
   mapEffectTypeToEffectImplementation,
   mapEffectTypeToJSONImplementation,
-  getEffectImplementationOptions,
 } from './ConfigurationForm.helpers';
 
 export const SCALA_VERSION_OPTIONS: FormSelectOption<string>[] = [
   {
-    label: '',
-    value: '',
+    label: 'Scala 2',
+    value: ScalaVersion.Scala2,
+  },
+  {
+    label: 'Scala 3',
+    value: ScalaVersion.Scala3,
   },
 ];
 
@@ -87,15 +91,15 @@ const valueGetter = (
   option: FormSelectOption | FormRadioOption
 ): FormSelectOption['value'] | FormRadioOption['value'] => option.value;
 
-const getEffectImplementationFieldMessage = (effectType: EffectType): string =>
-  `Server implementation must be one of the following values: ${getEffectImplementationOptions(effectType)
+const getEffectImplementationFieldMessage = (effectType: EffectType, scalaVer: ScalaVersion): string =>
+  `Server implementation must be one of the following values: ${getEffectImplementationOptions(effectType, scalaVer)
     .map(labelGetter)
     .join(', ')}`;
 
 const REQUIRED_FIELD_MESSAGE = 'This field is required';
 
-export const createStarterValidationSchema = (isScalaVersionFieldVisible: boolean) => {
-  const baseSchema = yup
+export const createStarterValidationSchema = () => {
+  return yup
     .object({
       projectName: yup
         .string()
@@ -124,12 +128,12 @@ export const createStarterValidationSchema = (isScalaVersionFieldVisible: boolea
       // NOTE: unfortunately this is the only way of multiple .when cases in yup :shrug-emoji:
       implementation: yup
         .mixed()
-        .when('effect', {
+        .when(['effect'], {
           is: EffectType.Future,
           then: schema =>
             schema.oneOf(
               mapEffectTypeToEffectImplementation(EffectType.Future),
-              getEffectImplementationFieldMessage(EffectType.Future)
+              getEffectImplementationFieldMessage(EffectType.Future, ScalaVersion.Scala2)
             ),
           otherwise: schema =>
             schema.when('effect', {
@@ -137,7 +141,7 @@ export const createStarterValidationSchema = (isScalaVersionFieldVisible: boolea
               then: schema =>
                 schema.oneOf(
                   mapEffectTypeToEffectImplementation(EffectType.IO),
-                  getEffectImplementationFieldMessage(EffectType.IO)
+                  getEffectImplementationFieldMessage(EffectType.IO, ScalaVersion.Scala2)
                 ),
               otherwise: schema =>
                 schema.when('effect', {
@@ -145,7 +149,7 @@ export const createStarterValidationSchema = (isScalaVersionFieldVisible: boolea
                   then: schema =>
                     schema.oneOf(
                       mapEffectTypeToEffectImplementation(EffectType.ZIO),
-                      getEffectImplementationFieldMessage(EffectType.ZIO)
+                      getEffectImplementationFieldMessage(EffectType.ZIO, ScalaVersion.Scala2)
                     ),
                 }),
             }),
@@ -162,14 +166,7 @@ export const createStarterValidationSchema = (isScalaVersionFieldVisible: boolea
         })
         .required(REQUIRED_FIELD_MESSAGE),
       addMetrics: yup.boolean().required(REQUIRED_FIELD_MESSAGE),
+      scalaVersion: yup.string().required(REQUIRED_FIELD_MESSAGE),
     })
     .required();
-
-  return baseSchema.concat(
-    isScalaVersionFieldVisible
-      ? yup.object({
-          scalaVersion: yup.string().required(REQUIRED_FIELD_MESSAGE),
-        })
-      : yup.object({})
-  );
 };

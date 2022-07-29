@@ -18,6 +18,11 @@ export enum JSONImplementation {
   No = 'No',
 }
 
+export enum ScalaVersion {
+  Scala2 = 'Scala2',
+  Scala3 = 'Scala3',
+}
+
 export type StarterRequest = {
   projectName: string;
   groupId: string;
@@ -26,4 +31,5 @@ export type StarterRequest = {
   addDocumentation: boolean;
   addMetrics: boolean;
   json: JSONImplementation;
+  scalaVersion: ScalaVersion;
 };
