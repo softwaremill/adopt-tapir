@@ -9,5 +9,6 @@ Content-Type: application/json
   "implementation": "Akka",
   "addDocumentation": true,
   "addMetrics": true,
-  "json": "Jsoniter"
+  "json": "Jsoniter",
+  "scalaVersion": "Scala2"
 }
