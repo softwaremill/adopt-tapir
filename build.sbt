@@ -9,7 +9,7 @@ import sbtbuildinfo.{BuildInfoKey, BuildInfoOption}
 import scala.sys.process.Process
 import scala.util.Try
 
-val tapirVersion = "1.0.2"
+val tapirVersion = "1.0.3"
 
 val http4sBlazeServerVersion = "0.23.12"
 val http4sCirceVersion = "0.23.14"
