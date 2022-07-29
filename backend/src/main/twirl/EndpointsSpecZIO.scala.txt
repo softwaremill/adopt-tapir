@@ -2,11 +2,14 @@
 starterDetails: com.softwaremill.adopttapir.starter.StarterDetails,
 additionalImports: List[com.softwaremill.adopttapir.template.scala.Import],
 helloStub: String,
-booksStub: String
+booksStub: String,
+scalaVersion: com.softwaremill.adopttapir.starter.ScalaVersion,
+leftBracket: Char = '{',
+rightBracket: Char = '}'
 )
 package @{starterDetails.groupId}
 
-import @{starterDetails.groupId}.Endpoints._
+import @{starterDetails.groupId}.Endpoints.@if(scalaVersion == com.softwaremill.adopttapir.starter.ScalaVersion.Scala2){_}else{@leftBracket*,given@rightBracket}
 import sttp.client3.testing.SttpBackendStub
 import sttp.client3.{UriContext, basicRequest}
 import sttp.tapir.server.stub.TapirStubInterpreter
@@ -15,7 +18,7 @@ import zio.test.{ZIOSpecDefault, assertZIO}
 @for(additionalImport <- additionalImports) {
 @{additionalImport.asScalaImport()}}
 
-object EndpointsSpec extends ZIOSpecDefault {
+object EndpointsSpec extends ZIOSpecDefault@if(scalaVersion == com.softwaremill.adopttapir.starter.ScalaVersion.Scala2){ @leftBracket}else{:}
   def spec = suite("Endpoints spec")(
     test("return hello message") {
     //given
@@ -45,4 +48,4 @@ object EndpointsSpec extends ZIOSpecDefault {
     }
 }
   )
-}
+@if(scalaVersion == com.softwaremill.adopttapir.starter.ScalaVersion.Scala2){@rightBracket}
