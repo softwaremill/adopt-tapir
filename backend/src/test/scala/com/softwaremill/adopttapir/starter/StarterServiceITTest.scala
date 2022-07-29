@@ -8,7 +8,7 @@ import cats.syntax.parallel._
 import com.softwaremill.adopttapir.starter.api._
 import com.softwaremill.adopttapir.template.ProjectTemplate
 import com.softwaremill.adopttapir.test.BaseTest
-import org.scalatest.{Assertion, Assertions, ParallelTestExecution}
+import org.scalatest.{Assertions, ParallelTestExecution}
 import os.SubProcess
 import sttp.client3.{HttpURLConnectionBackend, Identity, SttpBackend, UriContext, asStringAlways, basicRequest}
 
@@ -37,7 +37,7 @@ object Setup {
       s"${details.serverEffect}/${details.serverImplementation}/docs=${details.addDocumentation}/metrics=${details.addMetrics}/${details.jsonImplementation}"
   }
 
-  type TestFunction = Integer => IO[Assertion]
+  type TestFunction = Integer => IO[Unit]
 }
 
 object Timeouts {
@@ -60,6 +60,7 @@ class StarterServiceITTest extends BaseTest with ParallelTestExecution {
             basicRequest.response(asStringAlways).get(uri"http://localhost:$port/hello?name=Frodo").send(backend).body
 
           result shouldBe "Hello Frodo"
+          info(subTest("helo"))
         }
       )
 
@@ -69,6 +70,7 @@ class StarterServiceITTest extends BaseTest with ParallelTestExecution {
             basicRequest.response(asStringAlways).get(uri"http://localhost:$port/docs/docs.yaml").send(backend).body
 
           result should include("paths:\n  /hello:")
+          info(subTest("docs"))
         }
       )
 
@@ -83,6 +85,7 @@ class StarterServiceITTest extends BaseTest with ParallelTestExecution {
             and include("# TYPE tapir_request_total counter")
             and include("# HELP tapir_request_active Active HTTP requests")
             and include("# TYPE tapir_request_active gauge"))
+          info(subTest("metrics"))
         }
       )
 
@@ -91,6 +94,8 @@ class StarterServiceITTest extends BaseTest with ParallelTestExecution {
       service.run(List(helloEndpointTest, docsEndpointTest, metricsEndpointTest).flatten)
     }
   }
+
+  private def subTest(name: String): String = s"should have $name endpoint available"
 }
 
 case class ServiceUnderTest(details: StarterDetails) {
