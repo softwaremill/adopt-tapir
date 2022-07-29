@@ -93,17 +93,19 @@ class ProjectTemplate(config: StarterConfig) {
             starterDetails,
             toSortedList(helloServerStub.imports ++ booksServerStub.imports),
             helloServerStub.body,
-            booksServerStub.body
+            booksServerStub.body,
+            starterDetails.scalaVersion
           )
       } else {
-        val unwrapper = EndpointsSpecView.Unwrapper.prepareUnwrapper(starterDetails.serverEffect)
+        val unwrapper = EndpointsSpecView.Unwrapper.prepareUnwrapper(starterDetails.serverEffect, starterDetails.scalaVersion)
         txt
           .EndpointsSpec(
             starterDetails,
             toSortedList(helloServerStub.imports ++ booksServerStub.imports ++ unwrapper.imports),
             helloServerStub.body,
             unwrapper.body,
-            booksServerStub.body
+            booksServerStub.body,
+            starterDetails.scalaVersion
           )
       }
 
