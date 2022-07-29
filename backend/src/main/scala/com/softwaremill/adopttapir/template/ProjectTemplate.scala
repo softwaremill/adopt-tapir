@@ -2,7 +2,7 @@ package com.softwaremill.adopttapir.template
 
 import better.files.Resource
 import com.softwaremill.adopttapir.starter.ServerEffect.ZIOEffect
-import com.softwaremill.adopttapir.starter.{StarterConfig, StarterDetails}
+import com.softwaremill.adopttapir.starter.{ScalaVersion, StarterConfig, StarterDetails}
 import com.softwaremill.adopttapir.template.ProjectTemplate._
 import com.softwaremill.adopttapir.template.sbt.BuildSbtView
 import com.softwaremill.adopttapir.template.scala.{EndpointsSpecView, EndpointsView, Import, MainView}
@@ -21,12 +21,11 @@ case class GeneratedFile(
 class ProjectTemplate(config: StarterConfig) {
 
   def getBuildSbt(starterDetails: StarterDetails): GeneratedFile = {
-
     val content = txt
       .sbtBuild(
         starterDetails.projectName,
         starterDetails.groupId,
-        config.scalaVersion,
+        starterDetails.scalaVersion.value,
         TemplateDependencyInfo.tapirVersion,
         (BuildSbtView.getDependencies _).andThen(BuildSbtView.format)(starterDetails),
         starterDetails.serverEffect == ZIOEffect
@@ -74,7 +73,8 @@ class ProjectTemplate(config: StarterConfig) {
           docEndpoints.body,
           jsonEndpoint = jsonEndpoint.body,
           library.body,
-          allEndpoints.body
+          allEndpoints.body,
+          starterDetails.scalaVersion
         )
         .toString()
     )
@@ -93,17 +93,19 @@ class ProjectTemplate(config: StarterConfig) {
             starterDetails,
             toSortedList(helloServerStub.imports ++ booksServerStub.imports),
             helloServerStub.body,
-            booksServerStub.body
+            booksServerStub.body,
+            starterDetails.scalaVersion
           )
       } else {
-        val unwrapper = EndpointsSpecView.Unwrapper.prepareUnwrapper(starterDetails.serverEffect)
+        val unwrapper = EndpointsSpecView.Unwrapper.prepareUnwrapper(starterDetails.serverEffect, starterDetails.scalaVersion)
         txt
           .EndpointsSpec(
             starterDetails,
             toSortedList(helloServerStub.imports ++ booksServerStub.imports ++ unwrapper.imports),
             helloServerStub.body,
             unwrapper.body,
-            booksServerStub.body
+            booksServerStub.body,
+            starterDetails.scalaVersion
           )
       }
 
@@ -115,7 +117,8 @@ class ProjectTemplate(config: StarterConfig) {
 
   val pluginsSbt: GeneratedFile = GeneratedFile("project/plugins.sbt", templateResource("plugins.sbt"))
 
-  val scalafmtConf: GeneratedFile = GeneratedFile(ScalafmtConfigFile, txt.scalafmt(TemplateDependencyInfo.scalafmtVersion).toString())
+  val scalafmtConf: ScalaVersion => GeneratedFile = dialectVersion =>
+    GeneratedFile(ScalafmtConfigFile, txt.scalafmt(TemplateDependencyInfo.scalafmtVersion, dialectVersion).toString())
 
   val sbtx: GeneratedFile =
     GeneratedFile(sbtxFile, templateResource(sbtxFile))

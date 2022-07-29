@@ -9,10 +9,10 @@ import zhttp.service.server.ServerChannelFactory
 import zhttp.service.{EventLoopGroup, Server}
 import zio.{Console, Scope, Task, ZIO, ZIOAppArgs, ZIOAppDefault}
 
-object Main extends ZIOAppDefault {
+object Main extends ZIOAppDefault:
   val log = LoggerFactory.getLogger(ZioHttpInterpreter.getClass.getName)
 
-  override def run: ZIO[Any with ZIOAppArgs with Scope, Any, Any] = {
+  override def run: ZIO[Any with ZIOAppArgs with Scope, Any, Any] =
     val serverOptions: ZioHttpServerOptions[Any] =
       ZioHttpServerOptions.customiseInterceptors
         .serverLog(DefaultServerLog[Task](
@@ -28,12 +28,10 @@ object Main extends ZIOAppDefault {
 
     val port = sys.env.get("http.port").map(_.toInt).getOrElse(8080)
 
-    (for {
+    (for
       serverStart <- Server(app).withPort(port).make
       _ <- Console.printLine(s"@if(addDocumentation){Go to http://localhost:${serverStart.port}/docs to open SwaggerUI.}else{Server started at http://localhost:${serverStart.port}.} Press ENTER key to exit.")
       _ <- Console.readLine
-    } yield serverStart)
+    yield serverStart)
       .provideSomeLayer(EventLoopGroup.auto(0) ++ ServerChannelFactory.auto ++ Scope.default)
       .exitCode
-  }
-}
