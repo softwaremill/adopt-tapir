@@ -4,7 +4,6 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { saveAs } from 'file-saver';
 import { JSONImplementation, StarterRequest } from 'api/starter';
-import { useFeatureFlag } from '../../hooks/useFeatureFlag';
 import { FormTextField } from '../FormTextField';
 import { FormSelect } from '../FormSelect';
 import { FormRadioGroup } from '../FormRadioGroup';
@@ -30,12 +29,11 @@ interface ConfigurationFormProps {
 export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded = false }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const { isScalaVersionFieldVisible } = useFeatureFlag();
 
   const { classes, cx } = useStyles({ isEmbedded });
   const form = useForm<StarterRequest>({
     mode: 'onBlur',
-    resolver: yupResolver(createStarterValidationSchema(isScalaVersionFieldVisible)),
+    resolver: yupResolver(createStarterValidationSchema()),
     defaultValues: {
       addDocumentation: false,
       addMetrics: false,
@@ -43,7 +41,12 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
     },
   });
 
-  const [effectType, effectImplementation, jsonImplementation] = form.watch(['effect', 'implementation', 'json']);
+  const [effectType, effectImplementation, jsonImplementation, scalaVer] = form.watch([
+    'effect',
+    'implementation',
+    'json',
+    'scalaVersion',
+  ]);
   const isEffectTypeSelected = Boolean(effectType);
 
   useEffect(() => {
@@ -134,16 +137,12 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
             label="Group ID"
             placeholder="com.softwaremill"
           />
-
-          {isScalaVersionFieldVisible && (
-            <FormSelect
-              className={classes.formVersionsRow}
-              name="scalaVersion"
-              label="Scala version"
-              options={SCALA_VERSION_OPTIONS}
-            />
-          )}
-
+          <FormSelect
+            className={classes.formVersionsRow}
+            name="scalaVersion"
+            label="Scala version"
+            options={SCALA_VERSION_OPTIONS}
+          />
           <FormSelect
             className={classes.formEffectsRow}
             name="effect"
@@ -155,7 +154,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
             name="implementation"
             label="Server implementation"
             disabled={!isEffectTypeSelected}
-            options={isEffectTypeSelected ? getEffectImplementationOptions(effectType) : []}
+            options={isEffectTypeSelected ? getEffectImplementationOptions(effectType, scalaVer) : []}
           />
 
           <FormRadioGroup
