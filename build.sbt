@@ -22,7 +22,7 @@ val macwireVersion = "2.5.7"
 val scalafmtVersion = "3.5.8"
 val scalaLoggingVersion = "3.9.5"
 val logbackClassicVersion = "1.2.11"
-val scalaTestVersion = "3.2.12"
+val scalaTestVersion = "3.2.13"
 
 val httpDependencies = Seq(
   "org.http4s" %% "http4s-blaze-server" % http4sBlazeServerVersion,
@@ -195,7 +195,7 @@ lazy val rootProject = (project in file("."))
   )
   .aggregate(backend, templateDependencies)
 
-lazy val ItTest = config("ItTest") extend(Test)
+lazy val ItTest = config("ItTest") extend (Test)
 
 def itFilter(name: String): Boolean = name endsWith "ITTest"
 def unitFilter(name: String): Boolean = (name endsWith "Test") && !itFilter(name)
@@ -214,7 +214,9 @@ lazy val backend: Project = (project in file("backend"))
     },
     copyWebapp := copyWebapp.dependsOn(yarnTask.toTask(" build")).value,
     Test / testOptions := Seq(Tests.Filter(unitFilter)) ++ Seq(Tests.Argument("-P" + java.lang.Runtime.getRuntime.availableProcessors())),
-    ItTest / testOptions := Seq(Tests.Filter(itFilter)) ++ Seq(Tests.Argument("-P" + java.lang.Math.min(java.lang.Runtime.getRuntime.availableProcessors(), 2))),
+    ItTest / testOptions := Seq(Tests.Filter(itFilter)) ++ Seq(
+      Tests.Argument("-P" + java.lang.Math.min(java.lang.Runtime.getRuntime.availableProcessors(), 2))
+    ),
     ItTest / logBuffered := false
   )
   .dependsOn(templateDependencies)
