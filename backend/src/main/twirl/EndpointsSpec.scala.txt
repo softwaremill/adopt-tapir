@@ -18,7 +18,7 @@ import sttp.client3.testing.SttpBackendStub
 import sttp.client3.{UriContext, basicRequest}
 import sttp.tapir.server.stub.TapirStubInterpreter
 @for(additionalImport <- additionalImports) {
-@{additionalImport.asScalaImport()}}
+@{additionalImport.asScalaImport(scalaVersion)}}
 
 class EndpointsSpec extends AnyFlatSpec with Matchers with EitherValues@if(scalaVersion == com.softwaremill.adopttapir.starter.ScalaVersion.Scala2){ @leftBracket}else{:}
 

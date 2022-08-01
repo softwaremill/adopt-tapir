@@ -13,10 +13,10 @@ import @{starterDetails.groupId}.Endpoints.@if(scalaVersion == com.softwaremill.
 import sttp.client3.testing.SttpBackendStub
 import sttp.client3.{UriContext, basicRequest}
 import sttp.tapir.server.stub.TapirStubInterpreter
-import zio.test.Assertion._
+import zio.test.Assertion.@if(scalaVersion == com.softwaremill.adopttapir.starter.ScalaVersion.Scala2){_}else{*}
 import zio.test.{ZIOSpecDefault, assertZIO}
 @for(additionalImport <- additionalImports) {
-@{additionalImport.asScalaImport()}}
+@{additionalImport.asScalaImport(scalaVersion)}}
 
 object EndpointsSpec extends ZIOSpecDefault@if(scalaVersion == com.softwaremill.adopttapir.starter.ScalaVersion.Scala2){ @leftBracket}else{:}
   def spec = suite("Endpoints spec")(

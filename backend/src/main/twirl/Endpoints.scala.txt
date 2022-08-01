@@ -16,7 +16,7 @@ package @{starterDetails.groupId}
 
 import sttp.tapir.{PublicEndpoint, endpoint, query, stringBody}
 @for(additionalImport <- additionalImports) {
-@{additionalImport.asScalaImport()}}
+@{additionalImport.asScalaImport(scalaVersion)}}
 
 object Endpoints@if(scalaVersion == com.softwaremill.adopttapir.starter.ScalaVersion.Scala2){ @leftBracket}else{:}
 @{indent}case class User(name: String) extends AnyVal

@@ -5,7 +5,7 @@ import org.http4s.blaze.server.BlazeServerBuilder
 import org.http4s.server.Router@if(addMetrics){
 import sttp.tapir.server.http4s.Http4sServerOptions}
 import sttp.tapir.server.http4s.ztapir.ZHttp4sServerInterpreter
-import zio.interop.catz._
+import zio.interop.catz.*
 import zio.{Scope, Task, ZIO, ZIOAppArgs, ZIOAppDefault}
 import scala.io.StdIn
 
