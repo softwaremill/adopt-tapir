@@ -163,11 +163,10 @@ object EndpointsView {
           )
         case JsonImplementation.ZIOJson =>
           val codecs = {
-            // TODO: maybe in future ZIO release it will be based on `given` for scala 3
-            s"implicit val authorZioEncoder: zio.json.JsonEncoder[Author] = DeriveJsonEncoder.gen[Author]" + NEW_LINE_WITH_INDENT +
-              s"implicit val authorZioDecoder: zio.json.JsonDecoder[Author] = DeriveJsonDecoder.gen[Author]" + NEW_LINE_WITH_INDENT +
-              s"implicit val bookZioEncoder: zio.json.JsonEncoder[Book] = DeriveJsonEncoder.gen[Book]" + NEW_LINE_WITH_INDENT +
-              s"implicit val bookZioDecoder: zio.json.JsonDecoder[Book] = DeriveJsonDecoder.gen[Book]"
+            s"$givenPrefix authorZioEncoder: zio.json.JsonEncoder[Author] = DeriveJsonEncoder.gen[Author]" + NEW_LINE_WITH_INDENT +
+              s"$givenPrefix authorZioDecoder: zio.json.JsonDecoder[Author] = DeriveJsonDecoder.gen[Author]" + NEW_LINE_WITH_INDENT +
+              s"$givenPrefix bookZioEncoder: zio.json.JsonEncoder[Book] = DeriveJsonEncoder.gen[Book]" + NEW_LINE_WITH_INDENT +
+              s"$givenPrefix bookZioDecoder: zio.json.JsonDecoder[Book] = DeriveJsonDecoder.gen[Book]"
           }
 
           Code(
@@ -224,7 +223,7 @@ object EndpointsView {
 
     private def prepareCode(projectName: String, serverEffect: ServerEffect, endpoints: List[String]): String = {
       val (effect, endpoint) = serverEffectToEffectAndEndpoint(serverEffect)
-      s"""val $docEndpoints: List[${endpoint}] = SwaggerInterpreter().fromEndpoints[${effect}](List(${endpoints.mkString(
+      s"""val $docEndpoints: List[$endpoint] = SwaggerInterpreter().fromEndpoints[$effect](List(${endpoints.mkString(
           ","
         )}), "$projectName", "1.0.0")""".stripMargin
     }
