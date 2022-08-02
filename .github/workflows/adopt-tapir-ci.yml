@@ -19,6 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        scala: [ "Scala2", "Scala3" ]
         json: [ "No", "Circe", "Jsoniter", "ZIOJson" ]
 
     steps:
@@ -43,13 +44,13 @@ jobs:
           key: ${{ runner.os }}-sbt-${{ hashFiles('**/build.sbt') }}
 
       - name: Run unit tests
-        # run unit tests only against the ZIOJson configuration so that resources are spared
-        if: matrix.json == 'ZIOJson'
+        # run unit tests only against the ZIOJson & Scala2 configuration so that resources are spared
+        if: matrix.scala == 'Scala2' && matrix.json == 'ZIOJson'
         id: run-unit-tests
         run: sbt test
 
-      - name: Run integration tests with ${{ matrix.json }} JSON support
-        run: JSON=${{ matrix.json }} sbt 'ItTest / test'
+      - name: Run integration tests for ${{ matrix.scala }} with ${{ matrix.json }} JSON support
+        run: SCALA=${{ matrix.scala }} JSON=${{ matrix.json }} sbt 'ItTest / test'
 
   deploy:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
