@@ -30,13 +30,17 @@ object Setup {
       .toList
   }
 
+  lazy val scalaVersions: List[ScalaVersionRequest] = {
+    Properties.envOrElse("SCALA", ScalaVersionRequest.values.mkString(",")).split(",").map(ScalaVersionRequest.withName).toList
+  }
+
   val validConfigurations: Seq[StarterDetails] = for {
     effect <- EffectRequest.values
     server <- ServerImplementationRequest.values
     docs <- List(true, false)
     metrics <- List(true, false)
     json <- jsonImplementations
-    scalaVersion <- ScalaVersionRequest.values
+    scalaVersion <- scalaVersions
     starterRequest = StarterRequest(
       "myproject",
       "com.softwaremill",

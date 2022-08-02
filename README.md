@@ -17,14 +17,14 @@ that additional group needs to be called:
 sbt ';test ;ItTest / test'
 ```
 
-Note that `ItTest` can be restricted (or run in parallel) by JSON implementation e.g.
+Note that `ItTest` can be restricted (or run in parallel) by Scala or JSON implementations e.g.
 
 ```shell
-JSON="Circe,No" sbt 'ItTest / test'
+SCALA=Scala2 JSON="Circe,No" sbt 'ItTest / test'
 ```
 
-results in running integration tests only for configurations that JSON is either disabled (`No`) or using `Circe`
-implementation.
+results in running integration tests only for `Scala 2` configurations that JSON is either disabled (`No`) or using
+`Circe` implementation.
 
 ### Frontend: webapp
 
