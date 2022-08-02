@@ -17,6 +17,15 @@ that additional group needs to be called:
 sbt ';test ;ItTest / test'
 ```
 
+Note that `ItTest` can be restricted (or run in parallel) by JSON implementation e.g.
+
+```shell
+JSON="Circe,No" sbt 'ItTest / test'
+```
+
+results in running integration tests only for configurations that JSON is either disabled (`No`) or using `Circe`
+implementation.
+
 ### Frontend: webapp
 
 In order to locally run and build frontend webapp you need to have the following tools:

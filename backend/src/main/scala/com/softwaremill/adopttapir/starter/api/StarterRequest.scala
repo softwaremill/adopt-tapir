@@ -65,6 +65,9 @@ sealed trait JsonImplementationRequest extends EnumEntry {
   def toModel: JsonImplementation
 }
 
+/** Changes in JSON implementation have to be reflected in .github/workflows/adopt-tapir-ci.yml file so that running jobs in parallel is
+  * still possible
+  */
 object JsonImplementationRequest extends Enum[JsonImplementationRequest] with CirceEnum[JsonImplementationRequest] {
   case object No extends JsonImplementationRequest {
     override def toModel: JsonImplementation = JsonImplementation.WithoutJson
