@@ -16,6 +16,10 @@ on:
 jobs:
   verify:
     runs-on: ubuntu-18.04
+    strategy:
+      fail-fast: false
+      matrix:
+        json: [ "No", "Circe", "Jsoniter", "ZIOJson" ]
 
     steps:
       - name: Check-out repository
@@ -38,9 +42,14 @@ jobs:
             ~/.coursier
           key: ${{ runner.os }}-sbt-${{ hashFiles('**/build.sbt') }}
 
-      - name: Run tests
-        id: run-tests
-        run: sbt ';test ;ItTest / test'
+      - name: Run unit tests
+        # run unit tests only against the ZIOJson configuration so that resources are spared
+        if: matrix.json == 'ZIOJson'
+        id: run-unit-tests
+        run: sbt test
+
+      - name: Run integration tests with ${{ matrix.json }} JSON support
+        run: JSON=${{ matrix.json }} sbt 'ItTest / test'
 
   deploy:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'

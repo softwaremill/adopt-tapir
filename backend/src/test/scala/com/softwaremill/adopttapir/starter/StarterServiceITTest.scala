@@ -18,16 +18,24 @@ import scala.annotation.tailrec
 import scala.collection.mutable
 import scala.concurrent.TimeoutException
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
-import scala.util.Using
+import scala.util.{Properties, Using}
 import scala.util.matching.Regex
 
 object Setup {
+  lazy val jsonImplementations: List[JsonImplementationRequest] = {
+    Properties
+      .envOrElse("JSON", JsonImplementationRequest.values.mkString(","))
+      .split(",")
+      .map(JsonImplementationRequest.withName)
+      .toList
+  }
+
   val validConfigurations: Seq[StarterDetails] = for {
     effect <- EffectRequest.values
     server <- ServerImplementationRequest.values
     docs <- List(true, false)
     metrics <- List(true, false)
-    json <- JsonImplementationRequest.values
+    json <- jsonImplementations
     scalaVersion <- ScalaVersionRequest.values
     starterRequest = StarterRequest(
       "myproject",
