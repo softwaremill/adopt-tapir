@@ -20,7 +20,7 @@ jobs:
       fail-fast: false
       matrix:
         scala: [ "Scala2", "Scala3" ]
-        json: [ "No", "Circe", "Jsoniter", "ZIOJson" ]
+        json: [ "No", "Circe", "Jsoniter,ZIOJson" ]
 
     steps:
       - name: Check-out repository
@@ -44,8 +44,8 @@ jobs:
           key: ${{ runner.os }}-sbt-${{ hashFiles('**/build.sbt') }}
 
       - name: Run unit tests
-        # run unit tests only against the ZIOJson & Scala2 configuration so that resources are spared
-        if: matrix.scala == 'Scala2' && matrix.json == 'ZIOJson'
+        # run unit tests only against the No & Scala3 configuration so that resources are spared
+        if: matrix.scala == 'Scala3' && matrix.json == 'No'
         id: run-unit-tests
         run: sbt test
 
