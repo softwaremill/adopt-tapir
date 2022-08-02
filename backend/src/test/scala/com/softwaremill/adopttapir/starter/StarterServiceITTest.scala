@@ -146,7 +146,7 @@ case class ServiceUnderTest(details: StarterDetails) {
   }
 
   private def createTempDirectory(): Resource[IO, BFile] = {
-    Resource.make(IO.blocking(BFile.newTemporaryDirectory("sbtTesting")))(tempDir => IO.blocking(tempDir.delete()))
+    Resource.make(IO.blocking(BFile.newTemporaryDirectory("sbtTesting")))(tempDir => IO.blocking(tempDir.delete(true)))
   }
 
   private def unzipFile(zipFile: BFile, tempDir: BFile, logger: RunLogger): IO[Unit] = {
