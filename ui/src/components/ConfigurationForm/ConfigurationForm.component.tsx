@@ -3,18 +3,19 @@ import { Alert, Backdrop, Box, Button, CircularProgress, Snackbar, Typography } 
 import { FormProvider, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { saveAs } from 'file-saver';
-import { JSONImplementation, StarterRequest } from 'api/starter';
+import { JSONImplementation, ScalaVersion, StarterRequest } from 'api/starter';
 import { FormTextField } from '../FormTextField';
 import { FormSelect } from '../FormSelect';
 import { FormRadioGroup } from '../FormRadioGroup';
 import { useStyles } from './ConfigurationForm.styles';
 import {
-  createStarterValidationSchema,
   EFFECT_TYPE_OPTIONS,
   ENDPOINTS_OPTIONS,
   SCALA_VERSION_OPTIONS,
+  starterValidationSchema,
 } from './ConfigurationForm.consts';
 import {
+  forbiddenScala3EffectImplementations,
   getEffectImplementationOptions,
   getJSONImplementationOptions,
   isAddMetricsSupported,
@@ -33,7 +34,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
   const { classes, cx } = useStyles({ isEmbedded });
   const form = useForm<StarterRequest>({
     mode: 'onBlur',
-    resolver: yupResolver(createStarterValidationSchema()),
+    resolver: yupResolver(starterValidationSchema),
     defaultValues: {
       addDocumentation: false,
       addMetrics: false,
@@ -47,9 +48,19 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
     'json',
     'scalaVersion',
   ]);
-  const isEffectTypeSelected = Boolean(effectType);
+  const isEffectImplementationSelectable = Boolean(effectType) && Boolean(scalaVer);
 
   useEffect(() => {
+    // NOTE: reset effect implementation field value upon scala version change
+    if (
+      scalaVer &&
+      scalaVer === ScalaVersion.Scala3 &&
+      effectImplementation &&
+      forbiddenScala3EffectImplementations.includes(effectImplementation)
+    ) {
+      form.resetField('implementation');
+    }
+
     // NOTE: reset effect implementation field value upon effect type change
     if (
       effectType &&
@@ -137,7 +148,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
             label="Group ID"
             placeholder="com.softwaremill"
           />
-          <FormSelect
+          <FormRadioGroup
             className={classes.formVersionsRow}
             name="scalaVersion"
             label="Scala version"
@@ -153,8 +164,8 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
             className={classes.formEffectsRow}
             name="implementation"
             label="Server implementation"
-            disabled={!isEffectTypeSelected}
-            options={isEffectTypeSelected ? getEffectImplementationOptions(effectType, scalaVer) : []}
+            disabled={!isEffectImplementationSelectable}
+            options={isEffectImplementationSelectable ? getEffectImplementationOptions(effectType, scalaVer) : []}
           />
 
           <FormRadioGroup

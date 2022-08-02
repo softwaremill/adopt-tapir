@@ -18,14 +18,18 @@ export const mapEffectTypeToEffectImplementation = (effectType: EffectType): Eff
 };
 
 export const getEffectImplementationOptions = (effectType: EffectType, scalaVer: ScalaVersion): FormSelectOption[] => {
-  const availableEffectImplementations = mapEffectTypeToEffectImplementation(effectType);
-  const forbiddenScala3Implementations = [EffectImplementation.Akka];
+  const mappedEffectImplementations = mapEffectTypeToEffectImplementation(effectType);
 
-  return EFFECT_IMPLEMENTATIONS_OPTIONS.filter(({ value }) => availableEffectImplementations.includes(value)).filter(
-    ({ value }) => scalaVer === ScalaVersion.Scala2 || !forbiddenScala3Implementations.includes(value)
+  const availableEffectImplementations = mappedEffectImplementations.filter(effectImplementation =>
+    scalaVer === ScalaVersion.Scala2
+      ? effectImplementation
+      : !forbiddenScala3EffectImplementations.includes(effectImplementation)
   );
+
+  return EFFECT_IMPLEMENTATIONS_OPTIONS.filter(({ value }) => availableEffectImplementations.includes(value));
 };
 
+export const forbiddenScala3EffectImplementations = [EffectImplementation.Akka];
 /**
  * Effect implementation to metrics supported
  */
