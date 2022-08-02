@@ -6,10 +6,14 @@ import com.softwaremill.adopttapir.template.scala.EndpointsView.Constants._
 
 object EndpointsView {
 
-  def getHelloServerEndpoint(starterDetails: StarterDetails): Code = starterDetails.serverEffect match {
-    case ServerEffect.FutureEffect => HelloServerEndpoint.future
-    case ServerEffect.IOEffect     => HelloServerEndpoint.io
-    case ServerEffect.ZIOEffect    => HelloServerEndpoint.zio
+  def getHelloServerEndpoint(starterDetails: StarterDetails): Code = {
+    val helloServerCode = starterDetails.serverEffect match {
+      case ServerEffect.FutureEffect => HelloServerEndpoint.future
+      case ServerEffect.IOEffect     => HelloServerEndpoint.io
+      case ServerEffect.ZIOEffect    => HelloServerEndpoint.zio
+    }
+
+    helloServerCode.prependBody(INDENT)
   }
 
   def getMetricsEndpoint(starterDetails: StarterDetails): Code =
@@ -60,12 +64,12 @@ object EndpointsView {
         s"${if (hasDocumentation) s" ++ $docEndpoints" else ""}"
     }
 
-    Code(bodyTemplate(serverKind, hasBooksListingEndpoint, starterDetails.addMetrics, starterDetails.addDocumentation))
+    Code(bodyTemplate(serverKind, hasBooksListingEndpoint, starterDetails.addMetrics, starterDetails.addDocumentation)).prependBody(INDENT)
   }
 
   private object HelloServerEndpoint {
     def bodyTemplate(serverKind: String, pureEffectFn: String): String =
-      s"""val $helloServerEndpoint: $serverKind = $helloEndpoint.serverLogicSuccess(user =>
+      s"""${INDENT}val $helloServerEndpoint: $serverKind = $helloEndpoint.serverLogicSuccess(user =>
          |  $pureEffectFn(s"Hello $${user.name}")
          |)""".stripMargin
 
@@ -103,9 +107,8 @@ object EndpointsView {
         case JsonImplementation.WithoutJson => Code.empty
         case _ =>
           List(prepareBookListing(starterDetails), prepareBookListingServerLogic(starterDetails))
-            .reduce((a, b) => {
-              Code(a.body + NEW_LINE_WITH_INDENT + b.body, a.imports ++ b.imports)
-            })
+            .reduce((a, b) => Code(a.body + NEW_LINE_WITH_INDENT + b.body, a.imports ++ b.imports))
+            .prependBody(INDENT)
       }
     }
 
@@ -198,7 +201,7 @@ object EndpointsView {
     def prepareMetricsEndpoint(serverEffect: ServerEffect): Code = {
       val (effect, endpoint) = serverEffectToEffectAndEndpoint(serverEffect)
       Code(
-        s"val prometheusMetrics: PrometheusMetrics[$effect] = PrometheusMetrics.default[$effect]()" + NEW_LINE_WITH_INDENT +
+        s"${INDENT}val prometheusMetrics: PrometheusMetrics[$effect] = PrometheusMetrics.default[$effect]()" + NEW_LINE_WITH_INDENT +
           s"val metricsEndpoint: $endpoint = prometheusMetrics.metricsEndpoint",
         serverEffectImports(serverEffect) + Import("sttp.tapir.server.metrics.prometheus.PrometheusMetrics")
       )
@@ -218,7 +221,7 @@ object EndpointsView {
       val jsonEndpoint = if (jsonImplementation == JsonImplementation.WithoutJson) Nil else List(bookListing)
       val endpoints: List[String] = List(helloEndpoint) ++ metricsEndpoint ++ jsonEndpoint
 
-      Code(prepareCode(projectName, serverEffect, endpoints), prepareImports(serverEffect))
+      Code(prepareCode(projectName, serverEffect, endpoints), prepareImports(serverEffect)).prependBody(INDENT)
     }
 
     private def prepareCode(projectName: String, serverEffect: ServerEffect, endpoints: List[String]): String = {

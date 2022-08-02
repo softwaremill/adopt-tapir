@@ -8,7 +8,6 @@ jsonEndpoint: String,
 library: String,
 allEndpoints: String,
 scalaVersion: com.softwaremill.adopttapir.starter.ScalaVersion,
-indent: String = com.softwaremill.adopttapir.template.scala.EndpointsView.Constants.INDENT,
 leftBracket: Char = '{',
 rightBracket: Char = '}'
 )
@@ -19,20 +18,20 @@ import sttp.tapir.{PublicEndpoint, endpoint, query, stringBody}
 @{additionalImport.asScalaImport(scalaVersion)}}
 
 object Endpoints@if(scalaVersion == com.softwaremill.adopttapir.starter.ScalaVersion.Scala2){ @leftBracket}else{:}
-@{indent}case class User(name: String) extends AnyVal
-@{indent}val helloEndpoint: PublicEndpoint[User, Unit, String, Any] = endpoint.get
+  case class User(name: String) extends AnyVal
+  val helloEndpoint: PublicEndpoint[User, Unit, String, Any] = endpoint.get
     .in("hello")
     .in(query[User]("name"))
     .out(stringBody)
-@{indent}@helloEndpointServer
+@helloEndpointServer
 
-@{indent}@jsonEndpoint
+@jsonEndpoint
 
-@{indent}@metricsEndpoint
+@metricsEndpoint
 
-@{indent}@docEndpoints
+@docEndpoints
 
-@{indent}@allEndpoints
+@allEndpoints
 @if(scalaVersion == com.softwaremill.adopttapir.starter.ScalaVersion.Scala2){@rightBracket}
 
 @library
