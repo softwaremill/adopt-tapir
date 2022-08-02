@@ -231,7 +231,7 @@ lazy val backend: Project = (project in file("backend"))
   .enablePlugins(SbtTwirl)
   .settings(dockerSettings)
 
-val scala3Version = "3.1.1"
+val scala3Version = "3.1.3"
 val plokhotnyukJsoniterVersion = "2.13.39"
 val zioTestVersion = "2.0.0"
 
