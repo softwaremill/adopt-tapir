@@ -6,15 +6,18 @@ metricsEndpoint: String,
 docEndpoints: String,
 jsonEndpoint: String,
 library: String,
-allEndpoints: String
+allEndpoints: String,
+scalaVersion: com.softwaremill.adopttapir.starter.ScalaVersion,
+leftBracket: Char = '{',
+rightBracket: Char = '}'
 )
 package @{starterDetails.groupId}
 
 import sttp.tapir.{PublicEndpoint, endpoint, query, stringBody}
 @for(additionalImport <- additionalImports) {
-@{additionalImport.asScalaImport()}}
+@{additionalImport.asScalaImport(scalaVersion)}}
 
-object Endpoints {
+object Endpoints@if(scalaVersion == com.softwaremill.adopttapir.starter.ScalaVersion.Scala2){ @leftBracket}else{:}
   case class User(name: String) extends AnyVal
   val helloEndpoint: PublicEndpoint[User, Unit, String, Any] = endpoint.get
     .in("hello")
@@ -29,6 +32,6 @@ object Endpoints {
 @docEndpoints
 
 @allEndpoints
-}
+@if(scalaVersion == com.softwaremill.adopttapir.starter.ScalaVersion.Scala2){@rightBracket}
 
 @library

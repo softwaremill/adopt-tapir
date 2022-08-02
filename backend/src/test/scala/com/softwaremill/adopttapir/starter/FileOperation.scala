@@ -2,7 +2,6 @@ package com.softwaremill.adopttapir.starter
 
 import cats.effect.{ExitCode, IO, IOApp}
 import com.softwaremill.adopttapir.config.Config
-import com.softwaremill.adopttapir.starter.JsonImplementation.WithoutJson
 import com.softwaremill.adopttapir.template.ProjectTemplate
 
 @deprecated("Only for development purpose")
@@ -18,8 +17,9 @@ object FileOperation extends IOApp {
       ServerEffect.ZIOEffect,
       ServerImplementation.ZIOHttp,
       true,
-      true,
-      WithoutJson
+      false,
+      JsonImplementation.Circe,
+      ScalaVersion.Scala2
     )
 
     for {

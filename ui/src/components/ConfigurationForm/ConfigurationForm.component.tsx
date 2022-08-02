@@ -3,19 +3,19 @@ import { Alert, Backdrop, Box, Button, CircularProgress, Snackbar, Typography } 
 import { FormProvider, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { saveAs } from 'file-saver';
-import { JSONImplementation, StarterRequest } from 'api/starter';
-import { useFeatureFlag } from '../../hooks/useFeatureFlag';
+import { JSONImplementation, ScalaVersion, StarterRequest } from 'api/starter';
 import { FormTextField } from '../FormTextField';
 import { FormSelect } from '../FormSelect';
 import { FormRadioGroup } from '../FormRadioGroup';
 import { useStyles } from './ConfigurationForm.styles';
 import {
-  createStarterValidationSchema,
   EFFECT_TYPE_OPTIONS,
   ENDPOINTS_OPTIONS,
   SCALA_VERSION_OPTIONS,
+  starterValidationSchema,
 } from './ConfigurationForm.consts';
 import {
+  forbiddenScala3EffectImplementations,
   getEffectImplementationOptions,
   getJSONImplementationOptions,
   isAddMetricsSupported,
@@ -30,12 +30,11 @@ interface ConfigurationFormProps {
 export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded = false }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const { isScalaVersionFieldVisible } = useFeatureFlag();
 
   const { classes, cx } = useStyles({ isEmbedded });
   const form = useForm<StarterRequest>({
     mode: 'onBlur',
-    resolver: yupResolver(createStarterValidationSchema(isScalaVersionFieldVisible)),
+    resolver: yupResolver(starterValidationSchema),
     defaultValues: {
       addDocumentation: false,
       addMetrics: false,
@@ -43,10 +42,25 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
     },
   });
 
-  const [effectType, effectImplementation, jsonImplementation] = form.watch(['effect', 'implementation', 'json']);
-  const isEffectTypeSelected = Boolean(effectType);
+  const [effectType, effectImplementation, jsonImplementation, scalaVer] = form.watch([
+    'effect',
+    'implementation',
+    'json',
+    'scalaVersion',
+  ]);
+  const isEffectImplementationSelectable = Boolean(effectType) && Boolean(scalaVer);
 
   useEffect(() => {
+    // NOTE: reset effect implementation field value upon scala version change
+    if (
+      scalaVer &&
+      scalaVer === ScalaVersion.Scala3 &&
+      effectImplementation &&
+      forbiddenScala3EffectImplementations.includes(effectImplementation)
+    ) {
+      form.resetField('implementation');
+    }
+
     // NOTE: reset effect implementation field value upon effect type change
     if (
       effectType &&
@@ -134,16 +148,12 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
             label="Group ID"
             placeholder="com.softwaremill"
           />
-
-          {isScalaVersionFieldVisible && (
-            <FormSelect
-              className={classes.formVersionsRow}
-              name="scalaVersion"
-              label="Scala version"
-              options={SCALA_VERSION_OPTIONS}
-            />
-          )}
-
+          <FormRadioGroup
+            className={classes.formVersionsRow}
+            name="scalaVersion"
+            label="Scala version"
+            options={SCALA_VERSION_OPTIONS}
+          />
           <FormSelect
             className={classes.formEffectsRow}
             name="effect"
@@ -154,8 +164,8 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
             className={classes.formEffectsRow}
             name="implementation"
             label="Server implementation"
-            disabled={!isEffectTypeSelected}
-            options={isEffectTypeSelected ? getEffectImplementationOptions(effectType) : []}
+            disabled={!isEffectImplementationSelectable}
+            options={isEffectImplementationSelectable ? getEffectImplementationOptions(effectType, scalaVer) : []}
           />
 
           <FormRadioGroup

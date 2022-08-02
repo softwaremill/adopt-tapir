@@ -1,4 +1,4 @@
-import { EffectType, EffectImplementation, JSONImplementation } from 'api/starter';
+import { EffectImplementation, EffectType, JSONImplementation, ScalaVersion } from 'api/starter';
 import { EFFECT_IMPLEMENTATIONS_OPTIONS, JSON_OUTPUT_OPTIONS } from './ConfigurationForm.consts';
 import type { FormSelectOption } from '../FormSelect';
 import type { FormRadioOption } from '../FormRadioGroup';
@@ -17,12 +17,19 @@ export const mapEffectTypeToEffectImplementation = (effectType: EffectType): Eff
   return effectTypeImplementationMap[effectType];
 };
 
-export const getEffectImplementationOptions = (effectType: EffectType): FormSelectOption[] => {
-  const availableEffectImplementations = mapEffectTypeToEffectImplementation(effectType);
+export const getEffectImplementationOptions = (effectType: EffectType, scalaVer: ScalaVersion): FormSelectOption[] => {
+  const mappedEffectImplementations = mapEffectTypeToEffectImplementation(effectType);
+
+  const availableEffectImplementations = mappedEffectImplementations.filter(effectImplementation =>
+    scalaVer === ScalaVersion.Scala2
+      ? effectImplementation
+      : !forbiddenScala3EffectImplementations.includes(effectImplementation)
+  );
 
   return EFFECT_IMPLEMENTATIONS_OPTIONS.filter(({ value }) => availableEffectImplementations.includes(value));
 };
 
+export const forbiddenScala3EffectImplementations = [EffectImplementation.Akka];
 /**
  * Effect implementation to metrics supported
  */
