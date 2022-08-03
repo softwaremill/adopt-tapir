@@ -13,7 +13,8 @@ case class StarterDetails(
     addDocumentation: Boolean,
     addMetrics: Boolean,
     jsonImplementation: JsonImplementation,
-    scalaVersion: ScalaVersion
+    scalaVersion: ScalaVersion,
+    builder: Builder = Builder.Sbt // TODO: remove default once UI is finished
 )
 
 sealed trait ServerImplementation
@@ -62,4 +63,10 @@ object ScalaVersion {
   case object Scala3 extends ScalaVersion {
     override val value: String = TemplateDependencyInfo.scala3Version
   }
+}
+
+sealed trait Builder
+
+object Builder {
+  case object Sbt extends Builder
 }

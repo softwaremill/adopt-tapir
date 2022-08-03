@@ -3,7 +3,7 @@ package com.softwaremill.adopttapir.template
 import better.files.Resource
 import com.softwaremill.adopttapir.starter.ServerEffect.ZIOEffect
 import com.softwaremill.adopttapir.starter.{ScalaVersion, StarterDetails}
-import com.softwaremill.adopttapir.template.ProjectTemplate._
+import com.softwaremill.adopttapir.template.SbtProjectTemplate._
 import com.softwaremill.adopttapir.template.sbt.BuildSbtView
 import com.softwaremill.adopttapir.template.scala.{EndpointsSpecView, EndpointsView, Import, MainView}
 import com.softwaremill.adopttapir.version.TemplateDependencyInfo
@@ -18,28 +18,7 @@ case class GeneratedFile(
   *
   * As an example see @see [[EndpointsView]]
   */
-class ProjectTemplate {
-
-  def getBuildSbt(starterDetails: StarterDetails): GeneratedFile = {
-    val content = txt
-      .sbtBuild(
-        starterDetails.projectName,
-        starterDetails.groupId,
-        starterDetails.scalaVersion.value,
-        TemplateDependencyInfo.tapirVersion,
-        (BuildSbtView.getDependencies _).andThen(BuildSbtView.format)(starterDetails),
-        starterDetails.serverEffect == ZIOEffect
-      )
-      .toString()
-
-    GeneratedFile("build.sbt", content)
-  }
-
-  def getBuildProperties: GeneratedFile = GeneratedFile(
-    "project/build.properties",
-    txt.buildProperties(TemplateDependencyInfo.sbtVersion).toString()
-  )
-
+abstract class ProjectTemplate {
   def getMain(starterDetails: StarterDetails): GeneratedFile = {
     val groupId = starterDetails.groupId
 
@@ -115,6 +94,31 @@ class ProjectTemplate {
     )
   }
 
+  protected def pathUnderPackage(prefixDir: String, groupId: String, fileName: String): String =
+    prefixDir + "/" + groupId.split('.').mkString("/") + "/" + fileName
+}
+
+class SbtProjectTemplate extends ProjectTemplate {
+  def getBuildSbt(starterDetails: StarterDetails): GeneratedFile = {
+    val content = txt
+      .sbtBuild(
+        starterDetails.projectName,
+        starterDetails.groupId,
+        starterDetails.scalaVersion.value,
+        TemplateDependencyInfo.tapirVersion,
+        (BuildSbtView.getDependencies _).andThen(BuildSbtView.format)(starterDetails),
+        starterDetails.serverEffect == ZIOEffect
+      )
+      .toString()
+
+    GeneratedFile("build.sbt", content)
+  }
+
+  def getBuildProperties: GeneratedFile = GeneratedFile(
+    "project/build.properties",
+    txt.buildProperties(TemplateDependencyInfo.sbtVersion).toString()
+  )
+
   val pluginsSbt: GeneratedFile = GeneratedFile("project/plugins.sbt", templateResource("plugins.sbt"))
 
   val scalafmtConf: ScalaVersion => GeneratedFile = dialectVersion =>
@@ -125,13 +129,10 @@ class ProjectTemplate {
   val README: GeneratedFile =
     GeneratedFile(readMeFile, templateResource(readMeFile))
 
-  protected def pathUnderPackage(prefixDir: String, groupId: String, fileName: String): String =
-    prefixDir + "/" + groupId.split('.').mkString("/") + "/" + fileName
-
   private def templateResource(fileName: String): String = Resource.getAsString(s"template/$fileName")
 }
 
-object ProjectTemplate {
+object SbtProjectTemplate {
   val ScalafmtConfigFile = ".scalafmt.conf"
   val sbtxFile = "sbtx"
   val readMeFile = "README.md"
