@@ -52,6 +52,12 @@ jobs:
       - name: Run integration tests for ${{ matrix.scala }} with ${{ matrix.json }} JSON support
         run: SCALA=${{ matrix.scala }} JSON=${{ matrix.json }} sbt 'ItTest / test'
 
+      - name: Build docker image locally
+        # run this step only once across all configurations
+        if: matrix.scala == 'Scala3' && matrix.json == 'No'
+        id: build-docker-image-locally
+        run: sbt docker:publishLocal
+
   deploy:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: [ verify ]
