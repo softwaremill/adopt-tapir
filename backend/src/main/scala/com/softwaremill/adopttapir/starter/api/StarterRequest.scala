@@ -1,6 +1,6 @@
 package com.softwaremill.adopttapir.starter.api
 
-import com.softwaremill.adopttapir.starter.{JsonImplementation, ScalaVersion, ServerEffect, ServerImplementation}
+import com.softwaremill.adopttapir.starter.{Builder, JsonImplementation, ScalaVersion, ServerEffect, ServerImplementation}
 import enumeratum.{CirceEnum, Enum, EnumEntry}
 
 case class StarterRequest(
@@ -11,7 +11,8 @@ case class StarterRequest(
     addDocumentation: Boolean,
     addMetrics: Boolean,
     json: JsonImplementationRequest,
-    scalaVersion: ScalaVersionRequest
+    scalaVersion: ScalaVersionRequest,
+    builder: BuilderRequest = BuilderRequest.Sbt // TODO: remove default once UI is finished
 )
 
 object StarterRequest {}
@@ -105,4 +106,16 @@ object ScalaVersionRequest extends Enum[ScalaVersionRequest] with CirceEnum[Scal
   }
 
   override def values: IndexedSeq[ScalaVersionRequest] = findValues
+}
+
+sealed trait BuilderRequest extends EnumEntry {
+  def toModel: Builder
+}
+
+object BuilderRequest extends Enum[BuilderRequest] with CirceEnum[BuilderRequest] {
+  case object Sbt extends BuilderRequest {
+    override def toModel: Builder = Builder.Sbt
+  }
+
+  override def values: IndexedSeq[BuilderRequest] = findValues
 }

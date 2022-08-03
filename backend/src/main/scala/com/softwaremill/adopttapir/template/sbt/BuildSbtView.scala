@@ -95,12 +95,12 @@ object BuildSbtView {
 
   private def getHttpDependencies(starterDetails: StarterDetails): List[Dependency] = {
     starterDetails match {
-      case StarterDetails(_, _, FutureEffect, Akka, _, _, _, _)  => HttpDependencies.akka()
-      case StarterDetails(_, _, FutureEffect, Netty, _, _, _, _) => HttpDependencies.netty()
-      case StarterDetails(_, _, IOEffect, Http4s, _, _, _, _)    => HttpDependencies.http4s()
-      case StarterDetails(_, _, IOEffect, Netty, _, _, _, _)     => HttpDependencies.ioNetty()
-      case StarterDetails(_, _, ZIOEffect, Http4s, _, _, _, _)   => HttpDependencies.http4sZIO()
-      case StarterDetails(_, _, ZIOEffect, ZIOHttp, _, _, _, _)  => HttpDependencies.ZIOHttp()
+      case StarterDetails(_, _, FutureEffect, Akka, _, _, _, _, _)  => HttpDependencies.akka()
+      case StarterDetails(_, _, FutureEffect, Netty, _, _, _, _, _) => HttpDependencies.netty()
+      case StarterDetails(_, _, IOEffect, Http4s, _, _, _, _, _)    => HttpDependencies.http4s()
+      case StarterDetails(_, _, IOEffect, Netty, _, _, _, _, _)     => HttpDependencies.ioNetty()
+      case StarterDetails(_, _, ZIOEffect, Http4s, _, _, _, _, _)   => HttpDependencies.http4sZIO()
+      case StarterDetails(_, _, ZIOEffect, ZIOHttp, _, _, _, _, _)  => HttpDependencies.ZIOHttp()
       case other: StarterDetails => throw new UnsupportedOperationException(s"Cannot pick dependencies for $other")
     }
   }

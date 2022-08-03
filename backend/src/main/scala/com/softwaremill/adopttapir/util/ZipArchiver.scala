@@ -1,7 +1,7 @@
 package com.softwaremill.adopttapir.util
 
 import better.files.{DisposeableExtensions, FileExtensions}
-import com.softwaremill.adopttapir.template.ProjectTemplate.sbtxFile
+import com.softwaremill.adopttapir.template.SbtProjectTemplate.sbtxFile
 import org.apache.commons.compress.archivers.zip.{ZipArchiveEntry, ZipArchiveOutputStream}
 
 import java.nio.file.Path

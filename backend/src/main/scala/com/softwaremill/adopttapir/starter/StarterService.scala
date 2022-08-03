@@ -6,8 +6,8 @@ import cats.effect.IO
 import com.softwaremill.adopttapir.logging.FLogging
 import com.softwaremill.adopttapir.metrics.Metrics
 import com.softwaremill.adopttapir.metrics.Metrics.generatedStarterCounter
-import com.softwaremill.adopttapir.template.ProjectTemplate.legalizeGroupId
-import com.softwaremill.adopttapir.template.{GeneratedFile, ProjectTemplate}
+import com.softwaremill.adopttapir.template.SbtProjectTemplate.legalizeGroupId
+import com.softwaremill.adopttapir.template.{GeneratedFile, SbtProjectTemplate}
 import com.softwaremill.adopttapir.util.ZipArchiver
 
 import java.io.File
@@ -15,12 +15,12 @@ import scala.reflect.io.Directory
 
 class StarterService(
     config: StarterConfig,
-    template: ProjectTemplate
+    sbtTemplate: SbtProjectTemplate
 ) extends FLogging {
 
-  def generateZipFile(starterDetails: StarterDetails): IO[File] = {
+  def generateSbtZipFile(starterDetails: StarterDetails): IO[File] = {
     logger.info(s"received request: $starterDetails") *>
-      IO(generateFiles(starterDetails)).flatMap { filesToCreate =>
+      IO(generateSbtFiles(starterDetails)).flatMap { filesToCreate =>
         IO.blocking(newTemporaryDirectory(prefix = config.tempPrefix).toJava)
           .bracket { tempDir =>
             for {
@@ -35,17 +35,17 @@ class StarterService(
 
   }
 
-  protected def generateFiles(starterDetails: StarterDetails): List[GeneratedFile] = {
+  protected def generateSbtFiles(starterDetails: StarterDetails): List[GeneratedFile] = {
     List(
-      template.getBuildSbt(starterDetails),
-      template.getBuildProperties,
-      template.getMain(legalizeGroupId(starterDetails)),
-      template.getEndpoints(legalizeGroupId(starterDetails)),
-      template.getEndpointsSpec(legalizeGroupId(starterDetails)),
-      template.pluginsSbt,
-      template.scalafmtConf(starterDetails.scalaVersion),
-      template.sbtx,
-      template.README
+      sbtTemplate.getBuildSbt(starterDetails),
+      sbtTemplate.getBuildProperties,
+      sbtTemplate.getMain(legalizeGroupId(starterDetails)),
+      sbtTemplate.getEndpoints(legalizeGroupId(starterDetails)),
+      sbtTemplate.getEndpointsSpec(legalizeGroupId(starterDetails)),
+      sbtTemplate.pluginsSbt,
+      sbtTemplate.scalafmtConf(starterDetails.scalaVersion),
+      sbtTemplate.sbtx,
+      sbtTemplate.README
     )
   }
 
