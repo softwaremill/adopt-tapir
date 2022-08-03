@@ -16,7 +16,6 @@ interface FormRadioGroupProps {
 }
 
 // NOTE: if radio group would need to show some error we would have to add a FormHelperText component here
-
 export const FormRadioGroup: React.FC<FormRadioGroupProps> = ({
   className,
   name,

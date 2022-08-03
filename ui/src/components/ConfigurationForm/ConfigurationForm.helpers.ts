@@ -1,10 +1,11 @@
+import difference from 'lodash.difference';
 import { EffectImplementation, EffectType, JSONImplementation, ScalaVersion } from 'api/starter';
 import { EFFECT_IMPLEMENTATIONS_OPTIONS, JSON_OUTPUT_OPTIONS } from './ConfigurationForm.consts';
 import type { FormSelectOption } from '../FormSelect';
 import type { FormRadioOption } from '../FormRadioGroup';
 
 /**
- * Effect type to effect implementation mapping
+ * Effect type / scala version to effect implementation mapping
  */
 
 const effectTypeImplementationMap: Record<EffectType, EffectImplementation[]> = {
@@ -13,23 +14,38 @@ const effectTypeImplementationMap: Record<EffectType, EffectImplementation[]> = 
   [EffectType.ZIO]: [EffectImplementation.Http4s, EffectImplementation.ZIOHttp],
 };
 
-export const mapEffectTypeToEffectImplementation = (effectType: EffectType): EffectImplementation[] => {
+const scalaVersionEffectImplementationForbiddenMap: Record<ScalaVersion, EffectImplementation[]> = {
+  [ScalaVersion.Scala2]: [],
+  [ScalaVersion.Scala3]: [EffectImplementation.Akka],
+};
+
+const mapEffectTypeToEffectImplementation = (effectType: EffectType): EffectImplementation[] => {
   return effectTypeImplementationMap[effectType];
 };
 
-export const getEffectImplementationOptions = (effectType: EffectType, scalaVer: ScalaVersion): FormSelectOption[] => {
-  const mappedEffectImplementations = mapEffectTypeToEffectImplementation(effectType);
-
-  const availableEffectImplementations = mappedEffectImplementations.filter(effectImplementation =>
-    scalaVer === ScalaVersion.Scala2
-      ? effectImplementation
-      : !forbiddenScala3EffectImplementations.includes(effectImplementation)
-  );
-
-  return EFFECT_IMPLEMENTATIONS_OPTIONS.filter(({ value }) => availableEffectImplementations.includes(value));
+const mapScalaVersionToEffectImplementation = (scalaVersion: ScalaVersion): EffectImplementation[] => {
+  return scalaVersionEffectImplementationForbiddenMap[scalaVersion];
 };
 
-export const forbiddenScala3EffectImplementations = [EffectImplementation.Akka];
+export const getAvailableEffectImplementations = (
+  effectType: EffectType,
+  scalaVersion: ScalaVersion
+): EffectImplementation[] => {
+  const availableEffectImplementations = mapEffectTypeToEffectImplementation(effectType);
+  const forbiddenEffectImplementations = mapScalaVersionToEffectImplementation(scalaVersion);
+
+  return difference(availableEffectImplementations, forbiddenEffectImplementations);
+};
+
+export const getEffectImplementationOptions = (
+  effectType: EffectType,
+  scalaVersion: ScalaVersion
+): FormSelectOption[] => {
+  const effectImplementations = getAvailableEffectImplementations(effectType, scalaVersion);
+
+  return EFFECT_IMPLEMENTATIONS_OPTIONS.filter(({ value }) => effectImplementations.includes(value));
+};
+
 /**
  * Effect implementation to metrics supported
  */

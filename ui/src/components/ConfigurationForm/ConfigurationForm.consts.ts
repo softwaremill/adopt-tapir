@@ -1,10 +1,10 @@
 import * as yup from 'yup';
-import { EffectImplementation, EffectType, JSONImplementation, ScalaVersion } from 'api/starter';
+import { EffectImplementation, EffectType, JSONImplementation, ScalaVersion, StarterRequest } from 'api/starter';
 import type { FormSelectOption } from '../FormSelect';
 import type { FormRadioOption } from '../FormRadioGroup';
 import {
+  getAvailableEffectImplementations,
   getEffectImplementationOptions,
-  mapEffectTypeToEffectImplementation,
   mapEffectTypeToJSONImplementation,
 } from './ConfigurationForm.helpers';
 
@@ -91,8 +91,8 @@ const valueGetter = (
   option: FormSelectOption | FormRadioOption
 ): FormSelectOption['value'] | FormRadioOption['value'] => option.value;
 
-const getEffectImplementationFieldMessage = (effectType: EffectType, scalaVer: ScalaVersion): string =>
-  `Server implementation must be one of the following values: ${getEffectImplementationOptions(effectType, scalaVer)
+const getEffectImplementationFieldMessage = (effectType: EffectType, scalaVersion: ScalaVersion): string =>
+  `Server implementation must be one of the following values: ${getEffectImplementationOptions(effectType, scalaVersion)
     .map(labelGetter)
     .join(', ')}`;
 
@@ -124,34 +124,17 @@ export const starterValidationSchema = yup
         `Effect type must be one of the following values: ${EFFECT_TYPE_OPTIONS.map(labelGetter).join(', ')}`
       )
       .required(REQUIRED_FIELD_MESSAGE),
-    // NOTE: unfortunately this is the only way of multiple .when cases in yup :shrug-emoji:
     implementation: yup
       .mixed()
-      .when('effect', {
-        is: EffectType.Future,
-        then: schema =>
-          schema.oneOf(
-            mapEffectTypeToEffectImplementation(EffectType.Future),
-            getEffectImplementationFieldMessage(EffectType.Future, ScalaVersion.Scala2)
-          ),
-        otherwise: schema =>
-          schema.when('effect', {
-            is: EffectType.IO,
-            then: schema =>
-              schema.oneOf(
-                mapEffectTypeToEffectImplementation(EffectType.IO),
-                getEffectImplementationFieldMessage(EffectType.IO, ScalaVersion.Scala2)
-              ),
-            otherwise: schema =>
-              schema.when('effect', {
-                is: EffectType.ZIO,
-                then: schema =>
-                  schema.oneOf(
-                    mapEffectTypeToEffectImplementation(EffectType.ZIO),
-                    getEffectImplementationFieldMessage(EffectType.ZIO, ScalaVersion.Scala2)
-                  ),
-              }),
-          }),
+      .test('effect implementation validation', (value: EffectImplementation, context) => {
+        const { effect, scalaVersion } = context.parent as StarterRequest;
+
+        const effectImplementations = getAvailableEffectImplementations(effect, scalaVersion);
+
+        return (
+          effectImplementations.includes(value) ||
+          context.createError({ message: getEffectImplementationFieldMessage(effect, scalaVersion) })
+        );
       })
       .required(REQUIRED_FIELD_MESSAGE),
     addDocumentation: yup.boolean().required(REQUIRED_FIELD_MESSAGE),
@@ -165,6 +148,12 @@ export const starterValidationSchema = yup
       })
       .required(REQUIRED_FIELD_MESSAGE),
     addMetrics: yup.boolean().required(REQUIRED_FIELD_MESSAGE),
-    scalaVersion: yup.string().required(REQUIRED_FIELD_MESSAGE),
+    scalaVersion: yup
+      .mixed()
+      .oneOf(
+        SCALA_VERSION_OPTIONS.map(valueGetter),
+        `Scala version must be one of the following values: ${SCALA_VERSION_OPTIONS.map(labelGetter).join(', ')}`
+      )
+      .required(REQUIRED_FIELD_MESSAGE),
   })
   .required();
