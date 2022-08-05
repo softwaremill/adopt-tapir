@@ -16,27 +16,29 @@ export const useStyles = makeStyles<{ isEmbedded: boolean }>()((theme, { isEmbed
       },
     },
 
-    formMetadataRow: {
+    formFirstRow: {
       [theme.breakpoints.up(breakpoint)]: {
         gridRowStart: 1,
       },
     },
-    formVersionsRow: {
+    formSecondRow: {
+      alignSelf: 'center',
+
       [theme.breakpoints.up(breakpoint)]: {
         gridRowStart: 2,
       },
     },
-    formEffectsRow: {
+    formThirdRow: {
       [theme.breakpoints.up(breakpoint)]: {
         gridRowStart: 3,
       },
     },
-    formEndpointsRow: {
+    formFourthRow: {
       [theme.breakpoints.up(breakpoint)]: {
         gridRowStart: 4,
       },
     },
-    formEndpoints2ndRow: {
+    formFifthRow: {
       [theme.breakpoints.up(breakpoint)]: {
         gridRowStart: 5,
       },
@@ -50,9 +52,8 @@ export const useStyles = makeStyles<{ isEmbedded: boolean }>()((theme, { isEmbed
     },
 
     actionsContainer: {
-      display: 'flex',
-      justifyContent: 'flex-end',
-      alignItems: 'center',
+      justifySelf: 'end',
+
       '& button:first-child': {
         marginRight: theme.spacing(2),
       },

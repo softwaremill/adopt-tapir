@@ -1,13 +1,15 @@
-import {useEffect, useState} from 'react';
-import {Alert, Backdrop, Box, Button, CircularProgress, Snackbar, Typography} from '@mui/material';
-import {FormProvider, useForm} from 'react-hook-form';
-import {yupResolver} from '@hookform/resolvers/yup';
-import {saveAs} from 'file-saver';
-import {JSONImplementation, ScalaVersion, StarterRequest} from 'api/starter';
-import {FormTextField} from '../FormTextField';
-import {FormSelect} from '../FormSelect';
-import {FormRadioGroup} from '../FormRadioGroup';
-import {useStyles} from './ConfigurationForm.styles';
+import { useEffect, useState } from 'react';
+import { Alert, Backdrop, Box, Button, CircularProgress, Snackbar, Typography } from '@mui/material';
+import { FormProvider, useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { DevTool } from '@hookform/devtools';
+import { saveAs } from 'file-saver';
+import { JSONImplementation, ScalaVersion, StarterRequest } from 'api/starter';
+import { isDevelopment } from 'consts/env';
+import { FormTextField } from '../FormTextField';
+import { FormSelect } from '../FormSelect';
+import { FormRadioGroup } from '../FormRadioGroup';
+import { useStyles } from './ConfigurationForm.styles';
 import {
   EFFECT_TYPE_OPTIONS,
   ENDPOINTS_OPTIONS,
@@ -15,11 +17,10 @@ import {
   starterValidationSchema,
 } from './ConfigurationForm.consts';
 import {
-  forbiddenScala3EffectImplementations,
+  getAvailableEffectImplementations,
   getEffectImplementationOptions,
   getJSONImplementationOptions,
   isAddMetricsSupported,
-  mapEffectTypeToEffectImplementation,
   mapEffectTypeToJSONImplementation,
 } from './ConfigurationForm.helpers';
 
@@ -27,11 +28,11 @@ interface ConfigurationFormProps {
   isEmbedded?: boolean;
 }
 
-export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({isEmbedded = false}) => {
+export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded = false }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const {classes, cx} = useStyles({isEmbedded});
+  const { classes, cx } = useStyles({ isEmbedded });
   const form = useForm<StarterRequest>({
     mode: 'onBlur',
     resolver: yupResolver(starterValidationSchema),
@@ -39,37 +40,31 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({isEmbedded 
       addDocumentation: false,
       addMetrics: false,
       json: JSONImplementation.No,
+      scalaVersion: ScalaVersion.Scala3,
     },
   });
 
-  const [effectType, effectImplementation, jsonImplementation, scalaVer] = form.watch([
+  // TODO: improve type definitions in watch, as if they do not have default value they should be undefined
+  const [effectType, effectImplementation, jsonImplementation, scalaVersion] = form.watch([
     'effect',
     'implementation',
     'json',
     'scalaVersion',
   ]);
-  const isEffectImplementationSelectable = Boolean(effectType) && Boolean(scalaVer);
+  const isEffectImplementationSelectable = Boolean(effectType) && Boolean(scalaVersion);
 
   useEffect(() => {
-    // NOTE: reset effect implementation field value upon scala version change
-    if (
-      scalaVer &&
-      scalaVer === ScalaVersion.Scala3 &&
-      effectImplementation &&
-      forbiddenScala3EffectImplementations.includes(effectImplementation)
-    ) {
-      form.resetField('implementation');
-    }
-
-    // NOTE: reset effect implementation field value upon effect type change
+    // NOTE: reset effect implementation field value upon effect type or scala version change
     if (
       effectType &&
-      effectImplementation &&
-      !mapEffectTypeToEffectImplementation(effectType).includes(effectImplementation)
+      scalaVersion &&
+      !getAvailableEffectImplementations(effectType, scalaVersion).includes(effectImplementation)
     ) {
       form.resetField('implementation');
     }
+  }, [form, effectType, effectImplementation, scalaVersion]);
 
+  useEffect(() => {
     // NOTE: reset json field value upon effect type change
     if (
       effectType &&
@@ -78,12 +73,14 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({isEmbedded 
     ) {
       form.resetField('json');
     }
+  }, [form, effectType, jsonImplementation]);
 
+  useEffect(() => {
     // NOTE: reset addMetrics field value if metrics are not supported
     if (!isAddMetricsSupported(effectImplementation)) {
       form.resetField('addMetrics');
     }
-  }, [effectType, effectImplementation, jsonImplementation, form, scalaVer]);
+  }, [form, effectImplementation]);
 
   const handleFormSubmit = async (formData: StarterRequest): Promise<void> => {
     try {
@@ -137,53 +134,54 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({isEmbedded 
       <FormProvider {...form}>
         <form className={classes.formContainer} noValidate onSubmit={form.handleSubmit(handleFormSubmit)}>
           <FormTextField
-            className={classes.formMetadataRow}
+            className={classes.formFirstRow}
             name="projectName"
             label="Project name"
             placeholder="projectname"
           />
           <FormTextField
-            className={classes.formMetadataRow}
+            className={classes.formFirstRow}
             name="groupId"
             label="Group ID"
             placeholder="com.softwaremill"
           />
-          <FormRadioGroup
-            className={classes.formVersionsRow}
-            name="scalaVersion"
-            label="Scala version"
-            options={SCALA_VERSION_OPTIONS}
-          />
+
           <FormSelect
-            className={classes.formEffectsRow}
+            className={classes.formSecondRow}
             name="effect"
             label="Effect type"
             options={EFFECT_TYPE_OPTIONS}
           />
+          <FormRadioGroup
+            className={classes.formSecondRow}
+            name="scalaVersion"
+            label="Scala version"
+            options={SCALA_VERSION_OPTIONS}
+          />
+
           <FormSelect
-            className={classes.formEffectsRow}
+            className={classes.formThirdRow}
             name="implementation"
             label="Server implementation"
             disabled={!isEffectImplementationSelectable}
-            options={isEffectImplementationSelectable ? getEffectImplementationOptions(effectType, scalaVer) : []}
+            options={isEffectImplementationSelectable ? getEffectImplementationOptions(effectType, scalaVersion) : []}
           />
 
           <FormRadioGroup
-            className={classes.formEndpointsRow}
+            className={classes.formFourthRow}
             name="addDocumentation"
             label="Expose endpoint documentation using Swagger UI"
             options={ENDPOINTS_OPTIONS}
           />
-
           <FormRadioGroup
-            className={classes.formEndpointsRow}
+            className={classes.formFourthRow}
             name="json"
             label="Add JSON endpoint using"
             options={getJSONImplementationOptions(effectType)}
           />
 
           <FormRadioGroup
-            className={classes.formEndpoints2ndRow}
+            className={classes.formFifthRow}
             name="addMetrics"
             label="Add metrics endpoints"
             disabled={!isAddMetricsSupported(effectImplementation)}
@@ -207,14 +205,16 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({isEmbedded 
             </Button>
           </div>
         </form>
+
+        {isDevelopment && <DevTool control={form.control} />}
       </FormProvider>
 
       <Backdrop open={isLoading}>
-        <CircularProgress/>
+        <CircularProgress />
       </Backdrop>
       <Snackbar
         open={Boolean(errorMessage)}
-        anchorOrigin={{vertical: 'top', horizontal: 'right'}}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         autoHideDuration={5000}
         onClose={handleCloseAlert}
       >
