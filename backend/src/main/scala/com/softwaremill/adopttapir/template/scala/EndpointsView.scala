@@ -77,7 +77,6 @@ object EndpointsView {
       bodyTemplate("ServerEndpoint[Any, Future]", "Future.successful"),
       Set(
         Import("scala.concurrent.Future"),
-        Import("sttp.tapir._"),
         Import("sttp.tapir.server.ServerEndpoint")
       )
     )
@@ -86,7 +85,6 @@ object EndpointsView {
       bodyTemplate("ServerEndpoint[Any, IO]", "IO.pure"),
       Set(
         Import("cats.effect.IO"),
-        Import("sttp.tapir._"),
         Import("sttp.tapir.server.ServerEndpoint")
       )
     )
@@ -94,8 +92,8 @@ object EndpointsView {
     val zio: Code = Code(
       bodyTemplate("ZServerEndpoint[Any, Any]", "ZIO.succeed"),
       Set(
-        Import("sttp.tapir.ztapir._"),
-        Import("zio.ZIO")
+        Import("zio.ZIO"),
+        Import("sttp.tapir.ztapir.ZServerEndpoint")
       )
     )
   }
