@@ -13,7 +13,7 @@ rightBracket: Char = '}'
 )
 package @{starterDetails.groupId}
 
-import sttp.tapir.{PublicEndpoint, endpoint, query, stringBody}
+import sttp.tapir.@if(scalaVersion == com.softwaremill.adopttapir.starter.ScalaVersion.Scala2){_}else{*}
 @for(additionalImport <- additionalImports) {
 @{additionalImport.asScalaImport(scalaVersion)}}
 
