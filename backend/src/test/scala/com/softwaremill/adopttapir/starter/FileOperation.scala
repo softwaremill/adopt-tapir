@@ -2,13 +2,12 @@ package com.softwaremill.adopttapir.starter
 
 import cats.effect.{ExitCode, IO, IOApp}
 import com.softwaremill.adopttapir.config.Config
-import com.softwaremill.adopttapir.template.SbtProjectTemplate
 
 @deprecated("Only for development purpose")
 object FileOperation extends IOApp {
 
   private val cfg = Config.read.starter
-  val service = new StarterService(cfg.copy(deleteTempFolder = false), new SbtProjectTemplate)
+  val service = new StarterService(cfg.copy(deleteTempFolder = false))
 
   override def run(args: List[String]): IO[ExitCode] = {
     val details = StarterDetails(
@@ -23,7 +22,7 @@ object FileOperation extends IOApp {
     )
 
     for {
-      file <- service.generateSbtZipFile(details)
+      file <- service.generateZipFile(details)
       _ <- IO.println {
         val str = file.toString
         val index = str.lastIndexOf('_')

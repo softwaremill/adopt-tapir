@@ -10,5 +10,6 @@ Content-Type: application/json
   "addDocumentation": true,
   "addMetrics": true,
   "json": "Jsoniter",
-  "scalaVersion": "Scala2"
+  "scalaVersion": "Scala2",
+  "builder": "Sbt"
 }

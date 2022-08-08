@@ -6,21 +6,20 @@ import cats.effect.IO
 import com.softwaremill.adopttapir.logging.FLogging
 import com.softwaremill.adopttapir.metrics.Metrics
 import com.softwaremill.adopttapir.metrics.Metrics.generatedStarterCounter
-import com.softwaremill.adopttapir.template.SbtProjectTemplate.legalizeGroupId
-import com.softwaremill.adopttapir.template.{GeneratedFile, SbtProjectTemplate}
+import com.softwaremill.adopttapir.template.GeneratedFile
 import com.softwaremill.adopttapir.util.ZipArchiver
 
 import java.io.File
 import scala.reflect.io.Directory
 
 class StarterService(
-    config: StarterConfig,
-    sbtTemplate: SbtProjectTemplate
+    config: StarterConfig
 ) extends FLogging {
+  import FilesGenerator.StarterDetailsWithFilesGenerator
 
-  def generateSbtZipFile(starterDetails: StarterDetails): IO[File] = {
+  def generateZipFile(starterDetails: StarterDetails): IO[File] = {
     logger.info(s"received request: $starterDetails") *>
-      IO(generateSbtFiles(starterDetails)).flatMap { filesToCreate =>
+      IO(starterDetails.generateFiles).flatMap { filesToCreate =>
         IO.blocking(newTemporaryDirectory(prefix = config.tempPrefix).toJava)
           .bracket { tempDir =>
             for {
@@ -32,21 +31,6 @@ class StarterService(
             } yield zippedFile
           }(release = tempDir => if (config.deleteTempFolder) deleteRecursively(tempDir) else IO.unit)
       }
-
-  }
-
-  protected def generateSbtFiles(starterDetails: StarterDetails): List[GeneratedFile] = {
-    List(
-      sbtTemplate.getBuildSbt(starterDetails),
-      sbtTemplate.getBuildProperties,
-      sbtTemplate.getMain(legalizeGroupId(starterDetails)),
-      sbtTemplate.getEndpoints(legalizeGroupId(starterDetails)),
-      sbtTemplate.getEndpointsSpec(legalizeGroupId(starterDetails)),
-      sbtTemplate.pluginsSbt,
-      sbtTemplate.scalafmtConf(starterDetails.scalaVersion),
-      sbtTemplate.sbtx,
-      sbtTemplate.README
-    )
   }
 
   private def storeFiles(destinationFolder: File, filesToCreate: List[GeneratedFile]): IO[Unit] = IO.blocking {

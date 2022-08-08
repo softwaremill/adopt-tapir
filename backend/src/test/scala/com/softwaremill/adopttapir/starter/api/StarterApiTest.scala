@@ -8,7 +8,7 @@ import com.softwaremill.adopttapir.starter.api.EffectRequest.FutureEffect
 import com.softwaremill.adopttapir.starter.api.JsonImplementationRequest.Jsoniter
 import com.softwaremill.adopttapir.starter.api.ScalaVersionRequest.Scala2
 import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Akka, ZIOHttp}
-import com.softwaremill.adopttapir.starter.api.StarterApiTest.{mainPath, validRequest}
+import com.softwaremill.adopttapir.starter.api.StarterApiTest.{mainPath, validSbtRequest, validScalaCliRequest}
 import com.softwaremill.adopttapir.test.Rich.RichIO
 import com.softwaremill.adopttapir.test.{BaseTest, TestDependencies}
 import fs2.io.file.Files
@@ -18,9 +18,9 @@ import sttp.client3.{HttpError, Response}
 
 class StarterApiTest extends BaseTest with TestDependencies {
 
-  "/starter.zip" should "return a zip response with specified files" in {
+  "/starter.zip" should "return a zip response with specified files for Sbt builder" in {
     // given
-    val req = validRequest
+    val req = validSbtRequest
 
     // when
     val response: Response[fs2.Stream[IO, Byte]] = requests.requestZip(req)
@@ -42,10 +42,9 @@ class StarterApiTest extends BaseTest with TestDependencies {
     }
   }
 
-  it should "have relative paths associated with groupId in request for .scala files" in {
+  "/starter.zip" should "return a zip response with specified files for ScalaCli builder" in {
     // given
-    val req = validRequest
-    val groupIdRelativePath = s"${req.groupId.replace('.', '/')}"
+    val req = validScalaCliRequest
 
     // when
     val response: Response[fs2.Stream[IO, Byte]] = requests.requestZip(req)
@@ -53,18 +52,39 @@ class StarterApiTest extends BaseTest with TestDependencies {
     // then
     response.code.code shouldBe 200
     checkStreamZipContent(response.body) { unpackedDir =>
-      val paths = unpackedDir.listRecursively.toList
-        .collect {
-          case f: File if f.path.toString.endsWith(".scala") && f.isRegularFile =>
-            unpackedDir.relativize(f)
-        }
-      paths.map(_.toString) should contain theSameElementsAs List(
-        s"$mainPath/$groupIdRelativePath/Main.scala",
-        s"src/main/scala/$groupIdRelativePath/Endpoints.scala",
-        s"src/test/scala/$groupIdRelativePath/EndpointsSpec.scala"
+      unpackedDir.listRecursively.toList.filter(_.isRegularFile).map(_.path.getFileName.toString) should contain theSameElementsAs List(
+        ".scalafmt.conf",
+        "EndpointsSpec.scala",
+        "Endpoints.scala",
+        "Main.scala",
+        "README.md"
       )
     }
+  }
 
+  for { req <- Seq(validSbtRequest, validScalaCliRequest) } {
+    it should s"have relative paths associated with groupId in request for .scala files for ${req.builder} builder" in {
+      // given
+      val groupIdRelativePath = s"${req.groupId.replace('.', '/')}"
+
+      // when
+      val response: Response[fs2.Stream[IO, Byte]] = requests.requestZip(req)
+
+      // then
+      response.code.code shouldBe 200
+      checkStreamZipContent(response.body) { unpackedDir =>
+        val paths = unpackedDir.listRecursively.toList
+          .collect {
+            case f: File if f.path.toString.endsWith(".scala") && f.isRegularFile =>
+              unpackedDir.relativize(f)
+          }
+        paths.map(_.toString) should contain theSameElementsAs List(
+          s"$mainPath/$groupIdRelativePath/Main.scala",
+          s"src/main/scala/$groupIdRelativePath/Endpoints.scala",
+          s"src/test/scala/$groupIdRelativePath/EndpointsSpec.scala"
+        )
+      }
+    }
   }
 
   it should "return request error with information about picking wrong implementation for an effect" in {
@@ -121,7 +141,7 @@ class StarterApiTest extends BaseTest with TestDependencies {
 }
 
 object StarterApiTest {
-  val validRequest: StarterRequest = StarterRequest(
+  val validSbtRequest: StarterRequest = StarterRequest(
     projectName = "projectname",
     groupId = "com.softwaremill",
     effect = FutureEffect,
@@ -131,6 +151,8 @@ object StarterApiTest {
     json = Jsoniter,
     scalaVersion = Scala2
   )
+
+  val validScalaCliRequest: StarterRequest = validSbtRequest.copy(builder = BuilderRequest.ScalaCli)
 
   val mainPath = "src/main/scala"
   val testPath = "src/test/scala"

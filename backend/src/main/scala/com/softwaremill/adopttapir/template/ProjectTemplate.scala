@@ -3,6 +3,7 @@ package com.softwaremill.adopttapir.template
 import better.files.Resource
 import com.softwaremill.adopttapir.starter.ServerEffect.ZIOEffect
 import com.softwaremill.adopttapir.starter.{ScalaVersion, StarterDetails}
+import com.softwaremill.adopttapir.template.CommonObjectTemplate.legalizeGroupId
 import com.softwaremill.adopttapir.template.SbtProjectTemplate._
 import com.softwaremill.adopttapir.template.sbt.BuildSbtView
 import com.softwaremill.adopttapir.template.scala.{EndpointsSpecView, EndpointsView, Import, MainView}
@@ -19,8 +20,10 @@ case class GeneratedFile(
   * As an example see @see [[EndpointsView]]
   */
 abstract class ProjectTemplate {
+  import CommonObjectTemplate.StarterDetailsWithLegalizedGroupId
+
   def getMain(starterDetails: StarterDetails): GeneratedFile = {
-    val groupId = starterDetails.groupId
+    val groupId = starterDetails.legalizedGroupId
 
     GeneratedFile(
       pathUnderPackage("src/main/scala", groupId, "Main.scala"),
@@ -29,7 +32,7 @@ abstract class ProjectTemplate {
   }
 
   def getEndpoints(starterDetails: StarterDetails): GeneratedFile = {
-    val groupId = starterDetails.groupId
+    val groupId = starterDetails.legalizedGroupId
 
     val helloServerEndpoint = EndpointsView.getHelloServerEndpoint(starterDetails)
     val docEndpoints = EndpointsView.getDocEndpoints(starterDetails)
@@ -60,7 +63,7 @@ abstract class ProjectTemplate {
   }
 
   def getEndpointsSpec(starterDetails: StarterDetails): GeneratedFile = {
-    val groupId = starterDetails.groupId
+    val groupId = starterDetails.legalizedGroupId
 
     val helloServerStub = EndpointsSpecView.getHelloServerStub(starterDetails)
     val booksServerStub = EndpointsSpecView.getBookServerStub(starterDetails)
@@ -94,8 +97,14 @@ abstract class ProjectTemplate {
     )
   }
 
+  import com.softwaremill.adopttapir.template.CommonObjectTemplate.scalafmtConfigPath
+  val scalafmtConf: ScalaVersion => GeneratedFile = dialectVersion =>
+    GeneratedFile(scalafmtConfigPath, txt.scalafmt(TemplateDependencyInfo.scalafmtVersion, dialectVersion).toString())
+
   protected def pathUnderPackage(prefixDir: String, groupId: String, fileName: String): String =
     prefixDir + "/" + groupId.split('.').mkString("/") + "/" + fileName
+
+  private def toSortedList(set: Set[Import]): List[Import] = set.toList.sortBy(_.fullName)
 }
 
 class SbtProjectTemplate extends ProjectTemplate {
@@ -119,25 +128,25 @@ class SbtProjectTemplate extends ProjectTemplate {
     txt.buildProperties(TemplateDependencyInfo.sbtVersion).toString()
   )
 
-  val pluginsSbt: GeneratedFile = GeneratedFile("project/plugins.sbt", templateResource("plugins.sbt"))
-
-  val scalafmtConf: ScalaVersion => GeneratedFile = dialectVersion =>
-    GeneratedFile(ScalafmtConfigFile, txt.scalafmt(TemplateDependencyInfo.scalafmtVersion, dialectVersion).toString())
+  val pluginsSbt: GeneratedFile = GeneratedFile("project/plugins.sbt", CommonObjectTemplate.templateResource("plugins.sbt"))
 
   val sbtx: GeneratedFile =
-    GeneratedFile(sbtxFile, templateResource(sbtxFile))
-  val README: GeneratedFile =
-    GeneratedFile(readMeFile, templateResource(readMeFile))
+    GeneratedFile(sbtxFile, CommonObjectTemplate.templateResource(sbtxFile))
 
-  private def templateResource(fileName: String): String = Resource.getAsString(s"template/$fileName")
+  val README: GeneratedFile =
+    GeneratedFile(CommonObjectTemplate.readMePath, CommonObjectTemplate.templateResource("README_sbt.md"))
 }
 
-object SbtProjectTemplate {
-  val ScalafmtConfigFile = ".scalafmt.conf"
-  val sbtxFile = "sbtx"
-  val readMeFile = "README.md"
+object CommonObjectTemplate {
+  val scalafmtConfigPath = ".scalafmt.conf"
 
-  def legalizeGroupId(starterDetails: StarterDetails): StarterDetails = {
+  val readMePath: String = "README.md"
+
+  implicit class StarterDetailsWithLegalizedGroupId(starterDetails: StarterDetails) {
+    lazy val legalizedGroupId: String = legalizeGroupId(starterDetails)
+  }
+
+  private def legalizeGroupId(starterDetails: StarterDetails): String = {
     def legalize(packageNameSection: String): String = {
       val startsWithNumberRgx = "^\\d+.*$"
 
@@ -150,8 +159,17 @@ object SbtProjectTemplate {
 
     def legalizeGroupId(groupId: String): String = groupId.split('.').map(legalize).mkString(".")
 
-    starterDetails.copy(groupId = legalizeGroupId(starterDetails.groupId))
+    legalizeGroupId(starterDetails.groupId)
   }
 
-  def toSortedList(set: Set[Import]): List[Import] = set.toList.sortBy(_.fullName)
+  def templateResource(fileName: String): String = Resource.getAsString(s"template/$fileName")
+}
+
+object SbtProjectTemplate {
+  val sbtxFile = "sbtx"
+}
+
+class ScalaCliProjectTemplate extends ProjectTemplate {
+  lazy val README: GeneratedFile =
+    GeneratedFile(CommonObjectTemplate.readMePath, CommonObjectTemplate.templateResource("README_scala-cli.md"))
 }

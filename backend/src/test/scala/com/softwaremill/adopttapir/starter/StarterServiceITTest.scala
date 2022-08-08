@@ -6,7 +6,6 @@ import cats.effect.unsafe.implicits.global
 import cats.instances.list._
 import cats.syntax.parallel._
 import com.softwaremill.adopttapir.starter.api._
-import com.softwaremill.adopttapir.template.SbtProjectTemplate
 import com.softwaremill.adopttapir.test.BaseTest
 import org.scalatest.{Assertions, ParallelTestExecution}
 import os.SubProcess
@@ -140,7 +139,7 @@ case class ServiceUnderTest(details: StarterDetails) {
 
   private def generateZipFile(details: StarterDetails, logger: RunLogger): Resource[IO, BFile] = {
     Resource.make(for {
-      zipFile <- ZipGenerator.service.generateSbtZipFile(details).map(_.toScala)
+      zipFile <- ZipGenerator.service.generateZipFile(details).map(_.toScala)
       _ <- logger.log("* zip file was generated")
     } yield zipFile)(zipFile => IO.blocking(zipFile.delete()))
   }
@@ -250,7 +249,7 @@ case class Service(tempDir: better.files.File) {
 object ZipGenerator {
   val service: StarterService = {
     val config = StarterConfig(deleteTempFolder = true, tempPrefix = "sbtService")
-    new StarterService(config, new SbtProjectTemplate)
+    new StarterService(config)
   }
 }
 
