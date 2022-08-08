@@ -1,36 +1,35 @@
-package com.softwaremill.adopttapir.template.sbt
+package com.softwaremill.adopttapir.template
 
-import com.softwaremill.adopttapir.starter.ServerEffect._
+import com.softwaremill.adopttapir.starter.ServerEffect.{FutureEffect, IOEffect, ZIOEffect}
 import com.softwaremill.adopttapir.starter.ServerImplementation.{Akka, Http4s, Netty, ZIOHttp}
 import com.softwaremill.adopttapir.starter.{JsonImplementation, ServerEffect, StarterDetails}
-import com.softwaremill.adopttapir.template.sbt.Dependency._
+import Dependency.{JavaDependency, ScalaDependency, ScalaTestDependency, constantTapirVersion}
 import com.softwaremill.adopttapir.version.TemplateDependencyInfo
 
-object BuildSbtView {
-
-  def format(dependencies: List[Dependency]): String = {
-    val space = " " * 6
-
-    dependencies
-      .map(_.asSbtDependency)
-      .mkString(space, "," + System.lineSeparator() + space, "")
-
+abstract class BuildView {
+  def getAllDependencies(starterDetails: StarterDetails): List[Dependency] = {
+    getMainDependencies(starterDetails) ++ getAllTestDependencies(starterDetails)
   }
 
-  def getDependencies(starterDetails: StarterDetails): List[Dependency] = {
+  def getMainDependencies(starterDetails: StarterDetails): List[Dependency] = {
     val httpDependencies = getHttpDependencies(starterDetails)
     val monitoringDependencies = Nil
     val jsonDependencies = getJsonDependencies(starterDetails)
-    val docsDepenedencies = getDocsDependencies(starterDetails)
+    val docsDependencies = getDocsDependencies(starterDetails)
     val metricsDependencies = getMetricsDependencies(starterDetails)
     val baseDependencies = List(
       JavaDependency("ch.qos.logback", "logback-classic", TemplateDependencyInfo.logbackClassicVersion)
     )
-    val testDependencies = ScalaTestDependency("com.softwaremill.sttp.tapir", "tapir-sttp-stub-server", constantTapirVersion) ::
-      getTestDependencies(starterDetails.serverEffect) ++ getJsonTestDependencies(starterDetails)
 
-    httpDependencies ++ metricsDependencies ++ docsDepenedencies ++ monitoringDependencies ++ jsonDependencies ++ baseDependencies ++ testDependencies
+    httpDependencies ++ metricsDependencies ++ docsDependencies ++ monitoringDependencies ++ jsonDependencies ++ baseDependencies
   }
+
+  def getAllTestDependencies(starterDetails: StarterDetails): List[Dependency] = {
+    ScalaTestDependency("com.softwaremill.sttp.tapir", "tapir-sttp-stub-server", getTapirVersion()) ::
+      getTestDependencies(starterDetails.serverEffect) ++ getJsonTestDependencies(starterDetails)
+  }
+
+  protected def getTapirVersion(): String
 
   private def getTestDependencies(effect: ServerEffect): List[ScalaTestDependency] = {
     if (effect != ServerEffect.ZIOEffect) List(ScalaTestDependency("org.scalatest", "scalatest", TemplateDependencyInfo.scalaTestVersion))
@@ -43,13 +42,13 @@ object BuildSbtView {
 
   private def getDocsDependencies(starterDetails: StarterDetails): List[ScalaDependency] = {
     if (starterDetails.addDocumentation)
-      List(ScalaDependency("com.softwaremill.sttp.tapir", "tapir-swagger-ui-bundle", constantTapirVersion))
+      List(ScalaDependency("com.softwaremill.sttp.tapir", "tapir-swagger-ui-bundle", getTapirVersion()))
     else Nil
   }
 
   private def getMetricsDependencies(starterDetails: StarterDetails): List[ScalaDependency] = {
     if (starterDetails.addMetrics)
-      List(ScalaDependency("com.softwaremill.sttp.tapir", "tapir-prometheus-metrics", constantTapirVersion))
+      List(ScalaDependency("com.softwaremill.sttp.tapir", "tapir-prometheus-metrics", getTapirVersion()))
     else Nil
   }
 
@@ -58,11 +57,11 @@ object BuildSbtView {
       case JsonImplementation.WithoutJson => Nil
       case JsonImplementation.Circe =>
         List(
-          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-json-circe", constantTapirVersion)
+          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-json-circe", getTapirVersion())
         )
       case JsonImplementation.Jsoniter =>
         List(
-          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-jsoniter-scala", constantTapirVersion),
+          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-jsoniter-scala", getTapirVersion()),
           ScalaDependency(
             "com.github.plokhotnyuk.jsoniter-scala",
             "jsoniter-scala-core",
@@ -76,7 +75,7 @@ object BuildSbtView {
         )
       case JsonImplementation.ZIOJson =>
         List(
-          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-json-zio", constantTapirVersion)
+          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-json-zio", getTapirVersion())
         )
     }
   }
@@ -107,29 +106,52 @@ object BuildSbtView {
 
   object HttpDependencies {
     def akka(): List[ScalaDependency] = List(
-      ScalaDependency("com.softwaremill.sttp.tapir", "tapir-akka-http-server", constantTapirVersion)
+      ScalaDependency("com.softwaremill.sttp.tapir", "tapir-akka-http-server", getTapirVersion())
     )
 
     def netty(): List[ScalaDependency] = List(
-      ScalaDependency("com.softwaremill.sttp.tapir", "tapir-netty-server", constantTapirVersion)
+      ScalaDependency("com.softwaremill.sttp.tapir", "tapir-netty-server", getTapirVersion())
     )
 
     def ioNetty(): List[ScalaDependency] =
       List(
-        ScalaDependency("com.softwaremill.sttp.tapir", "tapir-cats", constantTapirVersion),
-        ScalaDependency("com.softwaremill.sttp.tapir", "tapir-netty-server-cats", constantTapirVersion)
+        ScalaDependency("com.softwaremill.sttp.tapir", "tapir-cats", getTapirVersion()),
+        ScalaDependency("com.softwaremill.sttp.tapir", "tapir-netty-server-cats", getTapirVersion())
       )
 
     def http4s(): List[ScalaDependency] = List(
-      ScalaDependency("com.softwaremill.sttp.tapir", "tapir-http4s-server", constantTapirVersion),
+      ScalaDependency("com.softwaremill.sttp.tapir", "tapir-http4s-server", getTapirVersion()),
       ScalaDependency("org.http4s", "http4s-blaze-server", TemplateDependencyInfo.http4sBlazeServerVersion)
     )
 
     def http4sZIO(): List[ScalaDependency] =
-      ScalaDependency("com.softwaremill.sttp.tapir", "tapir-http4s-server-zio", constantTapirVersion) :: http4s()
+      ScalaDependency("com.softwaremill.sttp.tapir", "tapir-http4s-server-zio", getTapirVersion()) :: http4s()
 
     def ZIOHttp(): List[ScalaDependency] = List(
-      ScalaDependency("com.softwaremill.sttp.tapir", "tapir-zio-http-server", constantTapirVersion)
+      ScalaDependency("com.softwaremill.sttp.tapir", "tapir-zio-http-server", getTapirVersion())
     )
   }
+}
+
+object BuildSbtView extends BuildView {
+  def format(dependencies: List[Dependency]): String = {
+    val space = " " * 6
+
+    dependencies
+      .map(_.asSbtDependency)
+      .mkString(space, "," + System.lineSeparator() + space, "")
+  }
+
+  override protected def getTapirVersion(): String = constantTapirVersion
+}
+
+object BuildScalaCliView extends BuildView {
+  def format(dependencies: List[Dependency]): String = {
+    val importPrefix = "using lib "
+    dependencies
+      .map(_.asScalaCliDependency)
+      .mkString(importPrefix, System.lineSeparator() + importPrefix, System.lineSeparator())
+  }
+
+  override protected def getTapirVersion(): String = TemplateDependencyInfo.tapirVersion
 }

@@ -40,6 +40,7 @@ private case object ScalaCliFilesGenerator extends FilesGenerator {
 
   override def generate(starterDetails: StarterDetails): List[GeneratedFile] = {
     List(
+      scalaCliTemplate.getBuildScalaCli(starterDetails),
       scalaCliTemplate.getMain(starterDetails),
       scalaCliTemplate.getEndpoints(starterDetails),
       scalaCliTemplate.getEndpointsSpec(starterDetails),

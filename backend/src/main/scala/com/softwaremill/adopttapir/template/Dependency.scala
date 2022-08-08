@@ -1,6 +1,6 @@
-package com.softwaremill.adopttapir.template.sbt
+package com.softwaremill.adopttapir.template
 
-import com.softwaremill.adopttapir.template.sbt.Dependency.constantTapirVersion
+import com.softwaremill.adopttapir.template.Dependency.constantTapirVersion
 
 sealed trait Dependency {
   val groupId: String
@@ -8,10 +8,14 @@ sealed trait Dependency {
   val version: String
 
   def asSbtDependency: String
+
+  def asScalaCliDependency: String
 }
 
 trait DefaultFormat { self: Dependency =>
   override def asSbtDependency: String = s"\"$groupId\" % \"$artifactId\" % \"$version\""
+
+  override def asScalaCliDependency: String = s"\"$groupId:$artifactId:$version\""
 }
 
 trait ScalaFormat { self: Dependency =>
@@ -20,6 +24,8 @@ trait ScalaFormat { self: Dependency =>
 
     s"\"$groupId\" %% \"$artifactId\" % $versionString"
   }
+
+  override def asScalaCliDependency: String = s"\"$groupId::$artifactId:$version\""
 }
 
 trait TestFormat extends ScalaFormat { self: Dependency =>
