@@ -124,6 +124,13 @@ export const starterValidationSchema = yup
         `Effect type must be one of the following values: ${EFFECT_TYPE_OPTIONS.map(labelGetter).join(', ')}`
       )
       .required(REQUIRED_FIELD_MESSAGE),
+    scalaVersion: yup
+      .mixed()
+      .oneOf(
+        SCALA_VERSION_OPTIONS.map(valueGetter),
+        `Scala version must be one of the following values: ${SCALA_VERSION_OPTIONS.map(labelGetter).join(', ')}`
+      )
+      .required(REQUIRED_FIELD_MESSAGE),
     implementation: yup
       .mixed()
       .test('effect implementation validation', (value: EffectImplementation, context) => {
@@ -148,12 +155,5 @@ export const starterValidationSchema = yup
       })
       .required(REQUIRED_FIELD_MESSAGE),
     addMetrics: yup.boolean().required(REQUIRED_FIELD_MESSAGE),
-    scalaVersion: yup
-      .mixed()
-      .oneOf(
-        SCALA_VERSION_OPTIONS.map(valueGetter),
-        `Scala version must be one of the following values: ${SCALA_VERSION_OPTIONS.map(labelGetter).join(', ')}`
-      )
-      .required(REQUIRED_FIELD_MESSAGE),
   })
   .required();
