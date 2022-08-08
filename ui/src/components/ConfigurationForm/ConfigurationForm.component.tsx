@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Alert, Backdrop, Box, Button, CircularProgress, Snackbar, Typography } from '@mui/material';
 import { FormProvider, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { DevTool } from '@hookform/devtools';
 import { saveAs } from 'file-saver';
 import { JSONImplementation, ScalaVersion, StarterRequest } from 'api/starter';
+import { useApiCall } from 'hooks/useApiCall';
 import { isDevelopment } from 'consts/env';
 import { FormTextField } from '../FormTextField';
 import { FormSelect } from '../FormSelect';
@@ -29,9 +30,7 @@ interface ConfigurationFormProps {
 }
 
 export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded = false }) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-
+  const { call, clearError, isLoading, errorMessage } = useApiCall();
   const { classes, cx } = useStyles({ isEmbedded });
   const form = useForm<StarterRequest>({
     mode: 'onBlur',
@@ -82,38 +81,30 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
     }
   }, [form, effectImplementation]);
 
-  const handleFormSubmit = async (formData: StarterRequest): Promise<void> => {
-    try {
-      setIsLoading(true);
+  const handleStarterRequest = async (formData: StarterRequest): Promise<void> => {
+    const response = await fetch('https://adopt-tapir.softwaremill.com/api/v1/starter.zip', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData),
+    });
 
-      const response = await fetch('https://adopt-tapir.softwaremill.com/api/v1/starter.zip', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+    if (!response.ok) {
+      const json = await response.json();
 
-      if (!response.ok) {
-        const json = await response.json();
-
-        throw new Error(json.error || 'Something went wrong, please try again later.');
-      }
-
-      const blob = await response.blob();
-      const filename = response.headers.get('Content-Disposition')?.split('filename=')[1].replaceAll('"', '');
-
-      // download starter zip file
-      saveAs(blob, filename ?? 'starter.zip');
-    } catch (error) {
-      if (error instanceof Error) {
-        setErrorMessage(error.message);
-      } else {
-        setErrorMessage(error as string);
-      }
-    } finally {
-      setIsLoading(false);
+      throw new Error(json.error || 'Something went wrong, please try again later.');
     }
+
+    const blob = await response.blob();
+    const filename = response.headers.get('Content-Disposition')?.split('filename=')[1].replaceAll('"', '');
+
+    // download starter zip file
+    saveAs(blob, filename ?? 'starter.zip');
+  };
+
+  const handleFormSubmit = async (formData: StarterRequest): Promise<void> => {
+    call(() => handleStarterRequest(formData));
   };
 
   const handleFormReset = (): void => {
@@ -121,7 +112,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
   };
 
   const handleCloseAlert = (): void => {
-    setErrorMessage('');
+    clearError();
   };
 
   return (

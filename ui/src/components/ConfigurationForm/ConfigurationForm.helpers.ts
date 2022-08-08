@@ -50,7 +50,7 @@ export const getEffectImplementationOptions = (
  * Effect implementation to metrics supported
  */
 
-export const isAddMetricsSupported = (effectImplementation: EffectImplementation): boolean => {
+export const isAddMetricsSupported = (effectImplementation: EffectImplementation | undefined): boolean => {
   return Boolean(effectImplementation) && effectImplementation !== EffectImplementation.Netty;
 };
 
