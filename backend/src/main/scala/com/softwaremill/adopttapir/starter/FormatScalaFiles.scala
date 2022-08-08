@@ -2,7 +2,7 @@ package com.softwaremill.adopttapir.starter
 
 import better.files.FileExtensions
 import cats.effect.IO
-import com.softwaremill.adopttapir.template.SbtProjectTemplate
+import com.softwaremill.adopttapir.template.CommonObjectTemplate
 import com.typesafe.scalalogging.LazyLogging
 import org.scalafmt.interfaces.Scalafmt
 
@@ -15,7 +15,7 @@ object FormatScalaFiles extends LazyLogging {
   private lazy val scalafmt = Scalafmt.create(getClass.getClassLoader)
 
   def apply(directory: File): IO[Unit] = IO.blocking {
-    val scalafmtConfig = directory.toScala / SbtProjectTemplate.ScalafmtConfigFile
+    val scalafmtConfig = directory.toScala / CommonObjectTemplate.scalafmtConfigPath
 
     directory.toScala.list(_.extension.exists(ScalaFileExtensions.contains)).foreach { file =>
       logger.debug(s"Formatting ${file.path}")

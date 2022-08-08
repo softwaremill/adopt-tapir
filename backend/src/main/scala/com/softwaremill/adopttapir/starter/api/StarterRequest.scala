@@ -117,5 +117,9 @@ object BuilderRequest extends Enum[BuilderRequest] with CirceEnum[BuilderRequest
     override def toModel: Builder = Builder.Sbt
   }
 
+  case object ScalaCli extends BuilderRequest {
+    override def toModel: Builder = Builder.ScalaCli
+  }
+
   override def values: IndexedSeq[BuilderRequest] = findValues
 }

@@ -90,7 +90,8 @@ sealed trait FormValidator {
         r.addDocumentation,
         addMetrics,
         json.toModel,
-        scalaVersion.toModel
+        scalaVersion.toModel,
+        r.builder.toModel
       )
     }.leftMap(errors => IncorrectInput(errors.toNonEmptyList.map(_.errMessage).toList.mkString(System.lineSeparator())))
       .toEither

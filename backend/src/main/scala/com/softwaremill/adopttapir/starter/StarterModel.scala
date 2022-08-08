@@ -69,4 +69,6 @@ sealed trait Builder
 
 object Builder {
   case object Sbt extends Builder
+
+  case object ScalaCli extends Builder
 }

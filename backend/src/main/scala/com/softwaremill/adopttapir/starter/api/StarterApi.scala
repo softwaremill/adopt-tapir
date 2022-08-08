@@ -37,7 +37,7 @@ class StarterApi(http: Http, starterService: StarterService) {
           det <- EitherT(IO.pure(FormValidator.validate(request)))
           result <- EitherT.liftF(
             starterService
-              .generateSbtZipFile(det)
+              .generateZipFile(det)
               .map(file => (toStreamDeleteAfterComplete(file), defineZipFileName(request.projectName), file.length()))
           )
         } yield result
