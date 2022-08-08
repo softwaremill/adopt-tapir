@@ -5,7 +5,6 @@ import com.softwaremill.adopttapir.starter.ServerEffect.ZIOEffect
 import com.softwaremill.adopttapir.starter.{ScalaVersion, StarterDetails}
 import com.softwaremill.adopttapir.template.CommonObjectTemplate.legalizeGroupId
 import com.softwaremill.adopttapir.template.SbtProjectTemplate._
-import com.softwaremill.adopttapir.template.sbt.BuildSbtView
 import com.softwaremill.adopttapir.template.scala.{EndpointsSpecView, EndpointsView, Import, MainView}
 import com.softwaremill.adopttapir.version.TemplateDependencyInfo
 
@@ -115,7 +114,7 @@ class SbtProjectTemplate extends ProjectTemplate {
         starterDetails.groupId,
         starterDetails.scalaVersion.value,
         TemplateDependencyInfo.tapirVersion,
-        (BuildSbtView.getDependencies _).andThen(BuildSbtView.format)(starterDetails),
+        (BuildSbtView.getAllDependencies _).andThen(BuildSbtView.format)(starterDetails),
         starterDetails.serverEffect == ZIOEffect
       )
       .toString()
@@ -170,6 +169,18 @@ object SbtProjectTemplate {
 }
 
 class ScalaCliProjectTemplate extends ProjectTemplate {
+  def getBuildScalaCli(starterDetails: StarterDetails): GeneratedFile = {
+    val content = txt
+      .scalaCliBuild(
+        starterDetails.projectName,
+        starterDetails.groupId,
+        starterDetails.scalaVersion.value,
+        (BuildScalaCliView.getMainDependencies _).andThen(BuildScalaCliView.format)(starterDetails)
+      )
+      .toString()
+    GeneratedFile("build.sc", content)
+  }
+
   lazy val README: GeneratedFile =
     GeneratedFile(CommonObjectTemplate.readMePath, CommonObjectTemplate.templateResource("README_scala-cli.md"))
 }
