@@ -181,6 +181,11 @@ class ScalaCliProjectTemplate extends ProjectTemplate {
     GeneratedFile("build.sc", content)
   }
 
+  def getTestScalaCli(starterDetails: StarterDetails): GeneratedFile = {
+    val content = (BuildScalaCliView.getAllTestDependencies _).andThen(BuildScalaCliView.format)(starterDetails)
+    GeneratedFile("src/test/scala/test.sc", content)
+  }
+
   lazy val README: GeneratedFile =
     GeneratedFile(CommonObjectTemplate.readMePath, CommonObjectTemplate.templateResource("README_scala-cli.md"))
 }
