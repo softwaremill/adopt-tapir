@@ -249,8 +249,8 @@ case class Service(tempDir: better.files.File) {
 
 object ZipGenerator {
   val service: StarterService = {
-    val config = StarterConfig(deleteTempFolder = true, tempPrefix = "sbtService", scalaVersion = "2.13.8")
-    new StarterService(config, new ProjectTemplate(config))
+    val config = StarterConfig(deleteTempFolder = true, tempPrefix = "sbtService")
+    new StarterService(config, new ProjectTemplate)
   }
 }
 
