@@ -2,7 +2,7 @@ package com.softwaremill.adopttapir.template
 
 import better.files.Resource
 import com.softwaremill.adopttapir.starter.ServerEffect.ZIOEffect
-import com.softwaremill.adopttapir.starter.{ScalaVersion, StarterConfig, StarterDetails}
+import com.softwaremill.adopttapir.starter.{ScalaVersion, StarterDetails}
 import com.softwaremill.adopttapir.template.ProjectTemplate._
 import com.softwaremill.adopttapir.template.sbt.BuildSbtView
 import com.softwaremill.adopttapir.template.scala.{EndpointsSpecView, EndpointsView, Import, MainView}
@@ -18,7 +18,7 @@ case class GeneratedFile(
   *
   * As an example see @see [[EndpointsView]]
   */
-class ProjectTemplate(config: StarterConfig) {
+class ProjectTemplate {
 
   def getBuildSbt(starterDetails: StarterDetails): GeneratedFile = {
     val content = txt
