@@ -20,20 +20,20 @@ jobs:
       fail-fast: false
       matrix:
         scala: [ "Scala2", "Scala3" ]
-        json: [ "No", "Circe", "Jsoniter,ZIOJson" ]
+        json: [ "No", "Circe", "Jsoniter", "ZIOJson" ]
 
     steps:
       - name: Check-out repository
         id: repo-checkout
         uses: actions/checkout@v3
 
-      - name: Set up JDK 17
-        id: jdk-setup
-        uses: actions/setup-java@v3
+      - name: Cache scala-cli
+        uses: coursier/cache-action@v6.3
+
+      - name: Set up scala-cli
+        uses: VirtusLab/scala-cli-setup@v0.1
         with:
-          distribution: 'temurin'
-          java-version: 17
-          cache: 'sbt'
+          jvm: temurin:17
 
       - name: Cache SBT
         id: cache-sbt
@@ -52,7 +52,7 @@ jobs:
         run: sbt test
 
       - name: Run integration tests for ${{ matrix.scala }} with ${{ matrix.json }} JSON support
-        run: SCALA=${{ matrix.scala }} JSON=${{ matrix.json }} sbt 'ItTest / test'
+        run: SCALA=${{ matrix.scala }} JSON=${{ matrix.json }} IT_TESTS_THREADS_NO=1 sbt 'ItTest / test'
 
       - name: Build docker image locally
         # run this step only once across all configurations
