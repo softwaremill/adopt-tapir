@@ -6,19 +6,14 @@ import cats.effect.unsafe.implicits.global
 import cats.instances.list._
 import cats.syntax.parallel._
 import com.softwaremill.adopttapir.starter.api._
-import com.softwaremill.adopttapir.test.BaseTest
+import com.softwaremill.adopttapir.test.ServiceTimeouts.waitForPortTimeout
+import com.softwaremill.adopttapir.test.{BaseTest, GeneratedService}
 import org.scalatest.{Assertions, ParallelTestExecution}
-import os.SubProcess
 import sttp.client3.{HttpURLConnectionBackend, Identity, SttpBackend, UriContext, asStringAlways, basicRequest}
 
-import java.io.{PrintWriter, StringWriter}
-import java.time.LocalDateTime
-import scala.annotation.tailrec
 import scala.collection.mutable
-import scala.concurrent.TimeoutException
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
-import scala.util.{Properties, Using}
-import scala.util.matching.Regex
+import scala.util.Properties
 
 object Setup {
   lazy val jsonImplementations: List[JsonImplementationRequest] = {
@@ -40,6 +35,7 @@ object Setup {
     metrics <- List(true, false)
     json <- jsonImplementations
     scalaVersion <- scalaVersions
+    builder <- BuilderRequest.values
     starterRequest = StarterRequest(
       "myproject",
       "com.softwaremill",
@@ -48,27 +44,23 @@ object Setup {
       addDocumentation = docs,
       addMetrics = metrics,
       json,
-      scalaVersion
+      scalaVersion,
+      builder
     )
     starterDetails <- FormValidator.validate(starterRequest).toSeq
   } yield starterDetails
 
-  implicit class StarterDetailsWithDescribe(details: StarterDetails) {
-    lazy val describe: String =
-      s"${details.serverEffect}/${details.serverImplementation}/docs=${details.addDocumentation}/metrics=${details.addMetrics}/json=${details.jsonImplementation}/scalaVersion=${details.scalaVersion}"
-  }
-
   type TestFunction = Integer => IO[Unit]
 }
 
-object Timeouts {
-  val waitForPortTimeout: FiniteDuration = 90.seconds
+object TestTimeouts {
   // wait for tests has to be longer than waiting for port otherwise it will break waiting for port with bogus errors
   val waitForTestsTimeout: FiniteDuration = waitForPortTimeout + 30.seconds
 }
 
 class StarterServiceITTest extends BaseTest with ParallelTestExecution {
   import Setup._
+  import com.softwaremill.adopttapir.test.Describers.StarterDetailsWithDescribe
 
   for { details <- Setup.validConfigurations } {
     it should s"return zip file containing working sbt folder with: ${details.describe}" in {
@@ -111,7 +103,7 @@ class StarterServiceITTest extends BaseTest with ParallelTestExecution {
       )
 
       // get implementation for a given configuration, compile it, unit & integration test it
-      val service = ServiceUnderTest(details)
+      val service = GeneratedServiceUnderTest(details)
       service.run(List(helloEndpointTest, docsEndpointTest, metricsEndpointTest).flatten)
     }
   }
@@ -119,9 +111,10 @@ class StarterServiceITTest extends BaseTest with ParallelTestExecution {
   private def subTest(name: String): String = s"should have $name endpoint available"
 }
 
-case class ServiceUnderTest(details: StarterDetails) {
+case class GeneratedServiceUnderTest(details: StarterDetails) {
   import Setup._
-  import Timeouts.waitForTestsTimeout
+  import TestTimeouts.waitForTestsTimeout
+  import com.softwaremill.adopttapir.test.Describers._
 
   def run(tests: List[TestFunction]): Unit = {
     val logger = RunLogger()
@@ -152,11 +145,11 @@ case class ServiceUnderTest(details: StarterDetails) {
     IO.blocking(zipFile.unzipTo(tempDir)) >> logger.log("* zip file was unzipped")
   }
 
-  private def spawnService(tempDir: BFile): Resource[IO, Service] = {
-    Resource.make(IO.blocking(Service(tempDir)))(_.close())
+  private def spawnService(tempDir: BFile): Resource[IO, GeneratedService] = {
+    Resource.make(GeneratedService(details.builder, tempDir))(_.close())
   }
 
-  private def getPortFromService(service: Service, logger: RunLogger): IO[Integer] = {
+  private def getPortFromService(service: GeneratedService, logger: RunLogger): IO[Integer] = {
     for {
       port <- service.port
       _ <- logger.log(s"* service compiled, tested & started on port $port")
@@ -170,90 +163,20 @@ case class ServiceUnderTest(details: StarterDetails) {
       .timeoutAndForget(waitForTestsTimeout)
       .onError(e =>
         Assertions.fail(
-          s"Only the following test steps were finished for configuration '${details.describe}':$logger\n${describe(e)}"
+          s"Only the following test steps were finished for configuration '${details.describe}':$logger${System.lineSeparator()}${e.describe()}"
         )
       ) >> logger.log(s"* integration tests on port $port were finished")
-  }
-
-  private def describe(e: Throwable) = {
-    Using.Manager { _ =>
-      val sw = new StringWriter()
-      val pw = new PrintWriter(sw)
-      e.printStackTrace(pw)
-      sw.toString
-    }.get
-  }
-}
-
-case class Service(tempDir: better.files.File) {
-  import Timeouts.waitForPortTimeout
-
-  private val portPattern = new Regex("^(?:\\[info\\] )(?:Go to |Server started at )http://localhost:(\\d+).*")
-
-  private val process: SubProcess = {
-    os.proc(
-      "sbt",
-      "-no-colors",
-      // start in forked mode so that process input can be forwarded and process waits before closing otherwise `StdIn.readLine` will exit immediately
-      "set run / fork := true",
-      // forward std input to forked process - https://www.scala-sbt.org/1.x/docs/Forking.html#Configuring+Input
-      "set run / connectInput := true",
-      ";compile ;test ;run"
-    ).spawn(cwd = os.Path(tempDir.toJava), env = Map("http.port" -> "0"), mergeErrIntoOut = true)
-  }
-
-  val port: IO[Integer] = {
-    val stdOut = new mutable.StringBuilder()
-    val timeout = waitForPortTimeout
-    IO.blocking {
-      val port = waitForPort(stdOut)
-      assert(port > -1)
-      port
-    }.timeoutAndForget(timeout)
-      .onError(e =>
-        Assertions.fail(
-          s"Detecting port of the running server failed${if (e.isInstanceOf[TimeoutException]) s" due to timeout [${timeout}s]" else ""} with process std output:\n$stdOut"
-        )
-      )
-  }
-
-  @tailrec
-  private def waitForPort(stdOut: mutable.StringBuilder): Integer = {
-    if (process.stdout.available() > 0 || process.isAlive()) {
-      val line = process.stdout.readLine()
-      if (line == null) {
-        -1
-      } else {
-        stdOut.append("### process log <").append(new Timestamper).append(line).append(">").append('\n')
-        portPattern.findFirstMatchIn(line) match {
-          case Some(port) => port.group(1).toInt
-          case None       => waitForPort(stdOut)
-        }
-      }
-    } else {
-      -1
-    }
-  }
-
-  def close(): IO[Unit] = IO.blocking {
-    if (process.isAlive()) process.close()
-  }
-
-  private class Timestamper {
-    private val timestamp = LocalDateTime.now()
-
-    override def toString: String = s"[$timestamp]"
   }
 }
 
 object ZipGenerator {
   val service: StarterService = {
-    val config = StarterConfig(deleteTempFolder = true, tempPrefix = "sbtService")
+    val config = StarterConfig(deleteTempFolder = true, tempPrefix = "generatedService")
     new StarterService(config)
   }
 }
 
 case class RunLogger(log: mutable.StringBuilder = new mutable.StringBuilder()) {
-  def log(l: String): IO[Unit] = IO(log.append('\n').append(l))
+  def log(l: String): IO[Unit] = IO(log.append(System.lineSeparator()).append(l))
   override def toString: String = log.toString()
 }

@@ -216,7 +216,9 @@ lazy val backend: Project = (project in file("backend"))
     copyWebapp := copyWebapp.dependsOn(yarnTask.toTask(" build")).value,
     Test / testOptions := Seq(Tests.Filter(unitFilter)) ++ Seq(Tests.Argument("-P" + java.lang.Runtime.getRuntime.availableProcessors())),
     ItTest / testOptions := Seq(Tests.Filter(itFilter)) ++ Seq(
-      Tests.Argument("-P" + java.lang.Math.min(java.lang.Runtime.getRuntime.availableProcessors(), 2))
+      Tests.Argument(
+        "-P" + sys.env.get("IT_TESTS_THREADS_NO").getOrElse(java.lang.Math.min(java.lang.Runtime.getRuntime.availableProcessors() / 2, 4))
+      )
     ),
     ItTest / logBuffered := false
   )
