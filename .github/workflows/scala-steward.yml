@@ -8,16 +8,19 @@ on:
 
 jobs:
   scala-steward:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-      - name: Set up JDK 11
-        uses: actions/setup-java@v1
+        uses: actions/checkout@v3
+      - name: Set up JDK 17
+        id: jdk-setup
+        uses: actions/setup-java@v3
         with:
-          java-version: 11
+          distribution: 'temurin'
+          java-version: 17
+          cache: 'sbt'
       - name: Cache sbt
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ~/.sbt
