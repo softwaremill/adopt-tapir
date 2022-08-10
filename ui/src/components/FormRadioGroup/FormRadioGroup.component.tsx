@@ -39,8 +39,8 @@ export const FormRadioGroup: React.FC<FormRadioGroupProps> = ({
           margin="normal"
           disabled={disabled}
         >
-          <FormLabel>{label}</FormLabel>
-          <RadioGroup row {...field}>
+          <FormLabel id={`form-control-label-${field.name}`}>{label}</FormLabel>
+          <RadioGroup aria-labelledby={`form-control-label-${field.name}`} row {...field}>
             {options.map((option, index) => (
               <FormControlLabel key={index} value={option.value} label={option.label} control={<Radio />} />
             ))}

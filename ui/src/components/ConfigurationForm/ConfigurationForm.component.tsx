@@ -103,7 +103,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
     saveAs(blob, filename ?? 'starter.zip');
   };
 
-  const handleFormSubmit = async (formData: StarterRequest): Promise<void> => {
+  const handleFormSubmit = (formData: StarterRequest): void => {
     call(() => handleStarterRequest(formData));
   };
 
@@ -123,7 +123,12 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
         </Typography>
       )}
       <FormProvider {...form}>
-        <form className={classes.formContainer} noValidate onSubmit={form.handleSubmit(handleFormSubmit)}>
+        <form
+          className={classes.formContainer}
+          data-testid="configuration-form"
+          noValidate
+          onSubmit={form.handleSubmit(handleFormSubmit)}
+        >
           <FormTextField
             className={classes.formFirstRow}
             name="projectName"
