@@ -194,7 +194,7 @@ lazy val rootProject = (project in file("."))
   .settings(
     name := "adopt-tapir"
   )
-  .aggregate(backend, templateDependencies)
+  .aggregate(backend, ui, templateDependencies)
 
 lazy val ItTest = config("ItTest") extend (Test)
 
@@ -230,6 +230,11 @@ lazy val backend: Project = (project in file("backend"))
   .enablePlugins(JavaServerAppPackaging)
   .enablePlugins(SbtTwirl)
   .settings(dockerSettings)
+
+lazy val ui = (project in file(uiProjectName))
+  .settings(commonSettings)
+  .settings(Test / test := (Test / test).dependsOn(yarnTask.toTask(" test")).value)
+  .settings(cleanFiles += baseDirectory.value / "build")
 
 val scala3Version = "3.1.3"
 val plokhotnyukJsoniterVersion = "2.14.1"
