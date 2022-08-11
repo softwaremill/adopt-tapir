@@ -6,20 +6,19 @@ import cats.effect.IO
 import com.softwaremill.adopttapir.logging.FLogging
 import com.softwaremill.adopttapir.metrics.Metrics
 import com.softwaremill.adopttapir.metrics.Metrics.generatedStarterCounter
-import com.softwaremill.adopttapir.template.GeneratedFile
+import com.softwaremill.adopttapir.template.{GeneratedFile, ProjectGenerator}
 import com.softwaremill.adopttapir.util.ZipArchiver
 
 import java.io.File
 import scala.reflect.io.Directory
 
 class StarterService(
-    config: StarterConfig
+    config: StarterConfig,
+    projectGenerator: ProjectGenerator
 ) extends FLogging {
-  import FilesGenerator.StarterDetailsWithFilesGenerator
-
   def generateZipFile(starterDetails: StarterDetails): IO[File] = {
     logger.info(s"received request: $starterDetails") *>
-      IO(starterDetails.generateFiles).flatMap { filesToCreate =>
+      IO(projectGenerator.generate(starterDetails)).flatMap { filesToCreate =>
         IO.blocking(newTemporaryDirectory(prefix = config.tempPrefix).toJava)
           .bracket { tempDir =>
             for {

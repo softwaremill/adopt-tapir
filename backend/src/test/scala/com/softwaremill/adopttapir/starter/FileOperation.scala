@@ -2,12 +2,13 @@ package com.softwaremill.adopttapir.starter
 
 import cats.effect.{ExitCode, IO, IOApp}
 import com.softwaremill.adopttapir.config.Config
+import com.softwaremill.adopttapir.template.ProjectGenerator
 
 @deprecated("Only for development purpose")
 object FileOperation extends IOApp {
 
   private val cfg = Config.read.starter
-  val service = new StarterService(cfg.copy(deleteTempFolder = false))
+  val service = new StarterService(cfg.copy(deleteTempFolder = false), new ProjectGenerator())
 
   override def run(args: List[String]): IO[ExitCode] = {
     val details = StarterDetails(
