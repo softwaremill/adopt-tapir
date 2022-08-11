@@ -2,9 +2,7 @@ package com.softwaremill.adopttapir.template
 
 import better.files.Resource
 import com.softwaremill.adopttapir.starter.ServerEffect.ZIOEffect
-import com.softwaremill.adopttapir.starter.{ScalaVersion, StarterDetails}
-import com.softwaremill.adopttapir.template.CommonObjectTemplate.legalizeGroupId
-import com.softwaremill.adopttapir.template.SbtProjectTemplate._
+import com.softwaremill.adopttapir.starter.{Builder, ScalaVersion, StarterDetails}
 import com.softwaremill.adopttapir.template.scala.{EndpointsSpecView, EndpointsView, Import, MainView}
 import com.softwaremill.adopttapir.version.TemplateDependencyInfo
 
@@ -12,6 +10,15 @@ case class GeneratedFile(
     relativePath: String,
     content: String
 )
+
+class ProjectGenerator {
+  def generate(starterDetails: StarterDetails): List[GeneratedFile] = {
+    starterDetails.builder match {
+      case Builder.Sbt      => SbtProjectTemplate.generate(starterDetails)
+      case Builder.ScalaCli => ScalaCliProjectTemplate.generate(starterDetails)
+    }
+  }
+}
 
 /** Every method represent one of generated file. As template mechanism Twirl library were used. Which have some crucial limitations for
   * more advanced logic. That's why it is passed to Twirl templates through simple String by using `*View` objects.
@@ -21,7 +28,17 @@ case class GeneratedFile(
 abstract class ProjectTemplate {
   import CommonObjectTemplate.StarterDetailsWithLegalizedGroupId
 
-  def getMain(starterDetails: StarterDetails): GeneratedFile = {
+  def generate(starterDetails: StarterDetails): List[GeneratedFile] = {
+    // common project elements regardless of the builder type
+    List(
+      getMain(starterDetails),
+      getEndpoints(starterDetails),
+      getEndpointsSpec(starterDetails),
+      scalafmtConf(starterDetails.scalaVersion)
+    )
+  }
+
+  private def getMain(starterDetails: StarterDetails): GeneratedFile = {
     val groupId = starterDetails.legalizedGroupId
 
     GeneratedFile(
@@ -30,7 +47,7 @@ abstract class ProjectTemplate {
     )
   }
 
-  def getEndpoints(starterDetails: StarterDetails): GeneratedFile = {
+  private def getEndpoints(starterDetails: StarterDetails): GeneratedFile = {
     val groupId = starterDetails.legalizedGroupId
 
     val helloServerEndpoint = EndpointsView.getHelloServerEndpoint(starterDetails)
@@ -61,7 +78,7 @@ abstract class ProjectTemplate {
     )
   }
 
-  def getEndpointsSpec(starterDetails: StarterDetails): GeneratedFile = {
+  private def getEndpointsSpec(starterDetails: StarterDetails): GeneratedFile = {
     val groupId = starterDetails.legalizedGroupId
 
     val helloServerStub = EndpointsSpecView.getHelloServerStub(starterDetails)
@@ -96,18 +113,23 @@ abstract class ProjectTemplate {
     )
   }
 
-  import com.softwaremill.adopttapir.template.CommonObjectTemplate.scalafmtConfigPath
-  val scalafmtConf: ScalaVersion => GeneratedFile = dialectVersion =>
+  import CommonObjectTemplate.scalafmtConfigPath
+  private val scalafmtConf: ScalaVersion => GeneratedFile = dialectVersion =>
     GeneratedFile(scalafmtConfigPath, txt.scalafmt(TemplateDependencyInfo.scalafmtVersion, dialectVersion).toString())
 
-  protected def pathUnderPackage(prefixDir: String, groupId: String, fileName: String): String =
+  private def pathUnderPackage(prefixDir: String, groupId: String, fileName: String): String =
     prefixDir + "/" + groupId.split('.').mkString("/") + "/" + fileName
 
   private def toSortedList(set: Set[Import]): List[Import] = set.toList.sortBy(_.fullName)
 }
 
-class SbtProjectTemplate extends ProjectTemplate {
-  def getBuildSbt(starterDetails: StarterDetails): GeneratedFile = {
+object SbtProjectTemplate extends ProjectTemplate {
+  override def generate(starterDetails: StarterDetails): List[GeneratedFile] =
+    super.generate(starterDetails) ::: List(getBuildSbt(starterDetails), buildProperties, pluginsSbt, sbtx, readme)
+
+  lazy val sbtxFile = "sbtx"
+
+  private def getBuildSbt(starterDetails: StarterDetails): GeneratedFile = {
     val content = txt
       .sbtBuild(
         starterDetails.projectName,
@@ -122,21 +144,23 @@ class SbtProjectTemplate extends ProjectTemplate {
     GeneratedFile("build.sbt", content)
   }
 
-  def getBuildProperties: GeneratedFile = GeneratedFile(
+  private lazy val buildProperties: GeneratedFile = GeneratedFile(
     "project/build.properties",
     txt.buildProperties(TemplateDependencyInfo.sbtVersion).toString()
   )
 
-  val pluginsSbt: GeneratedFile = GeneratedFile("project/plugins.sbt", CommonObjectTemplate.templateResource("plugins.sbt"))
+  private lazy val pluginsSbt: GeneratedFile = GeneratedFile("project/plugins.sbt", CommonObjectTemplate.templateResource("plugins.sbt"))
 
-  val sbtx: GeneratedFile =
+  private lazy val sbtx: GeneratedFile =
     GeneratedFile(sbtxFile, CommonObjectTemplate.templateResource(sbtxFile))
 
-  val README: GeneratedFile =
+  private lazy val readme: GeneratedFile =
     GeneratedFile(CommonObjectTemplate.readMePath, CommonObjectTemplate.templateResource("README_sbt.md"))
 }
 
 object CommonObjectTemplate {
+  def templateResource(fileName: String): String = Resource.getAsString(s"template/$fileName")
+
   val scalafmtConfigPath = ".scalafmt.conf"
 
   val readMePath: String = "README.md"
@@ -160,16 +184,13 @@ object CommonObjectTemplate {
 
     legalizeGroupId(starterDetails.groupId)
   }
-
-  def templateResource(fileName: String): String = Resource.getAsString(s"template/$fileName")
 }
 
-object SbtProjectTemplate {
-  val sbtxFile = "sbtx"
-}
+private object ScalaCliProjectTemplate extends ProjectTemplate {
+  override def generate(starterDetails: StarterDetails): List[GeneratedFile] =
+    super.generate(starterDetails) ::: List(getBuildScalaCli(starterDetails), getTestScalaCli(starterDetails), readme)
 
-class ScalaCliProjectTemplate extends ProjectTemplate {
-  def getBuildScalaCli(starterDetails: StarterDetails): GeneratedFile = {
+  private def getBuildScalaCli(starterDetails: StarterDetails): GeneratedFile = {
     val content = txt
       .scalaCliBuild(
         starterDetails.projectName,
@@ -181,11 +202,11 @@ class ScalaCliProjectTemplate extends ProjectTemplate {
     GeneratedFile("build.sc", content)
   }
 
-  def getTestScalaCli(starterDetails: StarterDetails): GeneratedFile = {
+  private def getTestScalaCli(starterDetails: StarterDetails): GeneratedFile = {
     val content = (BuildScalaCliView.getAllTestDependencies _).andThen(BuildScalaCliView.format)(starterDetails)
     GeneratedFile("src/test/scala/test.sc", content)
   }
 
-  lazy val README: GeneratedFile =
+  private lazy val readme: GeneratedFile =
     GeneratedFile(CommonObjectTemplate.readMePath, CommonObjectTemplate.templateResource("README_scala-cli.md"))
 }

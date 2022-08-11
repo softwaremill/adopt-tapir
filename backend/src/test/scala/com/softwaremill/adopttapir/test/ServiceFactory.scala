@@ -1,7 +1,9 @@
 package com.softwaremill.adopttapir.test
 
 import cats.effect.IO
+import cats.syntax.show._
 import com.softwaremill.adopttapir.starter.Builder
+import com.softwaremill.adopttapir.test.ShowHelpers.throwableShow
 import org.scalatest.Assertions
 import os.SubProcess
 
@@ -19,7 +21,6 @@ object ServiceTimeouts {
 
 abstract class GeneratedService {
   import ServiceTimeouts.waitForPortTimeout
-  import Describers.ThrowableWithDescribe
 
   protected val portPattern: Regex
   protected val process: SubProcess
@@ -34,7 +35,7 @@ abstract class GeneratedService {
       .onError(e =>
         Assertions.fail(
           s"Detecting port of the running server failed ${if (e.isInstanceOf[TimeoutException]) s"due to timeout [${waitForPortTimeout}s]"
-            else s"Exception:${System.lineSeparator()}${e.describe()}"} with process std output:${System.lineSeparator()}$stdOut"
+            else s"Exception:${System.lineSeparator()}${e.show}"} with process std output:${System.lineSeparator()}$stdOut"
         )
       )
   }
@@ -68,10 +69,10 @@ abstract class GeneratedService {
   }
 }
 
-object GeneratedService {
+class ServiceFactory {
   import ServiceTimeouts.waitForScalaCliCompileAndUnitTest
 
-  def apply(builder: Builder, tempDir: better.files.File): IO[GeneratedService] = {
+  def create(builder: Builder, tempDir: better.files.File): IO[GeneratedService] = {
     builder match {
       case Builder.Sbt      => IO.blocking(SbtService(tempDir))
       case Builder.ScalaCli => IO.blocking(ScalaCliService(tempDir)).timeoutAndForget(waitForScalaCliCompileAndUnitTest)

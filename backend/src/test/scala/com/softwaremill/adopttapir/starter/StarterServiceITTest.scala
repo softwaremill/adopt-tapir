@@ -1,13 +1,16 @@
 package com.softwaremill.adopttapir.starter
 
 import better.files.{FileExtensions, File => BFile}
-import cats.effect.{IO, Resource}
 import cats.effect.unsafe.implicits.global
+import cats.effect.{IO, Resource}
 import cats.instances.list._
 import cats.syntax.parallel._
+import cats.syntax.show._
 import com.softwaremill.adopttapir.starter.api._
+import com.softwaremill.adopttapir.template.ProjectGenerator
 import com.softwaremill.adopttapir.test.ServiceTimeouts.waitForPortTimeout
-import com.softwaremill.adopttapir.test.{BaseTest, GeneratedService}
+import com.softwaremill.adopttapir.test.ShowHelpers._
+import com.softwaremill.adopttapir.test.{BaseTest, GeneratedService, ServiceFactory}
 import org.scalatest.{Assertions, ParallelTestExecution}
 import sttp.client3.{HttpURLConnectionBackend, Identity, SttpBackend, UriContext, asStringAlways, basicRequest}
 
@@ -16,19 +19,9 @@ import scala.concurrent.duration.{DurationInt, FiniteDuration}
 import scala.util.Properties
 
 object Setup {
-  lazy val jsonImplementations: List[JsonImplementationRequest] = {
-    Properties
-      .envOrElse("JSON", JsonImplementationRequest.values.mkString(","))
-      .split(",")
-      .map(JsonImplementationRequest.withName)
-      .toList
-  }
+  type TestFunction = Integer => IO[Unit]
 
-  lazy val scalaVersions: List[ScalaVersionRequest] = {
-    Properties.envOrElse("SCALA", ScalaVersionRequest.values.mkString(",")).split(",").map(ScalaVersionRequest.withName).toList
-  }
-
-  val validConfigurations: Seq[StarterDetails] = for {
+  lazy val validConfigurations: Seq[StarterDetails] = for {
     effect <- EffectRequest.values
     server <- ServerImplementationRequest.values
     docs <- List(true, false)
@@ -50,7 +43,17 @@ object Setup {
     starterDetails <- FormValidator.validate(starterRequest).toSeq
   } yield starterDetails
 
-  type TestFunction = Integer => IO[Unit]
+  private lazy val jsonImplementations: List[JsonImplementationRequest] = {
+    Properties
+      .envOrElse("JSON", JsonImplementationRequest.values.mkString(","))
+      .split(",")
+      .map(JsonImplementationRequest.withName)
+      .toList
+  }
+
+  private lazy val scalaVersions: List[ScalaVersionRequest] = {
+    Properties.envOrElse("SCALA", ScalaVersionRequest.values.mkString(",")).split(",").map(ScalaVersionRequest.withName).toList
+  }
 }
 
 object TestTimeouts {
@@ -60,10 +63,9 @@ object TestTimeouts {
 
 class StarterServiceITTest extends BaseTest with ParallelTestExecution {
   import Setup._
-  import com.softwaremill.adopttapir.test.Describers.StarterDetailsWithDescribe
 
   for { details <- Setup.validConfigurations } {
-    it should s"return zip file containing working sbt folder with: ${details.describe}" in {
+    it should s"return zip file containing working sbt folder with: ${details.show}" in {
       val backend: SttpBackend[Identity, Any] = HttpURLConnectionBackend()
 
       // define endpoints integration tests
@@ -103,7 +105,7 @@ class StarterServiceITTest extends BaseTest with ParallelTestExecution {
       )
 
       // get implementation for a given configuration, compile it, unit & integration test it
-      val service = GeneratedServiceUnderTest(details)
+      val service = GeneratedServiceUnderTest(new ServiceFactory, details)
       service.run(List(helloEndpointTest, docsEndpointTest, metricsEndpointTest).flatten)
     }
   }
@@ -111,10 +113,9 @@ class StarterServiceITTest extends BaseTest with ParallelTestExecution {
   private def subTest(name: String): String = s"should have $name endpoint available"
 }
 
-case class GeneratedServiceUnderTest(details: StarterDetails) {
+case class GeneratedServiceUnderTest(serviceFactory: ServiceFactory, details: StarterDetails) {
   import Setup._
   import TestTimeouts.waitForTestsTimeout
-  import com.softwaremill.adopttapir.test.Describers._
 
   def run(tests: List[TestFunction]): Unit = {
     val logger = RunLogger()
@@ -146,7 +147,7 @@ case class GeneratedServiceUnderTest(details: StarterDetails) {
   }
 
   private def spawnService(tempDir: BFile): Resource[IO, GeneratedService] = {
-    Resource.make(GeneratedService(details.builder, tempDir))(_.close())
+    Resource.make(serviceFactory.create(details.builder, tempDir))(_.close())
   }
 
   private def getPortFromService(service: GeneratedService, logger: RunLogger): IO[Integer] = {
@@ -163,7 +164,7 @@ case class GeneratedServiceUnderTest(details: StarterDetails) {
       .timeoutAndForget(waitForTestsTimeout)
       .onError(e =>
         Assertions.fail(
-          s"Only the following test steps were finished for configuration '${details.describe}':$logger${System.lineSeparator()}${e.describe()}"
+          s"Only the following test steps were finished for configuration '${details.show}':$logger${System.lineSeparator()}${e.show}"
         )
       ) >> logger.log(s"* integration tests on port $port were finished")
   }
@@ -172,7 +173,7 @@ case class GeneratedServiceUnderTest(details: StarterDetails) {
 object ZipGenerator {
   val service: StarterService = {
     val config = StarterConfig(deleteTempFolder = true, tempPrefix = "generatedService")
-    new StarterService(config)
+    new StarterService(config, new ProjectGenerator())
   }
 }
 
