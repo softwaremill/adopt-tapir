@@ -1,5 +1,12 @@
 import * as yup from 'yup';
-import { EffectType, EffectImplementation, ScalaVersion, JSONImplementation, StarterRequest } from 'api/starter';
+import {
+  Builder,
+  EffectImplementation,
+  EffectType,
+  JSONImplementation,
+  ScalaVersion,
+  StarterRequest,
+} from 'api/starter';
 import { starterValidationSchema } from '../ConfigurationForm.consts';
 
 const TEST_FORM_VALUES: StarterRequest = {
@@ -11,6 +18,7 @@ const TEST_FORM_VALUES: StarterRequest = {
   addDocumentation: false,
   json: JSONImplementation.No,
   addMetrics: false,
+  builder: Builder.Sbt,
 };
 
 describe('configuration consts', () => {
@@ -240,6 +248,21 @@ describe('configuration consts', () => {
           expect(addMetricsSchema.isValidSync(addMetrics)).toBe(expected);
         }
       );
+    });
+
+    describe('builder field', () => {
+      const builderSchema = yup.reach(starterValidationSchema, 'builder');
+      const cases: { builder: Builder | undefined; expected: boolean }[] = [
+        { builder: Builder.Sbt, expected: true },
+        { builder: Builder.ScalaCli, expected: true },
+        { builder: 'notScalaVersion' as Builder, expected: false },
+        { builder: '' as Builder, expected: false },
+        { builder: undefined, expected: false },
+      ];
+
+      test.each(cases)('should return $expected based on builder [$builder] validity', ({ builder, expected }) => {
+        expect(builderSchema.isValidSync(builder)).toBe(expected);
+      });
     });
   });
 });

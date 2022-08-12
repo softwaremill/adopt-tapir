@@ -23,6 +23,11 @@ export enum ScalaVersion {
   Scala3 = 'Scala3',
 }
 
+export enum Builder {
+  Sbt = 'Sbt',
+  ScalaCli = 'ScalaCli',
+}
+
 export type StarterRequest = {
   projectName: string;
   groupId: string;
@@ -32,4 +37,5 @@ export type StarterRequest = {
   addMetrics: boolean;
   json: JSONImplementation;
   scalaVersion: ScalaVersion;
+  builder: Builder;
 };

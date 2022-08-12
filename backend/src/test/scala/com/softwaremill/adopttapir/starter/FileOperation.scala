@@ -19,7 +19,8 @@ object FileOperation extends IOApp {
       true,
       false,
       JsonImplementation.Circe,
-      ScalaVersion.Scala2
+      ScalaVersion.Scala2,
+      Builder.ScalaCli
     )
 
     for {

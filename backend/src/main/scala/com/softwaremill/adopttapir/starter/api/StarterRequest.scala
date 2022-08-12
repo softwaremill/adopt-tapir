@@ -12,7 +12,7 @@ case class StarterRequest(
     addMetrics: Boolean,
     json: JsonImplementationRequest,
     scalaVersion: ScalaVersionRequest,
-    builder: BuilderRequest = BuilderRequest.Sbt // TODO: remove default once UI is finished
+    builder: BuilderRequest
 )
 
 object StarterRequest {}
@@ -93,9 +93,9 @@ sealed trait ScalaVersionRequest extends EnumEntry {
   def toModel: ScalaVersion
 }
 
-/** Changes in Scala versions have to be reflected in .github/workflows/adopt-tapir-ci.yml file so that running jobs in parallel is
- * still possible
- */
+/** Changes in Scala versions have to be reflected in .github/workflows/adopt-tapir-ci.yml file so that running jobs in parallel is still
+  * possible
+  */
 object ScalaVersionRequest extends Enum[ScalaVersionRequest] with CirceEnum[ScalaVersionRequest] {
   case object Scala2 extends ScalaVersionRequest {
     override def toModel: ScalaVersion = ScalaVersion.Scala2

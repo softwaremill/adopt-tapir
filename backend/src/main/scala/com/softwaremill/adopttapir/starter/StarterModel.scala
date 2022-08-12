@@ -14,7 +14,7 @@ case class StarterDetails(
     addMetrics: Boolean,
     jsonImplementation: JsonImplementation,
     scalaVersion: ScalaVersion,
-    builder: Builder = Builder.Sbt // TODO: remove default once UI is finished
+    builder: Builder
 )
 
 sealed trait ServerImplementation

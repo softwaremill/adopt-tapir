@@ -29,6 +29,8 @@ export const useStyles = makeStyles<{ isEmbedded: boolean }>()((theme, { isEmbed
       },
     },
     formThirdRow: {
+      alignSelf: 'center',
+
       [theme.breakpoints.up(breakpoint)]: {
         gridRowStart: 3,
       },
