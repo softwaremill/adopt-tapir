@@ -7,7 +7,7 @@ import com.softwaremill.adopttapir.starter.api.JsonImplementationRequest.No
 import com.softwaremill.adopttapir.starter.api.ScalaVersionRequest.Scala3
 import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Akka, Http4s, Netty, ZIOHttp}
 import com.softwaremill.adopttapir.starter.api.StarterRequestGenerators.randomStarterRequest
-import com.softwaremill.adopttapir.starter.{ServerEffect, ServerImplementation, StarterDetails}
+import com.softwaremill.adopttapir.starter.{Builder, ServerEffect, ServerImplementation, StarterDetails}
 import com.softwaremill.adopttapir.test.BaseTest
 
 class FormValidatorTest extends BaseTest {
@@ -87,7 +87,8 @@ class FormValidatorTest extends BaseTest {
       addDocumentation = true,
       false,
       WithoutJson,
-      Scala2
+      Scala2,
+      Builder.Sbt
     )
     FormValidator.validate(request1).value shouldBe StarterDetails(
       request1.projectName,
@@ -97,7 +98,8 @@ class FormValidatorTest extends BaseTest {
       addDocumentation = true,
       false,
       WithoutJson,
-      Scala2
+      Scala2,
+      Builder.Sbt
     )
     FormValidator.validate(request2).value shouldBe StarterDetails(
       request2.projectName,
@@ -107,7 +109,8 @@ class FormValidatorTest extends BaseTest {
       addDocumentation = true,
       false,
       WithoutJson,
-      Scala2
+      Scala2,
+      Builder.Sbt
     )
     FormValidator.validate(request3).value shouldBe StarterDetails(
       request3.projectName,
@@ -117,7 +120,8 @@ class FormValidatorTest extends BaseTest {
       addDocumentation = true,
       false,
       WithoutJson,
-      Scala2
+      Scala2,
+      Builder.Sbt
     )
     FormValidator.validate(request4).value shouldBe StarterDetails(
       request4.projectName,
@@ -127,7 +131,8 @@ class FormValidatorTest extends BaseTest {
       addDocumentation = true,
       false,
       WithoutJson,
-      Scala2
+      Scala2,
+      Builder.Sbt
     )
     FormValidator.validate(request5).value shouldBe StarterDetails(
       request5.projectName,
@@ -137,7 +142,8 @@ class FormValidatorTest extends BaseTest {
       addDocumentation = true,
       false,
       WithoutJson,
-      Scala2
+      Scala2,
+      Builder.Sbt
     )
   }
 
@@ -155,7 +161,8 @@ class FormValidatorTest extends BaseTest {
       addDocumentation = true,
       true,
       WithoutJson,
-      Scala2
+      Scala2,
+      Builder.Sbt
     )
     FormValidator.validate(request1).value shouldBe StarterDetails(
       request1.projectName,
@@ -165,7 +172,8 @@ class FormValidatorTest extends BaseTest {
       addDocumentation = true,
       true,
       WithoutJson,
-      Scala2
+      Scala2,
+      Builder.Sbt
     )
     FormValidator.validate(request2).value shouldBe StarterDetails(
       request2.projectName,
@@ -175,7 +183,8 @@ class FormValidatorTest extends BaseTest {
       addDocumentation = true,
       true,
       WithoutJson,
-      Scala2
+      Scala2,
+      Builder.Sbt
     )
     FormValidator.validate(request3).value shouldBe StarterDetails(
       request3.projectName,
@@ -185,7 +194,8 @@ class FormValidatorTest extends BaseTest {
       addDocumentation = true,
       true,
       WithoutJson,
-      Scala2
+      Scala2,
+      Builder.Sbt
     )
   }
 
@@ -198,5 +208,15 @@ class FormValidatorTest extends BaseTest {
   }
 
   private def defaultRequest(): StarterRequest =
-    StarterRequest("project", "com.softwaremill", FutureEffect, Akka, addDocumentation = true, false, No, ScalaVersionRequest.Scala2)
+    StarterRequest(
+      "project",
+      "com.softwaremill",
+      FutureEffect,
+      Akka,
+      addDocumentation = true,
+      false,
+      No,
+      ScalaVersionRequest.Scala2,
+      BuilderRequest.Sbt
+    )
 }

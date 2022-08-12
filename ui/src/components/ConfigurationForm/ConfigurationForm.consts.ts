@@ -1,5 +1,12 @@
 import * as yup from 'yup';
-import { EffectImplementation, EffectType, JSONImplementation, ScalaVersion, StarterRequest } from 'api/starter';
+import {
+  Builder,
+  EffectImplementation,
+  EffectType,
+  JSONImplementation,
+  ScalaVersion,
+  StarterRequest,
+} from 'api/starter';
 import type { FormSelectOption } from '../FormSelect';
 import type { FormRadioOption } from '../FormRadioGroup';
 import {
@@ -83,6 +90,17 @@ export const JSON_OUTPUT_OPTIONS: FormRadioOption<JSONImplementation>[] = [
   },
 ];
 
+export const BUILDER_OPTIONS: FormRadioOption<Builder>[] = [
+  {
+    label: 'sbt',
+    value: Builder.Sbt,
+  },
+  {
+    label: 'Scala CLI',
+    value: Builder.ScalaCli,
+  },
+];
+
 const labelGetter = (
   option: FormSelectOption | FormRadioOption
 ): FormSelectOption['label'] | FormRadioOption['label'] => option.label;
@@ -155,5 +173,12 @@ export const starterValidationSchema = yup
       })
       .required(REQUIRED_FIELD_MESSAGE),
     addMetrics: yup.boolean().required(REQUIRED_FIELD_MESSAGE),
+    builder: yup
+      .mixed()
+      .oneOf(
+        BUILDER_OPTIONS.map(valueGetter),
+        `Builder must be one of the following values: ${BUILDER_OPTIONS.map(labelGetter).join(', ')}`
+      )
+      .required(REQUIRED_FIELD_MESSAGE),
   })
   .required();

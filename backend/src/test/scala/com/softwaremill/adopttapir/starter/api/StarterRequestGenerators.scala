@@ -21,6 +21,7 @@ object StarterRequestGenerators {
       metricsAdded <- Gen.oneOf(true, false)
       json <- Gen.oneOf(JsonImplementationRequest.values)
       scalaVersion <- Gen.oneOf(ScalaVersionRequest.values)
+      builder <- Gen.oneOf(BuilderRequest.values)
     } yield StarterRequest(
       projectName,
       groupId,
@@ -29,7 +30,8 @@ object StarterRequestGenerators {
       documentationAdded,
       metricsAdded,
       json,
-      scalaVersion
+      scalaVersion,
+      builder
     )
   }
 }

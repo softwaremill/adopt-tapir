@@ -151,7 +151,8 @@ object StarterApiTest {
     addDocumentation = true,
     addMetrics = false,
     json = Jsoniter,
-    scalaVersion = Scala2
+    scalaVersion = Scala2,
+    builder = BuilderRequest.Sbt
   )
 
   val validScalaCliRequest: StarterRequest = validSbtRequest.copy(builder = BuilderRequest.ScalaCli)

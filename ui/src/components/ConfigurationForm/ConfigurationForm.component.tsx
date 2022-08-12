@@ -4,7 +4,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { DevTool } from '@hookform/devtools';
 import { saveAs } from 'file-saver';
-import { JSONImplementation, ScalaVersion, StarterRequest } from 'api/starter';
+import { Builder, JSONImplementation, ScalaVersion, StarterRequest } from 'api/starter';
 import { useApiCall } from 'hooks/useApiCall';
 import { isDevelopment } from 'consts/env';
 import { FormTextField } from '../FormTextField';
@@ -12,6 +12,7 @@ import { FormSelect } from '../FormSelect';
 import { FormRadioGroup } from '../FormRadioGroup';
 import { useStyles } from './ConfigurationForm.styles';
 import {
+  BUILDER_OPTIONS,
   EFFECT_TYPE_OPTIONS,
   ENDPOINTS_OPTIONS,
   SCALA_VERSION_OPTIONS,
@@ -40,6 +41,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
       addMetrics: false,
       json: JSONImplementation.No,
       scalaVersion: ScalaVersion.Scala3,
+      builder: Builder.Sbt,
     },
   });
 
@@ -162,6 +164,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
             disabled={!isEffectImplementationSelectable}
             options={isEffectImplementationSelectable ? getEffectImplementationOptions(effectType, scalaVersion) : []}
           />
+          <FormRadioGroup className={classes.formThirdRow} name="builder" label="Builder" options={BUILDER_OPTIONS} />
 
           <FormRadioGroup
             className={classes.formFourthRow}
