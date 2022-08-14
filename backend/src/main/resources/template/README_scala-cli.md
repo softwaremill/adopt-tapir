@@ -1,6 +1,16 @@
 ## Quick start
 
-If you don't have [scala-cli](https://scala-cli.virtuslab.org/install) installed already, you can use the available docker image:
+If you don't have scala-cli install yet, please follow these [installation instructions](https://scala-cli.virtuslab.org/install).
+You can use the following commands to compile, test and run the projet:
+
+```shell
+scala-cli compile --test . # build the project ('--test' means that tests will be also compiled)
+scala-cli test . # run the tests
+scala-cli run . # run the application (Main)
+scala-cli fmt --check . # run scalaformat check on all scala files and print summary, removing '--check' fixes misformatted files
+```
+
+Alternatively, you can use scala-clie via a docker image:
 
 ```shell
 docker run -ti --rm -v $(pwd):/app virtuslab/scala-cli compile --test /app # build the project ('--test' means that tests will be also compiled)
@@ -9,15 +19,6 @@ docker run -ti --rm -p '8080:8080' -v $(pwd):/app virtuslab/scala-cli run /app #
 ```
 
 For more details check the [scala-cli commands](https://scala-cli.virtuslab.org/docs/commands/basics) page.
-
-Otherwise, if scala-cli is already installed, you can use the standard commands:
-
-```shell
-scala-cli compile --test . # build the project ('--test' means that tests will be also compiled)
-scala-cli test . # run the tests
-scala-cli run . # run the application (Main)
-scala-cli fmt --check . # run scalaformat check on all scala files and print summary, removing '--check' fixes misformatted files
-```
 
 ## Links:
 
