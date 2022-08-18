@@ -44,7 +44,7 @@ object EndpointsSpec extends ZIOSpecDefault@if(scalaVersion == com.softwaremill.
         .send(backendStub)
 
       // then
-      assertZIO(response.map(_.body))(isRight(equalTo(books.get())))
+      assertZIO(response.map(_.body))(isRight(equalTo(books)))
     }
 }
   )

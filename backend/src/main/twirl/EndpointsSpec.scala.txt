@@ -47,7 +47,7 @@ class EndpointsSpec extends AnyFlatSpec with Matchers with EitherValues@if(scala
       .send(backendStub)
 
     // then
-    response.map(_.body.value shouldBe books.get()).unwrap
+    response.map(_.body.value shouldBe books).unwrap
   }
 }
   @unwrapper

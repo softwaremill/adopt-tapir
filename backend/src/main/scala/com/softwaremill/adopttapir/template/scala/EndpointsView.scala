@@ -123,7 +123,7 @@ object EndpointsView {
          |  )
          |${if (scalaVersion == Scala2) "}" else ""}""".stripMargin,
       Set(
-        Import("Library.Book")
+        Import("Library._")
       )
     )
 
