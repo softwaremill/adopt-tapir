@@ -121,8 +121,10 @@ object EndpointsView {
          |    Book("The Art of Computer Programming", 1968, Author("Donald Knuth")),
          |    Book("Pharaoh", 1897, Author("Boleslaw Prus"))
          |  )
-         |)
-         |${if (scalaVersion == Scala2) "}" else ""}""".stripMargin
+         |${if (scalaVersion == Scala2) "}" else ""}""".stripMargin,
+      Set(
+        Import("Library.Book")
+      )
     )
 
     private def prepareBookListing(starterDetails: StarterDetails): Code = {
@@ -185,7 +187,7 @@ object EndpointsView {
       }
 
       // Imports silently taken from helloServerEndpoint
-      Code(s"val $booksListingServerEndpoint: $serverKind = $bookListing.serverLogicSuccess(_ => $pureEffectFn(Library.books")
+      Code(s"val $booksListingServerEndpoint: $serverKind = $bookListing.serverLogicSuccess(_ => $pureEffectFn(Library.books))")
     }
 
   }
