@@ -5,7 +5,6 @@ import cats.implicits._
 import com.softwaremill.adopttapir._
 import com.softwaremill.adopttapir.infrastructure.Json._
 import com.softwaremill.adopttapir.logging.FLogging
-import com.softwaremill.adopttapir.util.Id
 import com.softwaremill.tagging._
 import io.circe.Printer
 import sttp.model.StatusCode
@@ -14,7 +13,6 @@ import sttp.tapir.codec.enumeratum.TapirCodecEnumeratum
 import sttp.tapir.generic.auto.SchemaDerivation
 import sttp.tapir.json.circe.TapirJsonCirce
 import sttp.tapir.{Codec, Endpoint, EndpointOutput, PublicEndpoint, Schema, SchemaType, Tapir}
-import tsec.common.SecureRandomId
 
 /** Helper class for defining HTTP endpoints. Import the members of this class when defining an HTTP API using tapir. */
 class Http() extends Tapir with TapirJsonCirce with TapirSchemas with TapirCodecEnumeratum with FLogging {
@@ -29,12 +27,6 @@ class Http() extends Tapir with TapirJsonCirce with TapirSchemas with TapirCodec
     */
   val baseEndpoint: PublicEndpoint[Unit, (StatusCode, Error_OUT), Unit, Any] =
     endpoint.errorOut(failOutput)
-
-  /** Base endpoint description for secured endpoints. Specifies that errors are always returned as JSON values corresponding to the
-    * [[Error_OUT]] class, and that authentication is read from the `Authorization: Bearer` header.
-    */
-  val secureEndpoint: Endpoint[Id, Unit, (StatusCode, Error_OUT), Unit, Any] =
-    baseEndpoint.securityIn(auth.bearer[String]().map(_.asInstanceOf[Id])(identity))
 
   val failToResponseData: Fail => (StatusCode, Error_OUT) = {
     case Fail.NotFound(what)      => (StatusCode.NotFound, Error_OUT(what))
@@ -65,12 +57,9 @@ class Http() extends Tapir with TapirJsonCirce with TapirSchemas with TapirCodec
   * for custom types, and auto-derivation for ADTs & value classes.
   */
 trait TapirSchemas extends SchemaDerivation {
-  implicit val idPlainCodec: PlainCodec[SecureRandomId] =
-    Codec.string.map(_.asInstanceOf[SecureRandomId])(identity)
   implicit def taggedPlainCodec[U, T](implicit uc: PlainCodec[U]): PlainCodec[U @@ T] =
     uc.map(_.taggedWith[T])(identity)
 
-  implicit val schemaForId: Schema[Id] = Schema(SchemaType.SString[Id]())
   implicit def schemaForTagged[U, T](implicit uc: Schema[U]): Schema[U @@ T] = uc.asInstanceOf[Schema[U @@ T]]
 }
 
