@@ -14,7 +14,6 @@ val tapirVersion = "1.0.4"
 val http4sBlazeServerVersion = "0.23.12"
 val http4sCirceVersion = "0.23.14"
 val circeVersion = "0.14.2"
-val tsecVersion = "0.4.0"
 val sttpVersion = "3.7.4"
 val prometheusVersion = "0.16.0"
 val macwireVersion = "2.5.7"
@@ -72,11 +71,6 @@ val baseDependencies = Seq(
 
 val apiDocsDependencies = Seq(
   "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-bundle" % tapirVersion
-)
-
-val securityDependencies = Seq(
-  "io.github.jmcardon" %% "tsec-password" % tsecVersion,
-  "io.github.jmcardon" %% "tsec-cipher-jca" % tsecVersion
 )
 
 val macwireDependencies = Seq(
@@ -205,7 +199,7 @@ lazy val backend: Project = (project in file("backend"))
   .configs(ItTest)
   .settings(
     inConfig(ItTest)(Defaults.testTasks),
-    libraryDependencies ++= httpDependencies ++ jsonDependencies ++ apiDocsDependencies ++ monitoringDependencies ++ securityDependencies ++ macwireDependencies,
+    libraryDependencies ++= httpDependencies ++ jsonDependencies ++ apiDocsDependencies ++ monitoringDependencies ++ macwireDependencies,
     Compile / mainClass := Some("com.softwaremill.adopttapir.Main"),
     copyWebapp := {
       val source = uiDirectory.value / "build"
