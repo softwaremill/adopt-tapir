@@ -51,28 +51,30 @@ abstract class ProjectTemplate {
     val groupId = starterDetails.legalizedGroupId
 
     val helloServerEndpoint = EndpointsView.getHelloServerEndpoint(starterDetails)
-    val docEndpoints = EndpointsView.getDocEndpoints(starterDetails)
-    val metricsEndpoint = EndpointsView.getMetricsEndpoint(starterDetails)
     val jsonEndpoint = EndpointsView.getJsonOutModel(starterDetails)
     val library = EndpointsView.getJsonLibrary(starterDetails)
+    val apiEndpoints = EndpointsView.getApiEndpoints(starterDetails)
+    val docEndpoints = EndpointsView.getDocEndpoints(starterDetails)
+    val metricsEndpoint = EndpointsView.getMetricsEndpoint(starterDetails)
     val allEndpoints = EndpointsView.getAllEndpoints(starterDetails)
 
     GeneratedFile(
       pathUnderPackage("src/main/scala", groupId, "Endpoints.scala"),
       txt
         .Endpoints(
-          starterDetails,
-          toSortedList(
+          starterDetails = starterDetails,
+          additionalImports = toSortedList(
             helloServerEndpoint.imports ++ metricsEndpoint.imports ++ docEndpoints.imports
               ++ jsonEndpoint.imports ++ library.imports ++ allEndpoints.imports
           ),
-          helloServerEndpoint.body,
-          metricsEndpoint.body,
-          docEndpoints.body,
+          helloEndpointServer = helloServerEndpoint.body,
           jsonEndpoint = jsonEndpoint.body,
-          library.body,
-          allEndpoints.body,
-          starterDetails.scalaVersion
+          library = library.body,
+          apiEndpoints = apiEndpoints.body,
+          docEndpoints = docEndpoints.body,
+          metricsEndpoint = metricsEndpoint.body,
+          allEndpoints = allEndpoints.body,
+          scalaVersion = starterDetails.scalaVersion
         )
         .toString()
     )

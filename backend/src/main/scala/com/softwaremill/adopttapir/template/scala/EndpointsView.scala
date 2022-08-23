@@ -16,57 +16,6 @@ object EndpointsView {
     helloServerCode.prependBody(INDENT)
   }
 
-  def getMetricsEndpoint(starterDetails: StarterDetails): Code =
-    if (starterDetails.addMetrics) {
-      MetricsEndpoint.prepareMetricsEndpoint(starterDetails.serverEffect)
-    } else {
-      Code.empty
-    }
-
-  def getDocEndpoints(starterDetails: StarterDetails): Code = {
-    if (starterDetails.addDocumentation) {
-      DocumentationEndpoint.prepareDocEndpoints(
-        starterDetails.projectName,
-        starterDetails.serverEffect,
-        starterDetails.addMetrics,
-        starterDetails.jsonImplementation
-      )
-    } else
-      Code.empty
-  }
-
-  def getJsonOutModel(starterDetails: StarterDetails): Code = {
-    JsonModelObject.prepareJsonEndpoint(starterDetails)
-  }
-
-  def getJsonLibrary(starterDetails: StarterDetails): Code = {
-    if (starterDetails.jsonImplementation == JsonImplementation.WithoutJson) Code.empty
-    else JsonModelObject.prepareLibraryModel(starterDetails.scalaVersion)
-  }
-
-  def getAllEndpoints(starterDetails: StarterDetails): Code = {
-    val serverKind = starterDetails.serverEffect match {
-      case ServerEffect.FutureEffect => "List[ServerEndpoint[Any, Future]]"
-      case ServerEffect.IOEffect     => "List[ServerEndpoint[Any, IO]]"
-      case ServerEffect.ZIOEffect    => "List[ZServerEndpoint[Any, Any]]"
-    }
-
-    val hasBooksListingEndpoint = starterDetails.jsonImplementation match {
-      case JsonImplementation.WithoutJson => false
-      case _                              => true
-    }
-
-    def bodyTemplate(serverKind: String, hasJson: Boolean, addMetrics: Boolean, hasDocumentation: Boolean): String = {
-      s"val ${Constants.all}: $serverKind = List($helloServerEndpoint" +
-        s"${if (hasJson) s", $booksListingServerEndpoint" else ""}" +
-        s"${if (addMetrics) s", $metricsEndpoint" else ""}" +
-        ")" +
-        s"${if (hasDocumentation) s" ++ $docEndpoints" else ""}"
-    }
-
-    Code(bodyTemplate(serverKind, hasBooksListingEndpoint, starterDetails.addMetrics, starterDetails.addDocumentation)).prependBody(INDENT)
-  }
-
   private object HelloServerEndpoint {
     def bodyTemplate(serverKind: String, pureEffectFn: String): String =
       s"""${INDENT}val $helloServerEndpoint: $serverKind = $helloEndpoint.serverLogicSuccess(user =>
@@ -96,6 +45,10 @@ object EndpointsView {
         Import("sttp.tapir.ztapir.ZServerEndpoint")
       )
     )
+  }
+
+  def getJsonOutModel(starterDetails: StarterDetails): Code = {
+    JsonModelObject.prepareJsonEndpoint(starterDetails)
   }
 
   private object JsonModelObject {
@@ -189,8 +142,63 @@ object EndpointsView {
       // Imports silently taken from helloServerEndpoint
       Code(s"val $booksListingServerEndpoint: $serverKind = $bookListing.serverLogicSuccess(_ => $pureEffectFn(Library.books))")
     }
-
   }
+
+  def getJsonLibrary(starterDetails: StarterDetails): Code = {
+    if (starterDetails.jsonImplementation == JsonImplementation.WithoutJson) Code.empty
+    else JsonModelObject.prepareLibraryModel(starterDetails.scalaVersion)
+  }
+
+  def getApiEndpoints(starterDetails: StarterDetails): Code = {
+    val serverKind = starterDetails.serverEffect match {
+      case ServerEffect.FutureEffect => "List[ServerEndpoint[Any, Future]]"
+      case ServerEffect.IOEffect     => "List[ServerEndpoint[Any, IO]]"
+      case ServerEffect.ZIOEffect    => "List[ZServerEndpoint[Any, Any]]"
+    }
+
+    val jsonEndpoint = if (starterDetails.jsonImplementation == JsonImplementation.WithoutJson) Nil else List(booksListingServerEndpoint)
+    val endpoints = List(helloServerEndpoint) ++ jsonEndpoint
+    Code(
+      s"val ${apiEndpoints}: ${serverKind} = List(${endpoints.mkString(",")})"
+    ).prependBody(INDENT)
+  }
+
+  def getDocEndpoints(starterDetails: StarterDetails): Code = {
+    if (starterDetails.addDocumentation) {
+      DocumentationEndpoint.prepareDocEndpoints(
+        starterDetails.projectName,
+        starterDetails.serverEffect
+      )
+    } else
+      Code.empty
+  }
+
+  private object DocumentationEndpoint {
+
+    def prepareDocEndpoints(
+                             projectName: String,
+                             serverEffect: ServerEffect,
+                           ): Code = {
+      Code(prepareCode(projectName, serverEffect), prepareImports(serverEffect)).prependBody(INDENT)
+    }
+
+    private def prepareCode(projectName: String, serverEffect: ServerEffect): String = {
+      val (effect, endpoint) = serverEffectToEffectAndEndpoint(serverEffect)
+      s"""val $docEndpoints: List[$endpoint] = SwaggerInterpreter()
+          .fromServerEndpoints[$effect](${apiEndpoints}, "$projectName", "1.0.0")""".stripMargin
+    }
+
+    def prepareImports(serverEffect: ServerEffect): Set[Import] = {
+      serverEffectImports(serverEffect) + Import("sttp.tapir.swagger.bundle.SwaggerInterpreter")
+    }
+  }
+
+  def getMetricsEndpoint(starterDetails: StarterDetails): Code =
+    if (starterDetails.addMetrics) {
+      MetricsEndpoint.prepareMetricsEndpoint(starterDetails.serverEffect)
+    } else {
+      Code.empty
+    }
 
   private object MetricsEndpoint {
     def prepareMetricsEndpoint(serverEffect: ServerEffect): Code = {
@@ -200,34 +208,6 @@ object EndpointsView {
           s"val metricsEndpoint: $endpoint = prometheusMetrics.metricsEndpoint",
         serverEffectImports(serverEffect) + Import("sttp.tapir.server.metrics.prometheus.PrometheusMetrics")
       )
-    }
-  }
-
-  private object DocumentationEndpoint {
-
-    def prepareDocEndpoints(
-        projectName: String,
-        serverEffect: ServerEffect,
-        addMetrics: Boolean,
-        jsonImplementation: JsonImplementation
-    ): Code = {
-
-      val metricsEndpoint = if (addMetrics) List(docMetricsEndpoint) else Nil
-      val jsonEndpoint = if (jsonImplementation == JsonImplementation.WithoutJson) Nil else List(bookListing)
-      val endpoints: List[String] = List(helloEndpoint) ++ metricsEndpoint ++ jsonEndpoint
-
-      Code(prepareCode(projectName, serverEffect, endpoints), prepareImports(serverEffect)).prependBody(INDENT)
-    }
-
-    private def prepareCode(projectName: String, serverEffect: ServerEffect, endpoints: List[String]): String = {
-      val (effect, endpoint) = serverEffectToEffectAndEndpoint(serverEffect)
-      s"""val $docEndpoints: List[$endpoint] = SwaggerInterpreter().fromEndpoints[$effect](List(${endpoints.mkString(
-          ","
-        )}), "$projectName", "1.0.0")""".stripMargin
-    }
-
-    def prepareImports(serverEffect: ServerEffect): Set[Import] = {
-      serverEffectImports(serverEffect) + Import("sttp.tapir.swagger.bundle.SwaggerInterpreter")
     }
   }
 
@@ -246,6 +226,23 @@ object EndpointsView {
     }
   }
 
+  def getAllEndpoints(starterDetails: StarterDetails): Code = {
+    val serverKind = starterDetails.serverEffect match {
+      case ServerEffect.FutureEffect => "List[ServerEndpoint[Any, Future]]"
+      case ServerEffect.IOEffect     => "List[ServerEndpoint[Any, IO]]"
+      case ServerEffect.ZIOEffect    => "List[ZServerEndpoint[Any, Any]]"
+    }
+
+    def bodyTemplate(serverKind: String, addMetrics: Boolean, hasDocumentation: Boolean): String = {
+      s"val ${Constants.all}: $serverKind = $apiEndpoints" +
+        s"${if (hasDocumentation) s" ++ $docEndpoints" else ""}" +
+        s"${if (addMetrics) s" ++ List($metricsEndpoint)" else ""}"
+
+    }
+
+    Code(bodyTemplate(serverKind, starterDetails.addMetrics, starterDetails.addDocumentation)).prependBody(INDENT)
+  }
+
   object Constants {
     val INDENT: String = " " * 2
     val NEW_LINE_WITH_INDENT: String = System.lineSeparator() + INDENT
@@ -253,9 +250,9 @@ object EndpointsView {
     val helloServerEndpoint = "helloServerEndpoint"
     val bookListing = "booksListing"
     val booksListingServerEndpoint = "booksListingServerEndpoint"
-    val metricsEndpoint = "metricsEndpoint"
-    val docMetricsEndpoint = "metricsEndpoint.endpoint"
+    val apiEndpoints = "apiEndpoints"
     val docEndpoints = "docEndpoints"
+    val metricsEndpoint = "metricsEndpoint"
     val all = "all"
   }
 }
