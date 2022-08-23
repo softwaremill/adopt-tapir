@@ -152,18 +152,14 @@ object EndpointsView {
   def getApiEndpoints(starterDetails: StarterDetails): Code = {
     val serverKind = starterDetails.serverEffect match {
       case ServerEffect.FutureEffect => "List[ServerEndpoint[Any, Future]]"
-      case ServerEffect.IOEffect => "List[ServerEndpoint[Any, IO]]"
-      case ServerEffect.ZIOEffect => "List[ZServerEndpoint[Any, Any]]"
+      case ServerEffect.IOEffect     => "List[ServerEndpoint[Any, IO]]"
+      case ServerEffect.ZIOEffect    => "List[ZServerEndpoint[Any, Any]]"
     }
 
     val jsonEndpoint = if (starterDetails.jsonImplementation == JsonImplementation.WithoutJson) Nil else List(booksListingServerEndpoint)
     val endpoints = List(helloServerEndpoint) ++ jsonEndpoint
     Code(
-      s"val ${apiEndpoints}: ${serverKind} = List(${
-        endpoints.mkString(
-          ","
-        )
-      })"
+      s"val ${apiEndpoints}: ${serverKind} = List(${endpoints.mkString(",")})"
     ).prependBody(INDENT)
   }
 
@@ -218,15 +214,15 @@ object EndpointsView {
   private def serverEffectToEffectAndEndpoint(serverEffect: ServerEffect): (String, String) = {
     serverEffect match {
       case ServerEffect.FutureEffect => ("Future", "ServerEndpoint[Any, Future]")
-      case ServerEffect.IOEffect => ("IO", "ServerEndpoint[Any, IO]")
-      case ServerEffect.ZIOEffect => ("Task", "ZServerEndpoint[Any, Any]")
+      case ServerEffect.IOEffect     => ("IO", "ServerEndpoint[Any, IO]")
+      case ServerEffect.ZIOEffect    => ("Task", "ZServerEndpoint[Any, Any]")
     }
   }
 
   private def serverEffectImports(serverEffect: ServerEffect): Set[Import] = {
     serverEffect match {
       case ServerEffect.ZIOEffect => Set(Import("zio.Task"))
-      case _ => Set.empty[Import]
+      case _                      => Set.empty[Import]
     }
   }
 
