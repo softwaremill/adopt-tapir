@@ -135,8 +135,8 @@ object EndpointsView {
     private def prepareBookListingServerLogic(starterDetails: StarterDetails): Code = {
       val (serverKind, pureEffectFn) = starterDetails.serverEffect match {
         case ServerEffect.FutureEffect => ("ServerEndpoint[Any, Future]", "Future.successful")
-        case ServerEffect.IOEffect => ("ServerEndpoint[Any, IO]", "IO.pure")
-        case ServerEffect.ZIOEffect => ("ZServerEndpoint[Any, Any]", "ZIO.succeed")
+        case ServerEffect.IOEffect     => ("ServerEndpoint[Any, IO]", "IO.pure")
+        case ServerEffect.ZIOEffect    => ("ZServerEndpoint[Any, Any]", "ZIO.succeed")
       }
 
       // Imports silently taken from helloServerEndpoint
