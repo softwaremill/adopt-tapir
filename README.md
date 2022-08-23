@@ -55,6 +55,14 @@ To start the frontend:
 ./frontend-start.sh
 ```
 
+Please notice, that by default fronted points to the production backend.
+This could be changed by specifying the `REACT_APP_SERVER_ADDRESS` environmental variable.
+To start the frontend pointing to `http://localhost:9090` run:
+
+```sh
+export REACT_APP_SERVER_ADDRESS="http://localhost:9090"; ./frontend-start.sh
+```
+
 ## Copyright
 
 Copyright (C) 2013-2022 SoftwareMill [https://softwaremill.com](https://softwaremill.com).
