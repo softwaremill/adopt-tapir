@@ -6,7 +6,14 @@ pull_request_rules:
   - name: automatic merge for softwaremill-ci pull requests affecting build.sbt
     conditions:
       - author=softwaremill-ci
-      - check-success=verify
+      - check-success=verify (Scala2, No)
+      - check-success=verify (Scala2, Circe)
+      - check-success=verify (Scala2, Jsoniter)
+      - check-success=verify (Scala2, ZIOJson)
+      - check-success=verify (Scala3, No)
+      - check-success=verify (Scala3, Circe)
+      - check-success=verify (Scala3, Jsoniter)
+      - check-success=verify (Scala3, ZIOJson)
       - "#files=1"
       - files=build.sbt
     actions:
@@ -15,7 +22,14 @@ pull_request_rules:
   - name: automatic merge for softwaremill-ci pull requests affecting project plugins.sbt
     conditions:
       - author=softwaremill-ci
-      - check-success=verify
+      - check-success=verify (Scala2, No)
+      - check-success=verify (Scala2, Circe)
+      - check-success=verify (Scala2, Jsoniter)
+      - check-success=verify (Scala2, ZIOJson)
+      - check-success=verify (Scala3, No)
+      - check-success=verify (Scala3, Circe)
+      - check-success=verify (Scala3, Jsoniter)
+      - check-success=verify (Scala3, ZIOJson)
       - "#files=1"
       - files=project/plugins.sbt
     actions:
@@ -24,7 +38,14 @@ pull_request_rules:
   - name: semi-automatic merge for softwaremill-ci pull requests
     conditions:
       - author=softwaremill-ci
-      - check-success=verify
+      - check-success=verify (Scala2, No)
+      - check-success=verify (Scala2, Circe)
+      - check-success=verify (Scala2, Jsoniter)
+      - check-success=verify (Scala2, ZIOJson)
+      - check-success=verify (Scala3, No)
+      - check-success=verify (Scala3, Circe)
+      - check-success=verify (Scala3, Jsoniter)
+      - check-success=verify (Scala3, ZIOJson)
       - "#approved-reviews-by>=1"
     actions:
       merge:
@@ -32,7 +53,14 @@ pull_request_rules:
   - name: automatic merge for softwaremill-ci pull requests affecting project build.properties
     conditions:
       - author=softwaremill-ci
-      - check-success=verify
+      - check-success=verify (Scala2, No)
+      - check-success=verify (Scala2, Circe)
+      - check-success=verify (Scala2, Jsoniter)
+      - check-success=verify (Scala2, ZIOJson)
+      - check-success=verify (Scala3, No)
+      - check-success=verify (Scala3, Circe)
+      - check-success=verify (Scala3, Jsoniter)
+      - check-success=verify (Scala3, ZIOJson)
       - "#files=1"
       - files=project/build.properties
     actions:
@@ -41,7 +69,14 @@ pull_request_rules:
   - name: automatic merge for softwaremill-ci pull requests affecting .scalafmt.conf
     conditions:
       - author=softwaremill-ci
-      - check-success=verify
+      - check-success=verify (Scala2, No)
+      - check-success=verify (Scala2, Circe)
+      - check-success=verify (Scala2, Jsoniter)
+      - check-success=verify (Scala2, ZIOJson)
+      - check-success=verify (Scala3, No)
+      - check-success=verify (Scala3, Circe)
+      - check-success=verify (Scala3, Jsoniter)
+      - check-success=verify (Scala3, ZIOJson)
       - "#files=1"
       - files=.scalafmt.conf
     actions:
