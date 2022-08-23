@@ -1,17 +1,27 @@
-@(groupId: String, addDocumentation: Boolean)
+@(groupId: String, addDocumentation: Boolean, addMetrics: Boolean)
 package @groupId
 
+@if(addMetrics){import cats.effect.std.Dispatcher}
 import cats.effect.{ExitCode, IO, IOApp}
-import sttp.tapir.server.netty.cats.NettyCatsServer
+import sttp.tapir.server.netty.cats.@if(addMetrics){{NettyCatsServer, NettyCatsServerOptions}}else{NettyCatsServer}
 
+@if(addMetrics){import java.net.InetSocketAddress}
 import scala.io.StdIn
 
 object Main extends IOApp:
   val port = sys.env.get("http.port").map(_.toInt).getOrElse(8080)
 
   override def run(args: List[String]): IO[ExitCode] =
-    NettyCatsServer
-      .io()
+    @if(addMetrics){
+      Dispatcher[IO].map( d => { NettyCatsServer.apply[IO, InetSocketAddress]({
+        NettyCatsServerOptions.customiseInterceptors(d)
+          .addInterceptor(Endpoints.prometheusMetrics.metricsInterceptor())
+          .options
+      }) })
+    } else {
+      NettyCatsServer
+        .io()
+    }
       .use { server =>
         for
           bind <- server
