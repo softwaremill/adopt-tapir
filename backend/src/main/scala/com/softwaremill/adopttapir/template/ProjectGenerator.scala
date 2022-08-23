@@ -20,12 +20,11 @@ class ProjectGenerator {
   }
 }
 
-/** Every method represent one of generated file. As template mechanism Twirl library were used. Which have some crucial limitations for
-  * more advanced logic. That's why it is passed to Twirl templates through simple String by using `*View` objects.
-  *
-  * As an example see @see [[EndpointsView]]
+/** Twirl library was chosen for templating. Due to limitations in Twirl, some of arguments are passed as [[String]].<br> More advanced
+  * rendering is done by dedicated objects `*View` e.g. @see [[EndpointsView]] or @[[MainView]].
   */
 abstract class ProjectTemplate {
+
   import CommonObjectTemplate.StarterDetailsWithLegalizedGroupId
 
   def generate(starterDetails: StarterDetails): List[GeneratedFile] = {
@@ -116,6 +115,7 @@ abstract class ProjectTemplate {
   }
 
   import CommonObjectTemplate.scalafmtConfigPath
+
   private val scalafmtConf: ScalaVersion => GeneratedFile = dialectVersion =>
     GeneratedFile(scalafmtConfigPath, txt.scalafmt(TemplateDependencyInfo.scalafmtVersion, dialectVersion).toString())
 
