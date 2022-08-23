@@ -2,10 +2,11 @@
 starterDetails: com.softwaremill.adopttapir.starter.StarterDetails,
 additionalImports: List[com.softwaremill.adopttapir.template.scala.Import],
 helloEndpointServer: String,
-metricsEndpoint: String,
-docEndpoints: String,
 jsonEndpoint: String,
 library: String,
+apiEndpoints: String,
+docEndpoints: String,
+metricsEndpoint: String,
 allEndpoints: String,
 scalaVersion: com.softwaremill.adopttapir.starter.ScalaVersion,
 leftBracket: Char = '{',
@@ -27,9 +28,11 @@ object Endpoints@if(scalaVersion == com.softwaremill.adopttapir.starter.ScalaVer
 
 @jsonEndpoint
 
-@metricsEndpoint
+@apiEndpoints
 
 @docEndpoints
+
+@metricsEndpoint
 
 @allEndpoints
 @if(scalaVersion == com.softwaremill.adopttapir.starter.ScalaVersion.Scala2){@rightBracket}
