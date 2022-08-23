@@ -84,7 +84,8 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
   }, [form, effectImplementation]);
 
   const handleStarterRequest = async (formData: StarterRequest): Promise<void> => {
-    const response = await fetch('https://adopt-tapir.softwaremill.com/api/v1/starter.zip', {
+    const serverAddress = (process.env.REACT_APP_SERVER_ADDRESS == null) ? "https://adopt-tapir.softwaremill.com" : process.env.REACT_APP_SERVER_ADDRESS;
+    const response = await fetch(`${serverAddress}/api/v1/starter.zip`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
