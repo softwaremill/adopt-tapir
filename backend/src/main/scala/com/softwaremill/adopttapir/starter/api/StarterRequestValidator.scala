@@ -1,5 +1,6 @@
 package com.softwaremill.adopttapir.starter.api
 
+import cats.data.Validated.validNec
 import cats.data.ValidatedNec
 import cats.implicits.{catsSyntaxTuple6Semigroupal, catsSyntaxValidatedIdBinCompat0}
 import com.softwaremill.adopttapir.Fail._
@@ -132,9 +133,7 @@ sealed trait FormValidator {
       addMetrics: Boolean
   ): ValidatedNec[RequestValidation, Boolean] = {
     (effect, serverImplementation, addMetrics) match {
-      case t @ (_, Akka | Http4s | ZIOHttp, _) => t._3.validNec
-      case t @ (_, Netty, false)               => t._3.validNec
-      case (_, Netty, true) => RequestValidation.MetricsNotSupportedForNettyServerImplementation(effect, serverImplementation).invalidNec
+      case t @ (_, Akka | Http4s | ZIOHttp | Netty, _) => t._3.validNec
     }
   }
 
