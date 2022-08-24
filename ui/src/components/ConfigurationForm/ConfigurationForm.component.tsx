@@ -22,7 +22,6 @@ import {
   getAvailableEffectImplementations,
   getEffectImplementationOptions,
   getJSONImplementationOptions,
-  isAddMetricsSupported,
   mapEffectTypeToJSONImplementation,
 } from './ConfigurationForm.helpers';
 
@@ -75,13 +74,6 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
       form.resetField('json');
     }
   }, [form, effectType, jsonImplementation]);
-
-  useEffect(() => {
-    // NOTE: reset addMetrics field value if metrics are not supported
-    if (!isAddMetricsSupported(effectImplementation)) {
-      form.resetField('addMetrics');
-    }
-  }, [form, effectImplementation]);
 
   const handleStarterRequest = async (formData: StarterRequest): Promise<void> => {
     const serverAddress = (process.env.REACT_APP_SERVER_ADDRESS == null) ? "https://adopt-tapir.softwaremill.com" : process.env.REACT_APP_SERVER_ADDRESS;
@@ -184,7 +176,6 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
             className={classes.formFifthRow}
             name="addMetrics"
             label="Add metrics endpoints"
-            disabled={!isAddMetricsSupported(effectImplementation)}
             options={ENDPOINTS_OPTIONS}
           />
 

@@ -47,14 +47,6 @@ export const getEffectImplementationOptions = (
 };
 
 /**
- * Effect implementation to metrics supported
- */
-
-export const isAddMetricsSupported = (effectImplementation: EffectImplementation | undefined): boolean => {
-  return Boolean(effectImplementation) && effectImplementation !== EffectImplementation.Netty;
-};
-
-/**
  * Effect type to json implementation mapping
  */
 
