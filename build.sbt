@@ -12,7 +12,7 @@ import scala.util.Try
 val tapirVersion = "1.0.5"
 
 val http4sBlazeServerVersion = "0.23.12"
-val http4sCirceVersion = "0.23.14"
+val http4sCirceVersion = "0.23.15"
 val circeVersion = "0.14.2"
 val sttpVersion = "3.7.4"
 val prometheusVersion = "0.16.0"
