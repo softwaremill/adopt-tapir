@@ -85,7 +85,7 @@ class FormValidatorTest extends BaseTest {
       ServerEffect.FutureEffect,
       ServerImplementation.Akka,
       addDocumentation = true,
-      false,
+      addMetrics = false,
       WithoutJson,
       Scala2,
       Builder.Sbt
@@ -96,7 +96,7 @@ class FormValidatorTest extends BaseTest {
       ServerEffect.FutureEffect,
       ServerImplementation.Netty,
       addDocumentation = true,
-      false,
+      addMetrics = false,
       WithoutJson,
       Scala2,
       Builder.Sbt
@@ -107,7 +107,7 @@ class FormValidatorTest extends BaseTest {
       ServerEffect.IOEffect,
       ServerImplementation.Netty,
       addDocumentation = true,
-      false,
+      addMetrics = false,
       WithoutJson,
       Scala2,
       Builder.Sbt
@@ -118,7 +118,7 @@ class FormValidatorTest extends BaseTest {
       ServerEffect.IOEffect,
       ServerImplementation.Http4s,
       addDocumentation = true,
-      false,
+      addMetrics = false,
       WithoutJson,
       Scala2,
       Builder.Sbt
@@ -129,7 +129,7 @@ class FormValidatorTest extends BaseTest {
       ServerEffect.ZIOEffect,
       ServerImplementation.Http4s,
       addDocumentation = true,
-      false,
+      addMetrics = false,
       WithoutJson,
       Scala2,
       Builder.Sbt
@@ -140,71 +140,11 @@ class FormValidatorTest extends BaseTest {
       ServerEffect.ZIOEffect,
       ServerImplementation.ZIOHttp,
       addDocumentation = true,
-      false,
+      addMetrics = false,
       WithoutJson,
       Scala2,
       Builder.Sbt
     )
-  }
-
-  it should "not raise a problem with metrics for supported implementations" in {
-    val request = defaultRequest().copy(addMetrics = true)
-    val request1 = request.copy(effect = IOEffect, implementation = Http4s)
-    val request2 = request.copy(effect = ZIOEffect, implementation = Http4s)
-    val request3 = request.copy(effect = ZIOEffect, implementation = ZIOHttp)
-
-    FormValidator.validate(request).value shouldBe StarterDetails(
-      request.projectName,
-      request.groupId,
-      ServerEffect.FutureEffect,
-      ServerImplementation.Akka,
-      addDocumentation = true,
-      true,
-      WithoutJson,
-      Scala2,
-      Builder.Sbt
-    )
-    FormValidator.validate(request1).value shouldBe StarterDetails(
-      request1.projectName,
-      request1.groupId,
-      ServerEffect.IOEffect,
-      ServerImplementation.Http4s,
-      addDocumentation = true,
-      true,
-      WithoutJson,
-      Scala2,
-      Builder.Sbt
-    )
-    FormValidator.validate(request2).value shouldBe StarterDetails(
-      request2.projectName,
-      request2.groupId,
-      ServerEffect.ZIOEffect,
-      ServerImplementation.Http4s,
-      addDocumentation = true,
-      true,
-      WithoutJson,
-      Scala2,
-      Builder.Sbt
-    )
-    FormValidator.validate(request3).value shouldBe StarterDetails(
-      request3.projectName,
-      request3.groupId,
-      ServerEffect.ZIOEffect,
-      ServerImplementation.ZIOHttp,
-      addDocumentation = true,
-      true,
-      WithoutJson,
-      Scala2,
-      Builder.Sbt
-    )
-  }
-
-  it should "raise a problem when metrics are enabled for not supported implementations" in {
-    val request = defaultRequest().copy(addMetrics = true)
-    FormValidator.validate(request.copy(effect = FutureEffect, implementation = Netty)).left.value.msg should
-      include("Picked FutureEffect with Netty - Metrics not supported for Netty server implementation")
-    FormValidator.validate(request.copy(effect = IOEffect, implementation = Netty)).left.value.msg should
-      include("Picked IOEffect with Netty - Metrics not supported for Netty server implementation")
   }
 
   private def defaultRequest(): StarterRequest =
@@ -214,7 +154,7 @@ class FormValidatorTest extends BaseTest {
       FutureEffect,
       Akka,
       addDocumentation = true,
-      false,
+      addMetrics = false,
       No,
       ScalaVersionRequest.Scala2,
       BuilderRequest.Sbt
