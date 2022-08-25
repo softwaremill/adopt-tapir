@@ -2,7 +2,6 @@ import { EffectType, EffectImplementation, ScalaVersion, JSONImplementation } fr
 import {
   getAvailableEffectImplementations,
   getEffectImplementationOptions,
-  isAddMetricsSupported,
   getJSONImplementationOptions,
 } from '../ConfigurationForm.helpers';
 import type { FormSelectOption } from '../../FormSelect';
@@ -120,23 +119,6 @@ describe('configuration form helpers', () => {
 
         expect(effectImplementationOptions).toHaveLength(formSelectOptions.length);
         expect(effectImplementationOptions).toEqual(expect.arrayContaining(formSelectOptions));
-      }
-    );
-  });
-
-  describe('.isAddMetricsSupported()', () => {
-    const cases: [EffectImplementation | undefined, boolean][] = [
-      [EffectImplementation.Akka, true],
-      [EffectImplementation.Http4s, true],
-      [EffectImplementation.ZIOHttp, true],
-      [EffectImplementation.Netty, false],
-      [undefined, false],
-    ];
-
-    test.each(cases)(
-      'should return boolean value based on EffectImplementation - (%s)',
-      (effectImplementation, expected) => {
-        expect(isAddMetricsSupported(effectImplementation)).toBe(expected);
       }
     );
   });
