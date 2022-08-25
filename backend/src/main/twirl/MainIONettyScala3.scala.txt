@@ -15,7 +15,7 @@ object Main extends IOApp:
     @if(addMetrics){
       Dispatcher[IO].map( d => { NettyCatsServer.apply[IO, InetSocketAddress]({
         NettyCatsServerOptions.customiseInterceptors(d)
-          .addInterceptor(Endpoints.prometheusMetrics.metricsInterceptor())
+          .prependInterceptor(Endpoints.prometheusMetrics.metricsInterceptor())
           .options
       }) })
     } else {
