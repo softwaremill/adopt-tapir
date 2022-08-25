@@ -1,6 +1,5 @@
 package com.softwaremill.adopttapir.starter.api
 
-import cats.data.Validated.validNec
 import cats.data.ValidatedNec
 import cats.implicits.{catsSyntaxTuple6Semigroupal, catsSyntaxValidatedIdBinCompat0}
 import com.softwaremill.adopttapir.Fail._
