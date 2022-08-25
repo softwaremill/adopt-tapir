@@ -9,14 +9,14 @@ import sbtbuildinfo.{BuildInfoKey, BuildInfoOption}
 import scala.sys.process.Process
 import scala.util.Try
 
-val tapirVersion = "1.0.5"
+val tapirVersion = "1.0.6"
 
 val http4sBlazeServerVersion = "0.23.12"
-val http4sCirceVersion = "0.23.14"
+val http4sCirceVersion = "0.23.15"
 val circeVersion = "0.14.2"
 val sttpVersion = "3.7.4"
 val prometheusVersion = "0.16.0"
-val macwireVersion = "2.5.7"
+val macwireVersion = "2.5.8"
 
 val scalafmtVersion = "3.5.8"
 val scalaLoggingVersion = "3.9.5"
