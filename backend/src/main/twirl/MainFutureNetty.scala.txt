@@ -11,8 +11,9 @@ import ExecutionContext.Implicits.global
 object Main {
   def main(args: Array[String]): Unit = {
     @if(addMetrics) {
-      val serverOptions = NettyFutureServerOptions.default
-           .prependInterceptor(Endpoints.prometheusMetrics.metricsInterceptor())
+    val serverOptions = NettyFutureServerOptions.customiseInterceptors
+      .metricsInterceptor(Endpoints.prometheusMetrics.metricsInterceptor())
+      .options
     }
     val port = sys.env.get("http.port").map(_.toInt).getOrElse(8080)
     val program = for {
