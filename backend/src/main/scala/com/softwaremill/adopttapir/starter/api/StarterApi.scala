@@ -2,11 +2,12 @@ package com.softwaremill.adopttapir.starter.api
 
 import cats.data.{EitherT, NonEmptyList}
 import cats.effect.IO
-import cats.implicits.toBifunctorOps
+import cats.implicits.{catsSyntaxEitherId, toBifunctorOps}
 import com.softwaremill.adopttapir.Fail
 import com.softwaremill.adopttapir.http.Http
 import com.softwaremill.adopttapir.infrastructure.Json._
 import com.softwaremill.adopttapir.starter._
+import com.softwaremill.adopttapir.template.GeneratedFile
 import com.softwaremill.adopttapir.util.ServerEndpoints
 import fs2.io.file.Files
 import sttp.capabilities.fs2.Fs2Streams
@@ -57,11 +58,27 @@ class StarterApi(http: Http, starterService: StarterService) {
       .onFinalize(IO.blocking(zippedFile.delete()) >> IO.unit)
   }
 
+  private val contentPath = "content"
+
+  private val contentEndpoint = {
+    baseEndpoint.post
+      .in(contentPath)
+      .in(jsonBody[StarterRequest])
+      .out(jsonBody[List[GeneratedFile]])
+      .serverLogic { request =>
+        val temp = for {
+          det <- FormValidator.validate(request)
+          res <- starterService.generateProject(det).asRight[Fail]
+        } yield res
+
+        IO(temp.leftMap(http.failToResponseData))
+      }
+  }
+
   val endpoints: ServerEndpoints =
     NonEmptyList
       .of(
-        starterEndpoint
+        starterEndpoint.tag(starterPath),
+        contentEndpoint.tag(contentPath)
       )
-      .map(_.tag(starterPath))
-
 }

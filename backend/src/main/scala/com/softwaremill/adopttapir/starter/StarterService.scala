@@ -16,9 +16,13 @@ class StarterService(
     config: StarterConfig,
     projectGenerator: ProjectGenerator
 ) extends FLogging {
+
+  def generateProject(starterDetails: StarterDetails): List[GeneratedFile] =
+    projectGenerator.generate(starterDetails)
+
   def generateZipFile(starterDetails: StarterDetails): IO[File] = {
     logger.info(s"received request: $starterDetails") *>
-      IO(projectGenerator.generate(starterDetails)).flatMap { filesToCreate =>
+      IO(generateProject(starterDetails)).flatMap { filesToCreate =>
         IO.blocking(newTemporaryDirectory(prefix = config.tempPrefix).toJava)
           .bracket { tempDir =>
             for {
