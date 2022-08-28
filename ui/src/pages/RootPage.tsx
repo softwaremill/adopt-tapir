@@ -1,13 +1,26 @@
-import {CssBaseline, Grid} from "@mui/material";
+import {Box, Container, CssBaseline, Grid} from "@mui/material";
 import {Outlet} from "react-router-dom";
 import {useStyles} from "../App.styles";
+import {Sidebar} from "../components/Sidebar";
+import {Footer} from "../components/Footer";
 
 export function RootPage() {
   const { classes } = useStyles();
   return (<main>
     <CssBaseline />
     <Grid className={classes.gridContainer} container>
-      <Outlet/>
+      <Grid item xs={12} md={3}>
+        <Sidebar />
+      </Grid>
+
+      <Grid item xs={12} md={9}>
+        <Box className={classes.configurationWrapper}>
+          <Outlet/>
+        </Box>
+        <Box className={classes.footerWrapper}>
+          <Footer />
+        </Box>
+      </Grid>
     </Grid>
   </main>);
 }

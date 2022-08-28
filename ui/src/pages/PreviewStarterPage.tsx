@@ -1,4 +1,4 @@
-import {Box, Grid, Paper} from "@mui/material";
+import {Box, Grid} from "@mui/material";
 import {useStyles} from "../App.styles";
 import {FileTreeView} from "../components/FileTreeView/FileTreeView.component";
 import {FileTree, TreeState} from "../components/FileTreeView/FileTreeView.types";
@@ -35,6 +35,9 @@ const useTreeState: (opened: string) => TreeState = (opened: string) => {
     []);
   const isDirOpened = useCallback(
     (dir: NodeAbsoluteLocation) => {
+      if (dir.isRoot()) {
+        return true;
+      }
       return openedDirs.find(openedDir => dir.isSameAs(openedDir) || dir.isParentOf(openedDir)) !== undefined;
     },
     [openedDirs]);
@@ -46,14 +49,12 @@ export function PreviewStarterPage() {
   const {classes} = useStyles();
   const treeState = useTreeState("README.md");
   return (<>
-    <Grid item xs={4}>
-      <Box>
-        <Paper className={classes.configurationPaper} variant="outlined">
-          <FileTreeView tree={example} location={RootNodeLocation} state={treeState}/>
-        </Paper>
+    <Grid item xs={3} className={classes.fullHeight}>
+      <Box className={classes.fullHeight}>
+        <FileTreeView tree={example} location={RootNodeLocation} state={treeState}/>
       </Box>
     </Grid>
-    <Grid item xs={8}>
+    <Grid item xs={9}>
       {/* TODO implement file preview */}
     </Grid>
   </>);

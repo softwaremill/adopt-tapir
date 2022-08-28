@@ -33,4 +33,8 @@ export const useStyles = makeStyles()(theme => ({
     alignItems: 'center',
     padding: theme.spacing(2),
   },
+
+  fullHeight: {
+    height: '100%'
+  }
 }));

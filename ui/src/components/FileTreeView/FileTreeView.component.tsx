@@ -3,7 +3,7 @@ import {useStyles} from "./FileTreeView.styles";
 import {Folder, InsertDriveFileOutlined} from "@mui/icons-material";
 import {NodeAbsoluteLocation} from "./FileTreeView.utils";
 import {useEffect, useState} from "react";
-import {theme} from "../../theme";
+import {Paper} from "@mui/material";
 
 type Props = {
   tree: FileTree,
@@ -11,14 +11,27 @@ type Props = {
   location: NodeAbsoluteLocation
 }
 
-export function FileTreeView({tree, location, state}: Props) {
+export function FileTreeView(props: Props) {
+  const {classes} = useStyles({level: 0})
+
   return (<>
-    <div>
-      {tree.map((node, index) => node.type === 'directory'
-        ? (<DirNodeView key={'node-' + index} node={node} location={location} state={state}/>)
-        : (<FileNodeView key={'node-' + index} node={node} location={location} state={state}/>))}
-    </div>
+    <Paper className={classes.wrapper} variant="outlined">
+      <NodesView {...props}/>
+    </Paper>
   </>);
+}
+
+function NodesView({tree, location, state}: Props) {
+  const {classes} = useStyles({level: location.getLevel()})
+  const [opened, setOpened] = useState(state.isDirOpened(location))
+  useEffect(() => {
+    setOpened(state.isDirOpened(location))
+  }, [location, state]);
+  return <ul className={classes.nodeRoot} style={opened ? {} : {display: "none"}}>
+    {tree.map((node, index) => node.type === 'directory'
+      ? (<DirNodeView key={'node-' + index} node={node} location={location} state={state}/>)
+      : (<FileNodeView key={'node-' + index} node={node} location={location} state={state}/>))}
+  </ul>
 }
 
 type NodeProps<T> = {
@@ -28,34 +41,42 @@ type NodeProps<T> = {
 }
 
 function FileNodeView({node: {name}, location, state}: NodeProps<FileNode>) {
-  const {classes} = useStyles()
-  return (<div className={classes.nodeRow} onClick={() => state.openFile(location.add(name))}>
-    <span><InsertDriveFileOutlined/>{name}</span>
-  </div>);
+  const {classes, cx} = useStyles({level: location.getLevel()});
+  const [fileLocation, setFileLocation] = useState(location.add(name));
+  const [isOpened, setOpened] = useState(fileLocation.isSameAs(state.openedFile))
+
+  useEffect(() => {
+    setFileLocation(location.add(name));
+  }, [location, name]);
+
+  useEffect(() => {
+    setOpened(fileLocation.isSameAs(state.openedFile))
+  }, [fileLocation, name, state]);
+
+  return (<li className={classes.nodeRow} onClick={() => state.openFile(location.add(name))}>
+    <a href="#" className={isOpened ? cx(classes.nodeContent, classes.openedFile) : classes.nodeContent}>
+      <InsertDriveFileOutlined/>{name}
+    </a>
+  </li>);
 }
 
 function DirNodeView({node: {name, children}, location, state}: NodeProps<DirNode>) {
-  const {classes} = useStyles()
   const [dirLocation, setDirLocation] = useState(location.add(name))
-  const [opened, setOpened] = useState(state.isDirOpened(dirLocation))
+  const {classes} = useStyles({level: location.getLevel()})
 
   useEffect(() => {
     setDirLocation(location.add(name))
   }, [location, name])
 
-  useEffect(() => {
-    setOpened(state.isDirOpened(dirLocation))
-  }, [dirLocation, state])
-
   return (<>
-    <div className={classes.nodeRow} onClick={() => state.toggleDir(dirLocation)}>
-      <Folder/>{name}
-    </div>
-    <div className={classes.dirChildren} style={opened ? {} : {display: "none"}}>
-      <FileTreeView
+    <li className={classes.nodeRow}>
+      <a href="#" className={classes.nodeContent} onClick={() => state.toggleDir(dirLocation)}>
+        <Folder/>{name}
+      </a>
+      <NodesView
         tree={children}
         location={dirLocation}
         state={state}/>
-    </div>
+    </li>
   </>);
 }
