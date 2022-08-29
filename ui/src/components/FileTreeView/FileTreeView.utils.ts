@@ -39,6 +39,17 @@ export class NodeAbsoluteLocation {
   public getLevel(): number {
     return this.slugs.length;
   }
+
+  public getSlugs(): string[] {
+    return [...this.slugs];
+  }
+
+  public getName(): string {
+    if (this.isRoot()) {
+      return "/";
+    }
+    return this.slugs.at(-1) as string;
+  }
 }
 
 export const RootNodeLocation = new NodeAbsoluteLocation()

@@ -4,7 +4,7 @@ export const useStyles = makeStyles<{level: number}>()((theme, {level}) => {
   return {
     wrapper: {
       height: '100%',
-      overflowX: 'auto',
+      overflow: 'auto',
       padding: '2px'
     },
     nodeRoot: {
