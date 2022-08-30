@@ -7,14 +7,14 @@ import com.softwaremill.adopttapir.Fail
 import com.softwaremill.adopttapir.http.Http
 import com.softwaremill.adopttapir.infrastructure.Json._
 import com.softwaremill.adopttapir.starter._
-import com.softwaremill.adopttapir.template.GeneratedFile
+import com.softwaremill.adopttapir.starter.content.{ContentService, Node}
 import com.softwaremill.adopttapir.util.ServerEndpoints
 import fs2.io.file.Files
 import sttp.capabilities.fs2.Fs2Streams
 import sttp.model.HeaderNames
 import sttp.tapir.CodecFormat
 
-class StarterApi(http: Http, starterService: StarterService) {
+class StarterApi(http: Http, starterService: StarterService, contentService: ContentService) {
 
   type ContentDispositionValue = String
   type ContentLengthValue = Long
@@ -64,12 +64,12 @@ class StarterApi(http: Http, starterService: StarterService) {
     baseEndpoint.post
       .in(contentPath)
       .in(jsonBody[StarterRequest])
-      .out(jsonBody[List[GeneratedFile]])
+      .out(jsonBody[Node])
       .serverLogic { request =>
         val temp = for {
           det <- FormValidator.validate(request)
-          res <- starterService.generateProject(det).asRight[Fail]
-        } yield res
+          n <- contentService.generateContentTree(det).asRight[Fail]
+        } yield n
 
         IO(temp.leftMap(http.failToResponseData))
       }
