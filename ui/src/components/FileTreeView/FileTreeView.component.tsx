@@ -3,7 +3,6 @@ import {useStyles} from "./FileTreeView.styles";
 import {Folder, InsertDriveFileOutlined} from "@mui/icons-material";
 import {NodeAbsoluteLocation} from "./FileTreeView.utils";
 import {useEffect, useState} from "react";
-import {Paper} from "@mui/material";
 
 type Props = {
   tree: FileTree,
@@ -14,11 +13,9 @@ type Props = {
 export function FileTreeView(props: Props) {
   const {classes} = useStyles({level: 0})
 
-  return (<>
-    <Paper className={classes.wrapper} variant="outlined">
-      <NodesView {...props}/>
-    </Paper>
-  </>);
+  return (<div className={classes.wrapper}>
+    <NodesView {...props}/>
+  </div>);
 }
 
 function NodesView({tree, location, state}: Props) {

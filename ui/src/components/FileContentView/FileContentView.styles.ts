@@ -4,7 +4,7 @@ export const useStyles = makeStyles()((theme) => {
   return {
     wrapper: {
       height: '100%',
-      padding: '2px'
+      marginTop: 0
     }
   };
 });

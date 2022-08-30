@@ -1,4 +1,4 @@
-import {Box, Grid} from "@mui/material";
+import {Box, Button, Grid} from "@mui/material";
 import {useStyles} from "../App.styles";
 import {FileTreeView} from "../components/FileTreeView/FileTreeView.component";
 import {FileTree, TreeState} from "../components/FileTreeView/FileTreeView.types";
@@ -47,22 +47,37 @@ const useTreeState: (opened: string) => TreeState = (opened: string) => {
 }
 
 export function PreviewStarterPage() {
-  const {classes} = useStyles();
+  const {classes, cx} = useStyles();
   const [files] = useState(example);
   const treeState = useTreeState("README.md");
 
-  return (<Grid container className={classes.fullHeight}>
-    <Grid item xs={3} className={classes.fullHeight}>
-      <Box className={classes.fullHeight}>
-        <FileTreeView tree={files} location={RootNodeLocation} state={treeState}/>
-      </Box>
-    </Grid>
-    <Grid item xs={1}/>
-    <Grid item xs={8} className={classes.fullHeight}>
-      <Box className={classes.fullHeight}>
-        <FileContentView files={files} opened={treeState.openedFile}/>
-      </Box>
-    </Grid>
+  // 92.5px is the height of buttons panel.
+  return (<Grid container style={{height: 'calc(100% - 92.5px)'}}>
+        <Grid item xs={3} className={classes.fullHeight}>
+          <Box className={cx(classes.fullHeight, classes.treeViewContainer)}>
+              <FileTreeView tree={files} location={RootNodeLocation} state={treeState}/>
+          </Box>
+        </Grid>
+        <Grid item xs={9} className={classes.fullHeight}>
+          <Box className={cx(classes.fullHeight, classes.fileViewContainer)}>
+              <FileContentView files={files} opened={treeState.openedFile}/>
+          </Box>
+        </Grid>
+        <Grid item xs={12} className={classes.fileViewButtonsContainer}>
+            <Button
+              variant="contained"
+              color="secondary"
+              size="medium"
+              disableElevation>
+              Back
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              size="medium"
+              type="submit"
+              disableElevation>GENERATE .ZIP</Button>
+        </Grid>
   </Grid>);
 }
 

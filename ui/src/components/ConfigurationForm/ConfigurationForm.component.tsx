@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import {useEffect, useState} from 'react';
 import {Alert, Backdrop, Box, Button, CircularProgress, Snackbar, Typography} from '@mui/material';
 import { FormProvider, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -24,7 +24,6 @@ import {
   getJSONImplementationOptions,
   mapEffectTypeToJSONImplementation,
 } from './ConfigurationForm.helpers';
-import {Link} from "react-router-dom";
 
 interface ConfigurationFormProps {
   isEmbedded?: boolean;
@@ -185,9 +184,16 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
               Reset
             </Button>
 
-            <Link to="/preview-starter">
+            <Button
+              className={classes.submitButton}
+              variant="contained"
+              color="primary"
+              size="medium"
+              type="button"
+              disableElevation
+            >
               Preview
-            </Link>
+            </Button>
 
             <Button
               className={classes.submitButton}

@@ -59,6 +59,9 @@ export const useStyles = makeStyles<{ isEmbedded: boolean }>()((theme, { isEmbed
       '& button:first-child': {
         marginRight: theme.spacing(2),
       },
+      '& button:nth-child(2)': {
+        marginRight: theme.spacing(2),
+      },
     },
 
     submitButton: {

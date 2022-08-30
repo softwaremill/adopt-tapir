@@ -5,7 +5,6 @@ export const useStyles = makeStyles<{level: number}>()((theme, {level}) => {
     wrapper: {
       height: '100%',
       overflow: 'auto',
-      padding: '2px'
     },
     nodeRoot: {
       paddingLeft: '0px',
@@ -21,8 +20,8 @@ export const useStyles = makeStyles<{level: number}>()((theme, {level}) => {
       display: 'flex',
       alignItems: 'center',
       verticalAlign: 'middle',
-      padding: '4px 4px',
-      paddingLeft: `${level * 24}px`,
+      padding: theme.spacing(0.75),
+      paddingLeft: theme.spacing(level === 0 ? 1 : level * 3),
       color: 'inherit',
       textDecoration: 'none',
       ":hover": {
@@ -32,7 +31,9 @@ export const useStyles = makeStyles<{level: number}>()((theme, {level}) => {
     },
     openedFile: {
       fontWeight: "bold",
-      color: theme.palette.accent.main
+      color: theme.palette.primary.dark,
+      backgroundColor: theme.palette.primary.light,
+      backgroundClip: "padding-box"
     }
   };
 });

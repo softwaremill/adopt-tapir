@@ -1,5 +1,3 @@
-import {useStyles} from "./FileContentView.styles";
-import {Paper} from "@mui/material";
 import {FileNode, FileTree} from "../FileTreeView/FileTreeView.types";
 import {NodeAbsoluteLocation} from "../FileTreeView/FileTreeView.utils";
 import {useEffect, useState} from "react";
@@ -8,7 +6,7 @@ import scala from 'react-syntax-highlighter/dist/esm/languages/hljs/scala';
 import markdown from 'react-syntax-highlighter/dist/esm/languages/hljs/markdown';
 import ini from 'react-syntax-highlighter/dist/esm/languages/hljs/ini';
 import plaintext from 'react-syntax-highlighter/dist/esm/languages/hljs/plaintext';
-import { defaultStyle } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import { a11yLight } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 
 type SupportedLanguage = 'scala' | 'markdown' | 'ini' | 'plaintext'
 
@@ -23,8 +21,6 @@ type Props = {
 }
 
 export function FileContentView({files, opened}: Props) {
-  const {classes} = useStyles()
-
   const [name, setName] = useState(opened.getName());
   const [content, setContent] = useState("");
   const [language, setLanguage] = useState<SupportedLanguage>('plaintext');
@@ -69,10 +65,19 @@ export function FileContentView({files, opened}: Props) {
     }
   }, [name]);
   return (<>
-    <Paper className={classes.wrapper} variant="outlined">
-      <SyntaxHighlighter language={language} showLineNumbers={true} style={defaultStyle}>
+      <SyntaxHighlighter
+        customStyle={{
+          margin: 0,
+          backgroundColor: "rgb(255, 255, 255)",
+          padding: 0,
+          height: '100%',
+          overflowY: 'auto'
+      }}
+        lineNumberStyle={{minWidth: '44px'}}
+        language={language}
+        showLineNumbers={true}
+        style={a11yLight}>
         {content}
       </SyntaxHighlighter>
-    </Paper>
     </>);
 }
