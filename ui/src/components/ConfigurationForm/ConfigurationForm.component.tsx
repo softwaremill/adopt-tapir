@@ -24,12 +24,15 @@ import {
   getJSONImplementationOptions,
   mapEffectTypeToJSONImplementation,
 } from './ConfigurationForm.helpers';
+import {useLocation, useNavigate} from "react-router-dom";
 
 interface ConfigurationFormProps {
   isEmbedded?: boolean;
 }
 
 export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded = false }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const { call, clearError, isLoading, errorMessage } = useApiCall();
   const { classes, cx } = useStyles({ isEmbedded });
   const form = useForm<StarterRequest>({
@@ -52,6 +55,22 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
     'scalaVersion',
   ]);
   const isEffectImplementationSelectable = Boolean(effectType) && Boolean(scalaVersion);
+
+  useEffect(() => {
+    // state is passed from preview starter, after the click on 'Back' button.
+    if (location.state !== null) {
+      const request = location.state as StarterRequest;
+      form.setValue('projectName', request.projectName);
+      form.setValue('groupId', request.groupId);
+      form.setValue('effect', request.effect);
+      form.setValue('implementation', request.implementation);
+      form.setValue('addDocumentation', request.addDocumentation);
+      form.setValue('addMetrics', request.addMetrics);
+      form.setValue('json', request.json);
+      form.setValue('scalaVersion', request.scalaVersion);
+      form.setValue('builder', request.builder);
+    }
+  }, [location])
 
   useEffect(() => {
     // NOTE: reset effect implementation field value upon effect type or scala version change
@@ -103,8 +122,20 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
   };
 
   const handleFormReset = (): void => {
+    // Clear the state passed from preview starter page.
+    window.history.replaceState({}, document.title)
+
     form.reset();
   };
+
+  const handleShowPreview = (): void => {
+    form.trigger()
+      .then(isValid => {
+        if (isValid) {
+          navigate("/preview-starter", {state: form.getValues()});
+        }
+      })
+  }
 
   const handleCloseAlert = (): void => {
     clearError();
@@ -186,6 +217,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
 
             <Button
               className={classes.submitButton}
+              onClick={handleShowPreview}
               variant="contained"
               color="primary"
               size="medium"

@@ -2,9 +2,11 @@ import {Box, Button, Grid} from "@mui/material";
 import {useStyles} from "../App.styles";
 import {FileTreeView} from "../components/FileTreeView/FileTreeView.component";
 import {FileTree, TreeState} from "../components/FileTreeView/FileTreeView.types";
-import {Reducer, useCallback, useReducer, useState} from "react";
+import {Reducer, useCallback, useEffect, useReducer, useState} from "react";
 import {NodeAbsoluteLocation, RootNodeLocation} from "../components/FileTreeView/FileTreeView.utils";
 import {FileContentView} from "../components/FileContentView/FileContentView.component";
+import {useLocation, useNavigate} from "react-router-dom";
+import {StarterRequest} from "../api/starter";
 
 const useTreeState: (opened: string) => TreeState = (opened: string) => {
   const [openedDirs, toggleDir] = useReducer<Reducer<NodeAbsoluteLocation[], NodeAbsoluteLocation>>(
@@ -47,9 +49,24 @@ const useTreeState: (opened: string) => TreeState = (opened: string) => {
 }
 
 export function PreviewStarterPage() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const {classes, cx} = useStyles();
   const [files] = useState(example);
   const treeState = useTreeState("README.md");
+  const [request, setRequest] = useState<StarterRequest>();
+
+  useEffect(() => {
+    if (!location.state) {
+      navigate('/')
+    } else {
+      setRequest(location.state as StarterRequest);
+    }
+  }, [location]);
+
+  const handleBack = () => {
+    navigate('/', {state: request});
+  }
 
   // 92.5px is the height of buttons panel.
   return (<Grid container style={{height: 'calc(100% - 92.5px)'}}>
@@ -65,6 +82,7 @@ export function PreviewStarterPage() {
         </Grid>
         <Grid item xs={12} className={classes.fileViewButtonsContainer}>
             <Button
+              onClick={handleBack}
               variant="contained"
               color="secondary"
               size="medium"

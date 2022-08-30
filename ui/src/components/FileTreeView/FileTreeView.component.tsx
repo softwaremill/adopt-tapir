@@ -51,7 +51,10 @@ function FileNodeView({node: {name}, location, state}: NodeProps<FileNode>) {
   }, [fileLocation, name, state]);
 
   return (<li className={classes.nodeRow} onClick={() => state.openFile(location.add(name))}>
-    <a href="#" className={isOpened ? cx(classes.nodeContent, classes.openedFile) : classes.nodeContent}>
+    <a
+      href="#"
+      className={isOpened ? cx(classes.nodeContent, classes.openedFile) : classes.nodeContent}
+      onClick={e => e.preventDefault()}>
       <InsertDriveFileOutlined/>{name}
     </a>
   </li>);
@@ -67,7 +70,14 @@ function DirNodeView({node: {name, children}, location, state}: NodeProps<DirNod
 
   return (<>
     <li className={classes.nodeRow}>
-      <a href="#" className={classes.nodeContent} onClick={() => state.toggleDir(dirLocation)}>
+      <a
+        href="#"
+        className={classes.nodeContent}
+        onClick={e => {
+          e.preventDefault();
+          e.stopPropagation();
+          state.toggleDir(dirLocation)
+        }}>
         <Folder/>{name}
       </a>
       <NodesView
