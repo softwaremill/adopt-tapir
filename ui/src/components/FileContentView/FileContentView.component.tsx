@@ -16,7 +16,7 @@ SyntaxHighlighter.registerLanguage('ini', ini);
 SyntaxHighlighter.registerLanguage('plaintext', plaintext);
 
 type Props = {
-  files: FileTree,
+  files?: FileTree,
   opened: NodeAbsoluteLocation
 }
 
@@ -25,6 +25,9 @@ export function FileContentView({files, opened}: Props) {
   const [content, setContent] = useState("");
   const [language, setLanguage] = useState<SupportedLanguage>('plaintext');
   useEffect(() => {
+    if (!files) {
+      return;
+    }
     setName(opened.getName());
     const slugs = opened.getSlugs();
     const findFile: (tree: FileTree, remaining: string[]) => FileTree = (tree, remaining) => {

@@ -5,7 +5,7 @@ import {NodeAbsoluteLocation} from "./FileTreeView.utils";
 import {useEffect, useState} from "react";
 
 type Props = {
-  tree: FileTree,
+  tree?: FileTree,
   state: TreeState,
   location: NodeAbsoluteLocation
 }
@@ -25,7 +25,7 @@ function NodesView({tree, location, state}: Props) {
     setOpened(state.isDirOpened(location))
   }, [location, state]);
   return <ul className={classes.nodeRoot} style={opened ? {} : {display: "none"}}>
-    {tree.map((node, index) => node.type === 'directory'
+    {tree && tree.map((node, index) => node.type === 'directory'
       ? (<DirNodeView key={'node-' + index} node={node} location={location} state={state}/>)
       : (<FileNodeView key={'node-' + index} node={node} location={location} state={state}/>))}
   </ul>

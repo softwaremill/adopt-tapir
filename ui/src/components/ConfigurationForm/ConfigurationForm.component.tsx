@@ -1,16 +1,15 @@
-import {useEffect, useState} from 'react';
-import {Alert, Backdrop, Box, Button, CircularProgress, Snackbar, Typography} from '@mui/material';
-import { FormProvider, useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { DevTool } from '@hookform/devtools';
-import { saveAs } from 'file-saver';
-import { Builder, JSONImplementation, ScalaVersion, StarterRequest } from 'api/starter';
-import { useApiCall } from 'hooks/useApiCall';
-import { isDevelopment } from 'consts/env';
-import { FormTextField } from '../FormTextField';
-import { FormSelect } from '../FormSelect';
-import { FormRadioGroup } from '../FormRadioGroup';
-import { useStyles } from './ConfigurationForm.styles';
+import {useEffect} from 'react';
+import {Box, Button, Typography} from '@mui/material';
+import {FormProvider, useForm} from 'react-hook-form';
+import {yupResolver} from '@hookform/resolvers/yup';
+import {DevTool} from '@hookform/devtools';
+import {Builder, doRequestStarter, JSONImplementation, ScalaVersion, StarterRequest} from 'api/starter';
+import {useApiCall} from 'hooks/useApiCall';
+import {isDevelopment} from 'consts/env';
+import {FormTextField} from '../FormTextField';
+import {FormSelect} from '../FormSelect';
+import {FormRadioGroup} from '../FormRadioGroup';
+import {useStyles} from './ConfigurationForm.styles';
 import {
   BUILDER_OPTIONS,
   EFFECT_TYPE_OPTIONS,
@@ -25,6 +24,7 @@ import {
   mapEffectTypeToJSONImplementation,
 } from './ConfigurationForm.helpers';
 import {useLocation, useNavigate} from "react-router-dom";
+import {ApiCallAddons} from "../ApiCallAddons/ApiCallAddons.component";
 
 interface ConfigurationFormProps {
   isEmbedded?: boolean;
@@ -94,31 +94,8 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
     }
   }, [form, effectType, jsonImplementation]);
 
-  const handleStarterRequest = async (formData: StarterRequest): Promise<void> => {
-    const serverAddress = (process.env.REACT_APP_SERVER_ADDRESS == null) ? "https://adopt-tapir.softwaremill.com" : process.env.REACT_APP_SERVER_ADDRESS;
-    const response = await fetch(`${serverAddress}/api/v1/starter.zip`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formData),
-    });
-
-    if (!response.ok) {
-      const json = await response.json();
-
-      throw new Error(json.error || 'Something went wrong, please try again later.');
-    }
-
-    const blob = await response.blob();
-    const filename = response.headers.get('Content-Disposition')?.split('filename=')[1].replaceAll('"', '');
-
-    // download starter zip file
-    saveAs(blob, filename ?? 'starter.zip');
-  };
-
   const handleFormSubmit = (formData: StarterRequest): void => {
-    call(() => handleStarterRequest(formData));
+    call(() => doRequestStarter(formData));
   };
 
   const handleFormReset = (): void => {
@@ -132,14 +109,17 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
     form.trigger()
       .then(isValid => {
         if (isValid) {
-          navigate("/preview-starter", {state: form.getValues()});
+          const casted = form.getValues() as StarterRequest;
+          // Conversion of bools is done by hand, because casting writes booleans as strings.
+          const formData: StarterRequest = {
+            ...casted,
+            addDocumentation: "true" === casted.addDocumentation.toString(),
+            addMetrics: "true" === casted.addMetrics.toString()
+          }
+          navigate("/preview-starter", {state: formData});
         }
       })
   }
-
-  const handleCloseAlert = (): void => {
-    clearError();
-  };
 
   return (
     <Box>
@@ -215,7 +195,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
               Reset
             </Button>
 
-            <Button
+            {!isEmbedded && (<Button
               className={classes.submitButton}
               onClick={handleShowPreview}
               variant="contained"
@@ -225,7 +205,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
               disableElevation
             >
               Preview
-            </Button>
+            </Button>)}
 
             <Button
               className={classes.submitButton}
@@ -243,19 +223,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
         {isDevelopment && <DevTool control={form.control} />}
       </FormProvider>
 
-      <Backdrop open={isLoading}>
-        <CircularProgress />
-      </Backdrop>
-      <Snackbar
-        open={Boolean(errorMessage)}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-        autoHideDuration={5000}
-        onClose={handleCloseAlert}
-      >
-        <Alert severity="error" variant="outlined">
-          {errorMessage}
-        </Alert>
-      </Snackbar>
+      <ApiCallAddons isLoading={isLoading} clearError={clearError} errorMessage={errorMessage}/>
     </Box>
   );
 };
