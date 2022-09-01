@@ -2,7 +2,7 @@ import { makeStyles } from 'tss-react/mui';
 
 export const useStyles = makeStyles()(theme => ({
   fullHeight: {
-    height: '100%'
+    height: '100%',
   },
 
   treeViewContainer: {
@@ -16,7 +16,7 @@ export const useStyles = makeStyles()(theme => ({
     width: `calc(100% - ${theme.spacing(1)})`,
     backgroundColor: 'white',
     border: '1px solid ' + theme.palette.divider,
-    borderTopRightRadius: '4px'
+    borderTopRightRadius: '4px',
   },
 
   fileViewButtonsContainer: {
@@ -27,9 +27,9 @@ export const useStyles = makeStyles()(theme => ({
     border: '1px solid ' + theme.palette.divider,
     borderBottomLeftRadius: '4px',
     borderBottomRightRadius: '4px',
-    justifyContent: "center",
-    '& button:first-child': {
+    justifyContent: 'center',
+    '& button:not(:last-child)': {
       marginRight: theme.spacing(2),
     },
-  }
+  },
 }));

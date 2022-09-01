@@ -1,15 +1,15 @@
-import {useEffect} from 'react';
-import {Box, Button, Typography} from '@mui/material';
-import {FormProvider, useForm} from 'react-hook-form';
-import {yupResolver} from '@hookform/resolvers/yup';
-import {DevTool} from '@hookform/devtools';
-import {Builder, doRequestStarter, JSONImplementation, ScalaVersion, StarterRequest} from 'api/starter';
-import {useApiCall} from 'hooks/useApiCall';
-import {isDevelopment} from 'consts/env';
-import {FormTextField} from '../FormTextField';
-import {FormSelect} from '../FormSelect';
-import {FormRadioGroup} from '../FormRadioGroup';
-import {useStyles} from './ConfigurationForm.styles';
+import { useEffect } from 'react';
+import { Box, Button, Typography } from '@mui/material';
+import { FormProvider, useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { DevTool } from '@hookform/devtools';
+import { Builder, doRequestStarter, JSONImplementation, ScalaVersion, StarterRequest } from 'api/starter';
+import { useApiCall } from 'hooks/useApiCall';
+import { isDevelopment } from 'consts/env';
+import { FormTextField } from '../FormTextField';
+import { FormSelect } from '../FormSelect';
+import { FormRadioGroup } from '../FormRadioGroup';
+import { useStyles } from './ConfigurationForm.styles';
 import {
   BUILDER_OPTIONS,
   EFFECT_TYPE_OPTIONS,
@@ -23,8 +23,8 @@ import {
   getJSONImplementationOptions,
   mapEffectTypeToJSONImplementation,
 } from './ConfigurationForm.helpers';
-import {useLocation, useNavigate} from "react-router-dom";
-import {ApiCallAddons} from "../ApiCallAddons";
+import { useLocation, useNavigate } from 'react-router-dom';
+import { ApiCallAddons } from '../ApiCallAddons';
 
 interface ConfigurationFormProps {
   isEmbedded?: boolean;
@@ -70,7 +70,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
       form.setValue('scalaVersion', request.scalaVersion);
       form.setValue('builder', request.builder);
     }
-  }, [location])
+  }, [location, form]);
 
   useEffect(() => {
     // NOTE: reset effect implementation field value upon effect type or scala version change
@@ -100,26 +100,25 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
 
   const handleFormReset = (): void => {
     // Clear the state passed from preview starter page.
-    window.history.replaceState({}, document.title)
+    window.history.replaceState({}, document.title);
 
     form.reset();
   };
 
   const handleShowPreview = (): void => {
-    form.trigger()
-      .then(isValid => {
-        if (isValid) {
-          const casted = form.getValues() as StarterRequest;
-          // Conversion of bools is done by hand, because casting writes booleans as strings.
-          const formData: StarterRequest = {
-            ...casted,
-            addDocumentation: "true" === casted.addDocumentation.toString(),
-            addMetrics: "true" === casted.addMetrics.toString()
-          }
-          navigate("/preview-starter", {state: formData});
-        }
-      })
-  }
+    form.trigger().then(isValid => {
+      if (isValid) {
+        const casted = form.getValues() as StarterRequest;
+        // Conversion of bools is done by hand, because casting writes booleans as strings.
+        const formData: StarterRequest = {
+          ...casted,
+          addDocumentation: 'true' === casted.addDocumentation.toString(),
+          addMetrics: 'true' === casted.addMetrics.toString(),
+        };
+        navigate('/preview-starter', { state: formData });
+      }
+    });
+  };
 
   return (
     <Box>
@@ -195,17 +194,19 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
               Reset
             </Button>
 
-            {!isEmbedded && (<Button
-              className={classes.submitButton}
-              onClick={handleShowPreview}
-              variant="contained"
-              color="primary"
-              size="medium"
-              type="button"
-              disableElevation
-            >
-              Preview
-            </Button>)}
+            {!isEmbedded && (
+              <Button
+                className={classes.submitButton}
+                onClick={handleShowPreview}
+                variant="contained"
+                color="primary"
+                size="medium"
+                type="button"
+                disableElevation
+              >
+                Preview
+              </Button>
+            )}
 
             <Button
               className={classes.submitButton}
@@ -223,7 +224,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
         {isDevelopment && <DevTool control={form.control} />}
       </FormProvider>
 
-      <ApiCallAddons isLoading={isLoading} clearError={clearError} errorMessage={errorMessage}/>
+      <ApiCallAddons isLoading={isLoading} clearError={clearError} errorMessage={errorMessage} />
     </Box>
   );
 };

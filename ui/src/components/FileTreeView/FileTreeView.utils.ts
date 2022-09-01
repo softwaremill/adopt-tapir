@@ -1,5 +1,4 @@
 export class NodeAbsoluteLocation {
-
   private readonly slugs: string[];
   private readonly path: string;
 
@@ -17,7 +16,7 @@ export class NodeAbsoluteLocation {
   }
 
   public isSameAs(other: NodeAbsoluteLocation): boolean {
-    return other.path === this.path
+    return other.path === this.path;
   }
 
   public add(slug: string): NodeAbsoluteLocation {
@@ -46,11 +45,10 @@ export class NodeAbsoluteLocation {
 
   public getName(): string {
     if (this.isRoot()) {
-      return "/";
+      return '/';
     }
     return this.slugs.at(-1) as string;
   }
 }
 
-export const RootNodeLocation = new NodeAbsoluteLocation()
-
+export const RootNodeLocation = new NodeAbsoluteLocation();

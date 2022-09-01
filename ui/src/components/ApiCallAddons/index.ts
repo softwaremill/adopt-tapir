@@ -1,1 +1,1 @@
-export * from "./ApiCallAddons.component"
+export * from './ApiCallAddons.component';

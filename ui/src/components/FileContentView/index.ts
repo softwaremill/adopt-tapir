@@ -1,1 +1,1 @@
-export * from "./FileContentView.component"
+export * from './FileContentView.component';

@@ -1,1 +1,1 @@
-export * from "./PreviewStarterPage.component"
+export * from './PreviewStarterPage.component';

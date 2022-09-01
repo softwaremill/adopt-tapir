@@ -1,6 +1,6 @@
-import {makeStyles} from "tss-react/mui";
+import { makeStyles } from 'tss-react/mui';
 
-export const useStyles = makeStyles<{level: number}>()((theme, {level}) => {
+export const useStyles = makeStyles<{ level: number }>()((theme, { level }) => {
   return {
     wrapper: {
       height: '100%',
@@ -8,32 +8,35 @@ export const useStyles = makeStyles<{level: number}>()((theme, {level}) => {
     },
     nodeRoot: {
       paddingLeft: '0px',
-      margin: '0px'
-
+      margin: '0px',
     },
     nodeRow: {
       listStyleType: 'none',
-      position: "relative"
+      position: 'relative',
     },
     nodeContent: {
-      width: 'auto',
+      background: 'none',
+      color: 'inherit',
+      width: '100%',
+      border: 'none',
+      outline: 'inherit',
       display: 'flex',
       alignItems: 'center',
       verticalAlign: 'middle',
+      cursor: 'pointer',
       padding: theme.spacing(0.75),
       paddingLeft: theme.spacing(level === 0 ? 1 : level * 3),
-      color: 'inherit',
       textDecoration: 'none',
-      ":hover": {
+      ':hover': {
         backgroundColor: theme.palette.primary.light,
-        backgroundClip: "padding-box"
-      }
+        backgroundClip: 'padding-box',
+      },
     },
     openedFile: {
-      fontWeight: "bold",
+      fontWeight: 'bold',
       color: theme.palette.primary.dark,
       backgroundColor: theme.palette.primary.light,
-      backgroundClip: "padding-box"
-    }
+      backgroundClip: 'padding-box',
+    },
   };
 });

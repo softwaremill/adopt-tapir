@@ -1,1 +1,1 @@
-export * from "./ConfigurationFormPage.component"
+export * from './ConfigurationFormPage.component';

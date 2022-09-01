@@ -1,7 +1,7 @@
-import {render, screen, waitFor, within} from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {BrowserRouter} from 'react-router-dom';
-import {ConfigurationForm} from '../ConfigurationForm.component';
+import { BrowserRouter } from 'react-router-dom';
+import { ConfigurationForm } from '../ConfigurationForm.component';
 
 global.fetch = jest.fn();
 
@@ -14,7 +14,11 @@ describe('ConfigurationForm component', () => {
     );
 
     const user = userEvent.setup();
-    render(<BrowserRouter><ConfigurationForm /></BrowserRouter>);
+    render(
+      <BrowserRouter>
+        <ConfigurationForm />
+      </BrowserRouter>
+    );
 
     // when
     await user.type(screen.getByRole('textbox', { name: /Project name/i }), 'test-project');
@@ -75,7 +79,11 @@ describe('ConfigurationForm component', () => {
   test('for validation error and lack of network request while trying to submit not complete form', async () => {
     // given
     const user = userEvent.setup();
-    render(<BrowserRouter><ConfigurationForm /></BrowserRouter>);
+    render(
+      <BrowserRouter>
+        <ConfigurationForm />
+      </BrowserRouter>
+    );
 
     // when
     await user.type(screen.getByRole('textbox', { name: /Project name/i }), 'test-project');
@@ -109,7 +117,11 @@ describe('ConfigurationForm component', () => {
   test('reset flow to form default values', async () => {
     // given
     const user = userEvent.setup();
-    render(<BrowserRouter><ConfigurationForm /></BrowserRouter>);
+    render(
+      <BrowserRouter>
+        <ConfigurationForm />
+      </BrowserRouter>
+    );
 
     // when
     await user.type(screen.getByRole('textbox', { name: /Project name/i }), 'test-project');
@@ -154,7 +166,11 @@ describe('ConfigurationForm component', () => {
   test('effect implementation field reset flow based on scala version change', async () => {
     // given
     const user = userEvent.setup();
-    render(<BrowserRouter><ConfigurationForm /></BrowserRouter>);
+    render(
+      <BrowserRouter>
+        <ConfigurationForm />
+      </BrowserRouter>
+    );
 
     // when
     await user.click(screen.getByRole('button', { name: /Effect type/i }));
@@ -184,7 +200,11 @@ describe('ConfigurationForm component', () => {
   test('effect implementation field reset flow based on effect type change', async () => {
     // given
     const user = userEvent.setup();
-    render(<BrowserRouter><ConfigurationForm /></BrowserRouter>);
+    render(
+      <BrowserRouter>
+        <ConfigurationForm />
+      </BrowserRouter>
+    );
 
     // when
     await user.click(screen.getByRole('button', { name: /Effect type/i }));
@@ -213,7 +233,11 @@ describe('ConfigurationForm component', () => {
   test('json field reset flow based on effect type change', async () => {
     // given
     const user = userEvent.setup();
-    render(<BrowserRouter><ConfigurationForm /></BrowserRouter>);
+    render(
+      <BrowserRouter>
+        <ConfigurationForm />
+      </BrowserRouter>
+    );
 
     // when
     await user.click(screen.getByRole('button', { name: /Effect type/i }));

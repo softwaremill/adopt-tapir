@@ -1,1 +1,1 @@
-export * from "./RootPage.component"
+export * from './RootPage.component';

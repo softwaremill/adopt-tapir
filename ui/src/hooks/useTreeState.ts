@@ -1,5 +1,5 @@
-import {TreeState, NodeAbsoluteLocation} from "../components/FileTreeView";
-import {Reducer, useCallback, useReducer, useState} from "react";
+import { TreeState, NodeAbsoluteLocation } from '../components/FileTreeView';
+import { Reducer, useCallback, useReducer, useState } from 'react';
 
 export const useTreeState: (opened: string) => TreeState = (opened: string) => {
   const [openedDirs, toggleDir] = useReducer<Reducer<NodeAbsoluteLocation[], NodeAbsoluteLocation>>(
@@ -18,17 +18,18 @@ export const useTreeState: (opened: string) => TreeState = (opened: string) => {
           updated.push(touchedDir);
           processed = true;
         } else {
-          updated.push(current)
+          updated.push(current);
         }
       }
 
       if (!processed) {
-        updated.push(touchedDir)
+        updated.push(touchedDir);
       }
 
       return updated.filter(d => !d.isRoot());
     },
-    []);
+    []
+  );
   const isDirOpened = useCallback(
     (dir: NodeAbsoluteLocation) => {
       if (dir.isRoot()) {
@@ -36,7 +37,8 @@ export const useTreeState: (opened: string) => TreeState = (opened: string) => {
       }
       return openedDirs.find(openedDir => dir.isSameAs(openedDir) || dir.isParentOf(openedDir)) !== undefined;
     },
-    [openedDirs]);
+    [openedDirs]
+  );
   const [openedFile, openFile] = useState<NodeAbsoluteLocation>(new NodeAbsoluteLocation(opened));
-  return {openedDirs, toggleDir, isDirOpened, openedFile, openFile};
-}
+  return { openedDirs, toggleDir, isDirOpened, openedFile, openFile };
+};

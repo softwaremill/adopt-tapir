@@ -1,1 +1,1 @@
-export * from "./PreviewStarterButtons.component"
+export * from './PreviewStarterButtons.component';

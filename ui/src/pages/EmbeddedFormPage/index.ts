@@ -1,1 +1,1 @@
-export * from "./EmbeddedFormPage.component"
+export * from './EmbeddedFormPage.component';
