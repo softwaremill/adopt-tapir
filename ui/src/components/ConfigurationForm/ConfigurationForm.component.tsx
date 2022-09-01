@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import { FormProvider, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -23,8 +23,9 @@ import {
   getJSONImplementationOptions,
   mapEffectTypeToJSONImplementation,
 } from './ConfigurationForm.helpers';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ApiCallAddons } from '../ApiCallAddons';
+import { ConfigurationDataContext, resetFormData, setFormData } from '../../contexts';
 
 interface ConfigurationFormProps {
   isEmbedded?: boolean;
@@ -32,7 +33,7 @@ interface ConfigurationFormProps {
 
 export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded = false }) => {
   const navigate = useNavigate();
-  const location = useLocation();
+  const [{ formData }, contextDispatch] = useContext(ConfigurationDataContext);
   const { call, clearError, isLoading, errorMessage } = useApiCall();
   const { classes, cx } = useStyles({ isEmbedded });
   const form = useForm<StarterRequest>({
@@ -57,20 +58,18 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
   const isEffectImplementationSelectable = Boolean(effectType) && Boolean(scalaVersion);
 
   useEffect(() => {
-    // state is passed from preview starter, after the click on 'Back' button.
-    if (location.state !== null) {
-      const request = location.state as StarterRequest;
-      form.setValue('projectName', request.projectName);
-      form.setValue('groupId', request.groupId);
-      form.setValue('effect', request.effect);
-      form.setValue('implementation', request.implementation);
-      form.setValue('addDocumentation', request.addDocumentation);
-      form.setValue('addMetrics', request.addMetrics);
-      form.setValue('json', request.json);
-      form.setValue('scalaVersion', request.scalaVersion);
-      form.setValue('builder', request.builder);
+    if (formData !== undefined) {
+      form.setValue('projectName', formData.projectName);
+      form.setValue('groupId', formData.groupId);
+      form.setValue('effect', formData.effect);
+      form.setValue('implementation', formData.implementation);
+      form.setValue('addDocumentation', formData.addDocumentation);
+      form.setValue('addMetrics', formData.addMetrics);
+      form.setValue('json', formData.json);
+      form.setValue('scalaVersion', formData.scalaVersion);
+      form.setValue('builder', formData.builder);
     }
-  }, [location, form]);
+  }, [formData, form]);
 
   useEffect(() => {
     // NOTE: reset effect implementation field value upon effect type or scala version change
@@ -99,13 +98,12 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
   };
 
   const handleFormReset = (): void => {
-    // Clear the state passed from preview starter page.
-    window.history.replaceState({}, document.title);
-
+    contextDispatch(resetFormData());
     form.reset();
   };
 
   const handleShowPreview = (): void => {
+    // 'trigger()' triggers the validation.
     form.trigger().then(isValid => {
       if (isValid) {
         const casted = form.getValues() as StarterRequest;
@@ -115,7 +113,8 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
           addDocumentation: 'true' === casted.addDocumentation.toString(),
           addMetrics: 'true' === casted.addMetrics.toString(),
         };
-        navigate('/preview-starter', { state: formData });
+        contextDispatch(setFormData(formData));
+        navigate('/preview-starter');
       }
     });
   };

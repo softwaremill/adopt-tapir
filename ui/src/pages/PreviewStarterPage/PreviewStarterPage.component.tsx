@@ -1,37 +1,31 @@
 import { Box, Grid } from '@mui/material';
-import { FileTreeView, FileTree, RootNodeLocation } from '../../components/FileTreeView';
-import { useEffect, useState } from 'react';
+import { FileTree, FileTreeView, RootNodeLocation } from '../../components/FileTreeView';
+import { useContext, useEffect, useState } from 'react';
 import { FileContentView } from '../../components/FileContentView';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { doRequestPreview, StarterRequest } from '../../api/starter';
+import { useNavigate } from 'react-router-dom';
+import { doRequestPreview } from '../../api/starter';
 import { useApiCall } from '../../hooks/useApiCall';
 import { ApiCallAddons } from '../../components/ApiCallAddons';
 import { useTreeState } from '../../hooks/useTreeState';
 import { PreviewStarterButtons } from '../../components/PreviewStarterButtons';
 import { useStyles } from './PreviewStarterPage.styles';
+import { ConfigurationDataContext } from '../../contexts';
 
 export function PreviewStarterPage() {
-  const location = useLocation();
   const navigate = useNavigate();
+  const [{ formData }] = useContext(ConfigurationDataContext);
   const { classes, cx } = useStyles();
   const [files, setFiles] = useState<FileTree>();
   const treeState = useTreeState('README.md');
-  const [request, setRequest] = useState<StarterRequest>();
   const { call, clearError, isLoading, errorMessage } = useApiCall();
 
   useEffect(() => {
-    if (!location.state) {
+    if (formData === undefined) {
       navigate('/');
     } else {
-      setRequest(location.state as StarterRequest);
+      call(() => doRequestPreview(formData, setFiles));
     }
-  }, [location, navigate]);
-
-  useEffect(() => {
-    if (request !== undefined) {
-      call(() => doRequestPreview(request, setFiles));
-    }
-  }, [request, call]);
+  }, [formData, navigate, call]);
 
   // 92.5px is the height of buttons panel.
   return (
@@ -48,7 +42,7 @@ export function PreviewStarterPage() {
           </Box>
         </Grid>
         <Grid item xs={12} className={classes.fileViewButtonsContainer}>
-          <PreviewStarterButtons apiCaller={call} request={request} />
+          <PreviewStarterButtons apiCaller={call} request={formData} />
         </Grid>
       </Grid>
       <ApiCallAddons isLoading={isLoading} clearError={clearError} errorMessage={errorMessage} />
