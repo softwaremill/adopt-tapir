@@ -1,6 +1,6 @@
 import {Container, Paper} from "@mui/material";
-import {ConfigurationForm} from "../components/ConfigurationForm";
-import {useStyles} from "../App.styles";
+import {ConfigurationForm} from "../../components/ConfigurationForm";
+import {useStyles} from "./ConfigurationFormPage.styles";
 
 export function ConfigurationFormPage() {
   const { classes } = useStyles();

@@ -1,8 +1,8 @@
 import {BrowserRouter, Navigate, Route, Routes} from 'react-router-dom';
-import {RootPage} from "./pages/RootPage";
 import {ConfigurationFormPage} from "./pages/ConfigurationFormPage";
-import {PreviewStarterPage} from "./pages/PreviewStarterPage";
 import {EmbeddedFormPage} from "./pages/EmbeddedFormPage";
+import {PreviewStarterPage} from "./pages/PreviewStarterPage";
+import {RootPage} from "./pages/RootPage";
 
 export const App: React.FC = () => {
   return (

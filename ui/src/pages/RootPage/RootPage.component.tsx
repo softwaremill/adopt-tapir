@@ -1,8 +1,8 @@
 import {Box, CssBaseline, Grid} from "@mui/material";
 import {Outlet} from "react-router-dom";
-import {useStyles} from "../App.styles";
-import {Sidebar} from "../components/Sidebar";
-import {Footer} from "../components/Footer";
+import {Sidebar} from "../../components/Sidebar";
+import {Footer} from "../../components/Footer";
+import {useStyles} from "./RootPage.styles";
 
 export function RootPage() {
   const { classes } = useStyles();
