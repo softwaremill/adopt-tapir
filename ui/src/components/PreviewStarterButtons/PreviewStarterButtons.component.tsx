@@ -1,6 +1,6 @@
 import {Button} from "@mui/material";
 import {useCallback} from "react";
-import {doRequestStarter, StarterRequest} from "../../api/starter";
+import {doRequestStarter, StarterRequest} from "api/starter";
 import {useNavigate} from "react-router-dom";
 
 type Props = {

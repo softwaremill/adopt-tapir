@@ -1,6 +1,5 @@
-import {TreeState} from "../components/FileTreeView/FileTreeView.types";
+import {TreeState, NodeAbsoluteLocation} from "../components/FileTreeView";
 import {Reducer, useCallback, useReducer, useState} from "react";
-import {NodeAbsoluteLocation} from "../components/FileTreeView/FileTreeView.utils";
 
 export const useTreeState: (opened: string) => TreeState = (opened: string) => {
   const [openedDirs, toggleDir] = useReducer<Reducer<NodeAbsoluteLocation[], NodeAbsoluteLocation>>(

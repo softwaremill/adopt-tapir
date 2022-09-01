@@ -24,7 +24,7 @@ import {
   mapEffectTypeToJSONImplementation,
 } from './ConfigurationForm.helpers';
 import {useLocation, useNavigate} from "react-router-dom";
-import {ApiCallAddons} from "../ApiCallAddons/ApiCallAddons.component";
+import {ApiCallAddons} from "../ApiCallAddons";
 
 interface ConfigurationFormProps {
   isEmbedded?: boolean;

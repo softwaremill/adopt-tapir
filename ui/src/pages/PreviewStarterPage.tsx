@@ -1,16 +1,14 @@
 import {Box, Grid} from "@mui/material";
 import {useStyles} from "../App.styles";
-import {FileTreeView} from "../components/FileTreeView/FileTreeView.component";
-import {FileTree} from "../components/FileTreeView/FileTreeView.types";
+import {FileTreeView, FileTree, RootNodeLocation} from "../components/FileTreeView";
 import {useEffect, useState} from "react";
-import {RootNodeLocation} from "../components/FileTreeView/FileTreeView.utils";
-import {FileContentView} from "../components/FileContentView/FileContentView.component";
+import {FileContentView} from "../components/FileContentView";
 import {useLocation, useNavigate} from "react-router-dom";
 import {doRequestPreview, StarterRequest} from "../api/starter";
 import {useApiCall} from "../hooks/useApiCall";
-import {ApiCallAddons} from "../components/ApiCallAddons/ApiCallAddons.component";
+import {ApiCallAddons} from "../components/ApiCallAddons";
 import {useTreeState} from "../hooks/useTreeState";
-import {PreviewStarterButtons} from "../components/PreviewStarterButtons/PreviewStarterButtons.component";
+import {PreviewStarterButtons} from "../components/PreviewStarterButtons";
 
 export function PreviewStarterPage() {
   const location = useLocation();

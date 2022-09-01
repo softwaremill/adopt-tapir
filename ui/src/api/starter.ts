@@ -1,5 +1,5 @@
 import {saveAs} from "file-saver";
-import {FileTree} from "../components/FileTreeView/FileTreeView.types";
+import {FileTree} from "../components/FileTreeView";
 
 export enum EffectType {
   Future = 'FutureEffect',

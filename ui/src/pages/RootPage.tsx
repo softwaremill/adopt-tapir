@@ -1,4 +1,4 @@
-import {Box, Container, CssBaseline, Grid} from "@mui/material";
+import {Box, CssBaseline, Grid} from "@mui/material";
 import {Outlet} from "react-router-dom";
 import {useStyles} from "../App.styles";
 import {Sidebar} from "../components/Sidebar";

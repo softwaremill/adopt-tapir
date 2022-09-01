@@ -1,5 +1,4 @@
-import {FileNode, FileTree} from "../FileTreeView/FileTreeView.types";
-import {NodeAbsoluteLocation} from "../FileTreeView/FileTreeView.utils";
+import {FileNode, FileTree, NodeAbsoluteLocation} from "../FileTreeView";
 import {useEffect, useState} from "react";
 import {Light as SyntaxHighlighter} from "react-syntax-highlighter";
 import scala from 'react-syntax-highlighter/dist/esm/languages/hljs/scala';
