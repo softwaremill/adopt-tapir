@@ -2,13 +2,20 @@ package com.softwaremill.adopttapir.starter
 
 import cats.effect.{ExitCode, IO, IOApp}
 import com.softwaremill.adopttapir.config.Config
+import com.softwaremill.adopttapir.starter.files.FilesManager
+import com.softwaremill.adopttapir.starter.formatting.ProjectFormatter
 import com.softwaremill.adopttapir.template.ProjectGenerator
 
 @deprecated("Only for development purpose")
 object FileOperation extends IOApp {
 
-  private val cfg = Config.read.starter
-  val service = new StarterService(cfg.copy(deleteTempFolder = false), new ProjectGenerator())
+  val service: StarterService = {
+    val cfg = Config.read.storageConfig.copy(deleteTempFolder = false)
+    val pg = new ProjectGenerator()
+    val fm = new FilesManager(cfg)
+    val pf = new ProjectFormatter(fm)
+    new StarterService(pg, fm, pf)
+  }
 
   override def run(args: List[String]): IO[ExitCode] = {
     val details = StarterDetails(

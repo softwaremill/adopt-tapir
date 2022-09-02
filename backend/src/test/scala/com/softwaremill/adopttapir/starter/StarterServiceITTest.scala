@@ -7,6 +7,8 @@ import cats.instances.list._
 import cats.syntax.parallel._
 import cats.syntax.show._
 import com.softwaremill.adopttapir.starter.api._
+import com.softwaremill.adopttapir.starter.files.{FilesManager, StorageConfig}
+import com.softwaremill.adopttapir.starter.formatting.ProjectFormatter
 import com.softwaremill.adopttapir.template.ProjectGenerator
 import com.softwaremill.adopttapir.test.ServiceTimeouts.waitForPortTimeout
 import com.softwaremill.adopttapir.test.ShowHelpers._
@@ -172,8 +174,11 @@ case class GeneratedServiceUnderTest(serviceFactory: ServiceFactory, details: St
 
 object ZipGenerator {
   val service: StarterService = {
-    val config = StarterConfig(deleteTempFolder = true, tempPrefix = "generatedService")
-    new StarterService(config, new ProjectGenerator())
+    val cfg = StorageConfig(deleteTempFolder = true, tempPrefix = "generatedService")
+    val pg = new ProjectGenerator()
+    val fm = new FilesManager(cfg)
+    val pf = new ProjectFormatter(fm)
+    new StarterService(pg, fm, pf)
   }
 }
 

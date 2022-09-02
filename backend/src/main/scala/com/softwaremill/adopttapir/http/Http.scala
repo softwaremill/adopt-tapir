@@ -13,9 +13,15 @@ import sttp.tapir.codec.enumeratum.TapirCodecEnumeratum
 import sttp.tapir.generic.auto.SchemaDerivation
 import sttp.tapir.json.circe.TapirJsonCirce
 import sttp.tapir.{Codec, Endpoint, EndpointOutput, PublicEndpoint, Schema, SchemaType, Tapir}
+import sttp.tapir.generic.{Configuration => TapirConfiguration}
 
 /** Helper class for defining HTTP endpoints. Import the members of this class when defining an HTTP API using tapir. */
 class Http() extends Tapir with TapirJsonCirce with TapirSchemas with TapirCodecEnumeratum with FLogging {
+
+  implicit val tapirConfiguration: TapirConfiguration =
+    TapirConfiguration.default
+      .withDiscriminator(Http.DiscriminatorName)
+      .copy(toDiscriminatorValue = TapirConfiguration.default.toEncodedName.compose(_.fullName.toLowerCase))
 
   val jsonErrorOutOutput: EndpointOutput[Error_OUT] = jsonBody[Error_OUT]
 
@@ -51,6 +57,10 @@ class Http() extends Tapir with TapirJsonCirce with TapirSchemas with TapirCodec
   }
 
   override def jsonPrinter: Printer = noNullsPrinter
+}
+
+object Http {
+  val DiscriminatorName = "type"
 }
 
 /** Schemas for types used in endpoint descriptions (as parts of query parameters, JSON bodies, etc.). Includes explicitly defined schemas

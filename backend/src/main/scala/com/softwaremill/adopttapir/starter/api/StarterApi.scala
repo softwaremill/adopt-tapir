@@ -2,7 +2,7 @@ package com.softwaremill.adopttapir.starter.api
 
 import cats.data.{EitherT, NonEmptyList}
 import cats.effect.IO
-import cats.implicits.{catsSyntaxEitherId, toBifunctorOps}
+import cats.implicits.{toBifunctorOps}
 import com.softwaremill.adopttapir.Fail
 import com.softwaremill.adopttapir.http.Http
 import com.softwaremill.adopttapir.infrastructure.Json._
@@ -20,6 +20,8 @@ class StarterApi(http: Http, starterService: StarterService, contentService: Con
   type ContentLengthValue = Long
 
   import http._
+
+  private val starterApiTag = "starter"
 
   private val starterPath = "starter.zip"
 
@@ -65,20 +67,21 @@ class StarterApi(http: Http, starterService: StarterService, contentService: Con
       .in(contentPath)
       .in(jsonBody[StarterRequest])
       .out(jsonBody[Node])
-      .serverLogic { request =>
-        val temp = for {
-          det <- FormValidator.validate(request)
-          n <- contentService.generateContentTree(det).asRight[Fail]
+      .serverLogic[IO] { request =>
+        val node: EitherT[IO, Fail, Node] = for {
+          det <- EitherT(IO.pure(FormValidator.validate(request)))
+          n <- EitherT.liftF(contentService.generateContentTree(det))
         } yield n
 
-        IO(temp.leftMap(http.failToResponseData))
+        node.value
+          .map(_.leftMap(http.failToResponseData))
       }
   }
 
   val endpoints: ServerEndpoints =
     NonEmptyList
       .of(
-        starterEndpoint.tag(starterPath),
-        contentEndpoint.tag(contentPath)
+        starterEndpoint.tag(starterApiTag),
+        contentEndpoint.tag(starterApiTag)
       )
 }
