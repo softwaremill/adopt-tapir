@@ -5,18 +5,18 @@ object DirectoryMerger {
   def createTree(topDirName: String, pathNames: List[String], content: String): Directory = {
     assert(pathNames.nonEmpty, "`pathNames` list cannot be empty!")
 
-    def innerCreateTree(pathNames: List[String], content: String): Node = {
-      pathNames match {
-        case Nil          => throw new IllegalStateException("pathNames list cannot be empty!")
-        case last :: Nil  => File(last, content)
-        case head :: tail => Directory(head, List(innerCreateTree(tail, content)))
-      }
-    }
-
     val pathsWithRootDir = List(topDirName) ++ pathNames
-    innerCreateTree(pathsWithRootDir, content) match {
+    createTreeRec(pathsWithRootDir, content) match {
       case File(_, _)          => throw new IllegalStateException("Top element of created tree cannot be a `File`!")
       case d @ Directory(_, _) => d
+    }
+  }
+
+  private def createTreeRec(pathNames: List[String], content: String): Node = {
+    pathNames match {
+      case Nil          => throw new IllegalStateException("pathNames list cannot be empty!")
+      case last :: Nil  => File(last, content)
+      case head :: tail => Directory(head, List(createTreeRec(tail, content)))
     }
   }
 

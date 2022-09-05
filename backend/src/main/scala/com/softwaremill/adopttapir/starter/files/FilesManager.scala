@@ -41,9 +41,6 @@ class FilesManager(config: StorageConfig) {
         dir <- destinationDir
         _ <- IO(new Directory(dir).deleteRecursively())
       } yield dir
-      ()
-    } else {
-      ()
     }
   }
 }

@@ -1,7 +1,7 @@
 package com.softwaremill.adopttapir.starter.content
 
 import com.softwaremill.adopttapir.starter.files.StorageConfig
-import com.softwaremill.adopttapir.starter.formatting.ProjectFormatter
+import com.softwaremill.adopttapir.starter.formatting.GeneratedFilesFormatter
 import com.softwaremill.adopttapir.starter.files.FilesManager
 import com.softwaremill.adopttapir.starter.{Setup, StarterDetails}
 import com.softwaremill.adopttapir.template.ProjectGenerator
@@ -14,7 +14,7 @@ class ContentServiceTest extends BaseTest {
       val pg = new ProjectGenerator()
       val sc = StorageConfig(deleteTempFolder = true, tempPrefix = "generatedService")
       val fm = new FilesManager(sc)
-      val pf = new ProjectFormatter(fm)
+      val pf = new GeneratedFilesFormatter(fm)
       new ContentService(pg, pf)
     }
   }

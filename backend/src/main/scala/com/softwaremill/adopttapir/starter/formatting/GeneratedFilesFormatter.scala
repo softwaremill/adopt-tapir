@@ -8,7 +8,7 @@ import org.scalafmt.interfaces.Scalafmt
 
 import java.nio.file.Path
 
-class ProjectFormatter(fm: FilesManager) extends FLogging {
+class GeneratedFilesFormatter(fm: FilesManager) extends FLogging {
 
   private val ScalaFileExtensions = Set(".scala", ".sbt")
 
@@ -22,8 +22,8 @@ class ProjectFormatter(fm: FilesManager) extends FLogging {
             for {
               tempDir <- tempDirectory
               formatFile <- fm.createFile(tempDir, formatFile)
-              formattedFile <- IO(formatScalaFiles(formatFile.toPath, gfs))
-            } yield formattedFile
+              formattedFiles <- IO(formatScalaFiles(formatFile.toPath, gfs))
+            } yield formattedFiles
           }(release = tempDirectory => fm.deleteFilesAsStatedInConfig(tempDirectory))
       case None =>
         logger.error(s"Cannot find formatting file in generated project, scala files will NOT be formatted!")
@@ -43,5 +43,5 @@ class ProjectFormatter(fm: FilesManager) extends FLogging {
     }
   }
 
-  private def isScalaFilePath(p: String): Boolean = ScalaFileExtensions.exists(e => p.endsWith(e))
+  private def isScalaFilePath(path: String): Boolean = ScalaFileExtensions.exists(e => path.endsWith(e))
 }
