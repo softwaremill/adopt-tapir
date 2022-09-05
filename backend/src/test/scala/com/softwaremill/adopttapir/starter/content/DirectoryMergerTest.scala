@@ -2,9 +2,9 @@ package com.softwaremill.adopttapir.starter.content
 
 import com.softwaremill.adopttapir.test.BaseTest
 
-class ContentMergerTest extends BaseTest {
+class DirectoryMergerTest extends BaseTest {
 
-  object ContentMergerTest {
+  object DirectoryMergerTest {
     val TopDirName: String = "top-dir-name"
     val EmptyPathList: List[String] = List()
     val EmptyContent: String = ""
@@ -17,7 +17,7 @@ class ContentMergerTest extends BaseTest {
 
   }
 
-  import ContentMergerTest._
+  import DirectoryMergerTest._
 
   "createTree" should "throw if `pathsNames` is empty" in {
     an[AssertionError] should be thrownBy DirectoryMerger.createTree(
