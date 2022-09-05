@@ -20,7 +20,7 @@ class ContentMergerTest extends BaseTest {
   import ContentMergerTest._
 
   "createTree" should "throw if `pathsNames` is empty" in {
-    an[AssertionError] should be thrownBy ContentMerger.createTree(
+    an[AssertionError] should be thrownBy DirectoryMerger.createTree(
       TopDirName,
       EmptyPathList,
       EmptyContent
@@ -29,7 +29,7 @@ class ContentMergerTest extends BaseTest {
 
   "createTree" should "create single dir / single file structure" in {
     val fileName = "root"
-    ContentMerger.createTree(
+    DirectoryMerger.createTree(
       TopDirName,
       List(fileName),
       EmptyContent
@@ -38,7 +38,7 @@ class ContentMergerTest extends BaseTest {
 
   "createTree" should "create multiple dirs / single file structure" in {
     val (dirName1, dirName2, dirName3, fileName) = ("dirName1", "dirName2", "dirName3", "fileName")
-    ContentMerger.createTree(
+    DirectoryMerger.createTree(
       TopDirName,
       List(dirName1, dirName2, dirName3, fileName),
       NonEmptyContent
@@ -64,48 +64,48 @@ class ContentMergerTest extends BaseTest {
     val (dirWithSomeName, dirWithDifferentName) =
       (Directory(name = DirName, EmptyNodesList), Directory(name = DifferentDirName, EmptyNodesList))
 
-    an[AssertionError] should be thrownBy ContentMerger.merge(dirWithSomeName, dirWithDifferentName)
+    an[AssertionError] should be thrownBy DirectoryMerger(dirWithSomeName, dirWithDifferentName)
   }
 
   "merge" should "produce empty dir if both dirs to merge are empty" in {
     val (noFilesDir, anotherNoFilesDir) = (Directory(name = DirName, EmptyNodesList), Directory(name = DirName, EmptyNodesList))
 
-    ContentMerger.merge(noFilesDir, anotherNoFilesDir) should be(noFilesDir)
+    DirectoryMerger(noFilesDir, anotherNoFilesDir) should be(noFilesDir)
   }
 
   "merge" should "produce dir with one file if one of the dirs to has one file" in {
     val (dirWithFile, dirWithNoFiles) =
       (Directory(name = DirName, List(File(FileName, NonEmptyContent))), Directory(name = DirName, EmptyNodesList))
 
-    ContentMerger.merge(dirWithFile, dirWithNoFiles) should be(dirWithFile)
-    ContentMerger.merge(dirWithNoFiles, dirWithFile) should be(dirWithFile)
+    DirectoryMerger(dirWithFile, dirWithNoFiles) should be(dirWithFile)
+    DirectoryMerger(dirWithNoFiles, dirWithFile) should be(dirWithFile)
   }
 
   "merge" should "override second file if both files is dirs have the same name" in {
     val (dirWithNonEmptyContentFile, dirWithEmptyContentFile) =
       (Directory(name = DirName, List(File(FileName, NonEmptyContent))), Directory(name = DirName, List(File(FileName, EmptyContent))))
 
-    ContentMerger.merge(dirWithNonEmptyContentFile, dirWithEmptyContentFile) should be(dirWithNonEmptyContentFile)
-    ContentMerger.merge(dirWithEmptyContentFile, dirWithNonEmptyContentFile) should be(dirWithEmptyContentFile)
+    DirectoryMerger(dirWithNonEmptyContentFile, dirWithEmptyContentFile) should be(dirWithNonEmptyContentFile)
+    DirectoryMerger(dirWithEmptyContentFile, dirWithNonEmptyContentFile) should be(dirWithEmptyContentFile)
   }
 
   "merge" should "create proper project structure when project like files are given" in {
     val projectName = "project-name"
     val files = List(
-      ContentMerger.createTree(projectName, "src/main/scala/group/id/Main.scala".split('/').toList, "package group.id..."),
-      ContentMerger.createTree(projectName, "src/main/scala/group/id/Endpoints.scala".split('/').toList, "package group.id..."),
-      ContentMerger.createTree(projectName, "src/test/scala/group/id/EndpointsSpec.scala".split('/').toList, "package group.id..."),
-      ContentMerger.createTree(projectName, List(".scalafmt.conf"), "version = 3.5.8..."),
-      ContentMerger.createTree(projectName, List("build.sbt"), "val tapirVersion = \"1.0.6\"..."),
-      ContentMerger
+      DirectoryMerger.createTree(projectName, "src/main/scala/group/id/Main.scala".split('/').toList, "package group.id..."),
+      DirectoryMerger.createTree(projectName, "src/main/scala/group/id/Endpoints.scala".split('/').toList, "package group.id..."),
+      DirectoryMerger.createTree(projectName, "src/test/scala/group/id/EndpointsSpec.scala".split('/').toList, "package group.id..."),
+      DirectoryMerger.createTree(projectName, List(".scalafmt.conf"), "version = 3.5.8..."),
+      DirectoryMerger.createTree(projectName, List("build.sbt"), "val tapirVersion = \"1.0.6\"..."),
+      DirectoryMerger
         .createTree(projectName, List("project", "build.properties"), "sbt.version=1.7.1..."),
-      ContentMerger
+      DirectoryMerger
         .createTree(projectName, List("project", "plugins.sbt"), "addSbtPlugin(\"org.scalameta\" % \"sbt-scalafmt\" % \"2.4.6\")..."),
-      ContentMerger.createTree(projectName, List("sbtx"), "#!/usr/bin/env bash..."),
-      ContentMerger.createTree(projectName, List("README.md"), "## Quick start...")
+      DirectoryMerger.createTree(projectName, List("sbtx"), "#!/usr/bin/env bash..."),
+      DirectoryMerger.createTree(projectName, List("README.md"), "## Quick start...")
     )
 
-    files.reduce(ContentMerger.merge) should be(
+    files.reduce(DirectoryMerger.apply) should be(
       Directory(
         projectName,
         List(

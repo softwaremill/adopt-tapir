@@ -8,7 +8,6 @@ import com.softwaremill.adopttapir.template.GeneratedFile
 import com.softwaremill.adopttapir.util.ZipArchiver
 
 import java.io.File
-import java.nio.file.Path
 import scala.reflect.io.Directory
 
 class FilesManager(config: StorageConfig) {
@@ -17,16 +16,16 @@ class FilesManager(config: StorageConfig) {
     IO.blocking(newTemporaryDirectory(prefix = config.tempPrefix).toJava)
   }
 
-  def createFiles(destinationDir: File, filesToCreate: List[GeneratedFile]): IO[List[Path]] = {
+  def createFiles(destinationDir: File, filesToCreate: List[GeneratedFile]): IO[List[File]] = {
     filesToCreate.map(gf => { createFile(destinationDir, gf) }).sequence
   }
 
-  def createFile(destinationDir: File, fileToCreate: GeneratedFile): IO[Path] = {
+  def createFile(destinationDir: File, fileToCreate: GeneratedFile): IO[File] = {
     IO.blocking {
       val file = BFile(destinationDir.getPath, fileToCreate.relativePath)
       file.parent.createDirectories()
       file.overwrite(fileToCreate.content)
-      file.path
+      file.toJava
     }
   }
 

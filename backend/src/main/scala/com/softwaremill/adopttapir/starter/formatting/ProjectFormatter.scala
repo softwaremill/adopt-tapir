@@ -16,22 +16,18 @@ class ProjectFormatter(fm: FilesManager) extends FLogging {
 
   def format(gfs: List[GeneratedFile]): IO[List[GeneratedFile]] = {
     findGeneratedFormatFile(gfs) match {
-      case Some(formatFile) => {
+      case Some(formatFile) =>
         IO.blocking(fm.createTempDir())
           .bracket { tempDirectory =>
-            val formattedFiles = for {
+            for {
               tempDir <- tempDirectory
               formatFile <- fm.createFile(tempDir, formatFile)
-              formattedFile <- IO(formatScalaFiles(formatFile, gfs))
+              formattedFile <- IO(formatScalaFiles(formatFile.toPath, gfs))
             } yield formattedFile
-
-            formattedFiles
           }(release = tempDirectory => fm.deleteFilesAsStatedInConfig(tempDirectory))
-      }
-      case None => {
-        logger.error(s"Cannot find formatting file in generated project, scala files would NOT be formatted!")
+      case None =>
+        logger.error(s"Cannot find formatting file in generated project, scala files will NOT be formatted!")
         IO(gfs)
-      }
     }
   }
 

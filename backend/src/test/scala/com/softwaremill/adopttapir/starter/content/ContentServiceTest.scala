@@ -24,7 +24,7 @@ class ContentServiceTest extends BaseTest {
   it should "generate project tree for every valid configuration" in {
     allStarterDetails().foreach(sd => {
       service.generateContentTree(sd)
-      // if it would throw, the test would fail
+      // The content tree generation failure results in the exception being thrown and as a result a test failure
     })
   }
 

@@ -5,6 +5,7 @@ import cats.implicits._
 import com.softwaremill.adopttapir._
 import com.softwaremill.adopttapir.infrastructure.Json._
 import com.softwaremill.adopttapir.logging.FLogging
+import com.softwaremill.adopttapir.util.Constants
 import com.softwaremill.tagging._
 import io.circe.Printer
 import sttp.model.StatusCode
@@ -20,8 +21,8 @@ class Http() extends Tapir with TapirJsonCirce with TapirSchemas with TapirCodec
 
   implicit val tapirConfiguration: TapirConfiguration =
     TapirConfiguration.default
-      .withDiscriminator(Http.DiscriminatorName)
-      .copy(toDiscriminatorValue = TapirConfiguration.default.toEncodedName.compose(_.fullName.toLowerCase))
+      .withDiscriminator(Constants.DiscriminatorName)
+      .copy(toDiscriminatorValue = TapirConfiguration.default.toDiscriminatorValue.andThen(_.toLowerCase))
 
   val jsonErrorOutOutput: EndpointOutput[Error_OUT] = jsonBody[Error_OUT]
 
@@ -57,10 +58,6 @@ class Http() extends Tapir with TapirJsonCirce with TapirSchemas with TapirCodec
   }
 
   override def jsonPrinter: Printer = noNullsPrinter
-}
-
-object Http {
-  val DiscriminatorName = "type"
 }
 
 /** Schemas for types used in endpoint descriptions (as parts of query parameters, JSON bodies, etc.). Includes explicitly defined schemas

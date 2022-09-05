@@ -2,7 +2,7 @@ package com.softwaremill.adopttapir.starter.api
 
 import cats.data.{EitherT, NonEmptyList}
 import cats.effect.IO
-import cats.implicits.{toBifunctorOps}
+import cats.implicits.toBifunctorOps
 import com.softwaremill.adopttapir.Fail
 import com.softwaremill.adopttapir.http.Http
 import com.softwaremill.adopttapir.infrastructure.Json._
@@ -36,16 +36,16 @@ class StarterApi(http: Http, starterService: StarterService, contentService: Con
       .out(header[ContentDispositionValue](HeaderNames.ContentDisposition))
       .out(header[ContentLengthValue](HeaderNames.ContentLength))
       .serverLogic[IO] { request =>
-        val logicFlow: EitherT[IO, Fail, (fs2.Stream[IO, Byte], ContentDispositionValue, ContentLengthValue)] = for {
-          det <- EitherT(IO.pure(FormValidator.validate(request)))
-          result <- EitherT.liftF(
+        val result: EitherT[IO, Fail, (fs2.Stream[IO, Byte], ContentDispositionValue, ContentLengthValue)] = for {
+          starterDetailsOrFail <- EitherT(IO.pure(FormValidator.validate(request)))
+          zipFileOrFail <- EitherT.liftF(
             starterService
-              .generateZipFile(det)
+              .generateZipFile(starterDetailsOrFail)
               .map(file => (toStreamDeleteAfterComplete(file), defineZipFileName(request.projectName), file.length()))
           )
-        } yield result
+        } yield zipFileOrFail
 
-        logicFlow.value
+        result.value
           .map(_.leftMap(http.failToResponseData))
       }
   }
@@ -68,12 +68,12 @@ class StarterApi(http: Http, starterService: StarterService, contentService: Con
       .in(jsonBody[StarterRequest])
       .out(jsonBody[Node])
       .serverLogic[IO] { request =>
-        val node: EitherT[IO, Fail, Node] = for {
-          det <- EitherT(IO.pure(FormValidator.validate(request)))
-          n <- EitherT.liftF(contentService.generateContentTree(det))
-        } yield n
+        val result: EitherT[IO, Fail, Node] = for {
+          starterDetailsOrFail <- EitherT(IO.pure(FormValidator.validate(request)))
+          nodeOrFail <- EitherT.liftF(contentService.generateContentTree(starterDetailsOrFail))
+        } yield nodeOrFail
 
-        node.value
+        result.value
           .map(_.leftMap(http.failToResponseData))
       }
   }

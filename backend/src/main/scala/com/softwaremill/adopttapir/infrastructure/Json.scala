@@ -1,5 +1,6 @@
 package com.softwaremill.adopttapir.infrastructure
 
+import com.softwaremill.adopttapir.util.Constants
 import com.softwaremill.tagging.@@
 import io.circe.{Decoder, Encoder, Printer}
 import io.circe.generic.extras.{AutoDerivation, Configuration => CirceConfiguration}
@@ -8,12 +9,10 @@ import io.circe.generic.extras.{AutoDerivation, Configuration => CirceConfigurat
   */
 object Json extends AutoDerivation {
 
-  private val DiscriminatorName = "type"
-
   implicit val circeConfiguration: CirceConfiguration =
-    CirceConfiguration.default.withDiscriminator(DiscriminatorName)
-      .copy(transformConstructorNames = (s => s.toLowerCase)
-    )
+    CirceConfiguration.default
+      .withDiscriminator(Constants.DiscriminatorName)
+      .copy(transformConstructorNames = s => s.toLowerCase)
 
   val noNullsPrinter: Printer = Printer.noSpaces.copy(dropNullValues = true)
 
