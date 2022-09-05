@@ -1,3 +1,6 @@
+import { saveAs } from 'file-saver';
+import { FileTree } from '../components/FileTreeView';
+
 export enum EffectType {
   Future = 'FutureEffect',
   IO = 'IOEffect',
@@ -39,3 +42,51 @@ export type StarterRequest = {
   scalaVersion: ScalaVersion;
   builder: Builder;
 };
+
+export async function doRequestStarter(formData: StarterRequest) {
+  const serverAddress = !process.env.REACT_APP_SERVER_ADDRESS
+    ? 'https://adopt-tapir.softwaremill.com'
+    : process.env.REACT_APP_SERVER_ADDRESS;
+  const response = await fetch(`${serverAddress}/api/v1/starter.zip`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(formData),
+  });
+
+  if (!response.ok) {
+    const json = await response.json();
+
+    throw new Error(json.error || 'Something went wrong, please try again later.');
+  }
+
+  const blob = await response.blob();
+  const filename = response.headers.get('Content-Disposition')?.split('filename=')[1].replaceAll('"', '');
+
+  // download starter zip file
+  saveAs(blob, filename ?? 'starter.zip');
+}
+
+// TODO use dedicated endpoint.
+// Current request only simulates call to api. It will be replaced when endpoint is ready.
+export async function doRequestPreview(formData: StarterRequest, consumer: (resp: FileTree) => void) {
+  const serverAddress = !process.env.REACT_APP_SERVER_ADDRESS
+    ? 'https://adopt-tapir.softwaremill.com'
+    : process.env.REACT_APP_SERVER_ADDRESS;
+  const response = await fetch(`${serverAddress}/api/v1/content`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(formData),
+  });
+
+  if (!response.ok) {
+    const json = await response.json();
+
+    throw new Error(json.error || 'Something went wrong, please try again later.');
+  }
+
+  consumer(await response.json())
+}

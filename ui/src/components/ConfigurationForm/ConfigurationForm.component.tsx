@@ -1,10 +1,9 @@
-import { useEffect } from 'react';
-import { Alert, Backdrop, Box, Button, CircularProgress, Snackbar, Typography } from '@mui/material';
+import { useContext, useEffect } from 'react';
+import { Box, Button, Typography } from '@mui/material';
 import { FormProvider, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { DevTool } from '@hookform/devtools';
-import { saveAs } from 'file-saver';
-import { Builder, JSONImplementation, ScalaVersion, StarterRequest } from 'api/starter';
+import { Builder, doRequestStarter, JSONImplementation, ScalaVersion, StarterRequest } from 'api/starter';
 import { useApiCall } from 'hooks/useApiCall';
 import { isDevelopment } from 'consts/env';
 import { FormTextField } from '../FormTextField';
@@ -24,12 +23,17 @@ import {
   getJSONImplementationOptions,
   mapEffectTypeToJSONImplementation,
 } from './ConfigurationForm.helpers';
+import { useNavigate } from 'react-router-dom';
+import { ApiCallAddons } from '../ApiCallAddons';
+import { ConfigurationDataContext, resetFormData, setFormData } from '../../contexts';
 
 interface ConfigurationFormProps {
   isEmbedded?: boolean;
 }
 
 export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded = false }) => {
+  const navigate = useNavigate();
+  const [{ formData }, contextDispatch] = useContext(ConfigurationDataContext);
   const { call, clearError, isLoading, errorMessage } = useApiCall();
   const { classes, cx } = useStyles({ isEmbedded });
   const form = useForm<StarterRequest>({
@@ -54,6 +58,20 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
   const isEffectImplementationSelectable = Boolean(effectType) && Boolean(scalaVersion);
 
   useEffect(() => {
+    if (formData !== undefined) {
+      form.setValue('projectName', formData.projectName);
+      form.setValue('groupId', formData.groupId);
+      form.setValue('effect', formData.effect);
+      form.setValue('implementation', formData.implementation);
+      form.setValue('addDocumentation', formData.addDocumentation);
+      form.setValue('addMetrics', formData.addMetrics);
+      form.setValue('json', formData.json);
+      form.setValue('scalaVersion', formData.scalaVersion);
+      form.setValue('builder', formData.builder);
+    }
+  }, [formData, form]);
+
+  useEffect(() => {
     // NOTE: reset effect implementation field value upon effect type or scala version change
     if (
       effectType &&
@@ -75,39 +93,30 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
     }
   }, [form, effectType, jsonImplementation]);
 
-  const handleStarterRequest = async (formData: StarterRequest): Promise<void> => {
-    const serverAddress = (process.env.REACT_APP_SERVER_ADDRESS == null) ? "https://adopt-tapir.softwaremill.com" : process.env.REACT_APP_SERVER_ADDRESS;
-    const response = await fetch(`${serverAddress}/api/v1/starter.zip`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formData),
-    });
-
-    if (!response.ok) {
-      const json = await response.json();
-
-      throw new Error(json.error || 'Something went wrong, please try again later.');
-    }
-
-    const blob = await response.blob();
-    const filename = response.headers.get('Content-Disposition')?.split('filename=')[1].replaceAll('"', '');
-
-    // download starter zip file
-    saveAs(blob, filename ?? 'starter.zip');
-  };
-
   const handleFormSubmit = (formData: StarterRequest): void => {
-    call(() => handleStarterRequest(formData));
+    call(() => doRequestStarter(formData));
   };
 
   const handleFormReset = (): void => {
+    contextDispatch(resetFormData());
     form.reset();
   };
 
-  const handleCloseAlert = (): void => {
-    clearError();
+  const handleShowPreview = (): void => {
+    // 'trigger()' triggers the validation.
+    form.trigger().then(isValid => {
+      if (isValid) {
+        const casted = form.getValues() as StarterRequest;
+        // Conversion of bools is done by hand, because casting writes booleans as strings.
+        const formData: StarterRequest = {
+          ...casted,
+          addDocumentation: 'true' === casted.addDocumentation.toString(),
+          addMetrics: 'true' === casted.addMetrics.toString(),
+        };
+        contextDispatch(setFormData(formData));
+        navigate('/preview-starter');
+      }
+    });
   };
 
   return (
@@ -184,6 +193,20 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
               Reset
             </Button>
 
+            {!isEmbedded && (
+              <Button
+                className={classes.submitButton}
+                onClick={handleShowPreview}
+                variant="contained"
+                color="primary"
+                size="medium"
+                type="button"
+                disableElevation
+              >
+                Preview
+              </Button>
+            )}
+
             <Button
               className={classes.submitButton}
               variant="contained"
@@ -200,19 +223,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
         {isDevelopment && <DevTool control={form.control} />}
       </FormProvider>
 
-      <Backdrop open={isLoading}>
-        <CircularProgress />
-      </Backdrop>
-      <Snackbar
-        open={Boolean(errorMessage)}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-        autoHideDuration={5000}
-        onClose={handleCloseAlert}
-      >
-        <Alert severity="error" variant="outlined">
-          {errorMessage}
-        </Alert>
-      </Snackbar>
+      <ApiCallAddons isLoading={isLoading} clearError={clearError} errorMessage={errorMessage} />
     </Box>
   );
 };

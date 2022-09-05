@@ -56,7 +56,7 @@ export const useStyles = makeStyles<{ isEmbedded: boolean }>()((theme, { isEmbed
     actionsContainer: {
       justifySelf: 'end',
 
-      '& button:first-child': {
+      '& button:not(:last-child)': {
         marginRight: theme.spacing(2),
       },
     },

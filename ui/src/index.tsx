@@ -6,6 +6,7 @@ import createCache from '@emotion/cache';
 import { App } from './App';
 import { theme } from './theme';
 import reportWebVitals from './reportWebVitals';
+import { ConfigurationDataContextProvider } from './contexts';
 
 const muiCache = createCache({
   key: 'mui',
@@ -18,7 +19,9 @@ root.render(
   <React.StrictMode>
     <CacheProvider value={muiCache}>
       <ThemeProvider theme={theme}>
-        <App />
+        <ConfigurationDataContextProvider>
+          <App />
+        </ConfigurationDataContextProvider>
       </ThemeProvider>
     </CacheProvider>
   </React.StrictMode>

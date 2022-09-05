@@ -20,10 +20,6 @@ export const useStyles = makeStyles()(theme => ({
     },
   },
 
-  configurationPaper: {
-    padding: theme.spacing(3),
-  },
-
   footerWrapper: {
     height: '8%',
     backgroundColor: darken(theme.palette.neutral.main, 0.1),

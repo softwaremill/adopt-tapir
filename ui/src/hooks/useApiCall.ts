@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 export const useApiCall = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -8,7 +8,7 @@ export const useApiCall = () => {
     setErrorMessage('');
   };
 
-  const call = async (apiCall: () => Promise<void>) => {
+  const call = useCallback(async (apiCall: () => Promise<void>) => {
     try {
       clearError();
       setIsLoading(true);
@@ -23,7 +23,7 @@ export const useApiCall = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   return {
     call,
