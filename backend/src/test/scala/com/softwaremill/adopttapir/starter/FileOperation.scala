@@ -2,13 +2,18 @@ package com.softwaremill.adopttapir.starter
 
 import cats.effect.{ExitCode, IO, IOApp}
 import com.softwaremill.adopttapir.config.Config
+import com.softwaremill.adopttapir.starter.files.FilesManager
+import com.softwaremill.adopttapir.starter.formatting.GeneratedFilesFormatter
 import com.softwaremill.adopttapir.template.ProjectGenerator
 
 @deprecated("Only for development purpose")
 object FileOperation extends IOApp {
 
-  private val cfg = Config.read.starter
-  val service = new StarterService(cfg.copy(deleteTempFolder = false), new ProjectGenerator())
+  val service: StarterService = {
+    val cfg = Config.read.storageConfig.copy(deleteTempFolder = false)
+    val fm = new FilesManager(cfg)
+    new StarterService(new ProjectGenerator(), fm, new GeneratedFilesFormatter(fm))
+  }
 
   override def run(args: List[String]): IO[ExitCode] = {
     val details = StarterDetails(
@@ -16,8 +21,8 @@ object FileOperation extends IOApp {
       "com.mjoyit.experience",
       ServerEffect.ZIOEffect,
       ServerImplementation.ZIOHttp,
-      true,
-      false,
+      addDocumentation = true,
+      addMetrics = false,
       JsonImplementation.Circe,
       ScalaVersion.Scala2,
       Builder.ScalaCli

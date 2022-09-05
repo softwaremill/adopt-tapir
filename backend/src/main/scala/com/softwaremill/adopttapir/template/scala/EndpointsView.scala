@@ -159,7 +159,7 @@ object EndpointsView {
     val jsonEndpoint = if (starterDetails.jsonImplementation == JsonImplementation.WithoutJson) Nil else List(booksListingServerEndpoint)
     val endpoints = List(helloServerEndpoint) ++ jsonEndpoint
     Code(
-      s"val ${apiEndpoints}: ${serverKind} = List(${endpoints.mkString(",")})"
+      s"val $apiEndpoints: $serverKind = List(${endpoints.mkString(",")})"
     ).prependBody(INDENT)
   }
 
@@ -176,16 +176,16 @@ object EndpointsView {
   private object DocumentationEndpoint {
 
     def prepareDocEndpoints(
-                             projectName: String,
-                             serverEffect: ServerEffect,
-                           ): Code = {
+        projectName: String,
+        serverEffect: ServerEffect
+    ): Code = {
       Code(prepareCode(projectName, serverEffect), prepareImports(serverEffect)).prependBody(INDENT)
     }
 
     private def prepareCode(projectName: String, serverEffect: ServerEffect): String = {
       val (effect, endpoint) = serverEffectToEffectAndEndpoint(serverEffect)
       s"""val $docEndpoints: List[$endpoint] = SwaggerInterpreter()
-          .fromServerEndpoints[$effect](${apiEndpoints}, "$projectName", "1.0.0")""".stripMargin
+          .fromServerEndpoints[$effect]($apiEndpoints, "$projectName", "1.0.0")""".stripMargin
     }
 
     def prepareImports(serverEffect: ServerEffect): Set[Import] = {
