@@ -16,7 +16,7 @@ class ContentService(projectGenerator: ProjectGenerator, generatedFilesFormatter
       projectAsDirTrees <- IO(formattedGeneratedFiles.map(fgf => {
         val paths = fgf.relativePath.split('/').toList
         val content = fgf.content
-        DirectoryMerger.createTree(projectName, paths, content)
+        DirectoryMerger(projectName, paths, content)
       }))
       projectAsTree <- IO(projectAsDirTrees.reduce(DirectoryMerger.apply))
     } yield projectAsTree

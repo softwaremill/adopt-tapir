@@ -14,13 +14,12 @@ class DirectoryMergerTest extends BaseTest {
     val DirName: String = "DirName"
     val DifferentDirName: String = "DifferentDirName"
     val EmptyNodesList: List[Node] = List()
-
   }
 
   import DirectoryMergerTest._
 
   "createTree" should "throw if `pathsNames` is empty" in {
-    an[AssertionError] should be thrownBy DirectoryMerger.createTree(
+    an[AssertionError] should be thrownBy DirectoryMerger(
       TopDirName,
       EmptyPathList,
       EmptyContent
@@ -29,7 +28,7 @@ class DirectoryMergerTest extends BaseTest {
 
   "createTree" should "create single dir / single file structure" in {
     val fileName = "root"
-    DirectoryMerger.createTree(
+    DirectoryMerger(
       TopDirName,
       List(fileName),
       EmptyContent
@@ -38,7 +37,7 @@ class DirectoryMergerTest extends BaseTest {
 
   "createTree" should "create multiple dirs / single file structure" in {
     val (dirName1, dirName2, dirName3, fileName) = ("dirName1", "dirName2", "dirName3", "fileName")
-    DirectoryMerger.createTree(
+    DirectoryMerger(
       TopDirName,
       List(dirName1, dirName2, dirName3, fileName),
       NonEmptyContent
@@ -92,17 +91,15 @@ class DirectoryMergerTest extends BaseTest {
   "merge" should "create proper project structure when project like files are given" in {
     val projectName = "project-name"
     val files = List(
-      DirectoryMerger.createTree(projectName, "src/main/scala/group/id/Main.scala".split('/').toList, "package group.id..."),
-      DirectoryMerger.createTree(projectName, "src/main/scala/group/id/Endpoints.scala".split('/').toList, "package group.id..."),
-      DirectoryMerger.createTree(projectName, "src/test/scala/group/id/EndpointsSpec.scala".split('/').toList, "package group.id..."),
-      DirectoryMerger.createTree(projectName, List(".scalafmt.conf"), "version = 3.5.8..."),
-      DirectoryMerger.createTree(projectName, List("build.sbt"), "val tapirVersion = \"1.0.6\"..."),
-      DirectoryMerger
-        .createTree(projectName, List("project", "build.properties"), "sbt.version=1.7.1..."),
-      DirectoryMerger
-        .createTree(projectName, List("project", "plugins.sbt"), "addSbtPlugin(\"org.scalameta\" % \"sbt-scalafmt\" % \"2.4.6\")..."),
-      DirectoryMerger.createTree(projectName, List("sbtx"), "#!/usr/bin/env bash..."),
-      DirectoryMerger.createTree(projectName, List("README.md"), "## Quick start...")
+      DirectoryMerger(projectName, "src/main/scala/group/id/Main.scala".split('/').toList, "package group.id..."),
+      DirectoryMerger(projectName, "src/main/scala/group/id/Endpoints.scala".split('/').toList, "package group.id..."),
+      DirectoryMerger(projectName, "src/test/scala/group/id/EndpointsSpec.scala".split('/').toList, "package group.id..."),
+      DirectoryMerger(projectName, List(".scalafmt.conf"), "version = 3.5.8..."),
+      DirectoryMerger(projectName, List("build.sbt"), "val tapirVersion = \"1.0.6\"..."),
+      DirectoryMerger(projectName, List("project", "build.properties"), "sbt.version=1.7.1..."),
+      DirectoryMerger(projectName, List("project", "plugins.sbt"), "addSbtPlugin(\"org.scalameta\" % \"sbt-scalafmt\" % \"2.4.6\")..."),
+      DirectoryMerger(projectName, List("sbtx"), "#!/usr/bin/env bash..."),
+      DirectoryMerger(projectName, List("README.md"), "## Quick start...")
     )
 
     files.reduce(DirectoryMerger.apply) should be(

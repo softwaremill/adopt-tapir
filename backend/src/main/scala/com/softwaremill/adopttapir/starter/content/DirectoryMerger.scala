@@ -2,7 +2,7 @@ package com.softwaremill.adopttapir.starter.content
 
 object DirectoryMerger {
 
-  def createTree(topDirName: String, pathNames: List[String], content: String): Directory = {
+  def apply(topDirName: String, pathNames: List[String], content: String): Directory = {
     assert(pathNames.nonEmpty, "`pathNames` list cannot be empty!")
 
     val pathsWithRootDir = List(topDirName) ++ pathNames
