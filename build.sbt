@@ -14,13 +14,13 @@ val tapirVersion = "1.0.6"
 val http4sBlazeServerVersion = "0.23.12"
 val http4sCirceVersion = "0.23.15"
 val circeVersion = "0.14.2"
-val sttpVersion = "3.7.5"
+val sttpVersion = "3.7.6"
 val prometheusVersion = "0.16.0"
 val macwireVersion = "2.5.8"
 
 val scalafmtVersion = "3.5.8"
 val scalaLoggingVersion = "3.9.5"
-val logbackClassicVersion = "1.2.11"
+val logbackClassicVersion = "1.4.0"
 val scalaTestVersion = "3.2.13"
 
 val httpDependencies = Seq(
@@ -42,6 +42,7 @@ val monitoringDependencies = Seq(
 val jsonDependencies = Seq(
   "io.circe" %% "circe-core" % circeVersion,
   "io.circe" %% "circe-generic" % circeVersion,
+  "io.circe" %% "circe-generic-extras" % circeVersion,
   "io.circe" %% "circe-parser" % circeVersion,
   "com.softwaremill.sttp.tapir" %% "tapir-enumeratum" % tapirVersion,
   "com.beachape" %% "enumeratum-circe" % "1.7.0",
@@ -66,7 +67,7 @@ val configDependencies = Seq(
 val baseDependencies = Seq(
   "org.typelevel" %% "cats-effect" % "3.3.14",
   "com.softwaremill.common" %% "tagging" % "2.3.3",
-  "com.softwaremill.quicklens" %% "quicklens" % "1.8.8"
+  "com.softwaremill.quicklens" %% "quicklens" % "1.8.10"
 )
 
 val apiDocsDependencies = Seq(
@@ -233,7 +234,7 @@ lazy val ui = (project in file(uiProjectName))
   .settings(cleanFiles += baseDirectory.value / "build")
 
 val scala3Version = "3.1.3"
-val plokhotnyukJsoniterVersion = "2.15.0"
+val plokhotnyukJsoniterVersion = "2.17.0"
 val zioTestVersion = "2.0.0"
 
 lazy val templateDependencies: Project = project

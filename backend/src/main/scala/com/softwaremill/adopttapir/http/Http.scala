@@ -5,6 +5,7 @@ import cats.implicits._
 import com.softwaremill.adopttapir._
 import com.softwaremill.adopttapir.infrastructure.Json._
 import com.softwaremill.adopttapir.logging.FLogging
+import com.softwaremill.adopttapir.util.Constants
 import com.softwaremill.tagging._
 import io.circe.Printer
 import sttp.model.StatusCode
@@ -13,9 +14,15 @@ import sttp.tapir.codec.enumeratum.TapirCodecEnumeratum
 import sttp.tapir.generic.auto.SchemaDerivation
 import sttp.tapir.json.circe.TapirJsonCirce
 import sttp.tapir.{Codec, Endpoint, EndpointOutput, PublicEndpoint, Schema, SchemaType, Tapir}
+import sttp.tapir.generic.{Configuration => TapirConfiguration}
 
 /** Helper class for defining HTTP endpoints. Import the members of this class when defining an HTTP API using tapir. */
 class Http() extends Tapir with TapirJsonCirce with TapirSchemas with TapirCodecEnumeratum with FLogging {
+
+  implicit val tapirConfiguration: TapirConfiguration =
+    TapirConfiguration.default
+      .withDiscriminator(Constants.DiscriminatorName)
+      .copy(toDiscriminatorValue = TapirConfiguration.default.toDiscriminatorValue.andThen(_.toLowerCase))
 
   val jsonErrorOutOutput: EndpointOutput[Error_OUT] = jsonBody[Error_OUT]
 

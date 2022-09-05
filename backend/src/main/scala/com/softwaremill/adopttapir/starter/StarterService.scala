@@ -1,49 +1,35 @@
 package com.softwaremill.adopttapir.starter
 
-import better.files.File.newTemporaryDirectory
-import better.files.{File => BFile}
 import cats.effect.IO
 import com.softwaremill.adopttapir.logging.FLogging
 import com.softwaremill.adopttapir.metrics.Metrics
 import com.softwaremill.adopttapir.metrics.Metrics.generatedStarterCounter
-import com.softwaremill.adopttapir.template.{GeneratedFile, ProjectGenerator}
-import com.softwaremill.adopttapir.util.ZipArchiver
+import com.softwaremill.adopttapir.starter.files.FilesManager
+import com.softwaremill.adopttapir.starter.formatting.GeneratedFilesFormatter
+import com.softwaremill.adopttapir.template.ProjectGenerator
 
 import java.io.File
-import scala.reflect.io.Directory
 
-class StarterService(
-    config: StarterConfig,
-    projectGenerator: ProjectGenerator
-) extends FLogging {
+class StarterService(projectGenerator: ProjectGenerator, filesManager: FilesManager, generatedFilesFormatter: GeneratedFilesFormatter)
+    extends FLogging {
+
   def generateZipFile(starterDetails: StarterDetails): IO[File] = {
     logger.info(s"received request: $starterDetails") *>
-      IO(projectGenerator.generate(starterDetails)).flatMap { filesToCreate =>
-        IO.blocking(newTemporaryDirectory(prefix = config.tempPrefix).toJava)
-          .bracket { tempDir =>
-            for {
-              _ <- logger.debug("created temp dir: " + tempDir.toString)
-              _ <- storeFiles(tempDir, filesToCreate)
-              _ <- FormatScalaFiles(tempDir)
-              zippedFile <- zipDirectory(tempDir)
-              _ <- increaseMetricCounter(starterDetails)
-            } yield zippedFile
-          }(release = tempDir => if (config.deleteTempFolder) deleteRecursively(tempDir) else IO.unit)
-      }
-  }
-
-  private def storeFiles(destinationFolder: File, filesToCreate: List[GeneratedFile]): IO[Unit] = IO.blocking {
-    filesToCreate.foreach { generatedFile =>
-      val file = BFile(destinationFolder.getPath, generatedFile.relativePath)
-      file.parent.createDirectories()
-      file.overwrite(generatedFile.content)
-    }
-  }
-
-  private def zipDirectory(directoryFile: File): IO[File] = IO.blocking {
-    val destination = BFile.newTemporaryFile(prefix = directoryFile.getName + "_", suffix = ".zip")
-    ZipArchiver().create(destination.path, directoryFile.toPath)
-    destination.toJava
+      IO(generatedFilesFormatter.format(projectGenerator.generate(starterDetails)))
+        .flatMap(formattedGeneratedFiles => {
+          IO
+            .blocking(filesManager.createTempDir())
+            .bracket { tempDirectory =>
+              for {
+                tempDir <- tempDirectory
+                _ <- logger.debug("created temp dir: " + tempDir)
+                generatedFiles <- formattedGeneratedFiles
+                _ <- filesManager.createFiles(tempDir, generatedFiles)
+                zippedFile <- filesManager.zipDirectory(tempDir)
+                _ <- increaseMetricCounter(starterDetails)
+              } yield zippedFile
+            }(release = tempDirectory => filesManager.deleteFilesAsStatedInConfig(tempDirectory))
+        })
   }
 
   private def increaseMetricCounter(details: StarterDetails): IO[Unit] = {
@@ -58,10 +44,5 @@ class StarterService(
         .labels(labelValues: _*)
         .inc()
     )
-  }
-
-  private def deleteRecursively(tempDir: File): IO[Unit] = IO.blocking {
-    new Directory(tempDir).deleteRecursively()
-    ()
   }
 }

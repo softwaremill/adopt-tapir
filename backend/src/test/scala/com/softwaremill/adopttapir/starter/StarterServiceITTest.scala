@@ -7,6 +7,8 @@ import cats.instances.list._
 import cats.syntax.parallel._
 import cats.syntax.show._
 import com.softwaremill.adopttapir.starter.api._
+import com.softwaremill.adopttapir.starter.files.{FilesManager, StorageConfig}
+import com.softwaremill.adopttapir.starter.formatting.GeneratedFilesFormatter
 import com.softwaremill.adopttapir.template.ProjectGenerator
 import com.softwaremill.adopttapir.test.ServiceTimeouts.waitForPortTimeout
 import com.softwaremill.adopttapir.test.ShowHelpers._
@@ -139,7 +141,9 @@ case class GeneratedServiceUnderTest(serviceFactory: ServiceFactory, details: St
   }
 
   private def createTempDirectory(): Resource[IO, BFile] = {
-    Resource.make(IO.blocking(BFile.newTemporaryDirectory("sbtTesting")))(tempDir => IO.blocking(tempDir.delete(true)))
+    Resource.make(IO.blocking(BFile.newTemporaryDirectory("sbtTesting")))(tempDir =>
+      IO.blocking(tempDir.delete(swallowIOExceptions = true))
+    )
   }
 
   private def unzipFile(zipFile: BFile, tempDir: BFile, logger: RunLogger): IO[Unit] = {
@@ -172,8 +176,11 @@ case class GeneratedServiceUnderTest(serviceFactory: ServiceFactory, details: St
 
 object ZipGenerator {
   val service: StarterService = {
-    val config = StarterConfig(deleteTempFolder = true, tempPrefix = "generatedService")
-    new StarterService(config, new ProjectGenerator())
+    val cfg = StorageConfig(deleteTempFolder = true, tempPrefix = "generatedService")
+    val pg = new ProjectGenerator()
+    val fm = new FilesManager(cfg)
+    val pf = new GeneratedFilesFormatter(fm)
+    new StarterService(pg, fm, pf)
   }
 }
 

@@ -33,7 +33,7 @@ object Dependencies {
 
     autowire[Dependencies](
       config.api,
-      config.starter,
+      config.storageConfig,
       buildHttpApi _
     )
   }

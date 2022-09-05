@@ -1,7 +1,7 @@
 package com.softwaremill.adopttapir.config
 
 import com.softwaremill.adopttapir.http.HttpConfig
-import com.softwaremill.adopttapir.starter.StarterConfig
+import com.softwaremill.adopttapir.starter.files.StorageConfig
 import com.softwaremill.adopttapir.version.BuildInfo
 import com.typesafe.scalalogging.StrictLogging
 import pureconfig.ConfigSource
@@ -10,7 +10,7 @@ import pureconfig.generic.auto._
 import scala.collection.immutable.TreeMap
 
 /** Maps to the `application.conf` file. Configuration for all modules of the application. */
-case class Config(api: HttpConfig, starter: StarterConfig)
+case class Config(api: HttpConfig, storageConfig: StorageConfig)
 
 object Config extends StrictLogging {
   def log(config: Config): Unit = {
@@ -18,7 +18,7 @@ object Config extends StrictLogging {
                       |Adopt-tapir configuration:
                       |-----------------------
                       |API:            ${config.api}
-                      |Starter:        ${config.starter}
+                      |Storage:        ${config.storageConfig}
                       |
                       |Build & env info:
                       |-----------------
