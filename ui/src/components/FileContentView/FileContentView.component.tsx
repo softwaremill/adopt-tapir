@@ -35,7 +35,7 @@ export function FileContentView({ files, opened }: Props) {
       if (found === undefined) {
         throw Error(`File '${remaining}' not found in ${JSON.stringify(tree)}`);
       } else if (found.type === 'directory') {
-        return findFile(found.children, remaining.slice(1));
+        return findFile(found.content, remaining.slice(1));
       } else if (found.type === 'file') {
         return [found];
       } else {

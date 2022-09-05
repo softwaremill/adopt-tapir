@@ -13,7 +13,7 @@ export type FileNode = {
 export type DirNode = {
   name: string;
   type: 'directory';
-  children: FileTreeNode[];
+  content: FileTreeNode[];
 };
 
 export type TreeState = {

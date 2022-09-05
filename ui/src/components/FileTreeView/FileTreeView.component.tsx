@@ -72,7 +72,7 @@ function FileNodeView({ node: { name }, location, state }: NodeProps<FileNode>) 
   );
 }
 
-function DirNodeView({ node: { name, children }, location, state }: NodeProps<DirNode>) {
+function DirNodeView({ node: { name, content }, location, state }: NodeProps<DirNode>) {
   const [dirLocation, setDirLocation] = useState(location.add(name));
   const { classes } = useStyles({ level: location.getLevel() });
 
@@ -94,7 +94,7 @@ function DirNodeView({ node: { name, children }, location, state }: NodeProps<Di
           <Folder />
           {name}
         </button>
-        <NodesView tree={children} location={dirLocation} state={state} />
+        <NodesView tree={content} location={dirLocation} state={state} />
       </li>
     </>
   );
