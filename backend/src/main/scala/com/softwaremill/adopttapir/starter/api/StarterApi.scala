@@ -66,11 +66,11 @@ class StarterApi(http: Http, starterService: StarterService, contentService: Con
     baseEndpoint.post
       .in(contentPath)
       .in(jsonBody[StarterRequest])
-      .out(jsonBody[Node])
+      .out(jsonBody[List[Node]])
       .serverLogic[IO] { request =>
-        val result: EitherT[IO, Fail, Node] = for {
+        val result: EitherT[IO, Fail, List[Node]] = for {
           starterDetailsOrFail <- EitherT(IO.pure(FormValidator.validate(request)))
-          nodeOrFail <- EitherT.liftF(contentService.generateContentTree(starterDetailsOrFail))
+          nodeOrFail <- EitherT.liftF(contentService.generateContentTree(starterDetailsOrFail).map(_.content))
         } yield nodeOrFail
 
         result.value

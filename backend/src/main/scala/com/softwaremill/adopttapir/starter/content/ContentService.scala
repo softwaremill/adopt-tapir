@@ -7,7 +7,7 @@ import com.softwaremill.adopttapir.template.ProjectGenerator
 
 class ContentService(projectGenerator: ProjectGenerator, generatedFilesFormatter: GeneratedFilesFormatter) {
 
-  def generateContentTree(starterDetails: StarterDetails): IO[Node] = {
+  def generateContentTree(starterDetails: StarterDetails): IO[Directory] = {
     val projectName = starterDetails.projectName
     val rawGeneratedFiles = projectGenerator.generate(starterDetails)
 
