@@ -4,6 +4,7 @@ import cats.effect.IO
 import com.softwaremill.adopttapir.logging.FLogging
 import com.softwaremill.adopttapir.starter.files.FilesManager
 import com.softwaremill.adopttapir.template.{CommonObjectTemplate, GeneratedFile}
+import org.scalafmt.dynamic.ConsoleScalafmtReporter
 import org.scalafmt.interfaces.Scalafmt
 
 import java.nio.file.Path
@@ -12,7 +13,15 @@ class GeneratedFilesFormatter(fm: FilesManager) extends FLogging {
 
   private val ScalaFileExtensions = Set(".scala", ".sbt")
 
-  private lazy val scalafmt = Scalafmt.create(getClass.getClassLoader)
+  private lazy val scalafmt =
+    Scalafmt
+      .create(getClass.getClassLoader)
+      .withReporter(
+        new ConsoleScalafmtReporter(System.err) {
+          override def parsedConfig(config: Path, scalafmtVersion: String): Unit =
+            System.out.println(s"Parsed config (v$scalafmtVersion): $config.")
+        }
+      )
 
   def format(gfs: List[GeneratedFile]): IO[List[GeneratedFile]] = {
     findGeneratedFormatFile(gfs) match {
@@ -26,8 +35,8 @@ class GeneratedFilesFormatter(fm: FilesManager) extends FLogging {
             } yield formattedFiles
           }(release = tempDirectory => fm.deleteFilesAsStatedInConfig(tempDirectory))
       case None =>
-        logger.error(s"Cannot find formatting file in generated project, scala files will NOT be formatted!")
-        IO(gfs)
+        logger.error(s"Cannot find formatting file in generated project, scala files will NOT be formatted!") *>
+          IO(gfs)
     }
   }
 
