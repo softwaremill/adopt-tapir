@@ -1,27 +1,38 @@
 package com.softwaremill.adopttapir.starter.formatting
 
 import cats.effect.IO
-import com.softwaremill.adopttapir.logging.FLogging
 import com.softwaremill.adopttapir.starter.files.FilesManager
 import com.softwaremill.adopttapir.template.{CommonObjectTemplate, GeneratedFile}
-import org.scalafmt.dynamic.ConsoleScalafmtReporter
-import org.scalafmt.interfaces.Scalafmt
+import com.typesafe.scalalogging.StrictLogging
+import org.scalafmt.interfaces.{Scalafmt, ScalafmtReporter}
 
+import java.io.{OutputStreamWriter, PrintWriter}
 import java.nio.file.Path
 
-class GeneratedFilesFormatter(fm: FilesManager) extends FLogging {
+class GeneratedFilesFormatter(fm: FilesManager) extends StrictLogging {
 
   private val ScalaFileExtensions = Set(".scala", ".sbt")
+
+  private lazy val scalafmtReporter =
+    new ScalafmtReporter {
+      override def error(file: Path, message: String): Unit = logger.error(s"Error: $file: $message.")
+
+      override def error(file: Path, e: Throwable): Unit = logger.error(s"Error: $file: ", e)
+
+      override def excluded(file: Path): Unit = logger.info(s"File excluded: $file.")
+
+      override def parsedConfig(config: Path, scalafmtVersion: String): Unit =
+        logger.info(s"Parsed config (v$scalafmtVersion): $config.")
+
+      override def downloadWriter(): PrintWriter = new PrintWriter(System.out)
+
+      override def downloadOutputStreamWriter(): OutputStreamWriter = new OutputStreamWriter(System.out)
+    }
 
   private lazy val scalafmt =
     Scalafmt
       .create(getClass.getClassLoader)
-      .withReporter(
-        new ConsoleScalafmtReporter(System.err) {
-          override def parsedConfig(config: Path, scalafmtVersion: String): Unit =
-            System.out.println(s"Parsed config (v$scalafmtVersion): $config.")
-        }
-      )
+      .withReporter(scalafmtReporter)
 
   def format(gfs: List[GeneratedFile]): IO[List[GeneratedFile]] = {
     findGeneratedFormatFile(gfs) match {
@@ -35,8 +46,8 @@ class GeneratedFilesFormatter(fm: FilesManager) extends FLogging {
             } yield formattedFiles
           }(release = tempDirectory => fm.deleteFilesAsStatedInConfig(tempDirectory))
       case None =>
-        logger.error(s"Cannot find formatting file in generated project, scala files will NOT be formatted!") *>
-          IO(gfs)
+        logger.error(s"Cannot find formatting file in generated project, scala files will NOT be formatted!")
+        IO(gfs)
     }
   }
 
