@@ -47,43 +47,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
   const { classes, cx } = useStyles({ isEmbedded });
 
   const [searchParams, setSearchParams] = useSearchParams();
-  useEffect(() => {
-    if (searchParams.toString() !== '') {
-      const qp = parse(searchParams.toString(), { parseBooleans: true });
-      starterValidationSchema
-        .isValid(qp)
-        .then(isValid => {
-          if (isValid) {
-            const queryParams = qp as StarterRequest;
-            let key: keyof StarterRequest;
-            for (key in queryParams) {
-              form.setValue(key, queryParams[key]);
-            }
-            setSnackbar({
-              open: true,
-              severity: 'info',
-              message: 'Linked configuration was applied.',
-            });
-            //trigger form validity so that `share` button is enabled upon the values application
-            form.trigger().then(ignore => {});
-          } else {
-            setSnackbar({
-              open: true,
-              severity: 'warning',
-              message: 'Linked configuration is not valid therefore it was not applied.',
-            });
-          }
-        })
-        .catch(_ => {
-          setSnackbar({
-            open: true,
-            severity: 'warning',
-            message: 'Validation of linked configuration failed therefore it was not applied.',
-          });
-        });
-      setSearchParams({});
-    }
-  });
+  useEffect(() => applySharedConfiguration(searchParams));
 
   const form = useForm<StarterRequest>({
     mode: 'onBlur',
@@ -187,6 +151,44 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
     );
     await navigator.clipboard.writeText(urlToShare);
     setSnackbar({ open: true, severity: 'info', message: 'Link to configuration copied to clipboard.' });
+  };
+
+  const applySharedConfiguration = (searchParams: URLSearchParams) => {
+    if (searchParams.toString() !== '') {
+      const qp = parse(searchParams.toString(), { parseBooleans: true });
+      starterValidationSchema
+        .isValid(qp)
+        .then(isValid => {
+          if (isValid) {
+            const queryParams = qp as StarterRequest;
+            let key: keyof StarterRequest;
+            for (key in queryParams) {
+              form.setValue(key, queryParams[key]);
+            }
+            setSnackbar({
+              open: true,
+              severity: 'info',
+              message: 'Linked configuration was applied.',
+            });
+            //trigger form validity so that `share` button is enabled upon the values application
+            form.trigger().then(ignore => {});
+          } else {
+            setSnackbar({
+              open: true,
+              severity: 'warning',
+              message: 'Linked configuration is not valid therefore it was not applied.',
+            });
+          }
+        })
+        .catch(_ => {
+          setSnackbar({
+            open: true,
+            severity: 'warning',
+            message: 'Validation of linked configuration failed therefore it was not applied.',
+          });
+        });
+      setSearchParams({});
+    }
   };
 
   return (
