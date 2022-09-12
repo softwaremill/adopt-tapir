@@ -1,5 +1,5 @@
 import { SyntheticEvent, useContext, useEffect, useState } from 'react';
-import { Alert, AlertColor, Box, Button, IconButton, Snackbar, Stack, Tooltip, Typography } from '@mui/material';
+import { AlertColor, Box, Button, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import ShareTwoToneIcon from '@mui/icons-material/ShareTwoTone';
 import { FormProvider, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -28,6 +28,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { ApiCallAddons } from '../ApiCallAddons';
 import { ConfigurationDataContext, resetFormData, setFormData } from '../../contexts';
 import { parse, stringifyUrl } from 'query-string';
+import { CommonSnackbar } from '../CommonSnackbar';
 
 interface ConfigurationFormProps {
   isEmbedded?: boolean;
@@ -208,16 +209,13 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
         </Stack>
       )}
 
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={2500}
+      <CommonSnackbar
+        duration={2500}
+        message={snackbar.message}
         onClose={handleSnackClose}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-      >
-        <Alert onClose={handleSnackClose} severity={snackbar.severity} sx={{ width: '100%' }}>
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+        open={snackbar.open}
+        severity={snackbar.severity}
+      />
 
       <FormProvider {...form}>
         <form
