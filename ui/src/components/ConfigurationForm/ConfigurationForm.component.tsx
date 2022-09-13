@@ -1,5 +1,6 @@
-import { useContext, useEffect } from 'react';
-import { Box, Button, Typography } from '@mui/material';
+import { SyntheticEvent, useContext, useEffect, useState } from 'react';
+import { AlertColor, Box, Button, IconButton, Stack, Tooltip, Typography } from '@mui/material';
+import ShareTwoToneIcon from '@mui/icons-material/ShareTwoTone';
 import { FormProvider, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { DevTool } from '@hookform/devtools';
@@ -23,12 +24,20 @@ import {
   getJSONImplementationOptions,
   mapEffectTypeToJSONImplementation,
 } from './ConfigurationForm.helpers';
-import { useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { ApiCallAddons } from '../ApiCallAddons';
 import { ConfigurationDataContext, resetFormData, setFormData } from '../../contexts';
+import { parse, stringifyUrl } from 'query-string';
+import { CommonSnackbar } from '../CommonSnackbar';
 
 interface ConfigurationFormProps {
   isEmbedded?: boolean;
+}
+
+interface SnackbarConfig {
+  open: boolean;
+  severity?: AlertColor;
+  message?: String;
 }
 
 export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded = false }) => {
@@ -36,6 +45,10 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
   const [{ formData }, contextDispatch] = useContext(ConfigurationDataContext);
   const { call, clearError, isLoading, errorMessage } = useApiCall();
   const { classes, cx } = useStyles({ isEmbedded });
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  useEffect(() => applySharedConfiguration(searchParams));
+
   const form = useForm<StarterRequest>({
     mode: 'onBlur',
     resolver: yupResolver(starterValidationSchema),
@@ -119,13 +132,93 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
     });
   };
 
+  const [snackbar, setSnackbar] = useState<SnackbarConfig>({
+    open: false,
+    severity: 'info',
+  });
+  const handleSnackClose = (event?: SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbar({ ...snackbar, open: false });
+  };
+
+  const handleShareConfiguration = async () => {
+    const casted = form.getValues() as StarterRequest;
+    const urlToShare = stringifyUrl(
+      { url: window.location.href, query: { ...casted } },
+      { skipNull: true, skipEmptyString: true }
+    );
+    await navigator.clipboard.writeText(urlToShare);
+    setSnackbar({ open: true, severity: 'info', message: 'Link to configuration copied to clipboard.' });
+  };
+
+  const applySharedConfiguration = (searchParams: URLSearchParams) => {
+    if (searchParams.toString() !== '') {
+      const qp = parse(searchParams.toString(), { parseBooleans: true });
+      starterValidationSchema
+        .isValid(qp)
+        .then(isValid => {
+          if (isValid) {
+            const queryParams = qp as StarterRequest;
+            let key: keyof StarterRequest;
+            for (key in queryParams) {
+              form.setValue(key, queryParams[key]);
+            }
+            setSnackbar({
+              open: true,
+              severity: 'info',
+              message: 'Linked configuration was applied.',
+            });
+            //trigger form validity so that `share` button is enabled upon the values application
+            form.trigger().then(ignore => {});
+          } else {
+            setSnackbar({
+              open: true,
+              severity: 'warning',
+              message: 'Linked configuration is not valid therefore it was not applied.',
+            });
+          }
+        })
+        .catch(_ => {
+          setSnackbar({
+            open: true,
+            severity: 'warning',
+            message: 'Validation of linked configuration failed therefore it was not applied.',
+          });
+        });
+      setSearchParams({});
+    }
+  };
+
   return (
     <Box>
       {!isEmbedded && (
-        <Typography variant="h3" component="h3" fontWeight={300} gutterBottom>
-          Generate tapir project
-        </Typography>
+        <Stack direction="row" alignItems="baseline" spacing={0.25}>
+          <Typography variant="h3" component="h3" fontWeight={300} gutterBottom>
+            Generate tapir project
+          </Typography>
+          <Tooltip title="Share configuration" arrow>
+            <IconButton
+              color="secondary"
+              aria-label="share configuration"
+              onClick={handleShareConfiguration}
+              disabled={!form.formState.isValid}
+            >
+              <ShareTwoToneIcon />
+            </IconButton>
+          </Tooltip>
+        </Stack>
       )}
+
+      <CommonSnackbar
+        duration={2500}
+        message={snackbar.message}
+        onClose={handleSnackClose}
+        open={snackbar.open}
+        severity={snackbar.severity}
+      />
+
       <FormProvider {...form}>
         <form
           className={classes.formContainer}

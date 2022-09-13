@@ -88,5 +88,5 @@ export async function doRequestPreview(formData: StarterRequest, consumer: (resp
     throw new Error(json.error || 'Something went wrong, please try again later.');
   }
 
-  consumer(await response.json())
+  consumer(await response.json());
 }
