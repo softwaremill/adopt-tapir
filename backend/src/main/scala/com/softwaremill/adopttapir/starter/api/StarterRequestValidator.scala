@@ -34,7 +34,7 @@ object RequestValidation {
   abstract class EffectValidation {
     val effect: EffectRequest
     val implementation: ServerImplementationRequest
-    protected val prefixMessage = s"Picked $effect with $implementation -"
+    protected val prefixMessage: String = s"Picked $effect with $implementation -"
   }
 
   case class FutureEffectWillWorkOnlyWithAkkaAndNetty(effect: EffectRequest, implementation: ServerImplementationRequest)

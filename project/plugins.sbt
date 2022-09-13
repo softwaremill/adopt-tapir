@@ -15,3 +15,7 @@ addSbtPlugin("com.github.sbt" % "sbt-git" % "2.0.0")
 addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.6.3")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-twirl" % "1.5.1")
+
+//addCompilerPlugin("org.scalameta" % "semanticdb-scalac" % "4.5.13" cross CrossVersion.full)
+
+addSbtPlugin("ch.epfl.scala" % "sbt-scala3-migrate" % "0.5.0")

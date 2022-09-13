@@ -87,13 +87,13 @@ class HttpApi(
   lazy val resource: Resource[IO, (org.http4s.server.Server, org.http4s.server.Server)] = {
     def resource(routes: HttpRoutes[IO], port: Int) =
       BlazeServerBuilder[IO]
-        .bindHttp(port, config.host)
+        .bindHttp(port, config.host.toString)
         .withHttpApp(routes.orNotFound)
         .resource
 
     for {
-      public <- resource(publicRoutes, config.port)
-      admin <- resource(adminRoutes, config.adminPort)
+      public <- resource(publicRoutes, config.port.value)
+      admin <- resource(adminRoutes, config.adminPort.value)
     } yield (public, admin)
   }
 }

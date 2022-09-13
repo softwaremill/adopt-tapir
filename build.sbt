@@ -42,10 +42,10 @@ val monitoringDependencies = Seq(
 val jsonDependencies = Seq(
   "io.circe" %% "circe-core" % circeVersion,
   "io.circe" %% "circe-generic" % circeVersion,
-  "io.circe" %% "circe-generic-extras" % circeVersion,
+  "io.circe" %% "circe-generic-extras" % circeVersion cross CrossVersion.for3Use2_13,
   "io.circe" %% "circe-parser" % circeVersion,
-  "com.softwaremill.sttp.tapir" %% "tapir-enumeratum" % tapirVersion,
-  "com.beachape" %% "enumeratum-circe" % "1.7.0",
+  "com.softwaremill.sttp.tapir" %% "tapir-enumeratum" % tapirVersion cross CrossVersion.for3Use2_13,
+  "com.beachape" %% "enumeratum-circe" % "1.7.0" cross CrossVersion.for3Use2_13,
   "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % tapirVersion,
   "com.softwaremill.sttp.client3" %% "circe" % sttpVersion
 )
@@ -56,18 +56,19 @@ val loggingDependencies = Seq(
 )
 
 val fileDependencies = Seq(
-  "com.github.pathikrit" %% "better-files" % "3.9.1",
+  "com.github.pathikrit" %% "better-files" % "3.9.1" cross CrossVersion.for3Use2_13,
   "org.apache.commons" % "commons-compress" % "1.21"
 )
 
 val configDependencies = Seq(
-  "com.github.pureconfig" %% "pureconfig" % "0.17.1"
+  "com.github.pureconfig" %% "pureconfig-core" % "0.17.1"
 )
 
 val baseDependencies = Seq(
   "org.typelevel" %% "cats-effect" % "3.3.14",
   "com.softwaremill.common" %% "tagging" % "2.3.3",
-  "com.softwaremill.quicklens" %% "quicklens" % "1.8.10"
+  "com.softwaremill.quicklens" %% "quicklens" % "1.8.10",
+//  "org.scala-lang" %% "scala3-compiler" % scala31Version,
 )
 
 val apiDocsDependencies = Seq(
@@ -75,11 +76,11 @@ val apiDocsDependencies = Seq(
 )
 
 val macwireDependencies = Seq(
-  "com.softwaremill.macwire" %% "macrosautocats" % macwireVersion
+  "com.softwaremill.macwire" %% "macrosautocats" % macwireVersion cross CrossVersion.for3Use2_13
 ).map(_ % Provided)
 
 val scalafmtStandaloneDependencies = Seq(
-  "org.scalameta" %% "scalafmt-dynamic" % scalafmtVersion
+  "org.scalameta" %% "scalafmt-dynamic" % scalafmtVersion cross CrossVersion.for3Use2_13
 )
 
 val unitTestingStack = Seq(
@@ -98,9 +99,37 @@ lazy val yarnTask = inputKey[Unit]("Run yarn with arguments")
 lazy val copyWebapp = taskKey[Unit]("Copy webapp")
 
 val scala2Version = "2.13.8"
+val scala31Version = "3.1.3"
+val scala32Version = "3.2.0"
+
+val scala3ScalacOptions = Seq(
+  "-encoding",
+  "utf8",
+  "-feature",
+  "--language:implicitConversions",
+  "-language:existentials",
+  "-unchecked",
+  "-Werror",
+  "-Xlint"
+)
+
+//resolvers ++= Resolver.sonatypeOssRepos("public")
+//resolvers +=
+//  "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
+
+//resolvers += Resolver.mavenLocal
+
 lazy val commonSettings = commonSmlBuildSettings ++ Seq(
+//  resolvers ++= Resolver.sonatypeOssRepos("public"),
   organization := "com.softwaremill.adopttapir",
   scalaVersion := scala2Version,
+//  crossScalaVersions := Seq(scala32Version, scala2Version),
+  scalacOptions := {
+    CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((3, _)) => scala3ScalacOptions
+      case _ => scalacOptions.value
+    }
+  },
   libraryDependencies ++= commonDependencies,
   uiDirectory := (ThisBuild / baseDirectory).value / uiProjectName,
   updateYarn := {
@@ -191,7 +220,7 @@ lazy val rootProject = (project in file("."))
   )
   .aggregate(backend, ui, templateDependencies)
 
-lazy val ItTest = config("ItTest") extend (Test)
+lazy val ItTest = config("ItTest") extend Test
 
 def itFilter(name: String): Boolean = name endsWith "ITTest"
 def unitFilter(name: String): Boolean = (name endsWith "Test") && !itFilter(name)
@@ -212,7 +241,7 @@ lazy val backend: Project = (project in file("backend"))
     Test / testOptions := Seq(Tests.Filter(unitFilter)) ++ Seq(Tests.Argument("-P" + java.lang.Runtime.getRuntime.availableProcessors())),
     ItTest / testOptions := Seq(Tests.Filter(itFilter)) ++ Seq(
       Tests.Argument(
-        "-P" + sys.env.get("IT_TESTS_THREADS_NO").getOrElse(java.lang.Math.min(java.lang.Runtime.getRuntime.availableProcessors() / 2, 4))
+        "-P" + sys.env.getOrElse("IT_TESTS_THREADS_NO", java.lang.Math.min(java.lang.Runtime.getRuntime.availableProcessors() / 2, 4))
       )
     ),
     ItTest / logBuffered := false
@@ -233,14 +262,13 @@ lazy val ui = (project in file(uiProjectName))
   .settings(Test / test := (Test / test).dependsOn(yarnTask.toTask(" test")).value)
   .settings(cleanFiles += baseDirectory.value / "build")
 
-val scala3Version = "3.1.3"
 val plokhotnyukJsoniterVersion = "2.17.0"
 val zioTestVersion = "2.0.0"
 
 lazy val templateDependencies: Project = project
   .settings(
     name := "templateDependencies",
-    scalaVersion := scala3Version,
+    scalaVersion := scala31Version,
     libraryDependencies ++= List(
       "ch.qos.logback" % "logback-classic" % logbackClassicVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-sttp-stub-server" % tapirVersion % Provided,
@@ -265,7 +293,7 @@ lazy val templateDependencies: Project = project
     ),
     buildInfoKeys := Seq[BuildInfoKey](
       "scala2Version" -> scala2Version,
-      "scala3Version" -> scala3Version,
+      "scala3Version" -> scala31Version,
       "sttpVersion" -> sttpVersion,
       "plokhotnyukJsoniterVersion" -> plokhotnyukJsoniterVersion,
       "tapirVersion" -> tapirVersion,

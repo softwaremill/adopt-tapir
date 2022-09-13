@@ -4,8 +4,8 @@ import com.softwaremill.adopttapir.http.HttpConfig
 import com.softwaremill.adopttapir.starter.files.StorageConfig
 import com.softwaremill.adopttapir.version.BuildInfo
 import com.typesafe.scalalogging.StrictLogging
-import pureconfig.ConfigSource
-import pureconfig.generic.auto._
+import pureconfig.{ConfigReader, ConfigSource}
+
 
 import scala.collection.immutable.TreeMap
 
@@ -30,6 +30,9 @@ object Config extends StrictLogging {
 
     logger.info(info)
   }
+
+  implicit val configReader: ConfigReader[Config] =
+    ConfigReader.forProduct2("api", "storage-config")(Config(_, _))
 
   def read: Config = ConfigSource.default.loadOrThrow[Config]
 }

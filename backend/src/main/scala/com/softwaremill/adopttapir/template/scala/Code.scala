@@ -9,5 +9,5 @@ case class Code(body: String, imports: Set[Import] = Set()) {
 }
 
 object Code {
-  val empty = Code("")
+  val empty: Code = Code("")
 }
