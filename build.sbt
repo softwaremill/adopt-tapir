@@ -233,7 +233,7 @@ lazy val ui = (project in file(uiProjectName))
   .settings(Test / test := (Test / test).dependsOn(yarnTask.toTask(" test")).value)
   .settings(cleanFiles += baseDirectory.value / "build")
 
-val scala3Version = "3.1.3"
+val scala3Version = "3.2.0"
 val plokhotnyukJsoniterVersion = "2.17.0"
 val zioTestVersion = "2.0.0"
 
