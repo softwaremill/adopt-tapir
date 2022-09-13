@@ -31,12 +31,12 @@ export function PreviewStarterPage() {
   return (
     <>
       <Grid container style={{ height: 'calc(100% - 92.5px)' }}>
-        <Grid item xs={3} className={classes.fullHeight}>
+        <Grid item xs={2.2} className={classes.fullHeight}>
           <Box className={cx(classes.fullHeight, classes.treeViewContainer)}>
             <FileTreeView tree={files} location={RootNodeLocation} state={treeState} />
           </Box>
         </Grid>
-        <Grid item xs={9} className={classes.fullHeight}>
+        <Grid item xs={9.8} className={classes.fullHeight}>
           <Box className={cx(classes.fullHeight, classes.fileViewContainer)}>
             <FileContentView files={files} opened={treeState.openedFile} />
           </Box>
