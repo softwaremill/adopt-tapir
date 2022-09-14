@@ -67,8 +67,6 @@ export async function doRequestStarter(formData: StarterRequest) {
   saveAs(blob, filename ?? 'starter.zip');
 }
 
-// TODO use dedicated endpoint.
-// Current request only simulates call to api. It will be replaced when endpoint is ready.
 export async function doRequestPreview(formData: StarterRequest, consumer: (resp: FileTree) => void) {
   const serverAddress = !process.env.REACT_APP_SERVER_ADDRESS
     ? 'https://adopt-tapir.softwaremill.com'
