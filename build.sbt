@@ -14,7 +14,7 @@ val tapirVersion = "1.1.0"
 val http4sBlazeServerVersion = "0.23.12"
 val http4sCirceVersion = "0.23.15"
 val circeVersion = "0.14.2"
-val sttpVersion = "3.7.6"
+val sttpVersion = "3.8.0"
 val prometheusVersion = "0.16.0"
 val macwireVersion = "2.5.8"
 
