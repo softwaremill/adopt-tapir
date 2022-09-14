@@ -68,16 +68,15 @@ val baseDependencies = Seq(
   "org.typelevel" %% "cats-effect" % "3.3.14",
   "com.softwaremill.common" %% "tagging" % "2.3.3",
   "com.softwaremill.quicklens" %% "quicklens" % "1.8.10",
-//  "org.scala-lang" %% "scala3-compiler" % scala31Version,
 )
 
 val apiDocsDependencies = Seq(
   "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-bundle" % tapirVersion
 )
 
-val macwireDependencies = Seq(
-  "com.softwaremill.macwire" %% "macrosautocats" % macwireVersion cross CrossVersion.for3Use2_13
-).map(_ % Provided)
+//val macwireDependencies = Seq(
+//  "com.softwaremill.macwire" %% "macrosautocats" % macwireVersion cross CrossVersion.for3Use2_13
+//).map(_ % Provided)
 
 val scalafmtStandaloneDependencies = Seq(
   "org.scalameta" %% "scalafmt-dynamic" % scalafmtVersion cross CrossVersion.for3Use2_13
@@ -90,7 +89,7 @@ val unitTestingStack = Seq(
 )
 
 val commonDependencies =
-  baseDependencies ++ unitTestingStack ++ loggingDependencies ++ configDependencies ++ fileDependencies ++ scalafmtStandaloneDependencies
+  baseDependencies // ++ unitTestingStack ++ loggingDependencies // ++ configDependencies ++ fileDependencies // ++ scalafmtStandaloneDependencies
 
 lazy val uiProjectName = "ui"
 lazy val uiDirectory = settingKey[File]("Path to the ui project directory")
@@ -109,28 +108,33 @@ val scala3ScalacOptions = Seq(
   "--language:implicitConversions",
   "-language:existentials",
   "-unchecked",
-  "-Werror",
-  "-Xlint"
+  "-Xfatal-warnings",
+  "-Xlint",
+  "-Ykind-projector",
 )
 
-//resolvers ++= Resolver.sonatypeOssRepos("public")
-//resolvers +=
-//  "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
+resolvers ++= Resolver.sonatypeOssRepos("public")
+resolvers +=
+  "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
+resolvers += "Secured Central Repository" at "https://repo1.maven.org/maven2"
+
 
 //resolvers += Resolver.mavenLocal
 
-lazy val commonSettings = commonSmlBuildSettings ++ Seq(
+lazy val commonSettings =
+  //commonSmlBuildSettings ++ Seq(
+  Seq(
 //  resolvers ++= Resolver.sonatypeOssRepos("public"),
   organization := "com.softwaremill.adopttapir",
   scalaVersion := scala2Version,
 //  crossScalaVersions := Seq(scala32Version, scala2Version),
-  scalacOptions := {
-    CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((3, _)) => scala3ScalacOptions
-      case _ => scalacOptions.value
-    }
-  },
-  libraryDependencies ++= commonDependencies,
+//  scalacOptions := {
+//    CrossVersion.partialVersion(scalaVersion.value) match {
+//      case Some((3, _)) => scala3ScalacOptions
+//      case _ => scalacOptions.value
+//    }
+//  },
+//  libraryDependencies ++= commonDependencies,
   uiDirectory := (ThisBuild / baseDirectory).value / uiProjectName,
   updateYarn := {
     streams.value.log("Updating npm/yarn dependencies")
@@ -225,11 +229,16 @@ lazy val ItTest = config("ItTest") extend Test
 def itFilter(name: String): Boolean = name endsWith "ITTest"
 def unitFilter(name: String): Boolean = (name endsWith "Test") && !itFilter(name)
 
+val backendAdHocDependencies = Seq(
+  "org.scala-lang" %% "scala3-compiler" % scala32Version,
+)
+
 lazy val backend: Project = (project in file("backend"))
   .configs(ItTest)
   .settings(
     inConfig(ItTest)(Defaults.testTasks),
-    libraryDependencies ++= httpDependencies ++ jsonDependencies ++ apiDocsDependencies ++ monitoringDependencies ++ macwireDependencies,
+    //libraryDependencies ++= httpDependencies ++ jsonDependencies ++ apiDocsDependencies ++ monitoringDependencies, // ++ macwireDependencies, // ++ backendAdHocDependencies,
+//    libraryDependencies += "org.scala-lang" %% "scala3-compiler" % "3.2.0",
     Compile / mainClass := Some("com.softwaremill.adopttapir.Main"),
     copyWebapp := {
       val source = uiDirectory.value / "build"
@@ -246,16 +255,19 @@ lazy val backend: Project = (project in file("backend"))
     ),
     ItTest / logBuffered := false
   )
-  .dependsOn(templateDependencies)
-  .enablePlugins(BuildInfoPlugin)
+//  .dependsOn(templateDependencies)
+//  .enablePlugins(BuildInfoPlugin)
   .settings(commonSettings)
-  .settings(Revolver.settings)
-  .settings(buildInfoSettings)
-  .settings(fatJarSettings)
-  .enablePlugins(DockerPlugin)
-  .enablePlugins(JavaServerAppPackaging)
-  .enablePlugins(SbtTwirl)
-  .settings(dockerSettings)
+//  .settings(Revolver.settings)
+//  .settings(buildInfoSettings)
+//  .settings(fatJarSettings)
+  .settings(
+    scalaVersion := scala31Version,
+  )
+//  .enablePlugins(DockerPlugin)
+//  .enablePlugins(JavaServerAppPackaging)
+//  .enablePlugins(SbtTwirl)
+//  .settings(dockerSettings)
 
 lazy val ui = (project in file(uiProjectName))
   .settings(commonSettings)

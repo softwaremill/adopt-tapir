@@ -1,6 +1,6 @@
 addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.11.0")
 
-addSbtPlugin("io.spray" % "sbt-revolver" % "0.9.1")
+//addSbtPlugin("io.spray" % "sbt-revolver" % "0.9.1")
 
 addSbtPlugin("com.heroku" % "sbt-heroku" % "2.1.4")
 
@@ -14,8 +14,8 @@ addSbtPlugin("com.github.sbt" % "sbt-git" % "2.0.0")
 
 addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.6.3")
 
-addSbtPlugin("com.typesafe.sbt" % "sbt-twirl" % "1.5.1")
+//addSbtPlugin("com.typesafe.play" % "sbt-twirl" % "1.6.0-M6")
 
 //addCompilerPlugin("org.scalameta" % "semanticdb-scalac" % "4.5.13" cross CrossVersion.full)
 
-addSbtPlugin("ch.epfl.scala" % "sbt-scala3-migrate" % "0.5.0")
+//addSbtPlugin("ch.epfl.scala" % "sbt-scala3-migrate" % "0.5.0")
