@@ -10,8 +10,6 @@ object MainView {
     starterDetails.scalaVersion match {
       case ScalaVersion.Scala2 =>
         starterDetails match {
-          case StarterDetails(_, groupId, FutureEffect, Akka, addDocumentation, addMetrics, _, _, _) =>
-            txt.MainFutureAkka(groupId, addDocumentation, addMetrics).toString()
           case StarterDetails(_, groupId, FutureEffect, Netty, addDocumentation, addMetrics, _, _, _) =>
             txt.MainFutureNetty(groupId, addDocumentation, addMetrics).toString()
           case StarterDetails(_, groupId, IOEffect, Http4s, addDocumentation, addMetrics, _, _, _) =>

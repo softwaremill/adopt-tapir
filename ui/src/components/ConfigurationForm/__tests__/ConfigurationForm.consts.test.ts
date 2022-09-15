@@ -134,33 +134,27 @@ describe('configuration consts', () => {
       // NOTE: it's easier to comprehend cases definitions this way, step with casesDetails is purerly due formatting issues
       const casesDetails: [EffectType, ScalaVersion, EffectImplementation, boolean][] = [
         // Scala 2 variants
-        [EffectType.Future, ScalaVersion.Scala2, EffectImplementation.Akka, true],
         [EffectType.Future, ScalaVersion.Scala2, EffectImplementation.Netty, true],
         [EffectType.Future, ScalaVersion.Scala2, EffectImplementation.Http4s, false],
         [EffectType.Future, ScalaVersion.Scala2, EffectImplementation.ZIOHttp, false],
 
-        [EffectType.IO, ScalaVersion.Scala2, EffectImplementation.Akka, false],
         [EffectType.IO, ScalaVersion.Scala2, EffectImplementation.Netty, true],
         [EffectType.IO, ScalaVersion.Scala2, EffectImplementation.Http4s, true],
         [EffectType.IO, ScalaVersion.Scala2, EffectImplementation.ZIOHttp, false],
 
-        [EffectType.ZIO, ScalaVersion.Scala2, EffectImplementation.Akka, false],
         [EffectType.ZIO, ScalaVersion.Scala2, EffectImplementation.Netty, false],
         [EffectType.ZIO, ScalaVersion.Scala2, EffectImplementation.Http4s, true],
         [EffectType.ZIO, ScalaVersion.Scala2, EffectImplementation.ZIOHttp, true],
 
         // Scala 3 variants
-        [EffectType.Future, ScalaVersion.Scala3, EffectImplementation.Akka, false],
         [EffectType.Future, ScalaVersion.Scala3, EffectImplementation.Netty, true],
         [EffectType.Future, ScalaVersion.Scala3, EffectImplementation.Http4s, false],
         [EffectType.Future, ScalaVersion.Scala3, EffectImplementation.ZIOHttp, false],
 
-        [EffectType.IO, ScalaVersion.Scala3, EffectImplementation.Akka, false],
         [EffectType.IO, ScalaVersion.Scala3, EffectImplementation.Netty, true],
         [EffectType.IO, ScalaVersion.Scala3, EffectImplementation.Http4s, true],
         [EffectType.IO, ScalaVersion.Scala3, EffectImplementation.ZIOHttp, false],
 
-        [EffectType.ZIO, ScalaVersion.Scala3, EffectImplementation.Akka, false],
         [EffectType.ZIO, ScalaVersion.Scala3, EffectImplementation.Netty, false],
         [EffectType.ZIO, ScalaVersion.Scala3, EffectImplementation.Http4s, true],
         [EffectType.ZIO, ScalaVersion.Scala3, EffectImplementation.ZIOHttp, true],

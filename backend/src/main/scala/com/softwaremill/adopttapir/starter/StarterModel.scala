@@ -20,8 +20,6 @@ case class StarterDetails(
 sealed trait ServerImplementation
 
 object ServerImplementation {
-  case object Akka extends ServerImplementation
-
   case object Netty extends ServerImplementation
 
   case object Http4s extends ServerImplementation

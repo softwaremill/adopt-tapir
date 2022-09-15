@@ -25,7 +25,7 @@ object Metrics {
         "",
         "",
         ServerEffect.IOEffect,
-        ServerImplementation.Akka,
+        ServerImplementation.Netty,
         true,
         false,
         JsonImplementation.WithoutJson,

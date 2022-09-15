@@ -43,10 +43,6 @@ sealed trait ServerImplementationRequest extends EnumEntry {
 }
 
 object ServerImplementationRequest extends Enum[ServerImplementationRequest] with CirceEnum[ServerImplementationRequest] {
-  case object Akka extends ServerImplementationRequest {
-    override def toModel: ServerImplementation = ServerImplementation.Akka
-  }
-
   case object Netty extends ServerImplementationRequest {
     override def toModel: ServerImplementation = ServerImplementation.Netty
   }
