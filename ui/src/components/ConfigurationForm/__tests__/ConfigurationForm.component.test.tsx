@@ -30,7 +30,7 @@ describe('ConfigurationForm component', () => {
     await user.click(within(screen.getByRole('radiogroup', { name: /Scala version/i })).getByText('2'));
 
     await user.click(screen.getByRole('button', { name: /Server implementation/i }));
-    await user.click(screen.getByText('Akka HTTP'));
+    await user.click(screen.getByText('Netty'));
 
     await user.click(within(screen.getByRole('radiogroup', { name: /Build tool/i })).getByText('Scala CLI'));
 
@@ -64,7 +64,7 @@ describe('ConfigurationForm component', () => {
         effect: 'FutureEffect',
         json: 'Circe',
         addDocumentation: true,
-        implementation: 'Akka',
+        implementation: 'Netty',
         scalaVersion: 'Scala2',
         groupId: 'com.softwaremill',
         projectName: 'test-project',
@@ -133,7 +133,7 @@ describe('ConfigurationForm component', () => {
     await user.click(within(screen.getByRole('radiogroup', { name: /Scala version/i })).getByText('2'));
 
     await user.click(screen.getByRole('button', { name: /Server implementation/i }));
-    await user.click(screen.getByText('Akka HTTP'));
+    await user.click(screen.getByText('Netty'));
 
     await user.click(within(screen.getByRole('radiogroup', { name: /Build tool/i })).getByText('Scala CLI'));
 
@@ -157,40 +157,6 @@ describe('ConfigurationForm component', () => {
       scalaVersion: 'Scala3',
       implementation: '',
       builder: 'Sbt',
-      addDocumentation: 'false',
-      json: 'No',
-      addMetrics: 'false',
-    });
-  });
-
-  test('effect implementation field reset flow based on scala version change', async () => {
-    // given
-    const user = userEvent.setup();
-    render(
-      <BrowserRouter>
-        <ConfigurationForm />
-      </BrowserRouter>
-    );
-
-    // when
-    await user.click(screen.getByRole('button', { name: /Effect type/i }));
-    await user.click(screen.getByText('Future'));
-
-    await user.click(within(screen.getByRole('radiogroup', { name: /Scala version/i })).getByText('2'));
-
-    await user.click(screen.getByRole('button', { name: /Server implementation/i }));
-    await user.click(screen.getByText('Akka HTTP'));
-
-    await user.click(within(screen.getByRole('radiogroup', { name: /Scala version/i })).getByText('3'));
-
-    // then
-    expect(screen.getByTestId('configuration-form')).toHaveFormValues({
-      effect: 'FutureEffect',
-      scalaVersion: 'Scala3',
-      implementation: '',
-      // default values below
-      projectName: '',
-      groupId: '',
       addDocumentation: 'false',
       json: 'No',
       addMetrics: 'false',

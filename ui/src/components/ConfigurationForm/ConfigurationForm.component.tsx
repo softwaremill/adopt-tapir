@@ -86,11 +86,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
 
   useEffect(() => {
     // NOTE: reset effect implementation field value upon effect type or scala version change
-    if (
-      effectType &&
-      scalaVersion &&
-      !getAvailableEffectImplementations(effectType, scalaVersion).includes(effectImplementation)
-    ) {
+    if (effectType && !getAvailableEffectImplementations(effectType).includes(effectImplementation)) {
       form.resetField('implementation');
     }
   }, [form, effectType, effectImplementation, scalaVersion]);
@@ -257,7 +253,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
             name="implementation"
             label="Server implementation"
             disabled={!isEffectImplementationSelectable}
-            options={isEffectImplementationSelectable ? getEffectImplementationOptions(effectType, scalaVersion) : []}
+            options={isEffectImplementationSelectable ? getEffectImplementationOptions(effectType) : []}
           />
           <FormRadioGroup
             className={classes.formThirdRow}

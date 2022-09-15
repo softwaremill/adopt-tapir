@@ -254,7 +254,6 @@ lazy val templateDependencies: Project = project
       "com.softwaremill.sttp.client3" %% "circe" % sttpVersion % Provided,
       "com.softwaremill.sttp.client3" %% "jsoniter" % sttpVersion % Provided,
       "com.softwaremill.sttp.client3" %% "zio-json" % sttpVersion % Provided,
-      "com.softwaremill.sttp.tapir" %% "tapir-akka-http-server" % tapirVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-netty-server" % tapirVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-cats" % tapirVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-netty-server-cats" % tapirVersion % Provided,

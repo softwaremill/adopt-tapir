@@ -7,7 +7,7 @@ import com.softwaremill.adopttapir.infrastructure.Json._
 import com.softwaremill.adopttapir.starter.api.EffectRequest.FutureEffect
 import com.softwaremill.adopttapir.starter.api.JsonImplementationRequest.Jsoniter
 import com.softwaremill.adopttapir.starter.api.ScalaVersionRequest.Scala2
-import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Akka, ZIOHttp}
+import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Netty, ZIOHttp}
 import com.softwaremill.adopttapir.starter.api.StarterApiTest.{mainPath, validSbtRequest, validScalaCliRequest}
 import com.softwaremill.adopttapir.test.Rich.RichIO
 import com.softwaremill.adopttapir.test.{BaseTest, TestDependencies}
@@ -99,14 +99,14 @@ class StarterApiTest extends BaseTest with TestDependencies {
     // then
     ex.statusCode.code shouldBe 400
     jawn.decode[Error_OUT](ex.body).value.error should include(
-      "Picked FutureEffect with ZIOHttp - Future effect will work only with Akka and Netty"
+      "Picked FutureEffect with ZIOHttp - Future effect will work only with Netty"
     )
   }
 
   it should "return request error with information about wrong projectName " in {
     // given
     val request =
-      StarterRequestGenerators.randomStarterRequest().copy(projectName = "Uppercase", effect = FutureEffect, implementation = Akka)
+      StarterRequestGenerators.randomStarterRequest().copy(projectName = "Uppercase", effect = FutureEffect, implementation = Netty)
 
     // when
     val ex = intercept[HttpError[String]](requests.requestZip(request))
@@ -147,7 +147,7 @@ object StarterApiTest {
     projectName = "projectname",
     groupId = "com.softwaremill",
     effect = FutureEffect,
-    implementation = ServerImplementationRequest.Akka,
+    implementation = ServerImplementationRequest.Netty,
     addDocumentation = true,
     addMetrics = false,
     json = Jsoniter,

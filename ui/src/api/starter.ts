@@ -8,7 +8,6 @@ export enum EffectType {
 }
 
 export enum EffectImplementation {
-  Akka = 'Akka',
   Netty = 'Netty',
   Http4s = 'Http4s',
   ZIOHttp = 'ZIOHttp',
