@@ -32,7 +32,7 @@ describe('ConfigurationForm component', () => {
     await user.click(screen.getByRole('button', { name: /Server implementation/i }));
     await user.click(screen.getByText('Akka HTTP'));
 
-    await user.click(within(screen.getByRole('radiogroup', { name: /Builder/i })).getByText('Scala CLI'));
+    await user.click(within(screen.getByRole('radiogroup', { name: /Build tool/i })).getByText('Scala CLI'));
 
     await user.click(
       within(
@@ -135,7 +135,7 @@ describe('ConfigurationForm component', () => {
     await user.click(screen.getByRole('button', { name: /Server implementation/i }));
     await user.click(screen.getByText('Akka HTTP'));
 
-    await user.click(within(screen.getByRole('radiogroup', { name: /Builder/i })).getByText('Scala CLI'));
+    await user.click(within(screen.getByRole('radiogroup', { name: /Build tool/i })).getByText('Scala CLI'));
 
     await user.click(
       within(
