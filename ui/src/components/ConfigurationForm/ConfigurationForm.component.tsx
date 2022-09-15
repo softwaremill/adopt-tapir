@@ -259,7 +259,12 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
             disabled={!isEffectImplementationSelectable}
             options={isEffectImplementationSelectable ? getEffectImplementationOptions(effectType, scalaVersion) : []}
           />
-          <FormRadioGroup className={classes.formThirdRow} name="builder" label="Builder" options={BUILDER_OPTIONS} />
+          <FormRadioGroup
+            className={classes.formThirdRow}
+            name="builder"
+            label="Build tool"
+            options={BUILDER_OPTIONS}
+          />
 
           <FormRadioGroup
             className={classes.formFourthRow}
