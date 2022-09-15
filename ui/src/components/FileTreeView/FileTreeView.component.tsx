@@ -1,6 +1,6 @@
 import { DirNode, FileNode, FileTree, TreeState } from './FileTreeView.types';
 import { useStyles } from './FileTreeView.styles';
-import { Folder, InsertDriveFileOutlined } from '@mui/icons-material';
+import { FolderOpenTwoTone, FolderTwoTone, InsertDriveFileOutlined } from '@mui/icons-material';
 import { NodeAbsoluteLocation } from './FileTreeView.utils';
 import { useEffect, useState } from 'react';
 
@@ -91,7 +91,7 @@ function DirNodeView({ node: { name, content }, location, state }: NodeProps<Dir
             state.toggleDir(dirLocation);
           }}
         >
-          <Folder />
+          {state.isDirOpened(dirLocation) ? <FolderTwoTone /> : <FolderOpenTwoTone />}
           {name}
         </button>
         <NodesView tree={content} location={dirLocation} state={state} />
