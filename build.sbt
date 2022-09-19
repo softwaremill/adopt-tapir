@@ -13,7 +13,8 @@ val tapirVersion = "1.1.0"
 
 val http4sBlazeServerVersion = "0.23.12"
 val http4sCirceVersion = "0.23.16"
-val circeVersion = "0.14.2"
+val circeVersion = "0.14.3"
+val circeGenericsExtrasVersion = "0.14.2"
 val sttpVersion = "3.8.0"
 val prometheusVersion = "0.16.0"
 val macwireVersion = "2.5.8"
@@ -42,7 +43,7 @@ val monitoringDependencies = Seq(
 val jsonDependencies = Seq(
   "io.circe" %% "circe-core" % circeVersion,
   "io.circe" %% "circe-generic" % circeVersion,
-  "io.circe" %% "circe-generic-extras" % circeVersion,
+  "io.circe" %% "circe-generic-extras" % circeGenericsExtrasVersion,
   "io.circe" %% "circe-parser" % circeVersion,
   "com.softwaremill.sttp.tapir" %% "tapir-enumeratum" % tapirVersion,
   "com.beachape" %% "enumeratum-circe" % "1.7.0",
