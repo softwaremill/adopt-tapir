@@ -1,6 +1,7 @@
 package com.softwaremill.adopttapir.starter.content
 
 import cats.effect.IO
+import com.softwaremill.adopttapir.metrics.Metrics
 import com.softwaremill.adopttapir.starter.StarterDetails
 import com.softwaremill.adopttapir.starter.formatting.GeneratedFilesFormatter
 import com.softwaremill.adopttapir.template.ProjectGenerator
@@ -19,6 +20,7 @@ class ContentService(projectGenerator: ProjectGenerator, generatedFilesFormatter
         DirectoryMerger(projectName, paths, content)
       }))
       projectAsTree <- IO(projectAsDirTrees.reduce(DirectoryMerger.apply))
+      _ <- IO(Metrics.increasePreviewOperationMetricCounter(starterDetails))
     } yield projectAsTree
   }
 }
