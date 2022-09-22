@@ -1,16 +1,18 @@
-import { SyntheticEvent, useContext, useEffect, useState } from 'react';
-import { AlertColor, Box, Button, IconButton, Stack, Tooltip, Typography } from '@mui/material';
+import {SyntheticEvent, useContext, useEffect, useState} from 'react';
+import {AlertColor, Box, Button, IconButton, Stack, Tooltip, Typography} from '@mui/material';
 import ShareTwoToneIcon from '@mui/icons-material/ShareTwoTone';
-import { FormProvider, useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { DevTool } from '@hookform/devtools';
-import { Builder, doRequestStarter, JSONImplementation, ScalaVersion, StarterRequest } from 'api/starter';
-import { useApiCall } from 'hooks/useApiCall';
-import { isDevelopment } from 'consts/env';
-import { FormTextField } from '../FormTextField';
-import { FormSelect } from '../FormSelect';
-import { FormRadioGroup } from '../FormRadioGroup';
-import { useStyles } from './ConfigurationForm.styles';
+import {FormProvider, useForm} from 'react-hook-form';
+import {yupResolver} from '@hookform/resolvers/yup';
+import {DevTool} from '@hookform/devtools';
+import {Builder, doRequestStarter, JSONImplementation, ScalaVersion, StarterRequest} from 'api/starter';
+import {useApiCall} from 'hooks/useApiCall';
+import {isDevelopment} from 'consts/env';
+import {FormTextField} from '../FormTextField';
+import {FormSelect} from '../FormSelect';
+import {FormRadioGroup} from '../FormRadioGroup';
+import {useStyles} from './ConfigurationForm.styles';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+
 import {
   BUILDER_OPTIONS,
   EFFECT_TYPE_OPTIONS,
@@ -24,11 +26,13 @@ import {
   getJSONImplementationOptions,
   mapEffectTypeToJSONImplementation,
 } from './ConfigurationForm.helpers';
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import { ApiCallAddons } from '../ApiCallAddons';
-import { ConfigurationDataContext, resetFormData, setFormData } from '../../contexts';
-import { parse, stringifyUrl } from 'query-string';
-import { CommonSnackbar } from '../CommonSnackbar';
+import {useNavigate} from 'react-router-dom';
+import {ApiCallAddons} from '../ApiCallAddons';
+import {ConfigurationDataContext, resetFormData, setFormData} from '../../contexts';
+import {stringifyUrl} from 'query-string';
+import {CommonSnackbar} from '../CommonSnackbar';
+import {useInitialData} from "../../hooks/useInitialData";
+import {useSharedConfig} from "../../hooks/useSharedConfig";
 
 interface ConfigurationFormProps {
   isEmbedded?: boolean;
@@ -45,9 +49,10 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
   const [{ formData }, contextDispatch] = useContext(ConfigurationDataContext);
   const { call, clearError, isLoading, errorMessage } = useApiCall();
   const { classes, cx } = useStyles({ isEmbedded });
+  const initialData = useInitialData();
+  const [initialized, setInitialized] = useState(false);
 
-  const [searchParams, setSearchParams] = useSearchParams();
-  useEffect(() => applySharedConfiguration(searchParams));
+  const [sharedRequest, snackbarConfig, ready] = useSharedConfig();
 
   const form = useForm<StarterRequest>({
     mode: 'onBlur',
@@ -55,11 +60,35 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
     defaultValues: {
       addDocumentation: false,
       addMetrics: false,
+      projectName: '',
+      groupId: '',
       json: JSONImplementation.No,
       scalaVersion: ScalaVersion.Scala3,
       builder: Builder.Sbt,
     },
   });
+
+  useEffect(() => {
+    if (!ready || initialized) {
+      return;
+    }
+
+    // We either load data from the link, from the preview or load initial data.
+    // We don't set initial data as defaultValues:
+    // - so reset button works correctly,
+    // - so it is not loaded first, and replaced with sharedRequest or preview data, as it is visible to the user.
+    const data = sharedRequest || formData || initialData;
+    let key: keyof StarterRequest;
+    for (key in data) {
+      form.setValue(key, data[key]);
+    }
+    if (snackbarConfig !== undefined) {
+      setSnackbar(snackbarConfig);
+    }
+    // Share config button works after validation, so we trigger it.
+    form.trigger().then(_ => null);
+    setInitialized(true);
+  }, [ready, initialized, sharedRequest, formData, initialData, snackbarConfig, form]);
 
   // TODO: improve type definitions in watch, as if they do not have default value they should be undefined
   const [effectType, effectImplementation, jsonImplementation, scalaVersion] = form.watch([
@@ -69,20 +98,6 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
     'scalaVersion',
   ]);
   const isEffectImplementationSelectable = Boolean(effectType) && Boolean(scalaVersion);
-
-  useEffect(() => {
-    if (formData !== undefined) {
-      form.setValue('projectName', formData.projectName);
-      form.setValue('groupId', formData.groupId);
-      form.setValue('effect', formData.effect);
-      form.setValue('implementation', formData.implementation);
-      form.setValue('addDocumentation', formData.addDocumentation);
-      form.setValue('addMetrics', formData.addMetrics);
-      form.setValue('json', formData.json);
-      form.setValue('scalaVersion', formData.scalaVersion);
-      form.setValue('builder', formData.builder);
-    }
-  }, [formData, form]);
 
   useEffect(() => {
     // NOTE: reset effect implementation field value upon effect type or scala version change
@@ -149,44 +164,6 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
     setSnackbar({ open: true, severity: 'info', message: 'Link to configuration copied to clipboard.' });
   };
 
-  const applySharedConfiguration = (searchParams: URLSearchParams) => {
-    if (searchParams.toString() !== '') {
-      const qp = parse(searchParams.toString(), { parseBooleans: true });
-      starterValidationSchema
-        .isValid(qp)
-        .then(isValid => {
-          if (isValid) {
-            const queryParams = qp as StarterRequest;
-            let key: keyof StarterRequest;
-            for (key in queryParams) {
-              form.setValue(key, queryParams[key]);
-            }
-            setSnackbar({
-              open: true,
-              severity: 'info',
-              message: 'Linked configuration was applied.',
-            });
-            //trigger form validity so that `share` button is enabled upon the values application
-            form.trigger().then(ignore => {});
-          } else {
-            setSnackbar({
-              open: true,
-              severity: 'warning',
-              message: 'Linked configuration is not valid therefore it was not applied.',
-            });
-          }
-        })
-        .catch(_ => {
-          setSnackbar({
-            open: true,
-            severity: 'warning',
-            message: 'Validation of linked configuration failed therefore it was not applied.',
-          });
-        });
-      setSearchParams({});
-    }
-  };
-
   return (
     <Box>
       {!isEmbedded && (
@@ -222,65 +199,78 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
           noValidate
           onSubmit={form.handleSubmit(handleFormSubmit)}
         >
-          <FormTextField
-            className={classes.formFirstRow}
-            name="projectName"
-            label="Project name"
-            placeholder="projectname"
-          />
-          <FormTextField
-            className={classes.formFirstRow}
-            name="groupId"
-            label="Group ID"
-            placeholder="com.softwaremill"
-          />
+          <fieldset className={classes.groupedInputs}>
+            <legend className={classes.groupLegend}>Metadata</legend>
+            <FormTextField
+              name="projectName"
+              label="Project name"
+              placeholder="projectname"
+              selectOnClick={true}
+            />
+            <FormTextField
+              name="groupId"
+              label="Group ID"
+              placeholder="com.softwaremill"
+              defaultValue="com.softwaremill"
+              selectOnClick={true}
+            />
+          </fieldset>
 
-          <FormSelect
-            className={classes.formSecondRow}
-            name="effect"
-            label="Effect type"
-            options={EFFECT_TYPE_OPTIONS}
-          />
-          <FormRadioGroup
-            className={classes.formSecondRow}
-            name="scalaVersion"
-            label="Scala version"
-            options={SCALA_VERSION_OPTIONS}
-          />
+          <fieldset className={classes.groupedInputs}>
+            <legend className={classes.groupLegend}>Server</legend>
+            <FormSelect
+              name="effect"
+              label="Effect type"
+              options={EFFECT_TYPE_OPTIONS}
+            />
+            <div className={classes.inputWithAddon}>
+              <FormSelect
+                name="implementation"
+                label="Server implementation"
+                disabled={!isEffectImplementationSelectable}
+                options={isEffectImplementationSelectable ? getEffectImplementationOptions(effectType) : []}
+              />
+              <Tooltip
+                title="Available options depend on the values of the 'Effect type' and 'Scala version' inputs."
+                className={classes.serverTooltip} enterDelay={50}>
+                <Box>
+                  <InfoOutlinedIcon/>
+                </Box>
+              </Tooltip>
+            </div>
+          </fieldset>
 
-          <FormSelect
-            className={classes.formThirdRow}
-            name="implementation"
-            label="Server implementation"
-            disabled={!isEffectImplementationSelectable}
-            options={isEffectImplementationSelectable ? getEffectImplementationOptions(effectType) : []}
-          />
-          <FormRadioGroup
-            className={classes.formThirdRow}
-            name="builder"
-            label="Build tool"
-            options={BUILDER_OPTIONS}
-          />
+          <fieldset className={classes.groupedInputs}>
+            <legend className={classes.groupLegend}>Build</legend>
+            <FormRadioGroup
+              name="scalaVersion"
+              label="Scala version"
+              options={SCALA_VERSION_OPTIONS}
+            />
+            <FormRadioGroup
+              name="builder"
+              label="Build tool"
+              options={BUILDER_OPTIONS} />
+          </fieldset>
 
-          <FormRadioGroup
-            className={classes.formFourthRow}
-            name="addDocumentation"
-            label="Expose endpoint documentation using Swagger UI"
-            options={ENDPOINTS_OPTIONS}
-          />
-          <FormRadioGroup
-            className={classes.formFourthRow}
-            name="json"
-            label="Add JSON endpoint using"
-            options={getJSONImplementationOptions(effectType)}
-          />
-
-          <FormRadioGroup
-            className={classes.formFifthRow}
-            name="addMetrics"
-            label="Add metrics endpoints"
-            options={ENDPOINTS_OPTIONS}
-          />
+          <fieldset className={classes.groupedInputs}>
+            <legend className={classes.groupLegend}>Options</legend>
+            <FormRadioGroup
+              name="json"
+              label="Add JSON endpoint using"
+              options={getJSONImplementationOptions(effectType)}
+            />
+            <FormRadioGroup
+              name="addDocumentation"
+              label="Expose endpoint documentation using Swagger UI"
+              options={ENDPOINTS_OPTIONS}
+            />
+            <FormRadioGroup
+              name="addMetrics"
+              label="Add metrics endpoints"
+              options={ENDPOINTS_OPTIONS}
+            />
+          </fieldset>
 
           <div className={cx(classes.actionsContainer, classes.formActionsRow)}>
             <Button variant="contained" color="secondary" size="medium" onClick={handleFormReset} disableElevation>
