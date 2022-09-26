@@ -174,10 +174,10 @@ describe('ConfigurationForm component', () => {
 
     // when
     await user.click(screen.getByRole('button', { name: /Effect type/i }));
-    await user.click(screen.getByText('IO (cats-effect)'));
+    await user.click(screen.getByText('ZIO'));
 
     await user.click(screen.getByRole('button', { name: /Server implementation/i }));
-    await user.click(screen.getByText('http4s'));
+    await user.click(screen.getByText('ZIO Http'));
 
     await user.click(screen.getByRole('button', { name: /Effect type/i }));
     await user.click(screen.getByText('Future'));
@@ -188,8 +188,7 @@ describe('ConfigurationForm component', () => {
       scalaVersion: 'Scala3',
       implementation: '',
       // default values below
-      projectName: '',
-      groupId: '',
+      groupId: 'com.softwaremill',
       addDocumentation: 'false',
       json: 'No',
       addMetrics: 'false',
@@ -223,8 +222,7 @@ describe('ConfigurationForm component', () => {
       // default values below
       scalaVersion: 'Scala3',
       implementation: '',
-      projectName: '',
-      groupId: '',
+      groupId: 'com.softwaremill',
       addDocumentation: 'false',
       addMetrics: 'false',
     });

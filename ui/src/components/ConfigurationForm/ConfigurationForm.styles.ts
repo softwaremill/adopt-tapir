@@ -16,35 +16,20 @@ export const useStyles = makeStyles<{ isEmbedded: boolean }>()((theme, { isEmbed
       },
     },
 
-    formFirstRow: {
-      [theme.breakpoints.up(breakpoint)]: {
-        gridRowStart: 1,
-      },
+    groupedInputs: {
+      display: 'flex',
+      flexDirection: 'column',
+      border: 0,
+      paddingTop: 0
     },
-    formSecondRow: {
-      alignSelf: 'center',
 
-      [theme.breakpoints.up(breakpoint)]: {
-        gridRowStart: 2,
-      },
+    groupLegend: {
+      float: 'left',
+      color: theme.palette.secondary.main,
+      borderBottom: '1px solid ' + theme.palette.divider,
+      marginBottom: theme.spacing(1)
     },
-    formThirdRow: {
-      alignSelf: 'center',
 
-      [theme.breakpoints.up(breakpoint)]: {
-        gridRowStart: 3,
-      },
-    },
-    formFourthRow: {
-      [theme.breakpoints.up(breakpoint)]: {
-        gridRowStart: 4,
-      },
-    },
-    formFifthRow: {
-      [theme.breakpoints.up(breakpoint)]: {
-        gridRowStart: 5,
-      },
-    },
     formActionsRow: {
       [theme.breakpoints.up(breakpoint)]: {
         gridColumnStart: 2,
@@ -64,5 +49,23 @@ export const useStyles = makeStyles<{ isEmbedded: boolean }>()((theme, { isEmbed
     submitButton: {
       whiteSpace: 'nowrap',
     },
+
+    inputWithAddon: {
+      display: "flex",
+      alignItems: "baseline"
+    },
+
+    serverTooltip: {
+      paddingLeft: theme.spacing(1),
+      paddingRight: theme.spacing(1),
+      '& svg': {
+        color: theme.palette.secondary.main,
+      },
+      ":hover": {
+        '& svg': {
+          color: theme.palette.primary.main
+        }
+      }
+    }
   };
 });
