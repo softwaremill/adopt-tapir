@@ -22,7 +22,7 @@ val macwireVersion = "2.5.8"
 val scalafmtVersion = "3.5.8"
 val scalaLoggingVersion = "3.9.5"
 val logbackClassicVersion = "1.4.1"
-val scalaTestVersion = "3.2.13"
+val scalaTestVersion = "3.2.14"
 
 val httpDependencies = Seq(
   "org.http4s" %% "http4s-blaze-server" % http4sBlazeServerVersion,
