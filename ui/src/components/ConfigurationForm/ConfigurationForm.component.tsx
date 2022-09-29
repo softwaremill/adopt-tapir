@@ -1,16 +1,16 @@
-import {SyntheticEvent, useContext, useEffect, useState} from 'react';
-import {Box, Button, IconButton, Stack, Tooltip, Typography} from '@mui/material';
+import { SyntheticEvent, useContext, useEffect, useState } from 'react';
+import { Box, Button, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import ShareTwoToneIcon from '@mui/icons-material/ShareTwoTone';
-import {FormProvider, useForm} from 'react-hook-form';
-import {yupResolver} from '@hookform/resolvers/yup';
-import {DevTool} from '@hookform/devtools';
-import {Builder, doRequestStarter, JSONImplementation, ScalaVersion, StarterRequest} from 'api/starter';
-import {useApiCall} from 'hooks/useApiCall';
-import {isDevelopment} from 'consts/env';
-import {FormTextField} from '../FormTextField';
-import {FormSelect} from '../FormSelect';
-import {FormRadioGroup} from '../FormRadioGroup';
-import {useStyles} from './ConfigurationForm.styles';
+import { FormProvider, useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { DevTool } from '@hookform/devtools';
+import { Builder, doRequestStarter, JSONImplementation, ScalaVersion, StarterRequest } from 'api/starter';
+import { useApiCall } from 'hooks/useApiCall';
+import { isDevelopment } from 'consts/env';
+import { FormTextField } from '../FormTextField';
+import { FormSelect } from '../FormSelect';
+import { FormRadioGroup } from '../FormRadioGroup';
+import { useStyles } from './ConfigurationForm.styles';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 import {
@@ -26,13 +26,13 @@ import {
   getJSONImplementationOptions,
   mapEffectTypeToJSONImplementation,
 } from './ConfigurationForm.helpers';
-import {useNavigate} from 'react-router-dom';
-import {ApiCallAddons} from '../ApiCallAddons';
-import {ConfigurationDataContext, resetFormData, setFormData} from '../../contexts';
-import {stringifyUrl} from 'query-string';
-import {CommonSnackbar, SnackbarConfig} from '../CommonSnackbar';
-import {useInitialData} from "../../hooks/useInitialData";
-import {useSharedConfig} from "../../hooks/useSharedConfig";
+import { useNavigate } from 'react-router-dom';
+import { ApiCallAddons } from '../ApiCallAddons';
+import { ConfigurationDataContext, resetFormData, setFormData } from '../../contexts';
+import { stringifyUrl } from 'query-string';
+import { CommonSnackbar, SnackbarConfig } from '../CommonSnackbar';
+import { useInitialData } from '../../hooks/useInitialData';
+import { useSharedConfig } from '../../hooks/useSharedConfig';
 
 interface ConfigurationFormProps {
   isEmbedded?: boolean;
@@ -195,12 +195,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
         >
           <fieldset className={classes.groupedInputs}>
             <legend className={classes.groupLegend}>Metadata</legend>
-            <FormTextField
-              name="projectName"
-              label="Project name"
-              placeholder="projectname"
-              selectOnClick={true}
-            />
+            <FormTextField name="projectName" label="Project name" placeholder="projectname" selectOnClick={true} />
             <FormTextField
               name="groupId"
               label="Group ID"
@@ -212,11 +207,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
 
           <fieldset className={classes.groupedInputs}>
             <legend className={classes.groupLegend}>Server</legend>
-            <FormSelect
-              name="effect"
-              label="Effect type"
-              options={EFFECT_TYPE_OPTIONS}
-            />
+            <FormSelect name="effect" label="Effect type" options={EFFECT_TYPE_OPTIONS} />
             <div className={classes.inputWithAddon}>
               <FormSelect
                 name="implementation"
@@ -226,9 +217,11 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
               />
               <Tooltip
                 title="Available options depend on the values of the 'Effect type' and 'Scala version' inputs."
-                className={classes.serverTooltip} enterDelay={50}>
+                className={classes.serverTooltip}
+                enterDelay={50}
+              >
                 <Box>
-                  <InfoOutlinedIcon/>
+                  <InfoOutlinedIcon />
                 </Box>
               </Tooltip>
             </div>
@@ -236,15 +229,8 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
 
           <fieldset className={classes.groupedInputs}>
             <legend className={classes.groupLegend}>Build</legend>
-            <FormRadioGroup
-              name="scalaVersion"
-              label="Scala version"
-              options={SCALA_VERSION_OPTIONS}
-            />
-            <FormRadioGroup
-              name="builder"
-              label="Build tool"
-              options={BUILDER_OPTIONS} />
+            <FormRadioGroup name="scalaVersion" label="Scala version" options={SCALA_VERSION_OPTIONS} />
+            <FormRadioGroup name="builder" label="Build tool" options={BUILDER_OPTIONS} />
           </fieldset>
 
           <fieldset className={classes.groupedInputs}>
@@ -259,11 +245,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
               label="Expose endpoint documentation using Swagger UI"
               options={ENDPOINTS_OPTIONS}
             />
-            <FormRadioGroup
-              name="addMetrics"
-              label="Add metrics endpoints"
-              options={ENDPOINTS_OPTIONS}
-            />
+            <FormRadioGroup name="addMetrics" label="Add metrics endpoints" options={ENDPOINTS_OPTIONS} />
           </fieldset>
 
           <div className={cx(classes.actionsContainer, classes.formActionsRow)}>

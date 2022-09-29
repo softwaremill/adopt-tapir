@@ -9,10 +9,10 @@ type Props = {
 };
 
 export type SnackbarConfig = {
-  open: boolean,
-  severity?: AlertColor,
-  message?: String
-}
+  open: boolean;
+  severity?: AlertColor;
+  message?: String;
+};
 
 export function CommonSnackbar({ onClose, open, severity, message, duration }: Props) {
   return (

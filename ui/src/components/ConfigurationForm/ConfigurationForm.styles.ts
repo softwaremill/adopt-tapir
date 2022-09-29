@@ -20,14 +20,14 @@ export const useStyles = makeStyles<{ isEmbedded: boolean }>()((theme, { isEmbed
       display: 'flex',
       flexDirection: 'column',
       border: 0,
-      paddingTop: 0
+      paddingTop: 0,
     },
 
     groupLegend: {
       float: 'left',
       color: theme.palette.secondary.main,
       borderBottom: '1px solid ' + theme.palette.divider,
-      marginBottom: theme.spacing(1)
+      marginBottom: theme.spacing(1),
     },
 
     formActionsRow: {
@@ -51,8 +51,8 @@ export const useStyles = makeStyles<{ isEmbedded: boolean }>()((theme, { isEmbed
     },
 
     inputWithAddon: {
-      display: "flex",
-      alignItems: "baseline"
+      display: 'flex',
+      alignItems: 'baseline',
     },
 
     serverTooltip: {
@@ -61,11 +61,11 @@ export const useStyles = makeStyles<{ isEmbedded: boolean }>()((theme, { isEmbed
       '& svg': {
         color: theme.palette.secondary.main,
       },
-      ":hover": {
+      ':hover': {
         '& svg': {
-          color: theme.palette.primary.main
-        }
-      }
-    }
+          color: theme.palette.primary.main,
+        },
+      },
+    },
   };
 });

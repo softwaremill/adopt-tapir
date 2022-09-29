@@ -1,6 +1,6 @@
 import { TextField } from '@mui/material';
 import { Controller, useFormContext } from 'react-hook-form';
-import {useCallback} from "react";
+import { useCallback } from 'react';
 
 interface FormTextFieldProps {
   className?: string;
@@ -17,14 +17,17 @@ export const FormTextField: React.FC<FormTextFieldProps> = ({
   label,
   placeholder,
   defaultValue = '',
-  selectOnClick = false
+  selectOnClick = false,
 }) => {
   const { control } = useFormContext();
-  const onClick = useCallback((target: HTMLInputElement) => {
-    if (selectOnClick) {
-      return target.select();
-    }
-  }, [selectOnClick]);
+  const onClick = useCallback(
+    (target: HTMLInputElement) => {
+      if (selectOnClick) {
+        return target.select();
+      }
+    },
+    [selectOnClick]
+  );
   return (
     <Controller
       name={name}

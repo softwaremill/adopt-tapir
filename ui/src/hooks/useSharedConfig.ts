@@ -1,12 +1,11 @@
-import {useEffect, useState} from "react";
-import {parse} from "query-string";
-import {starterValidationSchema} from "../components/ConfigurationForm/ConfigurationForm.consts";
-import {StarterRequest} from "../api/starter";
-import {SnackbarConfig} from "../components/CommonSnackbar";
-import {useSearchParams} from "react-router-dom";
+import { useEffect, useState } from 'react';
+import { parse } from 'query-string';
+import { starterValidationSchema } from '../components/ConfigurationForm/ConfigurationForm.consts';
+import { StarterRequest } from '../api/starter';
+import { SnackbarConfig } from '../components/CommonSnackbar';
+import { useSearchParams } from 'react-router-dom';
 
-
-export function useSharedConfig(): [StarterRequest|undefined, SnackbarConfig|undefined, boolean] {
+export function useSharedConfig(): [StarterRequest | undefined, SnackbarConfig | undefined, boolean] {
   const [searchParams, setSearchParams] = useSearchParams();
   const [request, setRequest] = useState<StarterRequest>();
   const [snackbar, setSnackbar] = useState<SnackbarConfig>();
@@ -44,10 +43,10 @@ export function useSharedConfig(): [StarterRequest|undefined, SnackbarConfig|und
         });
       })
       .finally(() => {
-        setReady(true)
+        setReady(true);
       });
     setSearchParams({});
-  }, [searchParams, setSearchParams])
+  }, [searchParams, setSearchParams]);
 
   return [request, snackbar, ready];
 }
