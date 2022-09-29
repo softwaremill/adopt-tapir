@@ -1,5 +1,5 @@
 import {SyntheticEvent, useContext, useEffect, useState} from 'react';
-import {AlertColor, Box, Button, IconButton, Stack, Tooltip, Typography} from '@mui/material';
+import {Box, Button, IconButton, Stack, Tooltip, Typography} from '@mui/material';
 import ShareTwoToneIcon from '@mui/icons-material/ShareTwoTone';
 import {FormProvider, useForm} from 'react-hook-form';
 import {yupResolver} from '@hookform/resolvers/yup';
@@ -30,18 +30,12 @@ import {useNavigate} from 'react-router-dom';
 import {ApiCallAddons} from '../ApiCallAddons';
 import {ConfigurationDataContext, resetFormData, setFormData} from '../../contexts';
 import {stringifyUrl} from 'query-string';
-import {CommonSnackbar} from '../CommonSnackbar';
+import {CommonSnackbar, SnackbarConfig} from '../CommonSnackbar';
 import {useInitialData} from "../../hooks/useInitialData";
 import {useSharedConfig} from "../../hooks/useSharedConfig";
 
 interface ConfigurationFormProps {
   isEmbedded?: boolean;
-}
-
-interface SnackbarConfig {
-  open: boolean;
-  severity?: AlertColor;
-  message?: String;
 }
 
 export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded = false }) => {
