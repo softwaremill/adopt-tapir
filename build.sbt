@@ -231,7 +231,7 @@ lazy val backend: Project = (project in file("backend"))
 
 lazy val ui = (project in file(uiProjectName))
   .settings(commonSettings)
-  .settings(Test / test := (Test / test).dependsOn(yarnTask.toTask(" test")).value)
+  .settings(Test / test := (Test / test).dependsOn(yarnTask.toTask(" lint:check")).dependsOn(yarnTask.toTask(" test")).value)
   .settings(cleanFiles += baseDirectory.value / "build")
 
 val scala3Version = "3.2.0"

@@ -43,6 +43,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test --watchAll=false",
     "eject": "react-scripts eject",
+    "lint:check": "eslint --ext .ts,.tsx . && prettier --check ./src",
     "lint": "eslint --ext .ts,.tsx . && prettier --write ./src"
   },
   "eslintConfig": {
