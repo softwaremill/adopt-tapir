@@ -53,7 +53,9 @@ val jsonDependencies = Seq(
 
 val loggingDependencies = Seq(
   "com.typesafe.scala-logging" %% "scala-logging" % scalaLoggingVersion,
-  "ch.qos.logback" % "logback-classic" % logbackClassicVersion
+  "ch.qos.logback" % "logback-classic" % logbackClassicVersion,
+  "org.codehaus.janino" % "janino" % "3.1.8" % Runtime,
+  "net.logstash.logback" % "logstash-logback-encoder" % "7.2" % Runtime
 )
 
 val fileDependencies = Seq(

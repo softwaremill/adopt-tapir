@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <configuration scan="true">
-  <jmxConfigurator/>
-
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-    <encoder>
-      <pattern>%d{HH:mm:ss.SSS}%boldYellow(%replace( [%X{cid}] ){' \[\] ', ' '})[%thread] %-5level %logger{5} - %msg%n%rEx</pattern>
-    </encoder>
+    <if condition='p("LOGBACK_JSON_ENCODE").equals("true")'>
+      <then>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+      </then>
+      <else>
+        <encoder>
+          <pattern>%d{HH:mm:ss.SSS}%boldYellow(%replace( [%X{cid}] ){' \[\] ', ' '})[%thread] %-5level %logger{5} - %msg%n%rEx</pattern>
+        </encoder>
+      </else>
+    </if>
   </appender>
 
   <logger name="com.softwaremill.adopttapir" level="${LOG_LEVEL:-DEBUG}" additivity="false">
