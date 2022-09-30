@@ -14,7 +14,28 @@ on:
       - "helm/**"
 
 jobs:
-  verify:
+  verify_unit_tests_lint:
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+
+    steps:
+      - name: Check-out repository
+        id: repo-checkout
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17 with sbt cache
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 17
+          cache: 'sbt'
+
+      - name: Run unit tests & lint
+        id: run-unit-tests
+        run: sbt test
+
+  verify_integration:
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
@@ -45,24 +66,35 @@ jobs:
             ~/.coursier
           key: ${{ runner.os }}-sbt-${{ hashFiles('**/build.sbt') }}
 
-      - name: Run unit tests
-        # run unit tests only against the No & Scala3 configuration so that resources are spared
-        if: matrix.scala == 'Scala3' && matrix.json == 'No'
-        id: run-unit-tests
-        run: sbt test
-
       - name: Run integration tests for ${{ matrix.scala }} with ${{ matrix.json }} JSON support
         run: SCALA=${{ matrix.scala }} JSON=${{ matrix.json }} IT_TESTS_THREADS_NO=1 sbt 'ItTest / test'
 
+  verify_docker_image_build:
+    if: github.event_name == 'pull_request' && github.ref != 'refs/heads/main'
+    needs: [ verify_unit_tests_lint, verify_integration ]
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+
+    steps:
+      - name: Check-out repository
+        id: repo-checkout
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17 with sbt cache
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 17
+          cache: 'sbt'
+
       - name: Build docker image locally
-        # run this step only once across all configurations
-        if: matrix.scala == 'Scala3' && matrix.json == 'No'
         id: build-docker-image-locally
         run: sbt docker:publishLocal
 
   deploy:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-    needs: [ verify ]
+    needs: [ verify_unit_tests_lint, verify_integration ]
     runs-on: ubuntu-latest
 
     steps:
