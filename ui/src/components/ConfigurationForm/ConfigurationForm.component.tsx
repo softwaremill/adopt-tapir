@@ -1,4 +1,4 @@
-import { SyntheticEvent, useContext, useEffect, useState } from 'react';
+import { SyntheticEvent, useCallback, useContext, useEffect, useState } from 'react';
 import { Box, Button, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import ShareTwoToneIcon from '@mui/icons-material/ShareTwoTone';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -46,7 +46,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
   const initialData = useInitialData();
   const [initialized, setInitialized] = useState(false);
 
-  const [sharedRequest, snackbarConfig, ready] = useSharedConfig();
+  const [sharedRequest, snackbarConfig, ready, preview] = useSharedConfig();
 
   const form = useForm<StarterRequest>({
     mode: 'onBlur',
@@ -61,6 +61,23 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
       builder: Builder.Sbt,
     },
   });
+
+  const handleShowPreview = useCallback(() => {
+    // 'trigger()' triggers the validation.
+    form.trigger().then(isValid => {
+      if (isValid) {
+        const casted = form.getValues() as StarterRequest;
+        // Conversion of bools is done by hand, because casting writes booleans as strings.
+        const formData: StarterRequest = {
+          ...casted,
+          addDocumentation: 'true' === casted.addDocumentation.toString(),
+          addMetrics: 'true' === casted.addMetrics.toString(),
+        };
+        contextDispatch(setFormData(formData));
+        navigate('/preview-starter');
+      }
+    });
+  }, [form, contextDispatch, navigate]);
 
   useEffect(() => {
     if (!ready || initialized) {
@@ -82,7 +99,10 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
     // Share config button works after validation, so we trigger it.
     form.trigger().then(_ => null);
     setInitialized(true);
-  }, [ready, initialized, sharedRequest, formData, initialData, snackbarConfig, form]);
+    if (preview) {
+      handleShowPreview();
+    }
+  }, [ready, initialized, sharedRequest, formData, initialData, snackbarConfig, form, preview, handleShowPreview]);
 
   // TODO: improve type definitions in watch, as if they do not have default value they should be undefined
   const [effectType, effectImplementation, jsonImplementation, scalaVersion] = form.watch([
@@ -118,23 +138,6 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
   const handleFormReset = (): void => {
     contextDispatch(resetFormData());
     form.reset();
-  };
-
-  const handleShowPreview = (): void => {
-    // 'trigger()' triggers the validation.
-    form.trigger().then(isValid => {
-      if (isValid) {
-        const casted = form.getValues() as StarterRequest;
-        // Conversion of bools is done by hand, because casting writes booleans as strings.
-        const formData: StarterRequest = {
-          ...casted,
-          addDocumentation: 'true' === casted.addDocumentation.toString(),
-          addMetrics: 'true' === casted.addMetrics.toString(),
-        };
-        contextDispatch(setFormData(formData));
-        navigate('/preview-starter');
-      }
-    });
   };
 
   const [snackbar, setSnackbar] = useState<SnackbarConfig>({
