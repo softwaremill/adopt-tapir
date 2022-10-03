@@ -42,10 +42,9 @@ export type StarterRequest = {
   builder: Builder;
 };
 
+export const serverAddress = process.env.REACT_APP_SERVER_ADDRESS ?? 'https://adopt-tapir.softwaremill.com';
+
 export async function doRequestStarter(formData: StarterRequest) {
-  const serverAddress = !process.env.REACT_APP_SERVER_ADDRESS
-    ? 'https://adopt-tapir.softwaremill.com'
-    : process.env.REACT_APP_SERVER_ADDRESS;
   const response = await fetch(`${serverAddress}/api/v1/starter.zip`, {
     method: 'POST',
     headers: {

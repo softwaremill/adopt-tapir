@@ -4,7 +4,14 @@ import ShareTwoToneIcon from '@mui/icons-material/ShareTwoTone';
 import { FormProvider, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { DevTool } from '@hookform/devtools';
-import { Builder, doRequestStarter, JSONImplementation, ScalaVersion, StarterRequest } from 'api/starter';
+import {
+  Builder,
+  doRequestStarter,
+  JSONImplementation,
+  ScalaVersion,
+  serverAddress,
+  StarterRequest,
+} from 'api/starter';
 import { useApiCall } from 'hooks/useApiCall';
 import { isDevelopment } from 'consts/env';
 import { FormTextField } from '../FormTextField';
@@ -70,8 +77,8 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
         // Conversion of bools is done by hand, because casting writes booleans as strings.
         const formData: StarterRequest = {
           ...casted,
-          addDocumentation: 'true' === casted.addDocumentation.toString(),
-          addMetrics: 'true' === casted.addMetrics.toString(),
+          addDocumentation: JSON.parse(casted.addDocumentation.toString()),
+          addMetrics: JSON.parse(casted.addMetrics.toString()),
         };
         contextDispatch(setFormData(formData));
         navigate('/preview-starter');
@@ -159,6 +166,15 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
     );
     await navigator.clipboard.writeText(urlToShare);
     setSnackbar({ open: true, severity: 'info', message: 'Link to configuration copied to clipboard.' });
+  };
+
+  const handleShowPreviewInNewTab = () => {
+    const casted = form.getValues() as StarterRequest;
+    const urlToShare = stringifyUrl(
+      { url: serverAddress, query: { ...casted, preview: 'true' } },
+      { skipNull: true, skipEmptyString: true }
+    );
+    window.open(urlToShare, '_blank');
   };
 
   return (
@@ -256,19 +272,17 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
               Reset
             </Button>
 
-            {!isEmbedded && (
-              <Button
-                className={classes.submitButton}
-                onClick={handleShowPreview}
-                variant="contained"
-                color="primary"
-                size="medium"
-                type="button"
-                disableElevation
-              >
-                Preview
-              </Button>
-            )}
+            <Button
+              className={classes.submitButton}
+              onClick={isEmbedded ? handleShowPreviewInNewTab : handleShowPreview}
+              variant="contained"
+              color="primary"
+              size="medium"
+              type="button"
+              disableElevation
+            >
+              Preview
+            </Button>
 
             <Button
               className={classes.submitButton}
