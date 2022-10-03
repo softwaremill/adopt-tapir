@@ -5,11 +5,12 @@ import { StarterRequest } from '../api/starter';
 import { SnackbarConfig } from '../components/CommonSnackbar';
 import { useSearchParams } from 'react-router-dom';
 
-export function useSharedConfig(): [StarterRequest | undefined, SnackbarConfig | undefined, boolean] {
+export function useSharedConfig(): [StarterRequest | undefined, SnackbarConfig | undefined, boolean, boolean] {
   const [searchParams, setSearchParams] = useSearchParams();
   const [request, setRequest] = useState<StarterRequest>();
   const [snackbar, setSnackbar] = useState<SnackbarConfig>();
   const [ready, setReady] = useState(false);
+  const [preview, setPreview] = useState(false);
 
   useEffect(() => {
     if (searchParams.toString() === '') {
@@ -17,16 +18,20 @@ export function useSharedConfig(): [StarterRequest | undefined, SnackbarConfig |
       return;
     }
     const params = parse(searchParams.toString(), { parseBooleans: true });
+    const shouldPreview = 'preview' in params;
+    setPreview(shouldPreview);
     starterValidationSchema
       .isValid(params)
       .then(isValid => {
         if (isValid) {
           setRequest(params as StarterRequest);
-          setSnackbar({
-            open: true,
-            severity: 'info',
-            message: 'Linked configuration was applied.',
-          });
+          if (!shouldPreview) {
+            setSnackbar({
+              open: true,
+              severity: 'info',
+              message: 'Linked configuration was applied.',
+            });
+          }
         } else {
           setSnackbar({
             open: true,
@@ -48,5 +53,5 @@ export function useSharedConfig(): [StarterRequest | undefined, SnackbarConfig |
     setSearchParams({});
   }, [searchParams, setSearchParams]);
 
-  return [request, snackbar, ready];
+  return [request, snackbar, ready, preview];
 }
