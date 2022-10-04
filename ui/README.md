@@ -45,7 +45,7 @@ You can learn more in the [Create React App documentation](https://facebook.gith
 
 To learn React, check out the [React documentation](https://reactjs.org/).
 
-## Routing / embeddedable version
+## Routing / embeddable version
 
 Adopt Tapir is a single page app that currently mostly utilizes index/root path, there is an `/embedded-form` route available that renders only the form component. Its main purpose is to be embedded in [Tapir documentation](https://tapir.softwaremill.com/), so please make sure that this component stays as standalone as it can.
 
