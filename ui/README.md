@@ -53,7 +53,7 @@ Example:
 
 ```jsx
 <iframe
-  sandbox="allow-scripts allow-same-origin allow-forms allow-downloads"
+  sandbox="allow-scripts allow-same-origin allow-forms allow-downloads allow-popups"
   src={'https://adopt-tapir.softwaremill.com/embedded-form'}
   width="895"
   height="590"
