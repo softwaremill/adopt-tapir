@@ -10,6 +10,9 @@ scala-cli run . # run the application (Main)
 scala-cli fmt --check . # run scalaformat check on all scala files and print summary, removing '--check' fixes badly formatted files
 ```
 
+To open project in the IDE (Metals / IntelliJ) run any of the `compile` or `test` command above and open the project.
+IDE should detect a BSP project and import it.
+
 Alternatively, you can use Scala CLI via a docker image:
 
 ```shell
