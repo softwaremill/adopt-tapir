@@ -201,12 +201,12 @@ private object ScalaCliProjectTemplate extends ProjectTemplate {
         (BuildScalaCliView.getMainDependencies _).andThen(BuildScalaCliView.format)(starterDetails)
       )
       .toString()
-    GeneratedFile("build.sc", content)
+    GeneratedFile("build.scala", content)
   }
 
   private def getTestScalaCli(starterDetails: StarterDetails): GeneratedFile = {
     val content = (BuildScalaCliView.getAllTestDependencies _).andThen(BuildScalaCliView.format)(starterDetails)
-    GeneratedFile("src/test/scala/test.sc", content)
+    GeneratedFile("src/test/scala/build.test.scala", content)
   }
 
   private lazy val readme: GeneratedFile =

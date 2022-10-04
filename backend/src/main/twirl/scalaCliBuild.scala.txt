@@ -4,9 +4,9 @@ groupId: String,
 scalaVersion: String,
 dependencies: String
 )
-using publish.organization "@groupId"
-using publish.name "@name"
-using publish.version "0.1.0-SNAPSHOT"
+//> using publish.organization "@groupId"
+//> using publish.name "@name"
+//> using publish.version "0.1.0-SNAPSHOT"
 
-using scala "@scalaVersion"
+//> using scala "@scalaVersion"
 @dependencies
