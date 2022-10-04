@@ -142,7 +142,7 @@ object BuildSbtView extends BuildView {
 
 object BuildScalaCliView extends BuildView {
   def format(dependencies: List[Dependency]): String = {
-    val importPrefix = "using lib "
+    val importPrefix = "//> using lib "
     dependencies
       .map(_.asScalaCliDependency)
       .mkString(importPrefix, System.lineSeparator() + importPrefix, System.lineSeparator())
