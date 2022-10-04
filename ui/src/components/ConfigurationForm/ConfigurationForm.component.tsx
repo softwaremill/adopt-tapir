@@ -169,12 +169,17 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
   };
 
   const handleShowPreviewInNewTab = () => {
-    const casted = form.getValues() as StarterRequest;
-    const urlToShare = stringifyUrl(
-      { url: serverAddress, query: { ...casted, preview: 'true' } },
-      { skipNull: true, skipEmptyString: true }
-    );
-    window.open(urlToShare, '_blank');
+    // 'trigger()' triggers the validation.
+    form.trigger().then(isValid => {
+      if (isValid) {
+        const casted = form.getValues() as StarterRequest;
+        const urlToShare = stringifyUrl(
+          { url: serverAddress, query: { ...casted, preview: 'true' } },
+          { skipNull: true, skipEmptyString: true }
+        );
+        window.open(urlToShare, '_blank');
+      }
+    });
   };
 
   return (
