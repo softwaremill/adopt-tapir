@@ -1,0 +1,8 @@
+@(additionalIgnores: List[String])
+# common IDEs to be ignored
+.idea/
+.metals/
+.vscode/
+
+# build tool specific entries@for(additionalIgnore <- additionalIgnores){
+@additionalIgnore}
