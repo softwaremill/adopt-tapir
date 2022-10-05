@@ -19,6 +19,16 @@ const baseTheme = createTheme({
     },
     divider: 'rgba(0, 0, 0, 0.12)',
   },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        sizeMedium: {
+          paddingLeft: 14,
+          paddingRight: 14,
+        },
+      },
+    },
+  },
 });
 
 export const theme = responsiveFontSizes(baseTheme);
