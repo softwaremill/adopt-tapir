@@ -54,13 +54,13 @@ export function PreviewStarterPage() {
   // 92.5px is the height of buttons panel.
   return (
     <>
-      <Grid container style={{ height: 'calc(100% - 92.5px)' }}>
-        <Grid item xs={2.2} className={classes.fullHeight}>
+      <Grid container style={{ height: 'calc(100vh - (100vh * 0.08) - 150px)', minHeight: '450px' }}>
+        <Grid item xs={2.4} className={classes.fullHeight}>
           <Box className={cx(classes.fullHeight, classes.treeViewContainer)}>
             <FileTreeView tree={files} location={RootNodeLocation} state={treeState} />
           </Box>
         </Grid>
-        <Grid item xs={9.8} className={classes.fullHeight}>
+        <Grid item xs={9.6} className={classes.fullHeight}>
           <Box className={cx(classes.fullHeight, classes.fileViewContainer)}>
             <FileContentView files={files} opened={treeState.openedFile} />
           </Box>
