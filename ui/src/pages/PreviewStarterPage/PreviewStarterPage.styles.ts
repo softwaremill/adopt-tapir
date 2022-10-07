@@ -23,7 +23,7 @@ export const useStyles = makeStyles()(theme => ({
     display: 'flex',
     marginTop: theme.spacing(1),
     backgroundColor: 'white',
-    padding: theme.spacing(3),
+    padding: theme.spacing(2),
     border: '1px solid ' + theme.palette.divider,
     borderBottomLeftRadius: '4px',
     borderBottomRightRadius: '4px',

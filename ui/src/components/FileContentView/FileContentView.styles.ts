@@ -5,6 +5,7 @@ export const useStyles = makeStyles()(theme => {
     wrapper: {
       height: '100%',
       marginTop: 0,
+      overflow: 'auto',
     },
   };
 });

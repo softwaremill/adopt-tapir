@@ -74,7 +74,6 @@ export function FileContentView({ files, opened }: Props) {
           backgroundColor: 'rgb(255, 255, 255)',
           padding: 0,
           height: '100%',
-          overflowY: 'auto',
         }}
         lineNumberStyle={{ minWidth: '44px' }}
         language={language}
