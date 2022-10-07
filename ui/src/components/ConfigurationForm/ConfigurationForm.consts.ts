@@ -77,6 +77,10 @@ export const JSON_OUTPUT_OPTIONS: FormRadioOption<JSONImplementation>[] = [
     value: JSONImplementation.Circe,
   },
   {
+    label: 'µPickle',
+    value: JSONImplementation.UPickle,
+  },
+  {
     label: 'jsoniter',
     value: JSONImplementation.Jsoniter,
   },

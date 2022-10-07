@@ -206,16 +206,19 @@ describe('configuration consts', () => {
       const cases: { effectType: EffectType; jsonImplementation: JSONImplementation; expected: boolean }[] = [
         { effectType: EffectType.Future, jsonImplementation: JSONImplementation.No, expected: true },
         { effectType: EffectType.Future, jsonImplementation: JSONImplementation.Circe, expected: true },
+        { effectType: EffectType.Future, jsonImplementation: JSONImplementation.UPickle, expected: true },
         { effectType: EffectType.Future, jsonImplementation: JSONImplementation.Jsoniter, expected: true },
         { effectType: EffectType.Future, jsonImplementation: JSONImplementation.ZIOJson, expected: false },
 
         { effectType: EffectType.IO, jsonImplementation: JSONImplementation.No, expected: true },
         { effectType: EffectType.IO, jsonImplementation: JSONImplementation.Circe, expected: true },
+        { effectType: EffectType.IO, jsonImplementation: JSONImplementation.UPickle, expected: true },
         { effectType: EffectType.IO, jsonImplementation: JSONImplementation.Jsoniter, expected: true },
         { effectType: EffectType.IO, jsonImplementation: JSONImplementation.ZIOJson, expected: false },
 
         { effectType: EffectType.ZIO, jsonImplementation: JSONImplementation.No, expected: true },
         { effectType: EffectType.ZIO, jsonImplementation: JSONImplementation.Circe, expected: true },
+        { effectType: EffectType.ZIO, jsonImplementation: JSONImplementation.UPickle, expected: true },
         { effectType: EffectType.ZIO, jsonImplementation: JSONImplementation.Jsoniter, expected: true },
         { effectType: EffectType.ZIO, jsonImplementation: JSONImplementation.ZIOJson, expected: true },
       ];

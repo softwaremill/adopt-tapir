@@ -74,6 +74,10 @@ object JsonImplementationRequest extends Enum[JsonImplementationRequest] with Ci
     override def toModel: JsonImplementation = JsonImplementation.Circe
   }
 
+  case object UPickle extends JsonImplementationRequest {
+    override def toModel: JsonImplementation = JsonImplementation.UPickle
+  }
+
   case object Jsoniter extends JsonImplementationRequest {
     override def toModel: JsonImplementation = JsonImplementation.Jsoniter
   }

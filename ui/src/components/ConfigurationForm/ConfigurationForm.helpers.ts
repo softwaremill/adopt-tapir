@@ -35,6 +35,7 @@ export const getEffectImplementationOptions = (effectType: EffectType): FormSele
 const commonJSONImplementations: JSONImplementation[] = [
   JSONImplementation.No,
   JSONImplementation.Circe,
+  JSONImplementation.UPickle,
   JSONImplementation.Jsoniter,
 ];
 
