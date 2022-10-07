@@ -63,22 +63,45 @@ object EndpointsView {
       }
     }
 
-    def prepareLibraryModel(scalaVersion: ScalaVersion): Code = Code(
-      s"""object Library ${if (scalaVersion == Scala2) "{" else ":"}
+    def prepareLibraryModel(starterDetails: StarterDetails): Code = {
+      val objects =
+        s"""object Library ${if (starterDetails.scalaVersion == Scala2) "{" else ":"}
          |  case class Author(name: String)
          |  case class Book(title: String, year: Int, author: Author)
          |
-         |  val books = List(
-         |    Book("The Sorrows of Young Werther", 1774, Author("Johann Wolfgang von Goethe")),
-         |    Book("On the Niemen", 1888, Author("Eliza Orzeszkowa")),
-         |    Book("The Art of Computer Programming", 1968, Author("Donald Knuth")),
-         |    Book("Pharaoh", 1897, Author("Boleslaw Prus"))
-         |  )
-         |${if (scalaVersion == Scala2) "}" else ""}""".stripMargin,
-      Set(
-        Import("Library._")
+         |""".stripMargin
+
+      val implicits = starterDetails.jsonImplementation match {
+        case JsonImplementation.UPickle =>
+          s"""
+           |  object Author ${if (starterDetails.scalaVersion == Scala2) "{" else ":"}
+           |    implicit val rw: ReadWriter[Author] = macroRW
+           |  ${if (starterDetails.scalaVersion == Scala2) "}" else ""}
+           |
+           |  object Book ${if (starterDetails.scalaVersion == Scala2) "{" else ":"}
+           |    implicit val rw: ReadWriter[Book] = macroRW
+           |  ${if (starterDetails.scalaVersion == Scala2) "}" else ""}
+           |
+           |""".stripMargin
+        case _ => ""
+      }
+
+      val list =
+        s"""|  val books = List(
+            |    Book("The Sorrows of Young Werther", 1774, Author("Johann Wolfgang von Goethe")),
+            |    Book("On the Niemen", 1888, Author("Eliza Orzeszkowa")),
+            |    Book("The Art of Computer Programming", 1968, Author("Donald Knuth")),
+            |    Book("Pharaoh", 1897, Author("Boleslaw Prus"))
+            |  )
+            |${if (starterDetails.scalaVersion == Scala2) "}" else ""}""".stripMargin
+
+      Code(
+        objects + implicits + list,
+        Set(
+          Import("Library._")
+        )
       )
-    )
+    }
 
     private def prepareBookListing(starterDetails: StarterDetails): Code = {
       val givenPrefix = if (starterDetails.scalaVersion == Scala2) "implicit val" else "given"
@@ -99,6 +122,11 @@ object EndpointsView {
               Import("sttp.tapir.generic.auto._"),
               Import("sttp.tapir.json.circe._")
             )
+          )
+        case JsonImplementation.UPickle =>
+          Code(
+            prepareBookListing,
+            Set(Import("sttp.tapir.generic.auto._"), Import("upickle.default._"), Import("sttp.tapir.json.upickle._"))
           )
         case JsonImplementation.Jsoniter =>
           val codecs = s"$givenPrefix codecBooks: JsonValueCodec[List[Book]] = JsonCodecMaker.make"
@@ -146,7 +174,7 @@ object EndpointsView {
 
   def getJsonLibrary(starterDetails: StarterDetails): Code = {
     if (starterDetails.jsonImplementation == JsonImplementation.WithoutJson) Code.empty
-    else JsonModelObject.prepareLibraryModel(starterDetails.scalaVersion)
+    else JsonModelObject.prepareLibraryModel(starterDetails)
   }
 
   def getApiEndpoints(starterDetails: StarterDetails): Code = {

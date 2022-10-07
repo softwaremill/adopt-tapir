@@ -44,6 +44,8 @@ object JsonImplementation {
 
   case object Circe extends JsonImplementation
 
+  case object UPickle extends JsonImplementation
+
   case object Jsoniter extends JsonImplementation
 
   case object ZIOJson extends JsonImplementation
