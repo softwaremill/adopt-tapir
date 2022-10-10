@@ -81,7 +81,7 @@ export function FileContentView({ files, opened }: Props) {
           paddingRight: '1em',
           minWidth: '44px',
           userSelect: 'none',
-          WebkitUserSelect: 'none'
+          WebkitUserSelect: 'none',
         }}
         language={language}
         showLineNumbers={true}
