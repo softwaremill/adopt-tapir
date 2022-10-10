@@ -3,6 +3,7 @@ import { makeStyles } from 'tss-react/mui';
 export const useStyles = makeStyles<{ level: number }>()((theme, { level }) => {
   return {
     wrapper: {
+      display: 'flex',
       height: '100%',
       overflow: 'auto',
     },
