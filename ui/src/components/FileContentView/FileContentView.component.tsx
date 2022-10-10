@@ -75,9 +75,17 @@ export function FileContentView({ files, opened }: Props) {
           padding: 0,
           height: '100%',
         }}
-        lineNumberStyle={{ minWidth: '44px' }}
+        lineNumberContainerStyle={{
+          float: 'left',
+          textAlign: 'right',
+          paddingRight: '1em',
+          minWidth: '44px',
+          userSelect: 'none',
+          WebkitUserSelect: 'none'
+        }}
         language={language}
         showLineNumbers={true}
+        showInlineLineNumbers={false}
         style={a11yLight}
       >
         {content}
