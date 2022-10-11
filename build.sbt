@@ -21,7 +21,7 @@ val macwireVersion = "2.5.8"
 
 val scalafmtVersion = "3.5.8"
 val scalaLoggingVersion = "3.9.5"
-val logbackClassicVersion = "1.4.3"
+val logbackClassicVersion = "1.4.4"
 val scalaTestVersion = "3.2.14"
 
 val httpDependencies = Seq(
