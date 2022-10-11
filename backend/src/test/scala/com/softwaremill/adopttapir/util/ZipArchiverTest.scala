@@ -46,10 +46,10 @@ class ZipArchiverTest extends BaseTest with BeforeAndAfter {
   }
 
   private def checkZipEntry[A](filename: String, zippedFile: File)(applyFn: ZipFile => A) = {
-    for {
+    for
       channel <- new SeekableInMemoryByteChannel(zippedFile.byteArray).autoClosed
       zipFile <- new ZipFile(channel).autoClosed
-    } {
+    do {
       applyFn(zipFile)
     }
   }

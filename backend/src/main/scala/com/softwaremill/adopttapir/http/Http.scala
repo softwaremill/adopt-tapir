@@ -1,25 +1,25 @@
 package com.softwaremill.adopttapir.http
 
 import cats.effect.IO
-import cats.implicits._
-import com.softwaremill.adopttapir._
-import com.softwaremill.adopttapir.infrastructure.Json._
+import cats.implicits.*
+import com.softwaremill.adopttapir.*
+import com.softwaremill.adopttapir.infrastructure.Json.*
 import com.softwaremill.adopttapir.logging.FLogging
 import com.softwaremill.adopttapir.util.Constants
-import com.softwaremill.tagging._
-import io.circe.Printer
+import com.softwaremill.tagging.*
+import io.circe.{Printer, Encoder, Decoder}
 import sttp.model.StatusCode
 import sttp.tapir.Codec.PlainCodec
-import sttp.tapir.codec.enumeratum.TapirCodecEnumeratum
 import sttp.tapir.generic.auto.SchemaDerivation
 import sttp.tapir.json.circe.TapirJsonCirce
 import sttp.tapir.{Codec, Endpoint, EndpointOutput, PublicEndpoint, Schema, SchemaType, Tapir}
 import sttp.tapir.generic.{Configuration => TapirConfiguration}
+import io.circe.generic.semiauto.*
 
 /** Helper class for defining HTTP endpoints. Import the members of this class when defining an HTTP API using tapir. */
-class Http() extends Tapir with TapirJsonCirce with TapirSchemas with TapirCodecEnumeratum with FLogging {
+class Http() extends Tapir, TapirJsonCirce, TapirSchemas, FLogging:
 
-  implicit val tapirConfiguration: TapirConfiguration =
+  given TapirConfiguration =
     TapirConfiguration.default
       .withDiscriminator(Constants.DiscriminatorName)
       .copy(toDiscriminatorValue = TapirConfiguration.default.toDiscriminatorValue.andThen(_.toLowerCase))
@@ -36,38 +36,42 @@ class Http() extends Tapir with TapirJsonCirce with TapirSchemas with TapirCodec
     endpoint.errorOut(failOutput)
 
   val failToResponseData: Fail => (StatusCode, Error_OUT) = {
-    case Fail.NotFound(what)      => (StatusCode.NotFound, Error_OUT(what))
-    case Fail.Conflict(msg)       => (StatusCode.Conflict, Error_OUT(msg))
+    case Fail.NotFound(what) => (StatusCode.NotFound, Error_OUT(what))
+    case Fail.Conflict(msg) => (StatusCode.Conflict, Error_OUT(msg))
     case Fail.IncorrectInput(msg) => (StatusCode.BadRequest, Error_OUT(msg))
-    case Fail.Forbidden           => (StatusCode.Forbidden, Error_OUT("Forbidden"))
-    case Fail.Unauthorized(msg)   => (StatusCode.Unauthorized, Error_OUT(msg))
-    case _                        => (StatusCode.InternalServerError, Error_OUT("Internal server error"))
+    case Fail.Forbidden => (StatusCode.Forbidden, Error_OUT("Forbidden"))
+    case Fail.Unauthorized(msg) => (StatusCode.Unauthorized, Error_OUT(msg))
+    case _ => (StatusCode.InternalServerError, Error_OUT("Internal server error"))
   }
 
-  implicit class IOOut[T](f: IO[T]) {
-
-    /** An extension method for [[IO]], which converts a possibly failed IO, to one which either returns the error converted to an
-      * [[Error_OUT]] instance, or returns the successful value unchanged.
-      */
-    def toOut: IO[Either[(StatusCode, Error_OUT), T]] = {
-      f.map(t => t.asRight[(StatusCode, Error_OUT)]).recoverWith { case f: Fail =>
+  extension[T] (io: IO[T])
+    def toOut: IO[Either[(StatusCode, Error_OUT), T]] =
+      io.map(t => t.asRight[(StatusCode, Error_OUT)]).recoverWith { case f: Fail =>
         val (statusCode, message) = failToResponseData(f)
         logger.warn[IO](s"Request fail: ${message.error}").map(_ => (statusCode, message).asLeft[T])
       }
-    }
-  }
 
   override def jsonPrinter: Printer = noNullsPrinter
-}
+
 
 /** Schemas for types used in endpoint descriptions (as parts of query parameters, JSON bodies, etc.). Includes explicitly defined schemas
   * for custom types, and auto-derivation for ADTs & value classes.
   */
-trait TapirSchemas extends SchemaDerivation {
-  implicit def taggedPlainCodec[U, T](implicit uc: PlainCodec[U]): PlainCodec[U @@ T] =
+trait TapirSchemas extends SchemaDerivation:
+//  implicit def taggedPlainCodec[U, T](implicit uc: PlainCodec[U]): PlainCodec[U @@ T] =
+//    uc.map(_.taggedWith[T])(identity)
+
+  given [U, T](using uc: PlainCodec[U]): PlainCodec[U @@ T] =
     uc.map(_.taggedWith[T])(identity)
 
-  implicit def schemaForTagged[U, T](implicit uc: Schema[U]): Schema[U @@ T] = uc.asInstanceOf[Schema[U @@ T]]
-}
+  //implicit def schemaForTagged[U, T](implicit uc: Schema[U]): Schema[U @@ T] = uc.asInstanceOf[Schema[U @@ T]]
 
-case class Error_OUT(error: String)
+  given [U, T](using uc: Schema[U]): Schema[U @@ T] = uc.asInstanceOf[Schema[U @@ T]]
+
+final case class Error_OUT(error: String) derives Decoder, Encoder.AsObject
+
+//object Error_OUT:
+//  given Encoder[Error_OUT] = deriveEncoder
+
+//  implicit val errorOutDecoder: Decoder[Error_OUT] = deriveDecoder
+

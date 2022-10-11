@@ -1,5 +1,5 @@
 package com.softwaremill.adopttapir.util
 
-object Constants {
+object Constants:
   val DiscriminatorName = "type"
-}
+

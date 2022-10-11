@@ -6,12 +6,11 @@ import com.softwaremill.adopttapir.starter.{JsonImplementation, ServerEffect, St
 import Dependency.{JavaDependency, ScalaDependency, ScalaTestDependency, constantTapirVersion}
 import com.softwaremill.adopttapir.version.TemplateDependencyInfo
 
-abstract class BuildView {
-  def getAllDependencies(starterDetails: StarterDetails): List[Dependency] = {
+abstract class BuildView:
+  def getAllDependencies(starterDetails: StarterDetails): List[Dependency] =
     getMainDependencies(starterDetails) ++ getAllTestDependencies(starterDetails)
-  }
 
-  def getMainDependencies(starterDetails: StarterDetails): List[Dependency] = {
+  def getMainDependencies(starterDetails: StarterDetails): List[Dependency] =
     val httpDependencies = getHttpDependencies(starterDetails)
     val monitoringDependencies = Nil
     val jsonDependencies = getJsonDependencies(starterDetails)
@@ -22,37 +21,32 @@ abstract class BuildView {
     )
 
     httpDependencies ++ metricsDependencies ++ docsDependencies ++ monitoringDependencies ++ jsonDependencies ++ baseDependencies
-  }
 
-  def getAllTestDependencies(starterDetails: StarterDetails): List[Dependency] = {
+  def getAllTestDependencies(starterDetails: StarterDetails): List[Dependency] =
     ScalaTestDependency("com.softwaremill.sttp.tapir", "tapir-sttp-stub-server", getTapirVersion()) ::
       getTestDependencies(starterDetails.serverEffect) ++ getJsonTestDependencies(starterDetails)
-  }
 
   protected def getTapirVersion(): String
 
-  private def getTestDependencies(effect: ServerEffect): List[ScalaTestDependency] = {
-    if (effect != ServerEffect.ZIOEffect) List(ScalaTestDependency("org.scalatest", "scalatest", TemplateDependencyInfo.scalaTestVersion))
+  private def getTestDependencies(effect: ServerEffect): List[ScalaTestDependency] =
+    if effect != ServerEffect.ZIOEffect then List(ScalaTestDependency("org.scalatest", "scalatest", TemplateDependencyInfo.scalaTestVersion))
     else
       List(
         ScalaTestDependency("dev.zio", "zio-test", TemplateDependencyInfo.zioTestVersion),
         ScalaTestDependency("dev.zio", "zio-test-sbt", TemplateDependencyInfo.zioTestVersion)
       )
-  }
 
-  private def getDocsDependencies(starterDetails: StarterDetails): List[ScalaDependency] = {
-    if (starterDetails.addDocumentation)
+  private def getDocsDependencies(starterDetails: StarterDetails): List[ScalaDependency] =
+    if starterDetails.addDocumentation then
       List(ScalaDependency("com.softwaremill.sttp.tapir", "tapir-swagger-ui-bundle", getTapirVersion()))
     else Nil
-  }
 
-  private def getMetricsDependencies(starterDetails: StarterDetails): List[ScalaDependency] = {
-    if (starterDetails.addMetrics)
+  private def getMetricsDependencies(starterDetails: StarterDetails): List[ScalaDependency] =
+    if starterDetails.addMetrics then
       List(ScalaDependency("com.softwaremill.sttp.tapir", "tapir-prometheus-metrics", getTapirVersion()))
     else Nil
-  }
 
-  private def getJsonDependencies(starterDetails: StarterDetails): List[ScalaDependency] = {
+  private def getJsonDependencies(starterDetails: StarterDetails): List[ScalaDependency] =
     starterDetails.jsonImplementation match {
       case JsonImplementation.WithoutJson => Nil
       case JsonImplementation.Circe =>
@@ -78,9 +72,8 @@ abstract class BuildView {
           ScalaDependency("com.softwaremill.sttp.tapir", "tapir-json-zio", getTapirVersion())
         )
     }
-  }
 
-  private def getJsonTestDependencies(starterDetails: StarterDetails): List[ScalaTestDependency] = {
+  private def getJsonTestDependencies(starterDetails: StarterDetails): List[ScalaTestDependency] =
     starterDetails.jsonImplementation match {
       case JsonImplementation.WithoutJson => Nil
       case JsonImplementation.Circe =>
@@ -90,9 +83,8 @@ abstract class BuildView {
       case JsonImplementation.ZIOJson =>
         List(ScalaTestDependency("com.softwaremill.sttp.client3", "zio-json", TemplateDependencyInfo.sttpVersion))
     }
-  }
 
-  private def getHttpDependencies(starterDetails: StarterDetails): List[Dependency] = {
+  private def getHttpDependencies(starterDetails: StarterDetails): List[Dependency] =
     starterDetails match {
       case StarterDetails(_, _, FutureEffect, Akka, _, _, _, _, _)  => HttpDependencies.akka()
       case StarterDetails(_, _, FutureEffect, Netty, _, _, _, _, _) => HttpDependencies.netty()
@@ -102,9 +94,8 @@ abstract class BuildView {
       case StarterDetails(_, _, ZIOEffect, ZIOHttp, _, _, _, _, _)  => HttpDependencies.ZIOHttp()
       case other: StarterDetails => throw new UnsupportedOperationException(s"Cannot pick dependencies for $other")
     }
-  }
 
-  object HttpDependencies {
+  object HttpDependencies:
     def akka(): List[ScalaDependency] = List(
       ScalaDependency("com.softwaremill.sttp.tapir", "tapir-akka-http-server", getTapirVersion())
     )
@@ -130,28 +121,23 @@ abstract class BuildView {
     def ZIOHttp(): List[ScalaDependency] = List(
       ScalaDependency("com.softwaremill.sttp.tapir", "tapir-zio-http-server", getTapirVersion())
     )
-  }
-}
 
-object BuildSbtView extends BuildView {
-  def format(dependencies: List[Dependency]): String = {
+object BuildSbtView extends BuildView:
+  def format(dependencies: List[Dependency]): String =
     val space = " " * 6
 
     dependencies
       .map(_.asSbtDependency)
       .mkString(space, "," + System.lineSeparator() + space, "")
-  }
 
   override protected def getTapirVersion(): String = constantTapirVersion
-}
 
-object BuildScalaCliView extends BuildView {
-  def format(dependencies: List[Dependency]): String = {
+
+object BuildScalaCliView extends BuildView:
+  def format(dependencies: List[Dependency]): String =
     val importPrefix = "using lib "
     dependencies
       .map(_.asScalaCliDependency)
       .mkString(importPrefix, System.lineSeparator() + importPrefix, System.lineSeparator())
-  }
 
   override protected def getTapirVersion(): String = TemplateDependencyInfo.tapirVersion
-}

@@ -23,7 +23,7 @@ abstract class GeneratedService {
   import ServiceTimeouts.waitForPortTimeout
 
   protected val portPattern: Regex
-  protected val process: SubProcess
+  protected lazy val process: SubProcess
 
   val port: IO[Integer] = {
     val stdOut = new mutable.StringBuilder()
@@ -34,7 +34,7 @@ abstract class GeneratedService {
     }.timeoutAndForget(waitForPortTimeout)
       .onError(e =>
         Assertions.fail(
-          s"Detecting port of the running server failed ${if (e.isInstanceOf[TimeoutException]) s"due to timeout [${waitForPortTimeout}s]"
+          s"Detecting port of the running server failed ${if e.isInstanceOf[TimeoutException] then s"due to timeout [${waitForPortTimeout}s]"
             else s"Exception:${System.lineSeparator()}${e.show}"} with process std output:${System.lineSeparator()}$stdOut"
         )
       )
@@ -42,9 +42,9 @@ abstract class GeneratedService {
 
   @tailrec
   private def waitForPort(stdOut: mutable.StringBuilder): Integer = {
-    if (process.stdout.available() > 0 || process.isAlive()) {
+    if process.stdout.available() > 0 || process.isAlive() then {
       val line = process.stdout.readLine()
-      if (line == null) {
+      if line == null then {
         -1
       } else {
         stdOut.append("### process log <").append(new Timestamper).append(line).append(">").append(System.lineSeparator())
@@ -59,7 +59,7 @@ abstract class GeneratedService {
   }
 
   def close(): IO[Unit] = IO.blocking {
-    if (process.isAlive()) process.close()
+    if process.isAlive() then process.close()
   }
 
   private class Timestamper {

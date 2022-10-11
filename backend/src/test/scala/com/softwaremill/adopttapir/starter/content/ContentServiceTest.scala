@@ -11,11 +11,11 @@ class ContentServiceTest extends BaseTest {
 
   object ContentServiceTest {
     val service: ContentService = {
-      val pg = new ProjectGenerator()
+//      val pg = new ProjectGenerator()
       val sc = StorageConfig(deleteTempFolder = true, tempPrefix = "generatedService")
       val fm = new FilesManager(sc)
       val pf = new GeneratedFilesFormatter(fm)
-      new ContentService(pg, pf)
+      new ContentService(pf)
     }
   }
 

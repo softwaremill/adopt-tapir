@@ -10,7 +10,7 @@ object StarterRequestGenerators {
     randomStarterRequest().copy(effect = effect, implementation = implementation)
 
   private def randomStarterRequestGen(): Gen[StarterRequest] = {
-    for {
+    for
       projectName <- Gen.alphaLowerStr suchThat (str => str == str.toLowerCase)
       groupId <- Gen.containerOf[List, String](Gen.alphaLowerStr suchThat (str => str.nonEmpty)).map(_.mkString(".")) suchThat (str =>
         str.length <= 256 && str.nonEmpty
@@ -22,7 +22,7 @@ object StarterRequestGenerators {
       json <- Gen.oneOf(JsonImplementationRequest.values)
       scalaVersion <- Gen.oneOf(ScalaVersionRequest.values)
       builder <- Gen.oneOf(BuilderRequest.values)
-    } yield StarterRequest(
+    yield StarterRequest(
       projectName,
       groupId,
       effect,

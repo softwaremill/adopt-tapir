@@ -1,10 +1,10 @@
 package com.softwaremill.adopttapir.metrics
 
-import com.softwaremill.adopttapir.starter.ScalaVersion._
-import com.softwaremill.adopttapir.starter._
+import com.softwaremill.adopttapir.starter.ScalaVersion.*
+import com.softwaremill.adopttapir.starter.*
 import io.prometheus.client.{Counter, hotspot}
 
-object Metrics {
+object Metrics:
   lazy val generatedStarterCounter: Counter =
     Counter
       .build()
@@ -19,7 +19,7 @@ object Metrics {
 
   val excludedStarterDetailsFields: Set[String] = Set("projectName", "groupId")
 
-  private val starterDetailsLabels: Array[String] = {
+  private val starterDetailsLabels: Array[String] =
     val fakeInstance: StarterDetails =
       StarterDetails(
         "",
@@ -41,5 +41,3 @@ object Metrics {
     )
 
     names
-  }
-}

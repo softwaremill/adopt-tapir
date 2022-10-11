@@ -19,6 +19,7 @@ import sttp.client3.{HttpError, Response}
 class StarterApiTest extends BaseTest with TestDependencies {
 
   "/starter.zip" should "return a zip response with specified files for Sbt builder" in {
+    println("START")
     // given
     val req = validSbtRequest
 
@@ -64,7 +65,7 @@ class StarterApiTest extends BaseTest with TestDependencies {
     }
   }
 
-  for { req <- Seq(validSbtRequest, validScalaCliRequest) } {
+  for  req <- Seq(validSbtRequest, validScalaCliRequest)  do {
     it should s"have relative paths associated with groupId in request for .scala files for ${req.builder} builder" in {
       // given
       val groupIdRelativePath = s"${req.groupId.replace('.', '/')}"
@@ -119,18 +120,18 @@ class StarterApiTest extends BaseTest with TestDependencies {
   }
 
   def checkStreamZipContent(fileStream: fs2.Stream[IO, Byte])(assertionOnUnpackedDirFn: File => Assertion): Unit = {
-    (for {
+    (for
       tempZipFile <- tempZipFile()
       tempDir <- tempDir()
-    } yield (tempZipFile, tempDir)).use { case (tempZipFile, tempDir) =>
-      for {
+    yield (tempZipFile, tempDir)).use { case (tempZipFile, tempDir) =>
+      for
         _ <- fileStream
           .through(Files[IO].writeAll(fs2.io.file.Path(tempZipFile.toJava.getPath)))
           .compile
           .drain
         _ <- IO.blocking(tempZipFile.unzipTo(tempDir))
         _ <- IO.blocking(assertionOnUnpackedDirFn(tempDir))
-      } yield ()
+      yield ()
 
     }.unwrap
   }

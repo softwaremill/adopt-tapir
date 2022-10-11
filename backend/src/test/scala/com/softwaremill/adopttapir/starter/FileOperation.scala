@@ -12,7 +12,8 @@ object FileOperation extends IOApp {
   val service: StarterService = {
     val cfg = Config.read.storageConfig.copy(deleteTempFolder = false)
     val fm = new FilesManager(cfg)
-    new StarterService(new ProjectGenerator(), fm, new GeneratedFilesFormatter(fm))
+//    val gff = GeneratedFilesFormatter(fm)
+    new StarterService(GeneratedFilesFormatter(fm))
   }
 
   override def run(args: List[String]): IO[ExitCode] = {
@@ -28,7 +29,7 @@ object FileOperation extends IOApp {
       Builder.ScalaCli
     )
 
-    for {
+    for
       file <- service.generateZipFile(details)
       _ <- IO.println {
         val str = file.toString
@@ -37,6 +38,6 @@ object FileOperation extends IOApp {
           "Zipped file: " + str
       }
       exitCode <- IO(ExitCode.Success)
-    } yield exitCode
+    yield exitCode
   }
 }

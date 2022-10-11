@@ -19,7 +19,6 @@ trait TestDependencies extends BeforeAndAfterAll {
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()
-
     val resources = {
       Dependencies
         .wire(

@@ -1,8 +1,8 @@
 package com.softwaremill.adopttapir.starter.content
 
-object DirectoryMerger {
+object DirectoryMerger:
 
-  def apply(topDirName: String, pathNames: List[String], content: String): Directory = {
+  def apply(topDirName: String, pathNames: List[String], content: String): Directory = 
     assert(pathNames.nonEmpty, "`pathNames` list cannot be empty!")
 
     val pathsWithRootDir = List(topDirName) ++ pathNames
@@ -10,25 +10,23 @@ object DirectoryMerger {
       case File(_, _)          => throw new IllegalStateException("Top element of created tree cannot be a `File`!")
       case d @ Directory(_, _) => d
     }
-  }
 
-  private def createTreeRec(pathNames: List[String], content: String): Node = {
+  private def createTreeRec(pathNames: List[String], content: String): Node = 
     pathNames match {
       case Nil          => throw new IllegalStateException("pathNames list cannot be empty!")
       case last :: Nil  => File(last, content)
       case head :: tail => Directory(head, List(createTreeRec(tail, content)))
     }
-  }
 
-  def apply(d1: Directory, d2: Directory): Directory = {
+  def apply(d1: Directory, d2: Directory): Directory = 
     assert(d1.name == d2.name, "names of directories to merge cannot be different!")
 
     val (d1DirsAll, d2DirsAll) = (d1.childDirectories(), d2.childDirectories())
-    val dirsIntersection = for {
+    val dirsIntersection = for
       d1 <- d1DirsAll
       d2 <- d2DirsAll
       if d1.name == d2.name
-    } yield (d1, d2)
+    yield (d1, d2)
     val mergedDirs = dirsIntersection.map(d1d2 => DirectoryMerger(d1d2._1, d1d2._2))
     val d1DirsUnique = d1DirsAll.filter(d => !mergedDirs.exists(md => md.name == d.name))
     val d2DirsUnique = d2DirsAll.filter(d => !mergedDirs.exists(md => md.name == d.name))
@@ -44,5 +42,4 @@ object DirectoryMerger {
       content = (filesIntersection ++ d1FilesUnique ++ d2FilesUnique ++ mergedDirs ++ d1DirsUnique ++ d2DirsUnique)
         .sortWith((n1, n2) => n1.name.compareTo(n2.name) > 0)
     )
-  }
-}
+

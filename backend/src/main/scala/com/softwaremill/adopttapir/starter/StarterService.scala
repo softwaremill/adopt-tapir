@@ -10,29 +10,30 @@ import com.softwaremill.adopttapir.template.ProjectGenerator
 
 import java.io.File
 
-class StarterService(projectGenerator: ProjectGenerator, filesManager: FilesManager, generatedFilesFormatter: GeneratedFilesFormatter)
-    extends FLogging {
+class StarterService(generatedFilesFormatter: GeneratedFilesFormatter) extends FLogging:
 
-  def generateZipFile(starterDetails: StarterDetails): IO[File] = {
+//  export generatedFilesFormatter.filesManager
+  private val fm = generatedFilesFormatter.filesManager
+
+  def generateZipFile(starterDetails: StarterDetails): IO[File] =
     logger.info(s"received request: $starterDetails") *>
-      IO(generatedFilesFormatter.format(projectGenerator.generate(starterDetails)))
+      IO(generatedFilesFormatter.format(ProjectGenerator.generate(starterDetails)))
         .flatMap(formattedGeneratedFiles => {
           IO
-            .blocking(filesManager.createTempDir())
+            .blocking(fm.createTempDir())
             .bracket { tempDirectory =>
-              for {
+              for
                 tempDir <- tempDirectory
                 _ <- logger.debug("created temp dir: " + tempDir)
                 generatedFiles <- formattedGeneratedFiles
-                _ <- filesManager.createFiles(tempDir, generatedFiles)
-                zippedFile <- filesManager.zipDirectory(tempDir)
+                _ <- fm.createFiles(tempDir, generatedFiles)
+                zippedFile <- fm.zipDirectory(tempDir)
                 _ <- increaseMetricCounter(starterDetails)
-              } yield zippedFile
-            }(release = tempDirectory => filesManager.deleteFilesAsStatedInConfig(tempDirectory))
+              yield zippedFile
+            }(release = tempDirectory => fm.deleteFilesAsStatedInConfig(tempDirectory))
         })
-  }
 
-  private def increaseMetricCounter(details: StarterDetails): IO[Unit] = {
+  private def increaseMetricCounter(details: StarterDetails): IO[Unit] =
     val labelValues = details.productElementNames
       .zip(details.productIterator.toList)
       .filterNot { case (name, _) => Metrics.excludedStarterDetailsFields.contains(name) }
@@ -44,5 +45,3 @@ class StarterService(projectGenerator: ProjectGenerator, filesManager: FilesMana
         .labels(labelValues: _*)
         .inc()
     )
-  }
-}

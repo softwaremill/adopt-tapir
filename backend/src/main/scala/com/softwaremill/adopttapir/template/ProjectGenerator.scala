@@ -6,19 +6,16 @@ import com.softwaremill.adopttapir.starter.{Builder, ScalaVersion, StarterDetail
 import com.softwaremill.adopttapir.template.scala.{EndpointsSpecView, EndpointsView, Import, MainView}
 import com.softwaremill.adopttapir.version.TemplateDependencyInfo
 
-case class GeneratedFile(
+final case class GeneratedFile(
     relativePath: String,
     content: String
 )
 
-class ProjectGenerator {
-  def generate(starterDetails: StarterDetails): List[GeneratedFile] = {
-    starterDetails.builder match {
+object ProjectGenerator:
+  def generate(starterDetails: StarterDetails): List[GeneratedFile] = 
+    starterDetails.builder match 
       case Builder.Sbt      => SbtProjectTemplate.generate(starterDetails)
       case Builder.ScalaCli => ScalaCliProjectTemplate.generate(starterDetails)
-    }
-  }
-}
 
 /** Twirl library was chosen for templating. Due to limitations in Twirl, some of arguments are passed as [[String]].<br> More advanced
   * rendering is done by dedicated objects `*View` e.g. @see [[EndpointsView]] or @[[MainView]].
@@ -86,7 +83,7 @@ abstract class ProjectTemplate {
     val booksServerStub = EndpointsSpecView.getBookServerStub(starterDetails)
 
     val fileContent =
-      if (starterDetails.serverEffect == ZIOEffect) {
+      if starterDetails.serverEffect == ZIOEffect then {
         txt
           .EndpointsSpecZIO(
             starterDetails,
@@ -175,7 +172,7 @@ object CommonObjectTemplate {
     def legalize(packageNameSection: String): String = {
       val startsWithNumberRgx = "^\\d+.*$"
 
-      if (packageNameSection.matches(startsWithNumberRgx)) {
+      if packageNameSection.matches(startsWithNumberRgx) then {
         "_" + packageNameSection
       } else {
         packageNameSection

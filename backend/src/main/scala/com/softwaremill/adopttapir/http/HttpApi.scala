@@ -8,7 +8,7 @@ import com.typesafe.scalalogging.StrictLogging
 import org.http4s.HttpRoutes
 import org.http4s.blaze.server.BlazeServerBuilder
 import sttp.capabilities.fs2.Fs2Streams
-import sttp.tapir._
+import sttp.tapir.*
 import sttp.tapir.server.ServerEndpoint
 import sttp.tapir.server.http4s.{Http4sServerInterpreter, Http4sServerOptions}
 import sttp.tapir.server.interceptor.cors.CORSInterceptor
@@ -32,7 +32,8 @@ class HttpApi(
     adminEndpoints: ServerEndpoints,
     prometheusMetrics: PrometheusMetrics[IO],
     config: HttpConfig
-) extends StrictLogging {
+) extends StrictLogging:
+  
   private val apiContextPath = List("api", "v1")
 
   private val serverOptions: Http4sServerOptions[IO] = Http4sServerOptions
@@ -84,16 +85,15 @@ class HttpApi(
     (adminEndpoints ++ List(prometheusMetrics.metricsEndpoint)).toList
 
   /** The resource describing the HTTP server; binds when the resource is allocated. */
-  lazy val resource: Resource[IO, (org.http4s.server.Server, org.http4s.server.Server)] = {
+  lazy val resource: Resource[IO, (org.http4s.server.Server, org.http4s.server.Server)] =
     def resource(routes: HttpRoutes[IO], port: Int) =
       BlazeServerBuilder[IO]
         .bindHttp(port, config.host.toString)
         .withHttpApp(routes.orNotFound)
         .resource
 
-    for {
+    for
       public <- resource(publicRoutes, config.port.value)
       admin <- resource(adminRoutes, config.adminPort.value)
-    } yield (public, admin)
-  }
-}
+    yield (public, admin)
+  

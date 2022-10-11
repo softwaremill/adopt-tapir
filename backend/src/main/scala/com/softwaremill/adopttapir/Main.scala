@@ -6,7 +6,7 @@ import com.softwaremill.adopttapir.config.Config
 import com.softwaremill.adopttapir.metrics.Metrics
 import com.typesafe.scalalogging.StrictLogging
 
-object Main extends StrictLogging {
+object Main extends StrictLogging:
   def main(args: Array[String]): Unit = {
     Metrics.init()
     Thread.setDefaultUncaughtExceptionHandler((t, e) => logger.error("Uncaught exception in thread: " + t, e))
@@ -25,4 +25,3 @@ object Main extends StrictLogging {
       }
       .unsafeRunSync()
   }
-}
