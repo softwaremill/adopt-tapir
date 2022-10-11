@@ -17,9 +17,10 @@ SyntaxHighlighter.registerLanguage('plaintext', plaintext);
 type Props = {
   files?: FileTree;
   opened: NodeAbsoluteLocation;
+  openedFile: { name: string; content: string };
 };
 
-export function FileContentView({ files, opened }: Props) {
+export function FileContentView({ files, opened, openedFile }: Props) {
   const [name, setName] = useState(opened.getName());
   const [content, setContent] = useState('');
   const [language, setLanguage] = useState<SupportedLanguage>('plaintext');
@@ -45,10 +46,10 @@ export function FileContentView({ files, opened }: Props) {
     setContent((findFile(files, slugs)[0] as FileNode).content);
   }, [opened, files]);
   useEffect(() => {
-    if (name === undefined) {
+    if (openedFile.name === undefined) {
       return;
     }
-    const format = name.split('.').at(-1);
+    const format = openedFile.name.split('.').at(-1);
     switch (format) {
       case 'scala':
       case 'sc':
@@ -65,7 +66,7 @@ export function FileContentView({ files, opened }: Props) {
         setLanguage('plaintext');
         break;
     }
-  }, [name]);
+  }, [openedFile.name]);
   return (
     <>
       <SyntaxHighlighter
@@ -88,7 +89,7 @@ export function FileContentView({ files, opened }: Props) {
         showInlineLineNumbers={false}
         style={a11yLight}
       >
-        {content}
+        {openedFile.content}
       </SyntaxHighlighter>
     </>
   );
