@@ -1,5 +1,5 @@
 import { saveAs } from 'file-saver';
-import { FileTree } from '../components/FileTreeView';
+import { Tree } from 'components/FileTreeView/FileTreeView.types';
 
 export enum EffectType {
   Future = 'FutureEffect',
@@ -67,34 +67,7 @@ export async function doRequestStarter(formData: StarterRequest) {
   saveAs(blob, filename ?? 'starter.zip');
 }
 
-export async function doRequestPreview(formData: StarterRequest, consumer: (resp: FileTree) => void) {
-  const serverAddress = !process.env.REACT_APP_SERVER_ADDRESS
-    ? 'https://adopt-tapir.softwaremill.com'
-    : process.env.REACT_APP_SERVER_ADDRESS;
-  const response = await fetch(`${serverAddress}/api/v1/content`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(formData),
-  });
-
-  if (!response.ok) {
-    const json = await response.json();
-
-    throw new Error(json.error || 'Something went wrong, please try again later.');
-  }
-
-  consumer(await response.json());
-}
-
-type TreeNode = {
-  content: string | TreeNode;
-  name: string;
-  type: 'file' | 'directory';
-};
-
-export async function doRequestPreviewNew(formData: StarterRequest, consumer: (resp: any) => void) {
+export async function doRequestPreview(formData: StarterRequest, consumer: (resp: Tree) => void) {
   const serverAddress = !process.env.REACT_APP_SERVER_ADDRESS
     ? 'https://adopt-tapir.softwaremill.com'
     : process.env.REACT_APP_SERVER_ADDRESS;

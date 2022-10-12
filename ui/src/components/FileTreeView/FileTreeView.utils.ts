@@ -1,54 +1,23 @@
-export class NodeAbsoluteLocation {
-  private readonly slugs: string[];
-  private readonly path: string;
+import { TreeNode, Tree } from './FileTreeView.types';
 
-  constructor(...slugs: string[]) {
-    this.slugs = slugs;
-    this.path = slugs.join('/');
+export const DEFAULT_NODE: TreeNode = { content: '', name: '', type: 'file' };
+
+export const simulateMainNodeClick = (mainNodeId: string): void => {
+  // simulate clicking on Main.scala
+  // "selected" prop on TreeView doesn't work as expected
+  const element = document.querySelector(`[id$="${mainNodeId}"]`);
+  if (element instanceof HTMLElement && element.children[0] instanceof HTMLElement) {
+    element.children[0].click();
   }
+};
 
-  public isChildOf(other: NodeAbsoluteLocation): boolean {
-    return this.path.startsWith(other.path);
-  }
-
-  public isParentOf(other: NodeAbsoluteLocation): boolean {
-    return other.path.startsWith(this.path);
-  }
-
-  public isSameAs(other: NodeAbsoluteLocation): boolean {
-    return other.path === this.path;
-  }
-
-  public add(slug: string): NodeAbsoluteLocation {
-    return new NodeAbsoluteLocation(...this.slugs, slug);
-  }
-
-  public getParent(): NodeAbsoluteLocation {
-    if (this.isRoot()) {
-      return this;
+export const findNestedNode = (tree: Tree, nodeId: string): TreeNode => {
+  let foundNode: TreeNode = DEFAULT_NODE;
+  JSON.stringify(tree, (_, nestedNode) => {
+    if (nestedNode && nestedNode.id === nodeId) {
+      foundNode = nestedNode;
     }
-    const parentSlugs = [...this.slugs.slice(0, this.slugs.length - 1)];
-    return new NodeAbsoluteLocation(...parentSlugs);
-  }
-
-  public isRoot(): boolean {
-    return this.slugs.length === 0;
-  }
-
-  public getLevel(): number {
-    return this.slugs.length;
-  }
-
-  public getSlugs(): string[] {
-    return [...this.slugs];
-  }
-
-  public getName(): string {
-    if (this.isRoot()) {
-      return '/';
-    }
-    return this.slugs.at(-1) as string;
-  }
-}
-
-export const RootNodeLocation = new NodeAbsoluteLocation();
+    return nestedNode;
+  });
+  return foundNode;
+};
