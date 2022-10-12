@@ -1,4 +1,3 @@
-import { v4 as uuid } from 'uuid';
 import { Box, Grid } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
 import { FileContentView } from 'components/FileContentView';
@@ -19,39 +18,26 @@ export function PreviewStarterPage() {
   const { classes, cx } = useStyles();
   const [tree, setTree] = useState<Tree>();
   const { call, clearError, isLoading, errorMessage } = useApiCall();
-  const [mainNodeId, setMainNodeId] = useState('');
   const [openedFile, setOpenedFile] = useState(DEFAULT_NODE);
 
-  const allUniqueIds: string[] = [];
-
-  const addIds = (tree: Tree): Tree => {
-    return tree.map(file => {
-      if (file.id === undefined) {
-        const uniqueId = uuid();
-        file.id = uniqueId;
-        allUniqueIds.push(uniqueId);
-        if (file.name === 'Main.scala') {
-          setMainNodeId(uniqueId);
-        }
-      }
-      if (Array.isArray(file.content)) {
-        addIds(file.content);
-      }
-      return file;
-    });
-  };
-
-  const setParsedFiles = (tree: Tree): void => {
-    const treeWithIds = addIds(tree);
-    setTree(treeWithIds);
-  };
-
   useEffect(() => {
+    let ignore = false;
+
     if (formData === undefined) {
       navigate('/');
     } else {
-      call(() => doRequestPreview(formData, setParsedFiles));
+      call(() =>
+        doRequestPreview(formData, files => {
+          if (!ignore) {
+            setTree(files);
+          }
+        })
+      );
     }
+
+    return () => {
+      ignore = true;
+    };
   }, [formData, navigate, call]);
 
   // 92.5px is the height of buttons panel.
@@ -60,12 +46,7 @@ export function PreviewStarterPage() {
       <Grid container style={{ height: 'calc(100vh - (100vh * 0.08) - 150px)', minHeight: '450px' }}>
         <Grid item xs={2.4} className={classes.fullHeight}>
           <Box className={cx(classes.fullHeight, classes.treeViewContainer)}>
-            <FileTreeView
-              tree={tree}
-              setOpenedFile={setOpenedFile}
-              allUniqueIds={allUniqueIds}
-              mainNodeId={mainNodeId}
-            />
+            <FileTreeView tree={tree} setOpenedFile={setOpenedFile} />
           </Box>
         </Grid>
         <Grid item xs={9.6} className={classes.fullHeight}>

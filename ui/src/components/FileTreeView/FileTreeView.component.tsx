@@ -1,15 +1,14 @@
+import { v4 as uuid } from 'uuid';
 import TreeView from '@mui/lab/TreeView';
 import { Folder, InsertDriveFileOutlined, FolderOpenTwoTone } from '@mui/icons-material';
 import TreeItem from '@mui/lab/TreeItem';
-import { Dispatch, SetStateAction, useEffect } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { TreeNode, Tree } from './FileTreeView.types';
 import { findNestedNode, simulateMainNodeClick } from './FileTreeView.utils';
 
 interface Props {
   tree?: Tree;
   setOpenedFile: Dispatch<SetStateAction<TreeNode>>;
-  allUniqueIds: string[];
-  mainNodeId: string;
 }
 
 const renderTree = (node: TreeNode) => {
@@ -20,7 +19,11 @@ const renderTree = (node: TreeNode) => {
   );
 };
 
-export const FileTreeView = ({ tree, setOpenedFile, allUniqueIds, mainNodeId }: Props) => {
+export const FileTreeView = ({ tree, setOpenedFile }: Props) => {
+  const [mainNodeId, setMainNodeId] = useState('');
+  const [uniqueIds, setUniqueIds] = useState(['']);
+  const [parsedTree, setParsedTree] = useState<Tree | null>(null);
+
   const handleSelect = (event: React.SyntheticEvent, nodeId: string) => {
     if (tree) {
       const node = findNestedNode(tree, nodeId);
@@ -29,20 +32,58 @@ export const FileTreeView = ({ tree, setOpenedFile, allUniqueIds, mainNodeId }: 
   };
 
   useEffect(() => {
+    const addAndSaveIds = (tree: Tree): Tree => {
+      return tree.map(file => {
+        if (file.id === undefined) {
+          const uniqueId = uuid();
+          file.id = uniqueId;
+          setUniqueIds((oldIds: string[]) => [...oldIds, uniqueId]);
+        }
+        if (Array.isArray(file.content)) {
+          addAndSaveIds(file.content);
+        }
+        return file;
+      });
+    };
+
+    const findAndSetMainNodeId = (tree: Tree): void => {
+      tree.forEach(file => {
+        if (file.id !== undefined && file.name === 'Main.scala') {
+          setMainNodeId(file.id);
+        } else if (Array.isArray(file.content)) {
+          findAndSetMainNodeId(file.content);
+        }
+      });
+    };
+
+    if (tree !== undefined && parsedTree === null) {
+      const treeWithIds = addAndSaveIds(tree);
+      findAndSetMainNodeId(treeWithIds);
+      setParsedTree(treeWithIds);
+    }
+  }, [tree, parsedTree]);
+
+  useEffect(() => {
     simulateMainNodeClick(mainNodeId);
   }, [mainNodeId]);
 
   return (
-    <TreeView
-      aria-label="file tree view"
-      defaultEndIcon={<InsertDriveFileOutlined />}
-      defaultCollapseIcon={<FolderOpenTwoTone />}
-      defaultExpandIcon={<Folder />}
-      defaultExpanded={allUniqueIds}
-      onNodeSelect={handleSelect}
-      sx={{ flexGrow: 1, display: 'inline-flex', flexDirection: 'column' }}
-    >
-      {tree && tree[0] && tree.map((node: TreeNode, index: number) => <div key={index}>{renderTree(node)}</div>)}
-    </TreeView>
+    <>
+      {parsedTree && (
+        <TreeView
+          aria-label="file tree view"
+          defaultEndIcon={<InsertDriveFileOutlined />}
+          defaultCollapseIcon={<FolderOpenTwoTone />}
+          defaultExpandIcon={<Folder />}
+          defaultExpanded={uniqueIds}
+          onNodeSelect={handleSelect}
+          sx={{ flexGrow: 1, display: 'inline-flex', flexDirection: 'column' }}
+        >
+          {parsedTree.map((node: TreeNode, index: number) => (
+            <div key={index}>{renderTree(node)}</div>
+          ))}
+        </TreeView>
+      )}
+    </>
   );
 };
