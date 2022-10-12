@@ -1,19 +1,23 @@
 package com.softwaremill.adopttapir.http
 
+import cats.effect.std.Dispatcher
 import cats.effect.{IO, Resource}
 import com.softwaremill.adopttapir.infrastructure.CorrelationIdInterceptor
-import com.softwaremill.adopttapir.logging.FLogger
 import com.softwaremill.adopttapir.util.ServerEndpoints
 import com.typesafe.scalalogging.StrictLogging
-import org.http4s.HttpRoutes
-import org.http4s.blaze.server.BlazeServerBuilder
+import io.vertx.core.Vertx
+import io.vertx.core.http.HttpServer
+import io.vertx.ext.web.Router
 import sttp.capabilities.fs2.Fs2Streams
+import sttp.model.Method
 import sttp.tapir._
 import sttp.tapir.server.ServerEndpoint
-import sttp.tapir.server.http4s.{Http4sServerInterpreter, Http4sServerOptions}
-import sttp.tapir.server.interceptor.cors.CORSInterceptor
+import sttp.tapir.server.interceptor.cors.CORSConfig.AllowedMethods
+import sttp.tapir.server.interceptor.cors.{CORSConfig, CORSInterceptor}
 import sttp.tapir.server.metrics.prometheus.PrometheusMetrics
 import sttp.tapir.server.model.ValuedEndpointOutput
+import sttp.tapir.server.vertx.cats.{VertxCatsServerInterpreter, VertxCatsServerOptions}
+import sttp.tapir.server.vertx.cats.VertxCatsServerInterpreter._
 import sttp.tapir.static.ResourcesOptions
 import sttp.tapir.swagger.SwaggerUIOptions
 import sttp.tapir.swagger.bundle.SwaggerInterpreter
@@ -35,27 +39,16 @@ class HttpApi(
 ) extends StrictLogging {
   private val apiContextPath = List("api", "v1")
 
-  private val serverOptions: Http4sServerOptions[IO] = Http4sServerOptions
-    .customiseInterceptors[IO]
-    .prependInterceptor(CorrelationIdInterceptor)
-    // all errors are formatted as json, and there are no other additional http4s routes
-    .defaultHandlers(msg => ValuedEndpointOutput(http.jsonErrorOutOutput, Error_OUT(msg)), notFoundWhenRejected = true)
-    .serverLog {
-      // using a context-aware logger for http logging
-      val flogger = new FLogger(logger)
-      Http4sServerOptions
-        .defaultServerLog[IO]
-        .doLogWhenHandled((msg, e) => e.fold(flogger.debug[IO](msg))(flogger.debug(msg, _)))
-        .doLogAllDecodeFailures((msg, e) => e.fold(flogger.debug[IO](msg))(flogger.debug(msg, _)))
-        .doLogExceptions((msg, e) => flogger.error[IO](msg, e))
-        .doLogWhenReceived(msg => flogger.debug[IO](msg))
-    }
-    .corsInterceptor(CORSInterceptor.default[IO])
-    .metricsInterceptor(prometheusMetrics.metricsInterceptor())
-    .options
-
-  private lazy val publicRoutes: HttpRoutes[IO] = Http4sServerInterpreter(serverOptions).toRoutes(allPublicEndpoints)
-  private lazy val adminRoutes: HttpRoutes[IO] = Http4sServerInterpreter(serverOptions).toRoutes(allAdminEndpoints)
+  private def serverOptions(dispatcher: Dispatcher[IO]): VertxCatsServerOptions[IO] =
+    VertxCatsServerOptions
+      .customiseInterceptors[IO](dispatcher)
+      .prependInterceptor(CorrelationIdInterceptor)
+      // all errors are formatted as json, and there are no other additional http4s routes
+      .defaultHandlers(msg => ValuedEndpointOutput(http.jsonErrorOutOutput, Error_OUT(msg)), notFoundWhenRejected = true)
+      // TODO customise the serverLog when available
+      .corsInterceptor(CORSInterceptor.default[IO])
+      .metricsInterceptor(prometheusMetrics.metricsInterceptor())
+      .options
 
   lazy val allPublicEndpoints: List[ServerEndpoint[Any with Fs2Streams[IO], IO]] = {
     // creating the documentation using `mainEndpoints` without the /api/v1 context path; instead, a server will be added
@@ -84,16 +77,26 @@ class HttpApi(
     (adminEndpoints ++ List(prometheusMetrics.metricsEndpoint)).toList
 
   /** The resource describing the HTTP server; binds when the resource is allocated. */
-  lazy val resource: Resource[IO, (org.http4s.server.Server, org.http4s.server.Server)] = {
-    def resource(routes: HttpRoutes[IO], port: Int) =
-      BlazeServerBuilder[IO]
-        .bindHttp(port, config.host)
-        .withHttpApp(routes.orNotFound)
-        .resource
+  def resource(dispatcher: Dispatcher[IO]): Resource[IO, (HttpServer, HttpServer)] = {
+    def resource(dispatcher: Dispatcher[IO], endpoints: List[ServerEndpoint[Any with Fs2Streams[IO], IO]], port: Int) = {
+      Resource.make(
+        IO.delay {
+          val vertx = Vertx.vertx()
+          val server = vertx.createHttpServer()
+          val router = Router.router(vertx)
+          endpoints
+            .map(endpoint => VertxCatsServerInterpreter[IO](serverOptions(dispatcher)).route(endpoint))
+            .foreach(attach => attach(router))
+          server.requestHandler(router).listen(port, config.host)
+        }.flatMap(_.asF[IO])
+      )({ server =>
+        IO.delay(server.close).flatMap(_.asF[IO].void)
+      })
+    }
 
     for {
-      public <- resource(publicRoutes, config.port)
-      admin <- resource(adminRoutes, config.adminPort)
+      public <- resource(dispatcher, allPublicEndpoints, config.port)
+      admin <- resource(dispatcher, allAdminEndpoints, config.adminPort)
     } yield (public, admin)
   }
 }
