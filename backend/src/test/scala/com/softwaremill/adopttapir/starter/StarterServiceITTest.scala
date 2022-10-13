@@ -36,13 +36,13 @@ object Setup:
 
 
   lazy val validConfigurations: Seq[StarterDetails] = for
-    effect <- EffectRequest.values
-    server <- ServerImplementationRequest.values
+    effect <- EffectRequest.values.toIndexedSeq
+    server <- ServerImplementationRequest.values.toIndexedSeq
     docs <- List(true, false)
     metrics <- List(true, false)
     json <- jsonImplementations
     scalaVersion <- scalaVersions
-    builder <- BuilderRequest.values
+    builder <- BuilderRequest.values.toIndexedSeq
     starterRequest = StarterRequest(
       "myproject",
       "com.softwaremill",
@@ -66,7 +66,7 @@ object Setup:
     fromEnvOrElseAll("SCALA", ScalaVersionRequest.valueOf)(ScalaVersionRequest.values.toList)
 
 
-object TestTimeouts: 
+object TestTimeouts:
   // wait for tests has to be longer than waiting for port otherwise it will break waiting for port with bogus errors
   val waitForTestsTimeout: FiniteDuration = waitForPortTimeout + 30.seconds
 
@@ -127,7 +127,7 @@ case class GeneratedServiceUnderTest(serviceFactory: ServiceFactory, details: St
   import Setup.*
   import TestTimeouts.waitForTestsTimeout
 
-  def run(tests: List[TestFunction]): Unit = 
+  def run(tests: List[TestFunction]): Unit =
     val logger = RunLogger()
     (for
       zipFile <- generateZipFile(details, logger)
@@ -140,30 +140,30 @@ case class GeneratedServiceUnderTest(serviceFactory: ServiceFactory, details: St
       }
       .unsafeRunSync()
 
-  private def generateZipFile(details: StarterDetails, logger: RunLogger): Resource[IO, BFile] = 
+  private def generateZipFile(details: StarterDetails, logger: RunLogger): Resource[IO, BFile] =
     Resource.make(for
       zipFile <- ZipGenerator.service.generateZipFile(details).map(_.toScala)
       _ <- logger.log("* zip file was generated")
     yield zipFile)(zipFile => IO.blocking(zipFile.delete()))
 
-  private def createTempDirectory(): Resource[IO, BFile] = 
+  private def createTempDirectory(): Resource[IO, BFile] =
     Resource.make(IO.blocking(BFile.newTemporaryDirectory("sbtTesting")))(tempDir =>
       IO.blocking(tempDir.delete(swallowIOExceptions = true))
     )
 
-  private def unzipFile(zipFile: BFile, tempDir: BFile, logger: RunLogger): IO[Unit] = 
+  private def unzipFile(zipFile: BFile, tempDir: BFile, logger: RunLogger): IO[Unit] =
     IO.blocking(zipFile.unzipTo(tempDir)) >> logger.log("* zip file was unzipped")
 
-  private def spawnService(tempDir: BFile): Resource[IO, GeneratedService] = 
+  private def spawnService(tempDir: BFile): Resource[IO, GeneratedService] =
     Resource.make(serviceFactory.create(details.builder, tempDir))(_.close())
 
-  private def getPortFromService(service: GeneratedService, logger: RunLogger): IO[Integer] = 
+  private def getPortFromService(service: GeneratedService, logger: RunLogger): IO[Integer] =
     for
       port <- service.port
       _ <- logger.log(s"* service compiled, tested & started on port $port")
     yield port
 
-  private def runTests(port: Integer, tests: List[TestFunction], logger: RunLogger): IO[Unit] = 
+  private def runTests(port: Integer, tests: List[TestFunction], logger: RunLogger): IO[Unit] =
     tests
       .map(_(port))
       .parSequence
@@ -176,7 +176,7 @@ case class GeneratedServiceUnderTest(serviceFactory: ServiceFactory, details: St
 
 
 object ZipGenerator:
-  val service: StarterService = 
+  val service: StarterService =
     val cfg = StorageConfig(deleteTempFolder = true, tempPrefix = "generatedService")
 //    val pg = new ProjectGenerator()
     val fm = new FilesManager(cfg)

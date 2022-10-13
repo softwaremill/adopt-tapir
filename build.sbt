@@ -10,7 +10,6 @@ import scala.sys.process.Process
 import scala.util.Try
 
 val scala2Version = "2.13.9"
-val scala31Version = "3.1.3"
 val scala32Version = "3.2.0"
 
 val tapirVersion = "1.1.2"
@@ -25,6 +24,9 @@ val scalafmtVersion = "3.5.8"
 val scalaLoggingVersion = "3.9.5"
 val logbackClassicVersion = "1.4.4"
 val scalaTestVersion = "3.2.14"
+
+val plokhotnyukJsoniterVersion = "2.17.5"
+val zioTestVersion = "2.0.0"
 
 val httpDependencies = Seq(
   "org.http4s" %% "http4s-blaze-server" % http4sBlazeServerVersion,
@@ -97,33 +99,11 @@ lazy val yarnTask = inputKey[Unit]("Run yarn with arguments")
 lazy val copyWebapp = taskKey[Unit]("Copy webapp")
 
 lazy val commonSettings =
-  commonSmlBuildSettings ++ Seq(
-  organization := "com.softwaremill.adopttapir",
-  scalaVersion := scala32Version,
-  libraryDependencies ++= commonDependencies,
-  uiDirectory := (ThisBuild / baseDirectory).value / uiProjectName,
-  updateYarn := {
-    streams.value.log("Updating npm/yarn dependencies")
-    haltOnCmdResultError(Process("yarn install", uiDirectory.value).!)
-  },
-  yarnTask := {
-    val taskName = spaceDelimited("<arg>").parsed.mkString(" ")
-    updateYarn.value
-    val localYarnCommand = "yarn " + taskName
-
-    def runYarnTask() = Process(localYarnCommand, uiDirectory.value).!
-
-    streams.value.log("Running yarn task: " + taskName)
-    haltOnCmdResultError(runYarnTask())
-  }
-)
-
-// TODO check what's inside commonSmlSettings and verify we need them or not
-val topCommonSettings =
-//  commonSmlBuildSettings ++
+  commonSmlBuildSettings ++
     Seq(
       organization := "com.softwaremill.adopttapir",
       scalaVersion := scala32Version,
+      libraryDependencies ++= commonDependencies,
       uiDirectory := (ThisBuild / baseDirectory).value / uiProjectName,
       updateYarn := {
         streams.value.log("Updating npm/yarn dependencies")
@@ -139,29 +119,7 @@ val topCommonSettings =
         streams.value.log("Running yarn task: " + taskName)
         haltOnCmdResultError(runYarnTask())
       }
-    )
-
-def commonSettings2(scalaVer: String) =
-  commonSmlBuildSettings ++ Seq(
-    organization := "com.softwaremill.adopttapir",
-    scalaVersion := scalaVer,
-    libraryDependencies ++= commonDependencies,
-    uiDirectory := (ThisBuild / baseDirectory).value / uiProjectName,
-    updateYarn := {
-      streams.value.log("Updating npm/yarn dependencies")
-      haltOnCmdResultError(Process("yarn install", uiDirectory.value).!)
-    },
-    yarnTask := {
-      val taskName = spaceDelimited("<arg>").parsed.mkString(" ")
-      updateYarn.value
-      val localYarnCommand = "yarn " + taskName
-
-      def runYarnTask() = Process(localYarnCommand, uiDirectory.value).!
-
-      streams.value.log("Running yarn task: " + taskName)
-      haltOnCmdResultError(runYarnTask())
-    }
-  )
+)
 
 lazy val buildInfoSettings = Seq(
   buildInfoKeys := Seq[BuildInfoKey](
@@ -228,13 +186,8 @@ def now(): String = {
   new SimpleDateFormat("yyyy-MM-dd-hhmmss").format(new Date())
 }
 
-/**
-  * ************* ROOT
-  */
-
 lazy val rootProject = (project in file("."))
-//  .settings(commonSettings)
-  .settings(topCommonSettings)
+  .settings(commonSettings)
   .settings(
     name := "adopt-tapir",
   )
@@ -245,41 +198,23 @@ lazy val ItTest = config("ItTest") extend Test
 def itFilter(name: String): Boolean = name endsWith "ITTest"
 def unitFilter(name: String): Boolean = (name endsWith "Test") && !itFilter(name)
 
-
-/**
-  * ************** backend ********************************************
-  */
-
-
-// TODO explore scalacOptions for all subprojects: `show <subproject-name> / scalacOptions`
-
-val backendScalacOptions = Seq(
+val backendExtraScalacOptions = Seq(
   "-new-syntax",
-  "-rewrite",
-//  "-encoding",
-//  "utf8",
-  //  "-feature",
-//  "--language:implicitConversions",
-//  "-language:existentials",
-  //  "-unchecked",
-  //  "-Xfatal-warnings",
-  //  "-Xlint",
-  //  "-Ykind-projector",
+  "-indent",
 )
+
 lazy val backend: Project = (project in file("backend"))
-  .settings(topCommonSettings)
+  .configs(ItTest)
+  .settings(commonSettings)
   .settings(
     scalaVersion := scala32Version,
-    scalacOptions ++= backendScalacOptions,
+    scalacOptions ++= backendExtraScalacOptions,
     libraryDependencies ++=
-      commonDependencies
-        ++ httpDependencies
+      httpDependencies
         ++ jsonDependencies
         ++ apiDocsDependencies
         ++ monitoringDependencies
-        ++ fileDependencies
   )
-  .configs(ItTest)
   .settings(
     inConfig(ItTest)(Defaults.testTasks),
     Compile / mainClass := Some("com.softwaremill.adopttapir.Main"),
@@ -298,35 +233,21 @@ lazy val backend: Project = (project in file("backend"))
     ),
     ItTest / logBuffered := false
   )
-  .enablePlugins(BuildInfoPlugin)
+  .settings(dockerSettings)
   .settings(Revolver.settings)
   .settings(buildInfoSettings)
   .settings(fatJarSettings)
   .enablePlugins(DockerPlugin)
   .enablePlugins(JavaServerAppPackaging)
   .enablePlugins(SbtTwirl)
-  .settings(dockerSettings)
+  .enablePlugins(BuildInfoPlugin)
   .dependsOn(templateDependencies)
-  .settings(scalacOptions := Seq("-new-syntax", "-rewrite"))
-
-
-/**
-  * ************** ui
-  */
 
 lazy val ui = (project in file(uiProjectName))
   .settings(commonSettings)
   .settings(Test / test := (Test / test).dependsOn(yarnTask.toTask(" test")).value)
   .settings(cleanFiles += baseDirectory.value / "build")
 
-/**
-  * ************** tempaltes
-  */
-
-val plokhotnyukJsoniterVersion = "2.17.0"
-val zioTestVersion = "2.0.0"
-
-// TODO thoroughly test if these work as expected with scala 2.13.8 instead of 3.1.3
 lazy val templateDependencies: Project = project
   .settings(
     name := "templateDependencies",
@@ -344,7 +265,6 @@ lazy val templateDependencies: Project = project
       "com.softwaremill.sttp.client3" %% "circe" % sttpVersion % Provided,
       "com.softwaremill.sttp.client3" %% "jsoniter" % sttpVersion % Provided,
       "com.softwaremill.sttp.client3" %% "zio-json" % sttpVersion % Provided,
-//      "com.softwaremill.sttp.tapir" %% "tapir-akka-http-server" % tapirVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-netty-server" % tapirVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-cats" % tapirVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-netty-server-cats" % tapirVersion % Provided,
@@ -355,7 +275,7 @@ lazy val templateDependencies: Project = project
     ),
     buildInfoKeys := Seq[BuildInfoKey](
       "scala2Version" -> scala2Version,
-      "scala3Version" -> scala31Version,
+      "scala3Version" -> scala32Version,
       "sttpVersion" -> sttpVersion,
       "plokhotnyukJsoniterVersion" -> plokhotnyukJsoniterVersion,
       "tapirVersion" -> tapirVersion,
@@ -372,4 +292,4 @@ lazy val templateDependencies: Project = project
     buildInfoObject := "TemplateDependencyInfo"
   )
   .enablePlugins(BuildInfoPlugin)
-//  .settings(commonSettings2(scala2Version))
+  .settings(commonSettings)
