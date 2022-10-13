@@ -2,9 +2,9 @@ import { v4 as uuid } from 'uuid';
 import TreeView from '@mui/lab/TreeView';
 import { Folder, InsertDriveFileOutlined, FolderOpenTwoTone } from '@mui/icons-material';
 import TreeItem from '@mui/lab/TreeItem';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
 import { TreeNode, Tree } from './FileTreeView.types';
-import { findNestedNode, simulateMainNodeClick } from './FileTreeView.utils';
+import { findNestedNode } from './FileTreeView.utils';
 
 interface Props {
   tree?: Tree;
@@ -24,11 +24,18 @@ export const FileTreeView = ({ tree, setOpenedFile }: Props) => {
   const [uniqueIds, setUniqueIds] = useState(['']);
   const [parsedTree, setParsedTree] = useState<Tree | null>(null);
 
+  const openFile = useCallback(
+    (nodeId: string) => {
+      if (tree) {
+        const node = findNestedNode(tree, nodeId);
+        if (typeof node.content === 'string') setOpenedFile(node);
+      }
+    },
+    [tree, setOpenedFile]
+  );
+
   const handleSelect = (event: React.SyntheticEvent, nodeId: string) => {
-    if (tree) {
-      const node = findNestedNode(tree, nodeId);
-      if (typeof node.content === 'string') setOpenedFile(node);
-    }
+    openFile(nodeId);
   };
 
   useEffect(() => {
@@ -64,8 +71,8 @@ export const FileTreeView = ({ tree, setOpenedFile }: Props) => {
   }, [tree, parsedTree]);
 
   useEffect(() => {
-    simulateMainNodeClick(mainNodeId);
-  }, [mainNodeId]);
+    openFile(mainNodeId);
+  }, [mainNodeId, openFile]);
 
   return (
     <>
@@ -76,6 +83,7 @@ export const FileTreeView = ({ tree, setOpenedFile }: Props) => {
           defaultCollapseIcon={<FolderOpenTwoTone />}
           defaultExpandIcon={<Folder />}
           defaultExpanded={uniqueIds}
+          defaultSelected={mainNodeId}
           onNodeSelect={handleSelect}
           sx={{ flexGrow: 1, display: 'inline-flex', flexDirection: 'column' }}
         >
