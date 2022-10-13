@@ -12,7 +12,6 @@ import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Http
 sealed trait RequestValidation:
   def errMessage: String
 
-
 object RequestValidation:
   case class NotInSemverNotation(input: String) extends RequestValidation:
     override val errMessage: String = s"Provided input: `$input` is not in semantic versioning notation"
@@ -95,7 +94,7 @@ sealed trait FormValidator:
     if projectName.matches(projectNameRgx) then
       projectName.validNec
     else ProjectNameShouldMatchRegex(projectName, projectNameRgx).invalidNec
-  }
+  
 
   private def validateGroupId(groupId: String): ValidationResult[String] =
     if groupId.matches("(?:^[a-z][a-z0-9_]*|[a-z][a-z0-9_]*\\.[a-z0-9_]+)+$") && groupId.length <= 256 then groupId.validNec

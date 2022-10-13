@@ -17,11 +17,9 @@ import sttp.tapir.server.metrics.prometheus.PrometheusMetrics
 type ConfigReader[A] = Reader[Config, A]
 
 object ConfigReader:
-  val filesManagerReader: ConfigReader[FilesManager] =
-    Reader(config => FilesManager(config.storageConfig))
 
   val generatedFilesFormatterReader: ConfigReader[GeneratedFilesFormatter] =
-    filesManagerReader.map(fm => GeneratedFilesFormatter(fm))
+    Reader(config => GeneratedFilesFormatter(config.storageConfig))
 
   val starterServiceReader: ConfigReader[StarterService] =
     generatedFilesFormatterReader.map(gff => StarterService(gff))

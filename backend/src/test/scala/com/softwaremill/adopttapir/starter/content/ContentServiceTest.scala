@@ -7,17 +7,14 @@ import com.softwaremill.adopttapir.starter.{Setup, StarterDetails}
 import com.softwaremill.adopttapir.template.ProjectGenerator
 import com.softwaremill.adopttapir.test.BaseTest
 
-class ContentServiceTest extends BaseTest {
+class ContentServiceTest extends BaseTest:
 
-  object ContentServiceTest {
-    val service: ContentService = {
-//      val pg = new ProjectGenerator()
+  object ContentServiceTest:
+    val service: ContentService =
       val sc = StorageConfig(deleteTempFolder = true, tempPrefix = "generatedService")
-      val fm = new FilesManager(sc)
-      val pf = new GeneratedFilesFormatter(fm)
+      val pf = new GeneratedFilesFormatter(sc)
       new ContentService(pf)
-    }
-  }
+
 
   import ContentServiceTest._
 
@@ -29,4 +26,3 @@ class ContentServiceTest extends BaseTest {
   }
 
   private def allStarterDetails(): Seq[StarterDetails] = Setup.validConfigurations
-}

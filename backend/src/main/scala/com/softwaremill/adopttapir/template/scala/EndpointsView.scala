@@ -72,7 +72,7 @@ object EndpointsView:
           s"""
            |  object Author ${if starterDetails.scalaVersion == Scala2 then "{" else ":"}
            |    implicit val rw: ReadWriter[Author] = macroRW
-           |  ${if (starterDetails.scalaVersion == Scala2) "}" else ""}
+           |  ${if starterDetails.scalaVersion == Scala2 then "}" else ""}
            |
            |  object Book ${if starterDetails.scalaVersion == Scala2 then "{" else ":"}
            |    implicit val rw: ReadWriter[Book] = macroRW
@@ -89,7 +89,7 @@ object EndpointsView:
             |    Book("The Art of Computer Programming", 1968, Author("Donald Knuth")),
             |    Book("Pharaoh", 1897, Author("Boleslaw Prus"))
             |  )
-            |${if (starterDetails.scalaVersion == Scala2) "}" else ""}""".stripMargin
+            |${if starterDetails.scalaVersion == Scala2 then "}" else ""}""".stripMargin
 
       Code(
         objects + implicits + list,

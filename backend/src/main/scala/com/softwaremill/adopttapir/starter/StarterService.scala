@@ -11,23 +11,20 @@ import java.io.File
 
 class StarterService(generatedFilesFormatter: GeneratedFilesFormatter) extends FLogging:
 
-//  export generatedFilesFormatter.filesManager
-  private val fm = generatedFilesFormatter.filesManager
-
   def generateZipFile(starterDetails: StarterDetails): IO[File] =
     logger.info(s"received request: $starterDetails") *>
       IO(generatedFilesFormatter.format(ProjectGenerator.generate(starterDetails)))
         .flatMap(formattedGeneratedFiles => {
           IO
-            .blocking(fm.createTempDir())
+            .blocking(generatedFilesFormatter.createTempDir())
             .bracket { tempDirectory =>
               for
                 tempDir <- tempDirectory
                 _ <- logger.debug("created temp dir: " + tempDir)
                 generatedFiles <- formattedGeneratedFiles
-                _ <- filesManager.createFiles(tempDir, generatedFiles)
-                zippedFile <- filesManager.zipDirectory(tempDir)
+                _ <- generatedFilesFormatter.createFiles(tempDir, generatedFiles)
+                zippedFile <- generatedFilesFormatter.zipDirectory(tempDir)
                 _ <- IO(Metrics.increaseZipGenerationMetricCounter(starterDetails))
-              } yield zippedFile
-            }(release = tempDirectory => filesManager.deleteFilesAsStatedInConfig(tempDirectory))
+              yield zippedFile
+            }(release = tempDirectory => generatedFilesFormatter.deleteFilesAsStatedInConfig(tempDirectory))
         })

@@ -178,9 +178,7 @@ case class GeneratedServiceUnderTest(serviceFactory: ServiceFactory, details: St
 object ZipGenerator:
   val service: StarterService =
     val cfg = StorageConfig(deleteTempFolder = true, tempPrefix = "generatedService")
-//    val pg = new ProjectGenerator()
-    val fm = new FilesManager(cfg)
-    val pf = new GeneratedFilesFormatter(fm)
+    val pf = new GeneratedFilesFormatter(cfg)
     new StarterService(pf)
 
 

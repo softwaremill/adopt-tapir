@@ -252,7 +252,7 @@ lazy val ui = (project in file(uiProjectName))
 lazy val templateDependencies: Project = project
   .settings(
     name := "templateDependencies",
-    scalaVersion := scala3Version,
+    scalaVersion := scala32Version,
     libraryDependencies ++= List(
       "ch.qos.logback" % "logback-classic" % logbackClassicVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-sttp-stub-server" % tapirVersion % Provided,

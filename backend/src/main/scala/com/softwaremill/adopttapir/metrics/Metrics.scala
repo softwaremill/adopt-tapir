@@ -5,19 +5,15 @@ import com.softwaremill.adopttapir.starter.*
 import io.prometheus.client.{Counter, hotspot}
 
 object Metrics:
-  lazy val generatedStarterCounter: Counter =
-object Metrics {
   def init(): Unit = hotspot.DefaultExports.initialize()
 
-  def increaseZipGenerationMetricCounter(details: StarterDetails): Unit = {
+  def increaseZipGenerationMetricCounter(details: StarterDetails): Unit = 
     increaseMetricCounter(details, "generate")
-  }
 
-  def increasePreviewOperationMetricCounter(details: StarterDetails): Unit = {
+  def increasePreviewOperationMetricCounter(details: StarterDetails): Unit = 
     increaseMetricCounter(details, "preview")
-  }
-
-  private def increaseMetricCounter(details: StarterDetails, operation: String): Unit = {
+  
+  private def increaseMetricCounter(details: StarterDetails, operation: String): Unit = 
     val labelValues = details.productElementNames
       .zip(details.productIterator.toList)
       .filterNot { case (name, _) => excludedStarterDetailsFields.contains(name) }
@@ -27,7 +23,6 @@ object Metrics {
     generatedStarterCounter
       .labels(labelValues: _*)
       .inc()
-  }
 
   private lazy val generatedStarterCounter: Counter =
     Counter
@@ -65,4 +60,3 @@ object Metrics {
 
     labels
   }
-}

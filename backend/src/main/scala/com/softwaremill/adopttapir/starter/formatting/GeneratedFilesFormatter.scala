@@ -2,6 +2,7 @@ package com.softwaremill.adopttapir.starter.formatting
 
 import cats.effect.IO
 import com.softwaremill.adopttapir.starter.files.FilesManager
+import com.softwaremill.adopttapir.starter.files.StorageConfig
 import com.softwaremill.adopttapir.template.{CommonObjectTemplate, GeneratedFile}
 import com.typesafe.scalalogging.StrictLogging
 import org.scalafmt.interfaces.{Scalafmt, ScalafmtReporter}
@@ -9,7 +10,10 @@ import org.scalafmt.interfaces.{Scalafmt, ScalafmtReporter}
 import java.io.{OutputStreamWriter, PrintWriter}
 import java.nio.file.Path
 
-class GeneratedFilesFormatter(fm: FilesManager) extends StrictLogging {
+final case class GeneratedFilesFormatter(storageConfig: StorageConfig) extends StrictLogging:
+
+  private val filesManager: FilesManager = FilesManager(storageConfig)
+  export filesManager.*
 
   private val ScalaFileExtensions = Set(".scala", ".sbt")
 

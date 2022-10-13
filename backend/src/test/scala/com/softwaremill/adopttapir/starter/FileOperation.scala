@@ -7,14 +7,11 @@ import com.softwaremill.adopttapir.starter.formatting.GeneratedFilesFormatter
 import com.softwaremill.adopttapir.template.ProjectGenerator
 
 @deprecated("Only for development purpose")
-object FileOperation extends IOApp {
+object FileOperation extends IOApp:
 
-  val service: StarterService = {
+  val service: StarterService = 
     val cfg = Config.read.storageConfig.copy(deleteTempFolder = false)
-    val fm = new FilesManager(cfg)
-//    val gff = GeneratedFilesFormatter(fm)
-    new StarterService(GeneratedFilesFormatter(fm))
-  }
+    new StarterService(GeneratedFilesFormatter(cfg))
 
   override def run(args: List[String]): IO[ExitCode] = {
     val details = StarterDetails(
@@ -40,4 +37,4 @@ object FileOperation extends IOApp {
       exitCode <- IO(ExitCode.Success)
     yield exitCode
   }
-}
+
