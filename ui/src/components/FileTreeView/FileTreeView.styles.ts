@@ -3,6 +3,7 @@ import { makeStyles } from 'tss-react/mui';
 export const useStyles = makeStyles<{ level: number }>()((theme, { level }) => {
   return {
     wrapper: {
+      display: 'flex',
       height: '100%',
       overflow: 'auto',
     },
@@ -33,7 +34,6 @@ export const useStyles = makeStyles<{ level: number }>()((theme, { level }) => {
       },
     },
     openedFile: {
-      fontWeight: 'bold',
       color: theme.palette.primary.dark,
       backgroundColor: theme.palette.primary.light,
       backgroundClip: 'padding-box',

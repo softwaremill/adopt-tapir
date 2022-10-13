@@ -124,7 +124,7 @@ abstract class ProjectTemplate {
 
 object SbtProjectTemplate extends ProjectTemplate {
   override def generate(starterDetails: StarterDetails): List[GeneratedFile] =
-    super.generate(starterDetails) ::: List(getBuildSbt(starterDetails), buildProperties, pluginsSbt, sbtx, readme)
+    super.generate(starterDetails) ::: List(getBuildSbt(starterDetails), buildProperties, pluginsSbt, sbtx, readme, gitignore)
 
   lazy val sbtxFile = "sbtx"
 
@@ -155,6 +155,9 @@ object SbtProjectTemplate extends ProjectTemplate {
 
   private lazy val readme: GeneratedFile =
     GeneratedFile(CommonObjectTemplate.readMePath, CommonObjectTemplate.templateResource("README_sbt.md"))
+
+  private lazy val gitignore: GeneratedFile =
+    GeneratedFile(".gitignore", txt.gitignore(List(".bloop", "target", "metals.sbt", "project/project")).toString())
 }
 
 object CommonObjectTemplate {
@@ -187,7 +190,7 @@ object CommonObjectTemplate {
 
 private object ScalaCliProjectTemplate extends ProjectTemplate {
   override def generate(starterDetails: StarterDetails): List[GeneratedFile] =
-    super.generate(starterDetails) ::: List(getBuildScalaCli(starterDetails), getTestScalaCli(starterDetails), readme)
+    super.generate(starterDetails) ::: List(getBuildScalaCli(starterDetails), getTestScalaCli(starterDetails), readme, gitignore)
 
   private def getBuildScalaCli(starterDetails: StarterDetails): GeneratedFile = {
     val content = txt
@@ -198,14 +201,16 @@ private object ScalaCliProjectTemplate extends ProjectTemplate {
         (BuildScalaCliView.getMainDependencies _).andThen(BuildScalaCliView.format)(starterDetails)
       )
       .toString()
-    GeneratedFile("build.sc", content)
+    GeneratedFile("build.scala", content)
   }
 
   private def getTestScalaCli(starterDetails: StarterDetails): GeneratedFile = {
     val content = (BuildScalaCliView.getAllTestDependencies _).andThen(BuildScalaCliView.format)(starterDetails)
-    GeneratedFile("src/test/scala/test.sc", content)
+    GeneratedFile("src/test/scala/build.test.scala", content)
   }
 
   private lazy val readme: GeneratedFile =
     GeneratedFile(CommonObjectTemplate.readMePath, CommonObjectTemplate.templateResource("README_scala-cli.md"))
+
+  private lazy val gitignore: GeneratedFile = GeneratedFile(".gitignore", txt.gitignore(List(".bsp/", ".scala-build/")).toString())
 }

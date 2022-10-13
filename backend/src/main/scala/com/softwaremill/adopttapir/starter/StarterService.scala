@@ -3,7 +3,6 @@ package com.softwaremill.adopttapir.starter
 import cats.effect.IO
 import com.softwaremill.adopttapir.logging.FLogging
 import com.softwaremill.adopttapir.metrics.Metrics
-import com.softwaremill.adopttapir.metrics.Metrics.generatedStarterCounter
 import com.softwaremill.adopttapir.starter.files.FilesManager
 import com.softwaremill.adopttapir.starter.formatting.GeneratedFilesFormatter
 import com.softwaremill.adopttapir.template.ProjectGenerator
@@ -26,22 +25,9 @@ class StarterService(generatedFilesFormatter: GeneratedFilesFormatter) extends F
                 tempDir <- tempDirectory
                 _ <- logger.debug("created temp dir: " + tempDir)
                 generatedFiles <- formattedGeneratedFiles
-                _ <- fm.createFiles(tempDir, generatedFiles)
-                zippedFile <- fm.zipDirectory(tempDir)
-                _ <- increaseMetricCounter(starterDetails)
-              yield zippedFile
-            }(release = tempDirectory => fm.deleteFilesAsStatedInConfig(tempDirectory))
+                _ <- filesManager.createFiles(tempDir, generatedFiles)
+                zippedFile <- filesManager.zipDirectory(tempDir)
+                _ <- IO(Metrics.increaseZipGenerationMetricCounter(starterDetails))
+              } yield zippedFile
+            }(release = tempDirectory => filesManager.deleteFilesAsStatedInConfig(tempDirectory))
         })
-
-  private def increaseMetricCounter(details: StarterDetails): IO[Unit] =
-    val labelValues = details.productElementNames
-      .zip(details.productIterator.toList)
-      .filterNot { case (name, _) => Metrics.excludedStarterDetailsFields.contains(name) }
-      .map(_._2.toString)
-      .toList
-
-    IO(
-      generatedStarterCounter
-        .labels(labelValues: _*)
-        .inc()
-    )

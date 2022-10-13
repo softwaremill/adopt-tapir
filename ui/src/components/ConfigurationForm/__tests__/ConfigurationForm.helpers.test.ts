@@ -10,7 +10,7 @@ import type { FormRadioOption } from '../../FormRadioGroup';
 describe('configuration form helpers', () => {
   describe('.getAvailableEffectImplementations()', () => {
     const cases: [EffectType, ScalaVersion, EffectImplementation[]][] = [
-      [EffectType.Future, ScalaVersion.Scala2, [EffectImplementation.Akka, EffectImplementation.Netty]],
+      [EffectType.Future, ScalaVersion.Scala2, [EffectImplementation.Netty]],
       [EffectType.IO, ScalaVersion.Scala2, [EffectImplementation.Http4s, EffectImplementation.Netty]],
       [EffectType.ZIO, ScalaVersion.Scala2, [EffectImplementation.Http4s, EffectImplementation.ZIOHttp]],
 
@@ -33,10 +33,6 @@ describe('configuration form helpers', () => {
         EffectType.Future,
         ScalaVersion.Scala2,
         [
-          {
-            label: 'Akka HTTP',
-            value: EffectImplementation.Akka,
-          },
           {
             label: 'Netty',
             value: EffectImplementation.Netty,
@@ -137,6 +133,10 @@ describe('configuration form helpers', () => {
             value: JSONImplementation.Circe,
           },
           {
+            label: 'µPickle',
+            value: JSONImplementation.UPickle,
+          },
+          {
             label: 'jsoniter',
             value: JSONImplementation.Jsoniter,
           },
@@ -154,6 +154,10 @@ describe('configuration form helpers', () => {
             value: JSONImplementation.Circe,
           },
           {
+            label: 'µPickle',
+            value: JSONImplementation.UPickle,
+          },
+          {
             label: 'jsoniter',
             value: JSONImplementation.Jsoniter,
           },
@@ -169,6 +173,10 @@ describe('configuration form helpers', () => {
           {
             label: 'circe',
             value: JSONImplementation.Circe,
+          },
+          {
+            label: 'µPickle',
+            value: JSONImplementation.UPickle,
           },
           {
             label: 'jsoniter',

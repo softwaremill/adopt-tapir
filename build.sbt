@@ -17,6 +17,7 @@ val tapirVersion = "1.1.2"
 val http4sBlazeServerVersion = "0.23.12"
 val http4sCirceVersion = "0.23.16"
 val circeVersion = "0.14.3"
+val circeGenericsExtrasVersion = "0.14.2"
 val sttpVersion = "3.8.2"
 val prometheusVersion = "0.16.0"
 
@@ -72,7 +73,7 @@ val configDependencies = Seq(
 val baseDependencies = Seq(
   "org.typelevel" %% "cats-effect" % "3.3.14",
   "com.softwaremill.common" %% "tagging" % "2.3.3",
-  "com.softwaremill.quicklens" %% "quicklens" % "1.9.0",
+  "com.softwaremill.quicklens" %% "quicklens" % "1.9.0"
 )
 
 val apiDocsDependencies = Seq(
@@ -189,7 +190,7 @@ def now(): String = {
 lazy val rootProject = (project in file("."))
   .settings(commonSettings)
   .settings(
-    name := "adopt-tapir",
+    name := "adopt-tapir"
   )
   .aggregate(backend, ui, templateDependencies)
 
@@ -245,13 +246,13 @@ lazy val backend: Project = (project in file("backend"))
 
 lazy val ui = (project in file(uiProjectName))
   .settings(commonSettings)
-  .settings(Test / test := (Test / test).dependsOn(yarnTask.toTask(" test")).value)
+  .settings(Test / test := (Test / test).dependsOn(yarnTask.toTask(" lint:check")).dependsOn(yarnTask.toTask(" test")).value)
   .settings(cleanFiles += baseDirectory.value / "build")
 
 lazy val templateDependencies: Project = project
   .settings(
     name := "templateDependencies",
-    scalaVersion := scala2Version,
+    scalaVersion := scala3Version,
     libraryDependencies ++= List(
       "ch.qos.logback" % "logback-classic" % logbackClassicVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-sttp-stub-server" % tapirVersion % Provided,

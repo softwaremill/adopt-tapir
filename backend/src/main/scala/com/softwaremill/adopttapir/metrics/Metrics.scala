@@ -6,6 +6,30 @@ import io.prometheus.client.{Counter, hotspot}
 
 object Metrics:
   lazy val generatedStarterCounter: Counter =
+object Metrics {
+  def init(): Unit = hotspot.DefaultExports.initialize()
+
+  def increaseZipGenerationMetricCounter(details: StarterDetails): Unit = {
+    increaseMetricCounter(details, "generate")
+  }
+
+  def increasePreviewOperationMetricCounter(details: StarterDetails): Unit = {
+    increaseMetricCounter(details, "preview")
+  }
+
+  private def increaseMetricCounter(details: StarterDetails, operation: String): Unit = {
+    val labelValues = details.productElementNames
+      .zip(details.productIterator.toList)
+      .filterNot { case (name, _) => excludedStarterDetailsFields.contains(name) }
+      .map(_._2.toString)
+      .toList :+ operation
+
+    generatedStarterCounter
+      .labels(labelValues: _*)
+      .inc()
+  }
+
+  private lazy val generatedStarterCounter: Counter =
     Counter
       .build()
       .name(s"adopt_tapir_starter_generated_total")
@@ -15,17 +39,16 @@ object Metrics:
       )
       .register()
 
-  def init(): Unit = hotspot.DefaultExports.initialize()
+  private lazy val excludedStarterDetailsFields: Set[String] = Set("projectName", "groupId")
+  private lazy val additionalLabels = Array("operation")
 
-  val excludedStarterDetailsFields: Set[String] = Set("projectName", "groupId")
-
-  private val starterDetailsLabels: Array[String] =
+  private lazy val starterDetailsLabels: Array[String] = {
     val fakeInstance: StarterDetails =
       StarterDetails(
         "",
         "",
         ServerEffect.IOEffect,
-        ServerImplementation.Akka,
+        ServerImplementation.Netty,
         true,
         false,
         JsonImplementation.WithoutJson,
@@ -33,11 +56,13 @@ object Metrics:
         Builder.Sbt
       )
 
-    val names = fakeInstance.productElementNames.toArray.filterNot(excludedStarterDetailsFields.contains)
+    val labels = fakeInstance.productElementNames.toArray.filterNot(excludedStarterDetailsFields.contains) :++ additionalLabels
     require(
-      names.length == fakeInstance.productElementNames.length - excludedStarterDetailsFields.size,
+      labels.length == fakeInstance.productElementNames.length - excludedStarterDetailsFields.size + additionalLabels.length,
       s"One of fields $excludedStarterDetailsFields no longer exists in ${fakeInstance.productElementNames.toList
           .mkString("StarterDetails(", ",", ")")}"
     )
 
-    names
+    labels
+  }
+}

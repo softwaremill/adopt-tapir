@@ -1,7 +1,7 @@
 package com.softwaremill.adopttapir.template
 
 import com.softwaremill.adopttapir.starter.ServerEffect.{FutureEffect, IOEffect, ZIOEffect}
-import com.softwaremill.adopttapir.starter.ServerImplementation.{Akka, Http4s, Netty, ZIOHttp}
+import com.softwaremill.adopttapir.starter.ServerImplementation.{Http4s, Netty, ZIOHttp}
 import com.softwaremill.adopttapir.starter.{JsonImplementation, ServerEffect, StarterDetails}
 import Dependency.{JavaDependency, ScalaDependency, ScalaTestDependency, constantTapirVersion}
 import com.softwaremill.adopttapir.version.TemplateDependencyInfo
@@ -53,6 +53,10 @@ abstract class BuildView:
         List(
           ScalaDependency("com.softwaremill.sttp.tapir", "tapir-json-circe", getTapirVersion())
         )
+      case JsonImplementation.UPickle =>
+        List(
+          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-json-upickle", getTapirVersion())
+        )
       case JsonImplementation.Jsoniter =>
         List(
           ScalaDependency("com.softwaremill.sttp.tapir", "tapir-jsoniter-scala", getTapirVersion()),
@@ -78,6 +82,8 @@ abstract class BuildView:
       case JsonImplementation.WithoutJson => Nil
       case JsonImplementation.Circe =>
         List(ScalaTestDependency("com.softwaremill.sttp.client3", "circe", TemplateDependencyInfo.sttpVersion))
+      case JsonImplementation.UPickle =>
+        List(ScalaTestDependency("com.softwaremill.sttp.client3", "upickle", TemplateDependencyInfo.sttpVersion))
       case JsonImplementation.Jsoniter =>
         List(ScalaTestDependency("com.softwaremill.sttp.client3", "jsoniter", TemplateDependencyInfo.sttpVersion))
       case JsonImplementation.ZIOJson =>
@@ -86,7 +92,6 @@ abstract class BuildView:
 
   private def getHttpDependencies(starterDetails: StarterDetails): List[Dependency] =
     starterDetails match {
-      case StarterDetails(_, _, FutureEffect, Akka, _, _, _, _, _)  => HttpDependencies.akka()
       case StarterDetails(_, _, FutureEffect, Netty, _, _, _, _, _) => HttpDependencies.netty()
       case StarterDetails(_, _, IOEffect, Http4s, _, _, _, _, _)    => HttpDependencies.http4s()
       case StarterDetails(_, _, IOEffect, Netty, _, _, _, _, _)     => HttpDependencies.ioNetty()
@@ -96,10 +101,6 @@ abstract class BuildView:
     }
 
   object HttpDependencies:
-    def akka(): List[ScalaDependency] = List(
-      ScalaDependency("com.softwaremill.sttp.tapir", "tapir-akka-http-server", getTapirVersion())
-    )
-
     def netty(): List[ScalaDependency] = List(
       ScalaDependency("com.softwaremill.sttp.tapir", "tapir-netty-server", getTapirVersion())
     )
@@ -132,12 +133,12 @@ object BuildSbtView extends BuildView:
 
   override protected def getTapirVersion(): String = constantTapirVersion
 
-
 object BuildScalaCliView extends BuildView:
   def format(dependencies: List[Dependency]): String =
-    val importPrefix = "using lib "
+    val importPrefix = "//> using lib "
     dependencies
       .map(_.asScalaCliDependency)
       .mkString(importPrefix, System.lineSeparator() + importPrefix, System.lineSeparator())
+
 
   override protected def getTapirVersion(): String = TemplateDependencyInfo.tapirVersion

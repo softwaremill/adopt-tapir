@@ -7,7 +7,7 @@ import com.softwaremill.adopttapir.infrastructure.Json.*
 import com.softwaremill.adopttapir.starter.api.EffectRequest.FutureEffect
 import com.softwaremill.adopttapir.starter.api.JsonImplementationRequest.Jsoniter
 import com.softwaremill.adopttapir.starter.api.ScalaVersionRequest.Scala2
-import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Akka, ZIOHttp}
+import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Netty, ZIOHttp}
 import com.softwaremill.adopttapir.starter.api.StarterApiTest.{mainPath, validSbtRequest, validScalaCliRequest}
 import com.softwaremill.adopttapir.test.RichIO.unwrap
 import com.softwaremill.adopttapir.test.{BaseTest, TestDependencies}
@@ -37,7 +37,8 @@ class StarterApiTest extends BaseTest with TestDependencies {
         "Endpoints.scala",
         "Main.scala",
         "sbtx",
-        "README.md"
+        "README.md",
+        ".gitignore"
       )
     }
   }
@@ -53,13 +54,14 @@ class StarterApiTest extends BaseTest with TestDependencies {
     response.code.code shouldBe 200
     checkStreamZipContent(response.body) { unpackedDir =>
       unpackedDir.listRecursively.toList.filter(_.isRegularFile).map(_.path.getFileName.toString) should contain theSameElementsAs List(
-        "build.sc",
-        "test.sc",
+        "build.scala",
+        "build.test.scala",
         ".scalafmt.conf",
         "EndpointsSpec.scala",
         "Endpoints.scala",
         "Main.scala",
-        "README.md"
+        "README.md",
+        ".gitignore"
       )
     }
   }
@@ -77,7 +79,9 @@ class StarterApiTest extends BaseTest with TestDependencies {
       checkStreamZipContent(response.body) { unpackedDir =>
         val paths = unpackedDir.listRecursively.toList
           .collect {
-            case f: File if f.path.toString.endsWith(".scala") && f.isRegularFile =>
+            case f: File
+                if f.path.toString.endsWith(".scala") && !f.path
+                  .endsWith("build.scala") && !f.path.endsWith("build.test.scala") && f.isRegularFile =>
               unpackedDir.relativize(f)
           }
         paths.map(_.toString) should contain theSameElementsAs List(
@@ -99,14 +103,14 @@ class StarterApiTest extends BaseTest with TestDependencies {
     // then
     ex.statusCode.code shouldBe 400
     jawn.decode[Error_OUT](ex.body).value.error should include(
-      "Picked FutureEffect with ZIOHttp - Future effect will work only with Akka and Netty"
+      "Picked FutureEffect with ZIOHttp - Future effect will work only with Netty"
     )
   }
 
   it should "return request error with information about wrong projectName " in {
     // given
     val request =
-      StarterRequestGenerators.randomStarterRequest().copy(projectName = "Uppercase", effect = FutureEffect, implementation = Akka)
+      StarterRequestGenerators.randomStarterRequest().copy(projectName = "Uppercase", effect = FutureEffect, implementation = Netty)
 
     // when
     val ex = intercept[HttpError[String]](requests.requestZip(request))
@@ -147,7 +151,7 @@ object StarterApiTest {
     projectName = "projectname",
     groupId = "com.softwaremill",
     effect = FutureEffect,
-    implementation = ServerImplementationRequest.Akka,
+    implementation = ServerImplementationRequest.Netty,
     addDocumentation = true,
     addMetrics = false,
     json = Jsoniter,

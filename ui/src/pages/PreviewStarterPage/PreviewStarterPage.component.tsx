@@ -1,5 +1,11 @@
 import { Box, Grid } from '@mui/material';
-import { FileTree, FileTreeView, RootNodeLocation } from '../../components/FileTreeView';
+import {
+  FileTree,
+  FileTreeView,
+  getAllDirectories,
+  NodeAbsoluteLocation,
+  RootNodeLocation,
+} from '../../components/FileTreeView';
 import { useContext, useEffect, useState } from 'react';
 import { FileContentView } from '../../components/FileContentView';
 import { useNavigate } from 'react-router-dom';
@@ -27,16 +33,34 @@ export function PreviewStarterPage() {
     }
   }, [formData, navigate, call]);
 
+  // function references were introduced so that 'useCallback' can depend on them
+  const openFileRef = treeState.openFile;
+  const toggleDirRef = treeState.toggleDir;
+  useEffect(() => {
+    if (files !== undefined) {
+      // open up all 'src' dirs
+      getAllDirectories([], files)
+        .filter(slug => slug.length > 0 && slug[0] === 'src')
+        .forEach(dir => toggleDirRef(new NodeAbsoluteLocation(...dir)));
+
+      // select 'Main.scala' file
+      if (formData !== undefined) {
+        const mainScalaPath = ['src', 'main', 'scala', ...formData.groupId.split('.'), 'Main.scala'];
+        openFileRef(new NodeAbsoluteLocation(...mainScalaPath));
+      }
+    }
+  }, [files, formData, openFileRef, toggleDirRef]);
+
   // 92.5px is the height of buttons panel.
   return (
     <>
-      <Grid container style={{ height: 'calc(100% - 92.5px)' }}>
-        <Grid item xs={3} className={classes.fullHeight}>
+      <Grid container style={{ height: 'calc(100vh - (100vh * 0.08) - 150px)', minHeight: '450px' }}>
+        <Grid item xs={2.4} className={classes.fullHeight}>
           <Box className={cx(classes.fullHeight, classes.treeViewContainer)}>
             <FileTreeView tree={files} location={RootNodeLocation} state={treeState} />
           </Box>
         </Grid>
-        <Grid item xs={9} className={classes.fullHeight}>
+        <Grid item xs={9.6} className={classes.fullHeight}>
           <Box className={cx(classes.fullHeight, classes.fileViewContainer)}>
             <FileContentView files={files} opened={treeState.openedFile} />
           </Box>

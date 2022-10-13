@@ -4,8 +4,7 @@ import com.softwaremill.adopttapir.starter.JsonImplementation.WithoutJson
 import com.softwaremill.adopttapir.starter.ScalaVersion.Scala2
 import com.softwaremill.adopttapir.starter.api.EffectRequest.{FutureEffect, IOEffect, ZIOEffect}
 import com.softwaremill.adopttapir.starter.api.JsonImplementationRequest.No
-import com.softwaremill.adopttapir.starter.api.ScalaVersionRequest.Scala3
-import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Akka, Http4s, Netty, ZIOHttp}
+import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Http4s, Netty, ZIOHttp}
 import com.softwaremill.adopttapir.starter.api.StarterRequestGenerators.randomStarterRequest
 import com.softwaremill.adopttapir.starter.{Builder, ServerEffect, ServerImplementation, StarterDetails}
 import com.softwaremill.adopttapir.test.BaseTest
@@ -53,27 +52,17 @@ class FormValidatorTest extends BaseTest:
 
   it should "raise a problem when effect will not match implementation" in {
     FormValidator.validate(randomStarterRequest(FutureEffect, ZIOHttp)).left.value.msg should
-      include("Picked FutureEffect with ZIOHttp - Future effect will work only with Akka and Netty")
+      include("Picked FutureEffect with ZIOHttp - Future effect will work only with Netty")
     FormValidator.validate(randomStarterRequest(FutureEffect, Http4s)).left.value.msg should
-      include("Picked FutureEffect with Http4s - Future effect will work only with Akka and Netty")
-    FormValidator.validate(randomStarterRequest(IOEffect, Akka)).left.value.msg should
-      include("Picked IOEffect with Akka - IO effect will work only with Http4 and Netty")
+      include("Picked FutureEffect with Http4s - Future effect will work only with Netty")
     FormValidator.validate(randomStarterRequest(IOEffect, ZIOHttp)).left.value.msg should
       include("Picked IOEffect with ZIOHttp - IO effect will work only with Http4 and Netty")
-    FormValidator.validate(randomStarterRequest(ZIOEffect, Akka)).left.value.msg should
-      include("Picked ZIOEffect with Akka - ZIO effect will work only with Http4s and ZIOHttp")
     FormValidator.validate(randomStarterRequest(ZIOEffect, Netty)).left.value.msg should
       include("Picked ZIOEffect with Netty - ZIO effect will work only with Http4s and ZIOHttp")
   }
 
-  it should "raise a problem when Akka implementation is requested with scala 3 project" in {
-    FormValidator.validate(randomStarterRequest().copy(implementation = Akka, scalaVersion = Scala3)).left.value.msg should
-      include("Scala3 version is not supported for Akka server implementation")
-  }
-
   it should "not raise a problem with Effect and Implementation" in {
     val request = defaultRequest()
-    val request1 = request.copy(effect = FutureEffect, implementation = Netty)
     val request2 = request.copy(effect = IOEffect, implementation = Netty)
     val request3 = request.copy(effect = IOEffect, implementation = Http4s)
     val request4 = request.copy(effect = ZIOEffect, implementation = Http4s)
@@ -82,17 +71,6 @@ class FormValidatorTest extends BaseTest:
     FormValidator.validate(request).value shouldBe StarterDetails(
       request.projectName,
       request.groupId,
-      ServerEffect.FutureEffect,
-      ServerImplementation.Akka,
-      addDocumentation = true,
-      addMetrics = false,
-      WithoutJson,
-      Scala2,
-      Builder.Sbt
-    )
-    FormValidator.validate(request1).value shouldBe StarterDetails(
-      request1.projectName,
-      request1.groupId,
       ServerEffect.FutureEffect,
       ServerImplementation.Netty,
       addDocumentation = true,
@@ -152,7 +130,7 @@ class FormValidatorTest extends BaseTest:
       "project",
       "com.softwaremill",
       FutureEffect,
-      Akka,
+      Netty,
       addDocumentation = true,
       addMetrics = false,
       No,

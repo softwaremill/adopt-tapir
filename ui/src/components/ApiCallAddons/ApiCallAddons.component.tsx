@@ -1,4 +1,5 @@
-import { Alert, Backdrop, CircularProgress, Snackbar } from '@mui/material';
+import { Backdrop, CircularProgress } from '@mui/material';
+import { CommonSnackbar } from '../CommonSnackbar';
 
 type Props = {
   isLoading: boolean;
@@ -12,16 +13,7 @@ export function ApiCallAddons({ isLoading, clearError, errorMessage }: Props) {
       <Backdrop open={isLoading}>
         <CircularProgress />
       </Backdrop>
-      <Snackbar
-        open={Boolean(errorMessage)}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-        autoHideDuration={5000}
-        onClose={clearError}
-      >
-        <Alert severity="error" variant="outlined">
-          {errorMessage}
-        </Alert>
-      </Snackbar>
+      <CommonSnackbar onClose={clearError} open={Boolean(errorMessage)} />
     </>
   );
 }

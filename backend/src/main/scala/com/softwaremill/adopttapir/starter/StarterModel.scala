@@ -31,7 +31,7 @@ final case class StarterDetails(
 //}
 
 enum ServerImplementation:
-  case Akka, Netty, Http4s, ZIOHttp
+  case Netty, Http4s, ZIOHttp
 
 //sealed trait ServerEffect
 //
@@ -59,7 +59,7 @@ enum ServerEffect:
 //}
 
 enum JsonImplementation:
-  case WithoutJson, Circe, Jsoniter, ZIOJson
+  case WithoutJson, Circe, UPickle, Jsoniter, ZIOJson
 
 //sealed trait ScalaVersion {
 //  val value: String

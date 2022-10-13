@@ -9,14 +9,14 @@ export const useStyles = makeStyles()(theme => ({
   configurationWrapper: {
     height: '92%',
     backgroundColor: theme.palette.neutral.main,
-    padding: theme.spacing(8, 3),
+    padding: theme.spacing(5, 2),
 
     [theme.breakpoints.up('sm')]: {
-      padding: theme.spacing(8, 10),
+      padding: theme.spacing(5, 3),
     },
 
     [theme.breakpoints.up('xl')]: {
-      padding: theme.spacing(8, 16),
+      padding: theme.spacing(5, 5),
     },
   },
 

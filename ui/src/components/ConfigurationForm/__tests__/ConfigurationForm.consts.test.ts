@@ -134,33 +134,27 @@ describe('configuration consts', () => {
       // NOTE: it's easier to comprehend cases definitions this way, step with casesDetails is purerly due formatting issues
       const casesDetails: [EffectType, ScalaVersion, EffectImplementation, boolean][] = [
         // Scala 2 variants
-        [EffectType.Future, ScalaVersion.Scala2, EffectImplementation.Akka, true],
         [EffectType.Future, ScalaVersion.Scala2, EffectImplementation.Netty, true],
         [EffectType.Future, ScalaVersion.Scala2, EffectImplementation.Http4s, false],
         [EffectType.Future, ScalaVersion.Scala2, EffectImplementation.ZIOHttp, false],
 
-        [EffectType.IO, ScalaVersion.Scala2, EffectImplementation.Akka, false],
         [EffectType.IO, ScalaVersion.Scala2, EffectImplementation.Netty, true],
         [EffectType.IO, ScalaVersion.Scala2, EffectImplementation.Http4s, true],
         [EffectType.IO, ScalaVersion.Scala2, EffectImplementation.ZIOHttp, false],
 
-        [EffectType.ZIO, ScalaVersion.Scala2, EffectImplementation.Akka, false],
         [EffectType.ZIO, ScalaVersion.Scala2, EffectImplementation.Netty, false],
         [EffectType.ZIO, ScalaVersion.Scala2, EffectImplementation.Http4s, true],
         [EffectType.ZIO, ScalaVersion.Scala2, EffectImplementation.ZIOHttp, true],
 
         // Scala 3 variants
-        [EffectType.Future, ScalaVersion.Scala3, EffectImplementation.Akka, false],
         [EffectType.Future, ScalaVersion.Scala3, EffectImplementation.Netty, true],
         [EffectType.Future, ScalaVersion.Scala3, EffectImplementation.Http4s, false],
         [EffectType.Future, ScalaVersion.Scala3, EffectImplementation.ZIOHttp, false],
 
-        [EffectType.IO, ScalaVersion.Scala3, EffectImplementation.Akka, false],
         [EffectType.IO, ScalaVersion.Scala3, EffectImplementation.Netty, true],
         [EffectType.IO, ScalaVersion.Scala3, EffectImplementation.Http4s, true],
         [EffectType.IO, ScalaVersion.Scala3, EffectImplementation.ZIOHttp, false],
 
-        [EffectType.ZIO, ScalaVersion.Scala3, EffectImplementation.Akka, false],
         [EffectType.ZIO, ScalaVersion.Scala3, EffectImplementation.Netty, false],
         [EffectType.ZIO, ScalaVersion.Scala3, EffectImplementation.Http4s, true],
         [EffectType.ZIO, ScalaVersion.Scala3, EffectImplementation.ZIOHttp, true],
@@ -212,16 +206,19 @@ describe('configuration consts', () => {
       const cases: { effectType: EffectType; jsonImplementation: JSONImplementation; expected: boolean }[] = [
         { effectType: EffectType.Future, jsonImplementation: JSONImplementation.No, expected: true },
         { effectType: EffectType.Future, jsonImplementation: JSONImplementation.Circe, expected: true },
+        { effectType: EffectType.Future, jsonImplementation: JSONImplementation.UPickle, expected: true },
         { effectType: EffectType.Future, jsonImplementation: JSONImplementation.Jsoniter, expected: true },
         { effectType: EffectType.Future, jsonImplementation: JSONImplementation.ZIOJson, expected: false },
 
         { effectType: EffectType.IO, jsonImplementation: JSONImplementation.No, expected: true },
         { effectType: EffectType.IO, jsonImplementation: JSONImplementation.Circe, expected: true },
+        { effectType: EffectType.IO, jsonImplementation: JSONImplementation.UPickle, expected: true },
         { effectType: EffectType.IO, jsonImplementation: JSONImplementation.Jsoniter, expected: true },
         { effectType: EffectType.IO, jsonImplementation: JSONImplementation.ZIOJson, expected: false },
 
         { effectType: EffectType.ZIO, jsonImplementation: JSONImplementation.No, expected: true },
         { effectType: EffectType.ZIO, jsonImplementation: JSONImplementation.Circe, expected: true },
+        { effectType: EffectType.ZIO, jsonImplementation: JSONImplementation.UPickle, expected: true },
         { effectType: EffectType.ZIO, jsonImplementation: JSONImplementation.Jsoniter, expected: true },
         { effectType: EffectType.ZIO, jsonImplementation: JSONImplementation.ZIOJson, expected: true },
       ];

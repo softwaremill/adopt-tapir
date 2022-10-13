@@ -43,10 +43,6 @@ export const EFFECT_TYPE_OPTIONS: FormSelectOption<EffectType>[] = [
 
 export const EFFECT_IMPLEMENTATIONS_OPTIONS: FormSelectOption<EffectImplementation>[] = [
   {
-    label: 'Akka HTTP',
-    value: EffectImplementation.Akka,
-  },
-  {
     label: 'Netty',
     value: EffectImplementation.Netty,
   },
@@ -81,6 +77,10 @@ export const JSON_OUTPUT_OPTIONS: FormRadioOption<JSONImplementation>[] = [
     value: JSONImplementation.Circe,
   },
   {
+    label: 'µPickle',
+    value: JSONImplementation.UPickle,
+  },
+  {
     label: 'jsoniter',
     value: JSONImplementation.Jsoniter,
   },
@@ -109,8 +109,8 @@ const valueGetter = (
   option: FormSelectOption | FormRadioOption
 ): FormSelectOption['value'] | FormRadioOption['value'] => option.value;
 
-const getEffectImplementationFieldMessage = (effectType: EffectType, scalaVersion: ScalaVersion): string =>
-  `Server implementation must be one of the following values: ${getEffectImplementationOptions(effectType, scalaVersion)
+const getEffectImplementationFieldMessage = (effectType: EffectType): string =>
+  `Server implementation must be one of the following values: ${getEffectImplementationOptions(effectType)
     .map(labelGetter)
     .join(', ')}`;
 
@@ -152,13 +152,13 @@ export const starterValidationSchema = yup
     implementation: yup
       .mixed()
       .test('effect implementation validation', (value: EffectImplementation, context) => {
-        const { effect, scalaVersion } = context.parent as StarterRequest;
+        const { effect } = context.parent as StarterRequest;
 
-        const effectImplementations = getAvailableEffectImplementations(effect, scalaVersion);
+        const effectImplementations = getAvailableEffectImplementations(effect);
 
         return (
           effectImplementations.includes(value) ||
-          context.createError({ message: getEffectImplementationFieldMessage(effect, scalaVersion) })
+          context.createError({ message: getEffectImplementationFieldMessage(effect) })
         );
       })
       .required(REQUIRED_FIELD_MESSAGE),

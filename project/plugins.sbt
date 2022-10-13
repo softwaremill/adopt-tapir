@@ -12,7 +12,7 @@ addSbtPlugin("com.github.sbt" % "sbt-native-packager" % "1.9.9")
 
 addSbtPlugin("com.github.sbt" % "sbt-git" % "2.0.0")
 
-addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.6.3")
+addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.6.4")
 
 addSbtPlugin("com.typesafe.play" % "sbt-twirl" % "1.6.0-M6")
 
