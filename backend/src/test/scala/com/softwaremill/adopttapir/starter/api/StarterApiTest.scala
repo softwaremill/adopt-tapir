@@ -3,13 +3,13 @@ package com.softwaremill.adopttapir.starter.api
 import better.files.File
 import cats.effect.{IO, Resource}
 import com.softwaremill.adopttapir.http.Error_OUT
-import com.softwaremill.adopttapir.infrastructure.Json._
+import com.softwaremill.adopttapir.infrastructure.Json.*
 import com.softwaremill.adopttapir.starter.api.EffectRequest.FutureEffect
 import com.softwaremill.adopttapir.starter.api.JsonImplementationRequest.Jsoniter
 import com.softwaremill.adopttapir.starter.api.ScalaVersionRequest.Scala2
 import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Akka, ZIOHttp}
 import com.softwaremill.adopttapir.starter.api.StarterApiTest.{mainPath, validSbtRequest, validScalaCliRequest}
-import com.softwaremill.adopttapir.test.Rich.RichIO
+import com.softwaremill.adopttapir.test.RichIO.unwrap
 import com.softwaremill.adopttapir.test.{BaseTest, TestDependencies}
 import fs2.io.file.Files
 import io.circe.jawn
@@ -19,7 +19,6 @@ import sttp.client3.{HttpError, Response}
 class StarterApiTest extends BaseTest with TestDependencies {
 
   "/starter.zip" should "return a zip response with specified files for Sbt builder" in {
-    println("START")
     // given
     val req = validSbtRequest
 

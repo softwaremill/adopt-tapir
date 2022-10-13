@@ -5,8 +5,7 @@ import cats.effect.unsafe.implicits.global
 
 import scala.concurrent.duration.DurationInt
 
-object Rich {
-  implicit class RichIO[T](t: IO[T]) {
-    def unwrap: T = t.unsafeRunTimed(1.minute).get
-  }
-}
+object RichIO:
+  extension[T] (io: IO[T])
+    def unwrap: T = io.unsafeRunTimed(1.minute).get
+

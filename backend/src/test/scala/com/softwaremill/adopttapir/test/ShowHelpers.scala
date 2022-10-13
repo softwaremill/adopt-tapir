@@ -6,7 +6,7 @@ import com.softwaremill.adopttapir.starter.StarterDetails
 import java.io.{PrintWriter, StringWriter}
 import scala.util.Using
 
-object ShowHelpers {
+object ShowHelpers:
   implicit lazy val detailsShow: Show[StarterDetails] = Show.show[StarterDetails](details =>
     s"${details.serverEffect}/${details.serverImplementation}/docs=${details.addDocumentation}/metrics=${details.addMetrics}" +
       s"/json=${details.jsonImplementation}/scalaVersion=${details.scalaVersion}/builder=${details.builder}"
@@ -20,4 +20,4 @@ object ShowHelpers {
       sw.toString
     }.get
   )
-}
+

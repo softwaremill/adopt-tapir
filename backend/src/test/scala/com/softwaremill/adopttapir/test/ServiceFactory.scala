@@ -1,7 +1,7 @@
 package com.softwaremill.adopttapir.test
 
 import cats.effect.IO
-import cats.syntax.show._
+import cats.syntax.show.*
 import com.softwaremill.adopttapir.starter.Builder
 import com.softwaremill.adopttapir.test.ShowHelpers.throwableShow
 import org.scalatest.Assertions
@@ -14,18 +14,18 @@ import scala.concurrent.TimeoutException
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 import scala.util.matching.Regex
 
-object ServiceTimeouts {
+object ServiceTimeouts:
   val waitForScalaCliCompileAndUnitTest: FiniteDuration = 45.seconds
   val waitForPortTimeout: FiniteDuration = 90.seconds
-}
 
-abstract class GeneratedService {
+
+abstract class GeneratedService:
   import ServiceTimeouts.waitForPortTimeout
 
   protected val portPattern: Regex
   protected lazy val process: SubProcess
 
-  val port: IO[Integer] = {
+  val port: IO[Integer] =
     val stdOut = new mutable.StringBuilder()
     IO.blocking {
       val port = waitForPort(stdOut)
@@ -38,10 +38,9 @@ abstract class GeneratedService {
             else s"Exception:${System.lineSeparator()}${e.show}"} with process std output:${System.lineSeparator()}$stdOut"
         )
       )
-  }
 
   @tailrec
-  private def waitForPort(stdOut: mutable.StringBuilder): Integer = {
+  private def waitForPort(stdOut: mutable.StringBuilder): Integer =
     if process.stdout.available() > 0 || process.isAlive() then {
       val line = process.stdout.readLine()
       if line == null then {
@@ -56,30 +55,26 @@ abstract class GeneratedService {
     } else {
       -1
     }
-  }
 
   def close(): IO[Unit] = IO.blocking {
     if process.isAlive() then process.close()
   }
 
-  private class Timestamper {
+  private class Timestamper:
     private val timestamp = LocalDateTime.now()
 
     override def toString: String = s"[$timestamp]"
-  }
-}
 
-class ServiceFactory {
+class ServiceFactory:
   import ServiceTimeouts.waitForScalaCliCompileAndUnitTest
 
-  def create(builder: Builder, tempDir: better.files.File): IO[GeneratedService] = {
+  def create(builder: Builder, tempDir: better.files.File): IO[GeneratedService] =
     builder match {
       case Builder.Sbt      => IO.blocking(SbtService(tempDir))
       case Builder.ScalaCli => IO.blocking(ScalaCliService(tempDir)).timeoutAndForget(waitForScalaCliCompileAndUnitTest)
     }
-  }
 
-  private case class SbtService(tempDir: better.files.File) extends GeneratedService {
+  private case class SbtService(tempDir: better.files.File) extends GeneratedService:
     override protected val portPattern = new Regex("^(?:\\[info\\] )(?:Go to |Server started at )http://localhost:(\\d+).*")
 
     override protected lazy val process: SubProcess = {
@@ -93,12 +88,12 @@ class ServiceFactory {
         ";compile ;test ;run"
       ).spawn(cwd = os.Path(tempDir.toJava), env = Map("http.port" -> "0"), mergeErrIntoOut = true)
     }
-  }
 
-  private case class ScalaCliService(tempDir: better.files.File) extends GeneratedService {
+
+  private case class ScalaCliService(tempDir: better.files.File) extends GeneratedService:
     override protected val portPattern = new Regex("^(?:Go to |Server started at )http://localhost:(\\d+).*")
 
-    override protected lazy val process: SubProcess = {
+    override protected lazy val process: SubProcess =
       // one cannot chain multiple targets to scala-cli hence 'test' target (that implicitly calls compile) is called in
       // blocking manner and once it returns with success (0 exit code) the configuration is actually started
       val compileAndTest = os.proc("scala-cli", "test", ".").call(cwd = os.Path(tempDir.toJava), mergeErrIntoOut = true)
@@ -110,6 +105,3 @@ class ServiceFactory {
 
       os.proc("scala-cli", "run", ".")
         .spawn(cwd = os.Path(tempDir.toJava), env = Map("http.port" -> "0"), mergeErrIntoOut = true)
-    }
-  }
-}

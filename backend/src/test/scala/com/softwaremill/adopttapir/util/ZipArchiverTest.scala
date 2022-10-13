@@ -8,7 +8,7 @@ import org.scalatest.BeforeAndAfter
 
 import scala.util.Try
 
-class ZipArchiverTest extends BaseTest with BeforeAndAfter {
+class ZipArchiverTest extends BaseTest with BeforeAndAfter:
   var dirToZip: File = _
 
   before {
@@ -53,4 +53,4 @@ class ZipArchiverTest extends BaseTest with BeforeAndAfter {
       applyFn(zipFile)
     }
   }
-}
+

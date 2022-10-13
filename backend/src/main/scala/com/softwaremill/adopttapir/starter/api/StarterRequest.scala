@@ -1,8 +1,9 @@
 package com.softwaremill.adopttapir.starter.api
 
 import com.softwaremill.adopttapir.starter.{Builder, JsonImplementation, ScalaVersion, ServerEffect, ServerImplementation}
-import io.circe.{Encoder, Decoder}
+import io.circe.{Decoder, Encoder}
 import io.circe.generic.semiauto.*
+import org.latestbit.circe.adt.codec.*
 
 case class StarterRequest(
     projectName: String,
@@ -43,7 +44,7 @@ object StarterRequest:
 //  override def values: IndexedSeq[EffectRequest] = findValues
 //}
 
-enum EffectRequest(val toModel: ServerEffect):
+enum EffectRequest(val toModel: ServerEffect) derives JsonTaggedAdt.PureEncoder, JsonTaggedAdt.PureDecoder:
   case FutureEffect extends EffectRequest(ServerEffect.FutureEffect)
   case IOEffect extends EffectRequest(ServerEffect.IOEffect)
   case ZIOEffect extends EffectRequest(ServerEffect.ZIOEffect)
@@ -72,7 +73,7 @@ enum EffectRequest(val toModel: ServerEffect):
 //  override def values: IndexedSeq[ServerImplementationRequest] = findValues
 //}
 
-enum ServerImplementationRequest(val toModel: ServerImplementation):
+enum ServerImplementationRequest(val toModel: ServerImplementation) derives JsonTaggedAdt.PureEncoder, JsonTaggedAdt.PureDecoder:
   case Akka extends ServerImplementationRequest(ServerImplementation.Akka)
   case Netty extends ServerImplementationRequest(ServerImplementation.Netty)
   case Http4s extends ServerImplementationRequest(ServerImplementation.Http4s)
@@ -105,7 +106,7 @@ enum ServerImplementationRequest(val toModel: ServerImplementation):
 //  override def values: IndexedSeq[JsonImplementationRequest] = findValues
 //}
 
-enum JsonImplementationRequest(val toModel: JsonImplementation):
+enum JsonImplementationRequest(val toModel: JsonImplementation) derives JsonTaggedAdt.PureEncoder, JsonTaggedAdt.PureDecoder:
   case No extends JsonImplementationRequest(JsonImplementation.WithoutJson)
   case Circe extends JsonImplementationRequest(JsonImplementation.Circe)
   case Jsoniter extends JsonImplementationRequest(JsonImplementation.Jsoniter)
@@ -130,7 +131,7 @@ enum JsonImplementationRequest(val toModel: JsonImplementation):
 //  override def values: IndexedSeq[ScalaVersionRequest] = findValues
 //}
 
-enum ScalaVersionRequest(val toModel: ScalaVersion):
+enum ScalaVersionRequest(val toModel: ScalaVersion) derives JsonTaggedAdt.PureEncoder, JsonTaggedAdt.PureDecoder:
   case Scala2 extends ScalaVersionRequest(ScalaVersion.Scala2)
   case Scala3 extends ScalaVersionRequest(ScalaVersion.Scala3)
 
@@ -151,8 +152,6 @@ enum ScalaVersionRequest(val toModel: ScalaVersion):
 //  override def values: IndexedSeq[BuilderRequest] = findValues
 //}
 
-enum  BuilderRequest(val toModel: Builder):
+enum  BuilderRequest(val toModel: Builder) derives JsonTaggedAdt.PureEncoder, JsonTaggedAdt.PureDecoder:
   case Sbt extends BuilderRequest(Builder.Sbt)
   case ScalaCli extends BuilderRequest(Builder.ScalaCli)
-
-
