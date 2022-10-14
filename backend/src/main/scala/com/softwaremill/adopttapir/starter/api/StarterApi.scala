@@ -60,9 +60,7 @@ class StarterApi(http: Http, starterService: StarterService, contentService: Con
 
   private val contentPath = "content"
 
-  private val contentEndpoint = {
-    val starterRequestJsonBody =  jsonBody[StarterRequest]
-    val nodesJsonBody = jsonBody[List[Node]]
+  private val contentEndpoint =
     baseEndpoint.post
       .in(contentPath)
       .in(jsonBody[StarterRequest])
@@ -76,7 +74,6 @@ class StarterApi(http: Http, starterService: StarterService, contentService: Con
         result.value
           .map(_.leftMap(http.failToResponseData))
       }
-  }
 
   val endpoints: ServerEndpoints =
     NonEmptyList
