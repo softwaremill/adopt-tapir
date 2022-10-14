@@ -100,7 +100,7 @@ lazy val updateYarn = taskKey[Unit]("Update yarn")
 lazy val yarnTask = inputKey[Unit]("Run yarn with arguments")
 lazy val copyWebapp = taskKey[Unit]("Copy webapp")
 
-val scala2Version = "2.13.9"
+val scala2Version = "2.13.10"
 lazy val commonSettings = commonSmlBuildSettings ++ Seq(
   organization := "com.softwaremill.adopttapir",
   scalaVersion := scala2Version,
