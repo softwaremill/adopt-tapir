@@ -52,10 +52,12 @@ export const useStyles = makeStyles<{ isEmbedded: boolean }>()((theme, { isEmbed
 
     inputWithAddon: {
       display: 'flex',
-      alignItems: 'baseline',
+      alignItems: 'center',
     },
 
     serverTooltip: {
+      display: 'flex',
+      alignItems: 'center',
       paddingLeft: theme.spacing(1),
       paddingRight: theme.spacing(1),
       '& svg': {
@@ -66,6 +68,13 @@ export const useStyles = makeStyles<{ isEmbedded: boolean }>()((theme, { isEmbed
           color: theme.palette.primary.main,
         },
       },
+      margin: '16px 0 8px',
+    },
+
+    headingWrapper: {
+      marginBottom: '1em',
+      flexDirection: 'row',
+      alignItems: 'center',
     },
   };
 });
