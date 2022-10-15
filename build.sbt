@@ -200,7 +200,6 @@ def itFilter(name: String): Boolean = name endsWith "ITTest"
 def unitFilter(name: String): Boolean = (name endsWith "Test") && !itFilter(name)
 
 val backendExtraScalacOptions = Seq(
-  "-new-syntax",
   "-indent",
 )
 

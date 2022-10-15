@@ -20,7 +20,6 @@ case class StarterRequest(
 object StarterRequest:
   inline given Encoder[StarterRequest] = deriveEncoder
 
-
 enum EffectRequest(val toModel: ServerEffect) derives JsonTaggedAdt.PureEncoder, JsonTaggedAdt.PureDecoder:
   case FutureEffect extends EffectRequest(ServerEffect.FutureEffect)
   case IOEffect extends EffectRequest(ServerEffect.IOEffect)
