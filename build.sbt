@@ -9,7 +9,7 @@ import sbtbuildinfo.{BuildInfoKey, BuildInfoOption}
 import scala.sys.process.Process
 import scala.util.Try
 
-val scala2Version = "2.13.9"
+val scala2Version = "2.13.10"
 val scala32Version = "3.2.0"
 
 val tapirVersion = "1.1.2"
@@ -72,7 +72,7 @@ val configDependencies = Seq(
 
 val baseDependencies = Seq(
   "org.typelevel" %% "cats-effect" % "3.3.14",
-  "com.softwaremill.common" %% "tagging" % "2.3.3",
+  "com.softwaremill.common" %% "tagging" % "2.3.4",
   "com.softwaremill.quicklens" %% "quicklens" % "1.9.0"
 )
 

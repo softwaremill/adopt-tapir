@@ -185,19 +185,21 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
   return (
     <Box>
       {!isEmbedded && (
-        <Stack direction="row" alignItems="baseline" spacing={0.25}>
-          <Typography variant="h3" component="h3" fontWeight={300} gutterBottom>
+        <Stack spacing={0.25} className={classes.headingWrapper}>
+          <Typography variant="h3" component="h3" fontWeight={300}>
             Generate tapir project
           </Typography>
           <Tooltip title="Share configuration" arrow>
-            <IconButton
-              color="secondary"
-              aria-label="share configuration"
-              onClick={handleShareConfiguration}
-              disabled={!form.formState.isValid}
-            >
-              <ShareTwoToneIcon />
-            </IconButton>
+            <Box>
+              <IconButton
+                color="secondary"
+                aria-label="share configuration"
+                onClick={handleShareConfiguration}
+                disabled={!form.formState.isValid}
+              >
+                <ShareTwoToneIcon />
+              </IconButton>
+            </Box>
           </Tooltip>
         </Stack>
       )}
