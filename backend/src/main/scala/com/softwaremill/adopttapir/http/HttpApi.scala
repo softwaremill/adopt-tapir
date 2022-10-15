@@ -96,4 +96,3 @@ class HttpApi(
       public <- resource(publicRoutes, config.port.value)
       admin <- resource(adminRoutes, config.adminPort.value)
     yield (public, admin)
-  

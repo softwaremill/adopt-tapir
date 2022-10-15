@@ -13,19 +13,16 @@ val scala2Version = "2.13.10"
 val scala32Version = "3.2.0"
 
 val tapirVersion = "1.1.2"
-
 val http4sBlazeServerVersion = "0.23.12"
 val http4sCirceVersion = "0.23.16"
 val circeVersion = "0.14.3"
 val circeGenericsExtrasVersion = "0.14.2"
 val sttpVersion = "3.8.2"
 val prometheusVersion = "0.16.0"
-
 val scalafmtVersion = "3.5.8"
 val scalaLoggingVersion = "3.9.5"
 val logbackClassicVersion = "1.4.4"
 val scalaTestVersion = "3.2.14"
-
 val plokhotnyukJsoniterVersion = "2.17.5"
 val zioTestVersion = "2.0.0"
 

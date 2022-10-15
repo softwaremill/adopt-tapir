@@ -34,7 +34,6 @@ object Setup:
           .map(fromEnv) }
       .getOrElse(elseAll)
 
-
   lazy val validConfigurations: Seq[StarterDetails] = for
     effect <- EffectRequest.values.toIndexedSeq
     server <- ServerImplementationRequest.values.toIndexedSeq
@@ -60,11 +59,8 @@ object Setup:
   private lazy val jsonImplementations: List[JsonImplementationRequest] =
     fromEnvOrElseAll("JSON", JsonImplementationRequest.valueOf)(JsonImplementationRequest.values.toList)
 
-
-
   private lazy val scalaVersions: List[ScalaVersionRequest] =
     fromEnvOrElseAll("SCALA", ScalaVersionRequest.valueOf)(ScalaVersionRequest.values.toList)
-
 
 object TestTimeouts:
   // wait for tests has to be longer than waiting for port otherwise it will break waiting for port with bogus errors

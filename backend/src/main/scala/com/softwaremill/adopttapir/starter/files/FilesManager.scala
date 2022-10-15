@@ -8,9 +8,7 @@ import cats.implicits.toTraverseOps
 import com.softwaremill.adopttapir.template.GeneratedFile
 import com.softwaremill.adopttapir.util.ZipArchiver
 
-
 import java.io.File
-//import scala.reflect.io.Directory
 
 class FilesManager(config: StorageConfig):
 
@@ -40,9 +38,8 @@ class FilesManager(config: StorageConfig):
     if config.deleteTempFolder then
       for
         dir <- destinationDir
-        _ <- dir.delete().pure[IO] //        _ <- IO(new Directory(dir).deleteRecursively())
+        _ <- dir.delete().pure[IO]
       yield ()
     else
       ().pure[IO]
   }
-

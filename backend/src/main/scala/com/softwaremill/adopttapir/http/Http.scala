@@ -13,7 +13,7 @@ import sttp.tapir.Codec.PlainCodec
 import sttp.tapir.generic.auto.SchemaDerivation
 import sttp.tapir.json.circe.TapirJsonCirce
 import sttp.tapir.{Codec, Endpoint, EndpointOutput, PublicEndpoint, Schema, SchemaType, Tapir}
-import sttp.tapir.generic.{Configuration => TapirConfiguration}
+import sttp.tapir.generic.Configuration as TapirConfiguration
 import io.circe.generic.semiauto.*
 
 /** Helper class for defining HTTP endpoints. Import the members of this class when defining an HTTP API using tapir. */
@@ -36,12 +36,12 @@ class Http() extends Tapir, TapirJsonCirce, TapirSchemas, FLogging:
     endpoint.errorOut(failOutput)
 
   val failToResponseData: Fail => (StatusCode, Error_OUT) = {
-    case Fail.NotFound(what) => (StatusCode.NotFound, Error_OUT(what))
-    case Fail.Conflict(msg) => (StatusCode.Conflict, Error_OUT(msg))
-    case Fail.IncorrectInput(msg) => (StatusCode.BadRequest, Error_OUT(msg))
-    case Fail.Forbidden => (StatusCode.Forbidden, Error_OUT("Forbidden"))
-    case Fail.Unauthorized(msg) => (StatusCode.Unauthorized, Error_OUT(msg))
-    case _ => (StatusCode.InternalServerError, Error_OUT("Internal server error"))
+    case Fail.NotFound(what)          => (StatusCode.NotFound, Error_OUT(what))
+    case Fail.Conflict(msg)           => (StatusCode.Conflict, Error_OUT(msg))
+    case Fail.IncorrectInput(msg)     => (StatusCode.BadRequest, Error_OUT(msg))
+    case Fail.Forbidden               => (StatusCode.Forbidden, Error_OUT("Forbidden"))
+    case Fail.Unauthorized(msg)       => (StatusCode.Unauthorized, Error_OUT(msg))
+    case _                            => (StatusCode.InternalServerError, Error_OUT("Internal server error"))
   }
 
   extension[T] (io: IO[T])
@@ -53,25 +53,14 @@ class Http() extends Tapir, TapirJsonCirce, TapirSchemas, FLogging:
 
   override def jsonPrinter: Printer = noNullsPrinter
 
-
 /** Schemas for types used in endpoint descriptions (as parts of query parameters, JSON bodies, etc.). Includes explicitly defined schemas
   * for custom types, and auto-derivation for ADTs & value classes.
   */
 trait TapirSchemas extends SchemaDerivation:
-//  implicit def taggedPlainCodec[U, T](implicit uc: PlainCodec[U]): PlainCodec[U @@ T] =
-//    uc.map(_.taggedWith[T])(identity)
 
   given [U, T](using uc: PlainCodec[U]): PlainCodec[U @@ T] =
     uc.map(_.taggedWith[T])(identity)
 
-  //implicit def schemaForTagged[U, T](implicit uc: Schema[U]): Schema[U @@ T] = uc.asInstanceOf[Schema[U @@ T]]
-
   given [U, T](using uc: Schema[U]): Schema[U @@ T] = uc.asInstanceOf[Schema[U @@ T]]
 
 final case class Error_OUT(error: String) derives Decoder, Encoder.AsObject
-
-//object Error_OUT:
-//  given Encoder[Error_OUT] = deriveEncoder
-
-//  implicit val errorOutDecoder: Decoder[Error_OUT] = deriveDecoder
-

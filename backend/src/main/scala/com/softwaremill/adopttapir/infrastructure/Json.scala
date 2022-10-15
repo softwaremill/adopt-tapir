@@ -8,12 +8,6 @@ import io.circe.{Decoder, Encoder, Printer}
   */
 object Json:
 
-  // implicit val circeConfiguration: CirceConfiguration =
-  //   CirceConfiguration.default
-  //     .withDiscriminator(Constants.DiscriminatorName)
-  //     .copy(transformConstructorNames = s => s.toLowerCase)
-
   val noNullsPrinter: Printer = Printer.noSpaces.copy(dropNullValues = true)
-
   given [U]: Encoder[String @@ U] = Encoder.encodeString.asInstanceOf[Encoder[String @@ U]]
   given[U]: Decoder[String @@ U] = Decoder.decodeString.asInstanceOf[Decoder[String @@ U]]

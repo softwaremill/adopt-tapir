@@ -10,5 +10,3 @@ object HttpConfig:
   given ConfigReader[Port] = ConfigReader.fromStringOpt[Port](Port.fromString)
   given ConfigReader[HttpConfig] =
     ConfigReader.forProduct3("host", "port", "admin-port")(HttpConfig(_, _, _))
-
-
