@@ -1,101 +1,97 @@
-import { DirNode, FileNode, FileTree, TreeState } from './FileTreeView.types';
-import { useStyles } from './FileTreeView.styles';
-import { FolderOpenTwoTone, FolderTwoTone, InsertDriveFileOutlined } from '@mui/icons-material';
-import { NodeAbsoluteLocation } from './FileTreeView.utils';
-import { useEffect, useState } from 'react';
+import { v4 as uuid } from 'uuid';
+import TreeView from '@mui/lab/TreeView';
+import { Folder, InsertDriveFileOutlined, FolderOpenTwoTone } from '@mui/icons-material';
+import TreeItem from '@mui/lab/TreeItem';
+import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
+import { TreeNode, Tree } from './FileTreeView.types';
+import { findNestedNode } from './FileTreeView.utils';
 
-type Props = {
-  tree?: FileTree;
-  state: TreeState;
-  location: NodeAbsoluteLocation;
+interface Props {
+  tree?: Tree;
+  setOpenedFile: Dispatch<SetStateAction<TreeNode>>;
+}
+
+const renderTree = (node: TreeNode) => {
+  return (
+    <TreeItem key={node.name} nodeId={node.id ?? node.name} label={node.name}>
+      {Array.isArray(node.content) ? node.content.map(deeperNode => renderTree(deeperNode)) : null}
+    </TreeItem>
+  );
 };
 
-export function FileTreeView(props: Props) {
-  const { classes } = useStyles({ level: 0 });
+export const FileTreeView = ({ tree, setOpenedFile }: Props) => {
+  const [mainNodeId, setMainNodeId] = useState('');
+  const [uniqueIds, setUniqueIds] = useState(['']);
+  const [parsedTree, setParsedTree] = useState<Tree | null>(null);
 
-  return (
-    <div className={classes.wrapper}>
-      <NodesView {...props} />
-    </div>
+  const openFile = useCallback(
+    (nodeId: string) => {
+      if (tree) {
+        const node = findNestedNode(tree, nodeId);
+        if (typeof node.content === 'string') setOpenedFile(node);
+      }
+    },
+    [tree, setOpenedFile]
   );
-}
 
-function NodesView({ tree, location, state }: Props) {
-  const { classes } = useStyles({ level: location.getLevel() });
-  const [opened, setOpened] = useState(state.isDirOpened(location));
-  useEffect(() => {
-    setOpened(state.isDirOpened(location));
-  }, [location, state]);
-  return (
-    <ul className={classes.nodeRoot} style={opened ? {} : { display: 'none' }}>
-      {tree &&
-        tree.map((node, index) =>
-          node.type === 'directory' ? (
-            <DirNodeView key={'node-' + index} node={node} location={location} state={state} />
-          ) : (
-            <FileNodeView key={'node-' + index} node={node} location={location} state={state} />
-          )
-        )}
-    </ul>
-  );
-}
-
-type NodeProps<T> = {
-  node: T;
-  location: NodeAbsoluteLocation;
-  state: TreeState;
-};
-
-function FileNodeView({ node: { name }, location, state }: NodeProps<FileNode>) {
-  const { classes, cx } = useStyles({ level: location.getLevel() });
-  const [fileLocation, setFileLocation] = useState(location.add(name));
-  const [isOpened, setOpened] = useState(fileLocation.isSameAs(state.openedFile));
+  const handleSelect = (event: React.SyntheticEvent, nodeId: string) => {
+    openFile(nodeId);
+  };
 
   useEffect(() => {
-    setFileLocation(location.add(name));
-  }, [location, name]);
+    const addAndSaveIds = (tree: Tree): Tree => {
+      return tree.map(file => {
+        if (file.id === undefined) {
+          const uniqueId = uuid();
+          file.id = uniqueId;
+          setUniqueIds((oldIds: string[]) => [...oldIds, uniqueId]);
+        }
+        if (Array.isArray(file.content)) {
+          addAndSaveIds(file.content);
+        }
+        return file;
+      });
+    };
+
+    const findAndSetMainNodeId = (tree: Tree): void => {
+      tree.forEach(file => {
+        if (file.id !== undefined && file.name === 'Main.scala') {
+          setMainNodeId(file.id);
+        } else if (Array.isArray(file.content)) {
+          findAndSetMainNodeId(file.content);
+        }
+      });
+    };
+
+    if (tree !== undefined && parsedTree === null) {
+      const treeWithIds = addAndSaveIds(tree);
+      findAndSetMainNodeId(treeWithIds);
+      setParsedTree(treeWithIds);
+    }
+  }, [tree, parsedTree]);
 
   useEffect(() => {
-    setOpened(fileLocation.isSameAs(state.openedFile));
-  }, [fileLocation, name, state]);
-
-  return (
-    <li className={classes.nodeRow} onClick={() => state.openFile(location.add(name))}>
-      <button
-        className={isOpened ? cx(classes.nodeContent, classes.openedFile) : classes.nodeContent}
-        onClick={e => e.preventDefault()}
-      >
-        <InsertDriveFileOutlined />
-        {name}
-      </button>
-    </li>
-  );
-}
-
-function DirNodeView({ node: { name, content }, location, state }: NodeProps<DirNode>) {
-  const [dirLocation, setDirLocation] = useState(location.add(name));
-  const { classes } = useStyles({ level: location.getLevel() });
-
-  useEffect(() => {
-    setDirLocation(location.add(name));
-  }, [location, name]);
+    openFile(mainNodeId);
+  }, [mainNodeId, openFile]);
 
   return (
     <>
-      <li className={classes.nodeRow}>
-        <button
-          className={classes.nodeContent}
-          onClick={e => {
-            e.preventDefault();
-            e.stopPropagation();
-            state.toggleDir(dirLocation);
-          }}
+      {parsedTree && (
+        <TreeView
+          aria-label="file tree view"
+          defaultEndIcon={<InsertDriveFileOutlined />}
+          defaultCollapseIcon={<FolderOpenTwoTone />}
+          defaultExpandIcon={<Folder />}
+          defaultExpanded={uniqueIds}
+          defaultSelected={mainNodeId}
+          onNodeSelect={handleSelect}
+          sx={{ flexGrow: 1, display: 'inline-flex', flexDirection: 'column' }}
         >
-          {state.isDirOpened(dirLocation) ? <FolderTwoTone /> : <FolderOpenTwoTone />}
-          {name}
-        </button>
-        <NodesView tree={content} location={dirLocation} state={state} />
-      </li>
+          {parsedTree.map((node: TreeNode, index: number) => (
+            <div key={index}>{renderTree(node)}</div>
+          ))}
+        </TreeView>
+      )}
     </>
   );
-}
+};

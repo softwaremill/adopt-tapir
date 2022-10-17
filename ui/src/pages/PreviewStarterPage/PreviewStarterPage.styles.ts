@@ -9,6 +9,7 @@ export const useStyles = makeStyles()(theme => ({
     borderTopLeftRadius: '4px',
     border: '1px solid ' + theme.palette.divider,
     backgroundColor: 'white',
+    overflow: 'auto',
   },
 
   fileViewContainer: {
