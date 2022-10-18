@@ -15,7 +15,7 @@ val http4sBlazeServerVersion = "0.23.12"
 val http4sCirceVersion = "0.23.16"
 val circeVersion = "0.14.3"
 val circeGenericsExtrasVersion = "0.14.2"
-val sttpVersion = "3.8.2"
+val sttpVersion = "3.8.3"
 val prometheusVersion = "0.16.0"
 val macwireVersion = "2.5.8"
 
