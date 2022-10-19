@@ -1,5 +1,5 @@
 import { saveAs } from 'file-saver';
-import { FileTree } from '../components/FileTreeView';
+import { Tree } from 'components/FileTreeView/FileTreeView.types';
 
 export enum EffectType {
   Future = 'FutureEffect',
@@ -67,7 +67,7 @@ export async function doRequestStarter(formData: StarterRequest) {
   saveAs(blob, filename ?? 'starter.zip');
 }
 
-export async function doRequestPreview(formData: StarterRequest, consumer: (resp: FileTree) => void) {
+export async function doRequestPreview(formData: StarterRequest, consumer: (resp: Tree) => void) {
   const serverAddress = !process.env.REACT_APP_SERVER_ADDRESS
     ? 'https://adopt-tapir.softwaremill.com'
     : process.env.REACT_APP_SERVER_ADDRESS;

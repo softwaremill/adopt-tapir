@@ -1,4 +1,3 @@
-import { FileNode, FileTree, NodeAbsoluteLocation } from '../FileTreeView';
 import { useEffect, useState } from 'react';
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter';
 import scala from 'react-syntax-highlighter/dist/esm/languages/hljs/scala';
@@ -6,6 +5,7 @@ import markdown from 'react-syntax-highlighter/dist/esm/languages/hljs/markdown'
 import ini from 'react-syntax-highlighter/dist/esm/languages/hljs/ini';
 import plaintext from 'react-syntax-highlighter/dist/esm/languages/hljs/plaintext';
 import { a11yLight } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import { TreeNode } from '../FileTreeView/FileTreeView.types';
 
 type SupportedLanguage = 'scala' | 'markdown' | 'ini' | 'plaintext';
 
@@ -15,40 +15,17 @@ SyntaxHighlighter.registerLanguage('ini', ini);
 SyntaxHighlighter.registerLanguage('plaintext', plaintext);
 
 type Props = {
-  files?: FileTree;
-  opened: NodeAbsoluteLocation;
+  openedFile: TreeNode;
 };
 
-export function FileContentView({ files, opened }: Props) {
-  const [name, setName] = useState(opened.getName());
-  const [content, setContent] = useState('');
+export function FileContentView({ openedFile }: Props) {
   const [language, setLanguage] = useState<SupportedLanguage>('plaintext');
+
   useEffect(() => {
-    if (!files) {
+    if (openedFile.name === undefined) {
       return;
     }
-    setName(opened.getName());
-    const slugs = opened.getSlugs();
-    const findFile: (tree: FileTree, remaining: string[]) => FileTree = (tree, remaining) => {
-      const current = remaining[0];
-      const found = tree.find(f => f.name === current);
-      if (found === undefined) {
-        throw Error(`File '${remaining}' not found in ${JSON.stringify(tree)}`);
-      } else if (found.type === 'directory') {
-        return findFile(found.content, remaining.slice(1));
-      } else if (found.type === 'file') {
-        return [found];
-      } else {
-        throw Error(`File '${remaining}' not found in ${JSON.stringify(tree)}`);
-      }
-    };
-    setContent((findFile(files, slugs)[0] as FileNode).content);
-  }, [opened, files]);
-  useEffect(() => {
-    if (name === undefined) {
-      return;
-    }
-    const format = name.split('.').at(-1);
+    const format = openedFile.name.split('.').at(-1);
     switch (format) {
       case 'scala':
       case 'sc':
@@ -65,7 +42,8 @@ export function FileContentView({ files, opened }: Props) {
         setLanguage('plaintext');
         break;
     }
-  }, [name]);
+  }, [openedFile.name]);
+
   return (
     <>
       <SyntaxHighlighter
@@ -88,7 +66,7 @@ export function FileContentView({ files, opened }: Props) {
         showInlineLineNumbers={false}
         style={a11yLight}
       >
-        {content}
+        {String(openedFile.content)}
       </SyntaxHighlighter>
     </>
   );
