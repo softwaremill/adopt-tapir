@@ -31,7 +31,8 @@ object Setup:
         envValuesString
           .split(",")
           .toList
-          .map(fromEnv) }
+          .map(fromEnv)
+      }
       .getOrElse(elseAll)
 
   lazy val validConfigurations: Seq[StarterDetails] = for
@@ -66,11 +67,10 @@ object TestTimeouts:
   // wait for tests has to be longer than waiting for port otherwise it will break waiting for port with bogus errors
   val waitForTestsTimeout: FiniteDuration = waitForPortTimeout + 30.seconds
 
-
 class StarterServiceITTest extends BaseTest with ParallelTestExecution:
   import Setup.*
 
-  for  details <- Setup.validConfigurations do {
+  for details <- Setup.validConfigurations do {
     it should s"return zip file containing working sbt folder with: ${details.show}" in {
       val backend: SttpBackend[Identity, Any] = HttpURLConnectionBackend()
 
@@ -117,7 +117,6 @@ class StarterServiceITTest extends BaseTest with ParallelTestExecution:
   }
 
   private def subTest(name: String): String = s"should have $name endpoint available"
-
 
 case class GeneratedServiceUnderTest(serviceFactory: ServiceFactory, details: StarterDetails):
   import Setup.*
@@ -170,13 +169,12 @@ case class GeneratedServiceUnderTest(serviceFactory: ServiceFactory, details: St
         )
       ) >> logger.log(s"* integration tests on port $port were finished")
 
-
 object ZipGenerator:
   val service: StarterService =
     val cfg = StorageConfig(deleteTempFolder = true, tempPrefix = "generatedService")
-    val pf = new GeneratedFilesFormatter(cfg)
-    new StarterService(pf)
-
+    val fm = new FilesManager(cfg)
+    val gff = new GeneratedFilesFormatter(fm)
+    new StarterService(gff, fm)
 
 case class RunLogger(log: mutable.StringBuilder = new mutable.StringBuilder()):
   def log(l: String): IO[Unit] = IO(log.append(System.lineSeparator()).append(l))

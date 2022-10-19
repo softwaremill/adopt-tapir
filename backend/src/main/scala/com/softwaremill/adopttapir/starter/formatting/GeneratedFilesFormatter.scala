@@ -10,10 +10,7 @@ import org.scalafmt.interfaces.{Scalafmt, ScalafmtReporter}
 import java.io.{OutputStreamWriter, PrintWriter}
 import java.nio.file.Path
 
-final case class GeneratedFilesFormatter(storageConfig: StorageConfig) extends StrictLogging:
-
-  private val filesManager: FilesManager = FilesManager(storageConfig)
-  export filesManager.*
+final case class GeneratedFilesFormatter(filesManager: FilesManager) extends StrictLogging:
 
   private val ScalaFileExtensions = Set(".scala", ".sbt")
 

@@ -21,7 +21,6 @@ class VersionApi(http: Http):
       IO(Version_OUT(BuildInfo.lastCommitHash)).toOut
     }
 
-
 object VersionApi:
   final case class Version_OUT(buildSha: String) derives Decoder
 

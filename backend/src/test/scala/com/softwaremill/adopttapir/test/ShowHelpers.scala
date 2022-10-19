@@ -20,4 +20,3 @@ object ShowHelpers:
       sw.toString
     }.get
   )
-

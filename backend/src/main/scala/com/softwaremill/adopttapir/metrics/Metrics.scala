@@ -7,13 +7,13 @@ import io.prometheus.client.{Counter, hotspot}
 object Metrics:
   def init(): Unit = hotspot.DefaultExports.initialize()
 
-  def increaseZipGenerationMetricCounter(details: StarterDetails): Unit = 
+  def increaseZipGenerationMetricCounter(details: StarterDetails): Unit =
     increaseMetricCounter(details, "generate")
 
-  def increasePreviewOperationMetricCounter(details: StarterDetails): Unit = 
+  def increasePreviewOperationMetricCounter(details: StarterDetails): Unit =
     increaseMetricCounter(details, "preview")
-  
-  private def increaseMetricCounter(details: StarterDetails, operation: String): Unit = 
+
+  private def increaseMetricCounter(details: StarterDetails, operation: String): Unit =
     val labelValues = details.productElementNames
       .zip(details.productIterator.toList)
       .filterNot { case (name, _) => excludedStarterDetailsFields.contains(name) }
@@ -60,3 +60,5 @@ object Metrics:
 
     labels
   }
+
+end Metrics

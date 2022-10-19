@@ -7,7 +7,5 @@ final case class Code(body: String, imports: Set[Import] = Set()):
 
   def prependBody(prependSection: String): Code = copy(body = prependSection ++ this.body)
 
-
 object Code:
   val empty: Code = Code("")
-

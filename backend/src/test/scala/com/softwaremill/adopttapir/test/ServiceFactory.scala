@@ -18,7 +18,6 @@ object ServiceTimeouts:
   val waitForScalaCliCompileAndUnitTest: FiniteDuration = 45.seconds
   val waitForPortTimeout: FiniteDuration = 90.seconds
 
-
 abstract class GeneratedService:
   import ServiceTimeouts.waitForPortTimeout
 
@@ -34,8 +33,10 @@ abstract class GeneratedService:
     }.timeoutAndForget(waitForPortTimeout)
       .onError(e =>
         Assertions.fail(
-          s"Detecting port of the running server failed ${if e.isInstanceOf[TimeoutException] then s"due to timeout [${waitForPortTimeout}s]"
-            else s"Exception:${System.lineSeparator()}${e.show}"} with process std output:${System.lineSeparator()}$stdOut"
+          s"Detecting port of the running server failed ${
+              if e.isInstanceOf[TimeoutException] then s"due to timeout [${waitForPortTimeout}s]"
+              else s"Exception:${System.lineSeparator()}${e.show}"
+            } with process std output:${System.lineSeparator()}$stdOut"
         )
       )
 
@@ -88,7 +89,6 @@ class ServiceFactory:
         ";compile ;test ;run"
       ).spawn(cwd = os.Path(tempDir.toJava), env = Map("http.port" -> "0"), mergeErrIntoOut = true)
     }
-
 
   private case class ScalaCliService(tempDir: better.files.File) extends GeneratedService:
     override protected val portPattern = new Regex("^(?:Go to |Server started at )http://localhost:(\\d+).*")

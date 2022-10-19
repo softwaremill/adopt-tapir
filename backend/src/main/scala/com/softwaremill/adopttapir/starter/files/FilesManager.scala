@@ -31,15 +31,14 @@ class FilesManager(config: StorageConfig):
       val destination = BFile.newTemporaryFile(prefix = directoryFile.getName + "_", suffix = ".zip")
       ZipArchiver().create(destination.path, directoryFile.toPath)
       destination.toJava
-  }
+    }
 
   def deleteFilesAsStatedInConfig(destinationDir: IO[File]): IO[Unit] =
     IO.blocking {
-    if config.deleteTempFolder then
-      for
-        dir <- destinationDir
-        _ <- dir.delete().pure[IO]
-      yield ()
-    else
-      ().pure[IO]
-  }
+      if config.deleteTempFolder then
+        for
+          dir <- destinationDir
+          _ <- dir.delete().pure[IO]
+        yield ()
+      else ().pure[IO]
+    }

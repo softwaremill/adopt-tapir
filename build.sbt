@@ -10,7 +10,7 @@ import scala.sys.process.Process
 import scala.util.Try
 
 val scala2Version = "2.13.10"
-val scala32Version = "3.2.0"
+val scala3Version = "3.2.0"
 
 val tapirVersion = "1.1.2"
 val http4sBlazeServerVersion = "0.23.12"
@@ -100,7 +100,7 @@ lazy val commonSettings =
   commonSmlBuildSettings ++
     Seq(
       organization := "com.softwaremill.adopttapir",
-      scalaVersion := scala32Version,
+      scalaVersion := scala3Version,
       libraryDependencies ++= commonDependencies,
       uiDirectory := (ThisBuild / baseDirectory).value / uiProjectName,
       updateYarn := {
@@ -196,16 +196,11 @@ lazy val ItTest = config("ItTest") extend Test
 def itFilter(name: String): Boolean = name endsWith "ITTest"
 def unitFilter(name: String): Boolean = (name endsWith "Test") && !itFilter(name)
 
-val backendExtraScalacOptions = Seq(
-  "-indent",
-)
-
 lazy val backend: Project = (project in file("backend"))
   .configs(ItTest)
   .settings(commonSettings)
   .settings(
-    scalaVersion := scala32Version,
-    scalacOptions ++= backendExtraScalacOptions,
+    scalaVersion := scala3Version,
     libraryDependencies ++=
       httpDependencies
         ++ jsonDependencies
@@ -248,7 +243,7 @@ lazy val ui = (project in file(uiProjectName))
 lazy val templateDependencies: Project = project
   .settings(
     name := "templateDependencies",
-    scalaVersion := scala32Version,
+    scalaVersion := scala3Version,
     libraryDependencies ++= List(
       "ch.qos.logback" % "logback-classic" % logbackClassicVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-sttp-stub-server" % tapirVersion % Provided,
@@ -272,7 +267,7 @@ lazy val templateDependencies: Project = project
     ),
     buildInfoKeys := Seq[BuildInfoKey](
       "scala2Version" -> scala2Version,
-      "scala3Version" -> scala32Version,
+      "scala3Version" -> scala3Version,
       "sttpVersion" -> sttpVersion,
       "plokhotnyukJsoniterVersion" -> plokhotnyukJsoniterVersion,
       "tapirVersion" -> tapirVersion,

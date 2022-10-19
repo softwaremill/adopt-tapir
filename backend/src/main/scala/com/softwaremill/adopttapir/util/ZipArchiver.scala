@@ -11,7 +11,6 @@ trait ZipArchiver:
 
   def create(archivedPath: Path, directoryToZip: Path): Unit
 
-
 object ZipArchiver:
   val chmod755: Int = 0x1ed // 0755 written in hex as scala doesn't have octal notation
 
@@ -42,4 +41,3 @@ object ZipArchiver:
       }
     }
   }
-

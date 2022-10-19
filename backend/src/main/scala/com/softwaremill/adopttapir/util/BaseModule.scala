@@ -4,4 +4,3 @@ import com.softwaremill.adopttapir.config.Config
 
 trait BaseModule:
   def config: Config
-

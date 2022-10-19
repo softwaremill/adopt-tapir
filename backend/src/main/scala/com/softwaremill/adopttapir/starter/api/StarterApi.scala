@@ -57,7 +57,6 @@ class StarterApi(http: Http, starterService: StarterService, contentService: Con
       .readAll(fs2.io.file.Path(zippedFile.getPath))
       .onFinalize(IO.blocking(zippedFile.delete()) >> IO.unit)
 
-
   private val contentPath = "content"
 
   private val contentEndpoint =
@@ -82,3 +81,4 @@ class StarterApi(http: Http, starterService: StarterService, contentService: Con
         contentEndpoint.tag(starterApiTag)
       )
 
+end StarterApi

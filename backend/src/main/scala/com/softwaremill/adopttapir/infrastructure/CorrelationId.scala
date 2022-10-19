@@ -8,7 +8,7 @@ import sttp.tapir.server.interceptor.{EndpointInterceptor, RequestHandler, Reque
 
 import scala.util.Random
 
-object CorrelationId {
+object CorrelationId:
   private val localCid =
     import cats.effect.unsafe.implicits.global
     IOLocal(None: Option[String]).unsafeRunSync()
@@ -22,13 +22,11 @@ object CorrelationId {
   def get: IO[Option[String]] = localCid.get
   def set(v: Option[String]): IO[Unit] = localCid.set(v)
   def setOrNew(v: Option[String]): IO[Unit] = localCid.set(Some(v.getOrElse(generate())))
-}
 
 // covariance improves type inference, see: https://groups.google.com/g/scala-language/c/dQEomVCH3CI
 trait CorrelationIdSource[+F[_]]:
   def get: F[Option[String]]
   def map[T](f: Option[String] => T): F[T]
-
 
 object CorrelationIdSource:
   given CorrelationIdSource[IO] = new CorrelationIdSource[IO] {
@@ -36,10 +34,9 @@ object CorrelationIdSource:
     override def map[T](f: Option[String] => T): IO[T] = get.map(f)
   }
 
-
 /** An sttp backend wrapper, which sets the current correlation id on all outgoing requests. */
 class SetCorrelationIdBackend[P](delegate: SttpBackend[IO, P]) extends SttpBackend[IO, P]:
-  override def send[T, R >: P with Effect[IO]](request: Request[T, R]): IO[Response[T]] = 
+  override def send[T, R >: P with Effect[IO]](request: Request[T, R]): IO[Response[T]] =
     CorrelationId.get
       .map {
         case Some(cid) => request.header(CorrelationIdInterceptor.HeaderName, cid)
@@ -50,7 +47,6 @@ class SetCorrelationIdBackend[P](delegate: SttpBackend[IO, P]) extends SttpBacke
   override def close(): IO[Unit] = delegate.close()
 
   override def responseMonad: MonadError[IO] = delegate.responseMonad
-
 
 /** A tapir interceptor, which reads the correlation id from the headers; if it's absent, generates a new one. */
 object CorrelationIdInterceptor extends RequestInterceptor[IO]:
@@ -64,4 +60,3 @@ object CorrelationIdInterceptor extends RequestInterceptor[IO]:
       val set = CorrelationId.setOrNew(request.header(HeaderName))
       set >> requestHandler(EndpointInterceptor.noop)(request, endpoints)(monad)
     }
-

@@ -33,7 +33,7 @@ class HttpApi(
     prometheusMetrics: PrometheusMetrics[IO],
     config: HttpConfig
 ) extends StrictLogging:
-  
+
   private val apiContextPath = List("api", "v1")
 
   private val serverOptions: Http4sServerOptions[IO] = Http4sServerOptions
@@ -96,3 +96,5 @@ class HttpApi(
       public <- resource(publicRoutes, config.port.value)
       admin <- resource(adminRoutes, config.adminPort.value)
     yield (public, admin)
+
+end HttpApi

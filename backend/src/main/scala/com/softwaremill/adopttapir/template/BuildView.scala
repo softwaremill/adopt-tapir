@@ -29,7 +29,8 @@ abstract class BuildView:
   protected def getTapirVersion(): String
 
   private def getTestDependencies(effect: ServerEffect): List[ScalaTestDependency] =
-    if effect != ServerEffect.ZIOEffect then List(ScalaTestDependency("org.scalatest", "scalatest", TemplateDependencyInfo.scalaTestVersion))
+    if effect != ServerEffect.ZIOEffect then
+      List(ScalaTestDependency("org.scalatest", "scalatest", TemplateDependencyInfo.scalaTestVersion))
     else
       List(
         ScalaTestDependency("dev.zio", "zio-test", TemplateDependencyInfo.zioTestVersion),
@@ -42,8 +43,7 @@ abstract class BuildView:
     else Nil
 
   private def getMetricsDependencies(starterDetails: StarterDetails): List[ScalaDependency] =
-    if starterDetails.addMetrics then
-      List(ScalaDependency("com.softwaremill.sttp.tapir", "tapir-prometheus-metrics", getTapirVersion()))
+    if starterDetails.addMetrics then List(ScalaDependency("com.softwaremill.sttp.tapir", "tapir-prometheus-metrics", getTapirVersion()))
     else Nil
 
   private def getJsonDependencies(starterDetails: StarterDetails): List[ScalaDependency] =
@@ -123,6 +123,8 @@ abstract class BuildView:
       ScalaDependency("com.softwaremill.sttp.tapir", "tapir-zio-http-server", getTapirVersion())
     )
 
+end BuildView
+
 object BuildSbtView extends BuildView:
   def format(dependencies: List[Dependency]): String =
     val space = " " * 6
@@ -139,6 +141,5 @@ object BuildScalaCliView extends BuildView:
     dependencies
       .map(_.asScalaCliDependency)
       .mkString(importPrefix, System.lineSeparator() + importPrefix, System.lineSeparator())
-
 
   override protected def getTapirVersion(): String = TemplateDependencyInfo.tapirVersion

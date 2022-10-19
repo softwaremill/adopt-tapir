@@ -12,9 +12,8 @@ class ContentServiceTest extends BaseTest:
   object ContentServiceTest:
     val service: ContentService =
       val sc = StorageConfig(deleteTempFolder = true, tempPrefix = "generatedService")
-      val pf = new GeneratedFilesFormatter(sc)
+      val pf = new GeneratedFilesFormatter(FilesManager(sc))
       new ContentService(pf)
-
 
   import ContentServiceTest._
 

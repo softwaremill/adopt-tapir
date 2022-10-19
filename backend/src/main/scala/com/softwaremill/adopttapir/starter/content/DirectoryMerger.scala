@@ -2,7 +2,7 @@ package com.softwaremill.adopttapir.starter.content
 
 object DirectoryMerger:
 
-  def apply(topDirName: String, pathNames: List[String], content: String): Directory = 
+  def apply(topDirName: String, pathNames: List[String], content: String): Directory =
     assert(pathNames.nonEmpty, "`pathNames` list cannot be empty!")
 
     val pathsWithRootDir = List(topDirName) ++ pathNames
@@ -11,14 +11,14 @@ object DirectoryMerger:
       case d @ Directory(_, _) => d
     }
 
-  private def createTreeRec(pathNames: List[String], content: String): Node = 
+  private def createTreeRec(pathNames: List[String], content: String): Node =
     pathNames match {
       case Nil          => throw new IllegalStateException("pathNames list cannot be empty!")
       case last :: Nil  => File(last, content)
       case head :: tail => Directory(head, List(createTreeRec(tail, content)))
     }
 
-  def apply(d1: Directory, d2: Directory): Directory = 
+  def apply(d1: Directory, d2: Directory): Directory =
     assert(d1.name == d2.name, "names of directories to merge cannot be different!")
 
     val (d1DirsAll, d2DirsAll) = (d1.childDirectories(), d2.childDirectories())
@@ -42,4 +42,3 @@ object DirectoryMerger:
       content = (filesIntersection ++ d1FilesUnique ++ d2FilesUnique ++ mergedDirs ++ d1DirsUnique ++ d2DirsUnique)
         .sortWith((n1, n2) => n1.name.compareTo(n2.name) > 0)
     )
-

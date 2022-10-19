@@ -9,9 +9,10 @@ import com.softwaremill.adopttapir.template.ProjectGenerator
 @deprecated("Only for development purpose")
 object FileOperation extends IOApp:
 
-  val service: StarterService = 
+  val service: StarterService =
     val cfg = Config.read.storageConfig.copy(deleteTempFolder = false)
-    new StarterService(GeneratedFilesFormatter(cfg))
+    val fm = FilesManager(cfg)
+    new StarterService(GeneratedFilesFormatter(fm), fm)
 
   override def run(args: List[String]): IO[ExitCode] = {
     val details = StarterDetails(
@@ -37,4 +38,3 @@ object FileOperation extends IOApp:
       exitCode <- IO(ExitCode.Success)
     yield exitCode
   }
-

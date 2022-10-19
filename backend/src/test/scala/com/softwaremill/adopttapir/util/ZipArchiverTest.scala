@@ -53,4 +53,3 @@ class ZipArchiverTest extends BaseTest with BeforeAndAfter:
       applyFn(zipFile)
     }
   }
-

@@ -168,7 +168,6 @@ object EndpointsView:
     if starterDetails.jsonImplementation == JsonImplementation.WithoutJson then Code.empty
     else JsonModelObject.prepareLibraryModel(starterDetails)
 
-
   def getApiEndpoints(starterDetails: StarterDetails): Code =
     val serverKind = starterDetails.serverEffect match {
       case ServerEffect.FutureEffect => "List[ServerEndpoint[Any, Future]]"
@@ -188,8 +187,7 @@ object EndpointsView:
         starterDetails.projectName,
         starterDetails.serverEffect
       )
-    } else
-      Code.empty
+    } else Code.empty
 
   private object DocumentationEndpoint:
 

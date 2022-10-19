@@ -36,15 +36,15 @@ class Http() extends Tapir, TapirJsonCirce, TapirSchemas, FLogging:
     endpoint.errorOut(failOutput)
 
   val failToResponseData: Fail => (StatusCode, Error_OUT) = {
-    case Fail.NotFound(what)          => (StatusCode.NotFound, Error_OUT(what))
-    case Fail.Conflict(msg)           => (StatusCode.Conflict, Error_OUT(msg))
-    case Fail.IncorrectInput(msg)     => (StatusCode.BadRequest, Error_OUT(msg))
-    case Fail.Forbidden               => (StatusCode.Forbidden, Error_OUT("Forbidden"))
-    case Fail.Unauthorized(msg)       => (StatusCode.Unauthorized, Error_OUT(msg))
-    case _                            => (StatusCode.InternalServerError, Error_OUT("Internal server error"))
+    case Fail.NotFound(what)      => (StatusCode.NotFound, Error_OUT(what))
+    case Fail.Conflict(msg)       => (StatusCode.Conflict, Error_OUT(msg))
+    case Fail.IncorrectInput(msg) => (StatusCode.BadRequest, Error_OUT(msg))
+    case Fail.Forbidden           => (StatusCode.Forbidden, Error_OUT("Forbidden"))
+    case Fail.Unauthorized(msg)   => (StatusCode.Unauthorized, Error_OUT(msg))
+    case _                        => (StatusCode.InternalServerError, Error_OUT("Internal server error"))
   }
 
-  extension[T] (io: IO[T])
+  extension [T](io: IO[T])
     def toOut: IO[Either[(StatusCode, Error_OUT), T]] =
       io.map(t => t.asRight[(StatusCode, Error_OUT)]).recoverWith { case f: Fail =>
         val (statusCode, message) = failToResponseData(f)
@@ -52,6 +52,8 @@ class Http() extends Tapir, TapirJsonCirce, TapirSchemas, FLogging:
       }
 
   override def jsonPrinter: Printer = noNullsPrinter
+
+end Http
 
 /** Schemas for types used in endpoint descriptions (as parts of query parameters, JSON bodies, etc.). Includes explicitly defined schemas
   * for custom types, and auto-derivation for ADTs & value classes.

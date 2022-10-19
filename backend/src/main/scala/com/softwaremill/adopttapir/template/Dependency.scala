@@ -11,13 +11,11 @@ sealed trait Dependency:
 
   def asScalaCliDependency: String
 
-
 trait DefaultFormat:
   self: Dependency =>
   override def asSbtDependency: String = s"\"$groupId\" % \"$artifactId\" % \"$version\""
 
   override def asScalaCliDependency: String = s"\"$groupId:$artifactId:$version\""
-
 
 trait ScalaFormat:
   self: Dependency =>
@@ -29,11 +27,9 @@ trait ScalaFormat:
 
   override def asScalaCliDependency: String = s"\"$groupId::$artifactId:$version\""
 
-
 trait TestFormat extends ScalaFormat:
   self: Dependency =>
   override def asSbtDependency: String = super.asSbtDependency + s" % Test"
-
 
 object Dependency:
   val constantTapirVersion = "tapirVersion"

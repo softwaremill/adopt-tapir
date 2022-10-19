@@ -20,4 +20,3 @@ class Requests(backend: SttpBackend[IO, Any with Fs2Streams[IO]]):
       .response(asStreamUnsafe(Fs2Streams[IO]).getRight)
       .send(backend)
       .unwrap
-

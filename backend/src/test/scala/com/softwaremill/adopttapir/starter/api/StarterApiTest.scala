@@ -66,7 +66,7 @@ class StarterApiTest extends BaseTest with TestDependencies {
     }
   }
 
-  for  req <- Seq(validSbtRequest, validScalaCliRequest)  do {
+  for req <- Seq(validSbtRequest, validScalaCliRequest) do {
     it should s"have relative paths associated with groupId in request for .scala files for ${req.builder} builder" in {
       // given
       val groupIdRelativePath = s"${req.groupId.replace('.', '/')}"

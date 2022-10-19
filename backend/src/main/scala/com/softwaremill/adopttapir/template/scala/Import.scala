@@ -10,4 +10,3 @@ final case class Import(fullName: String):
     }
 
     s"import $adjustedImport"
-

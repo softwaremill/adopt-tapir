@@ -16,52 +16,44 @@ object RequestValidation:
   case class NotInSemverNotation(input: String) extends RequestValidation:
     override val errMessage: String = s"Provided input: `$input` is not in semantic versioning notation"
 
-
   case class ProjectNameShouldBeLowerCaseWritten(input: String) extends RequestValidation:
     override val errMessage: String = s"Project name: `$input` should be written with lowercase"
-
 
   case class ProjectNameShouldMatchRegex(input: String, regex: String) extends RequestValidation:
     override val errMessage: String = s"Project name: `$input` should match regex: `$regex`"
 
-
   case class GroupIdShouldFollowJavaPackageConvention(input: String) extends RequestValidation:
     override val errMessage: String = s"GroupId: `$input` should follow Java package convention and be smaller than 256 characters"
-
 
   abstract class EffectValidation:
     val effect: EffectRequest
     val implementation: ServerImplementationRequest
     protected val prefixMessage: String = s"Picked $effect with $implementation -"
 
-
   case class FutureEffectWillWorkOnlyWithNetty(effect: EffectRequest, implementation: ServerImplementationRequest)
       extends EffectValidation
       with RequestValidation:
     override val errMessage: String = s"$prefixMessage Future effect will work only with Netty"
-
 
   case class IOEffectWillWorkOnlyWithHttp4sAndNetty(effect: EffectRequest, implementation: ServerImplementationRequest)
       extends EffectValidation
       with RequestValidation:
     override val errMessage: String = s"$prefixMessage IO effect will work only with Http4 and Netty"
 
-
   case class ZIOEffectWillWorkOnlyWithHttp4sAndZIOHttp(effect: EffectRequest, implementation: ServerImplementationRequest)
       extends EffectValidation
       with RequestValidation:
     override val errMessage: String = s"$prefixMessage ZIO effect will work only with Http4s and ZIOHttp"
-
 
   case class MetricsNotSupportedForNettyServerImplementation(effect: EffectRequest, implementation: ServerImplementationRequest)
       extends EffectValidation
       with RequestValidation:
     override val errMessage: String = s"$prefixMessage Metrics not supported for ${ServerImplementationRequest.Netty} server implementation"
 
-
   case object ZIOJsonWillWorkOnlyWithZIOEffect extends RequestValidation:
     override val errMessage: String = s"ZIOJson will work only with ZIO effect"
 
+end RequestValidation
 
 sealed trait FormValidator:
   type ValidationResult[A] = ValidatedNec[RequestValidation, A]
@@ -91,10 +83,8 @@ sealed trait FormValidator:
   private def validateProjectName(projectName: String): ValidationResult[String] =
     val projectNameRgx = "^[a-z0-9_]$|^[a-z0-9_]+[a-z0-9_-]*[a-z0-9_]+$"
 
-    if projectName.matches(projectNameRgx) then
-      projectName.validNec
+    if projectName.matches(projectNameRgx) then projectName.validNec
     else ProjectNameShouldMatchRegex(projectName, projectNameRgx).invalidNec
-  
 
   private def validateGroupId(groupId: String): ValidationResult[String] =
     if groupId.matches("(?:^[a-z][a-z0-9_]*|[a-z][a-z0-9_]*\\.[a-z0-9_]+)+$") && groupId.length <= 256 then groupId.validNec
@@ -134,5 +124,6 @@ sealed trait FormValidator:
       case t                        => t._2.validNec
     }
 
+end FormValidator
 
 object FormValidator extends FormValidator
