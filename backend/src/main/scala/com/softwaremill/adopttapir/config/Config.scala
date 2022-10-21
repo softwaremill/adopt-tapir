@@ -30,7 +30,4 @@ object Config extends StrictLogging:
 
     logger.info(info)
 
-//  given ConfigReader[Config] =
-//    ConfigReader.forProduct2("api", "storage-config")(Config(_, _))
-
   def read: Config = ConfigSource.default.loadOrThrow[Config]
