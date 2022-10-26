@@ -1,6 +1,7 @@
 package com.softwaremill.adopttapir
 
 import cats.effect.IO
+import cats.effect.std.Dispatcher
 import cats.effect.unsafe.implicits.global
 import com.softwaremill.adopttapir.config.Config
 import com.softwaremill.adopttapir.metrics.Metrics
@@ -14,14 +15,19 @@ object Main extends StrictLogging {
     val config = Config.read
     Config.log(config)
 
-    Dependencies
-      .wire(config)
-      .use { case Dependencies(httpApi) =>
-        /*
-        - allocates the http api resource, and never releases it (so that the http server is available
-          as long as our application runs)
-         */
-        httpApi.resource.use(_ => IO.never)
+    Dispatcher[IO]
+      .use { dispatcher =>
+        {
+          Dependencies
+            .wire(config)
+            .use { case Dependencies(httpApi) =>
+              /*
+              allocates the http api resource, and never releases it (so that the http server is available
+              as long as our application runs)
+               */
+              httpApi.resource(dispatcher).useForever
+            }
+        }
       }
       .unsafeRunSync()
   }

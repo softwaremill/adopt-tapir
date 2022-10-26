@@ -25,11 +25,9 @@ val logbackClassicVersion = "1.4.4"
 val scalaTestVersion = "3.2.14"
 
 val httpDependencies = Seq(
-  "org.http4s" %% "http4s-blaze-server" % http4sBlazeServerVersion,
-  "org.http4s" %% "http4s-circe" % http4sCirceVersion,
   "com.softwaremill.sttp.client3" %% "async-http-client-backend-fs2" % sttpVersion,
   "com.softwaremill.sttp.client3" %% "slf4j-backend" % sttpVersion,
-  "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % tapirVersion,
+  "com.softwaremill.sttp.tapir" %% "tapir-vertx-server-cats" % tapirVersion,
   "com.softwaremill.sttp.tapir" %% "tapir-sttp-stub-server" % tapirVersion
 )
 
