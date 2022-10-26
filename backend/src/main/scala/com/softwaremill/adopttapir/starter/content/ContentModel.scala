@@ -12,10 +12,9 @@ import io.circe.*
 sealed trait Node:
   def name: String
 
-/**
-  * Here we diverged from using default deriving approach for both
-  * * Schema[Node] due to https://tapir.softwaremill.com/en/latest/endpoint/schemas.html#derivation-for-recursive-types-in-scala3
-  * * Encoder[Node] due to limitations of circe 0.14 for Scala 3 wrt customizing serializers
+/** Here we diverged from using default deriving approach for both * Schema[Node] due to
+  * https://tapir.softwaremill.com/en/latest/endpoint/schemas.html#derivation-for-recursive-types-in-scala3 * Encoder[Node] due to
+  * limitations of circe 0.14 for Scala 3 wrt customizing serializers
   */
 object Node:
   implicit def schema: Schema[Node] = Schema.derived[Node]

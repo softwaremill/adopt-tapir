@@ -22,7 +22,4 @@ class VersionApi(http: Http):
     }
 
 object VersionApi:
-  final case class Version_OUT(buildSha: String) derives Decoder
-
-  object Version_OUT:
-    inline given Encoder[Version_OUT] = deriveEncoder
+  final case class Version_OUT(buildSha: String) derives Decoder, Encoder.AsObject

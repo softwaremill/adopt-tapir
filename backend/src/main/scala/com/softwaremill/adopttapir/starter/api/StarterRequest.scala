@@ -20,6 +20,8 @@ case class StarterRequest(
 object StarterRequest:
   inline given Encoder[StarterRequest] = deriveEncoder
 
+/** We use JsonTaggedAdt to serialize starter request enums in a pure, tags-constant only way.
+  */
 enum EffectRequest(val toModel: ServerEffect) derives JsonTaggedAdt.PureEncoder, JsonTaggedAdt.PureDecoder:
   case FutureEffect extends EffectRequest(ServerEffect.FutureEffect)
   case IOEffect extends EffectRequest(ServerEffect.IOEffect)
