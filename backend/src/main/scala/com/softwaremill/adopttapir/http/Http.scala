@@ -10,14 +10,13 @@ import com.softwaremill.tagging.*
 import io.circe.{Printer, Encoder, Decoder}
 import sttp.model.StatusCode
 import sttp.tapir.Codec.PlainCodec
-import sttp.tapir.generic.auto.SchemaDerivation
 import sttp.tapir.json.circe.TapirJsonCirce
 import sttp.tapir.{Codec, Endpoint, EndpointOutput, PublicEndpoint, Schema, SchemaType, Tapir}
 import sttp.tapir.generic.Configuration as TapirConfiguration
 import io.circe.generic.semiauto.*
 
 /** Helper class for defining HTTP endpoints. Import the members of this class when defining an HTTP API using tapir. */
-class Http() extends Tapir, TapirJsonCirce, TapirSchemas, FLogging:
+class Http() extends Tapir, TapirJsonCirce, FLogging:
 
   given TapirConfiguration =
     TapirConfiguration.default
@@ -55,14 +54,4 @@ class Http() extends Tapir, TapirJsonCirce, TapirSchemas, FLogging:
 
 end Http
 
-/** Schemas for types used in endpoint descriptions (as parts of query parameters, JSON bodies, etc.). Includes explicitly defined schemas
-  * for custom types, and auto-derivation for ADTs & value classes.
-  */
-trait TapirSchemas extends SchemaDerivation:
-
-  given [U, T](using uc: PlainCodec[U]): PlainCodec[U @@ T] =
-    uc.map(_.taggedWith[T])(identity)
-
-  given [U, T](using uc: Schema[U]): Schema[U @@ T] = uc.asInstanceOf[Schema[U @@ T]]
-
-final case class Error_OUT(error: String) derives Decoder, Encoder.AsObject
+final case class Error_OUT(error: String) derives Decoder, Encoder.AsObject, Schema

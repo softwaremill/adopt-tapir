@@ -7,6 +7,7 @@ import com.softwaremill.adopttapir.version.BuildInfo
 import sttp.tapir.server.ServerEndpoint
 import io.circe.{Encoder, Decoder}
 import io.circe.generic.semiauto.*
+import sttp.tapir.Schema
 
 /** Defines an endpoint which exposes the current application version information.
   */
@@ -22,4 +23,4 @@ class VersionApi(http: Http):
     }
 
 object VersionApi:
-  final case class Version_OUT(buildSha: String) derives Decoder, Encoder.AsObject
+  final case class Version_OUT(buildSha: String) derives Decoder, Encoder.AsObject, Schema
