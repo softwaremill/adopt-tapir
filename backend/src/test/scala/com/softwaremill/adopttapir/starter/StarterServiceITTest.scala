@@ -3,15 +3,15 @@ package com.softwaremill.adopttapir.starter
 import better.files.{FileExtensions, File => BFile}
 import cats.effect.unsafe.implicits.global
 import cats.effect.{IO, Resource}
-import cats.instances.list._
-import cats.syntax.parallel._
-import cats.syntax.show._
-import com.softwaremill.adopttapir.starter.api._
+import cats.instances.list.*
+import cats.syntax.parallel.*
+import cats.syntax.show.*
+import com.softwaremill.adopttapir.starter.api.*
 import com.softwaremill.adopttapir.starter.files.{FilesManager, StorageConfig}
 import com.softwaremill.adopttapir.starter.formatting.GeneratedFilesFormatter
 import com.softwaremill.adopttapir.template.ProjectGenerator
 import com.softwaremill.adopttapir.test.ServiceTimeouts.waitForPortTimeout
-import com.softwaremill.adopttapir.test.ShowHelpers._
+import com.softwaremill.adopttapir.test.ShowHelpers.*
 import com.softwaremill.adopttapir.test.{BaseTest, GeneratedService, ServiceFactory}
 import org.scalatest.{Assertions, ParallelTestExecution}
 import sttp.client3.{HttpURLConnectionBackend, Identity, SttpBackend, UriContext, asStringAlways, basicRequest}
@@ -19,18 +19,30 @@ import sttp.client3.{HttpURLConnectionBackend, Identity, SttpBackend, UriContext
 import scala.collection.mutable
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 import scala.util.Properties
+import scala.reflect.ClassTag
 
-object Setup {
+object Setup:
   type TestFunction = Integer => IO[Unit]
 
-  lazy val validConfigurations: Seq[StarterDetails] = for {
-    effect <- EffectRequest.values
-    server <- ServerImplementationRequest.values
+  def fromEnvOrElseAll[A](envKeyString: String, fromEnv: String => A)(elseAll: List[A]): List[A] =
+    Properties
+      .envOrNone(envKeyString)
+      .map { envValuesString =>
+        envValuesString
+          .split(",")
+          .toList
+          .map(fromEnv)
+      }
+      .getOrElse(elseAll)
+
+  lazy val validConfigurations: Seq[StarterDetails] = for
+    effect <- EffectRequest.values.toIndexedSeq
+    server <- ServerImplementationRequest.values.toIndexedSeq
     docs <- List(true, false)
     metrics <- List(true, false)
     json <- jsonImplementations
     scalaVersion <- scalaVersions
-    builder <- BuilderRequest.values
+    builder <- BuilderRequest.values.toIndexedSeq
     starterRequest = StarterRequest(
       "myproject",
       "com.softwaremill",
@@ -43,30 +55,22 @@ object Setup {
       builder
     )
     starterDetails <- FormValidator.validate(starterRequest).toSeq
-  } yield starterDetails
+  yield starterDetails
 
-  private lazy val jsonImplementations: List[JsonImplementationRequest] = {
-    Properties
-      .envOrElse("JSON", JsonImplementationRequest.values.mkString(","))
-      .split(",")
-      .map(JsonImplementationRequest.withName)
-      .toList
-  }
+  private lazy val jsonImplementations: List[JsonImplementationRequest] =
+    fromEnvOrElseAll("JSON", JsonImplementationRequest.valueOf)(JsonImplementationRequest.values.toList)
 
-  private lazy val scalaVersions: List[ScalaVersionRequest] = {
-    Properties.envOrElse("SCALA", ScalaVersionRequest.values.mkString(",")).split(",").map(ScalaVersionRequest.withName).toList
-  }
-}
+  private lazy val scalaVersions: List[ScalaVersionRequest] =
+    fromEnvOrElseAll("SCALA", ScalaVersionRequest.valueOf)(ScalaVersionRequest.values.toList)
 
-object TestTimeouts {
+object TestTimeouts:
   // wait for tests has to be longer than waiting for port otherwise it will break waiting for port with bogus errors
   val waitForTestsTimeout: FiniteDuration = waitForPortTimeout + 30.seconds
-}
 
-class StarterServiceITTest extends BaseTest with ParallelTestExecution {
-  import Setup._
+class StarterServiceITTest extends BaseTest with ParallelTestExecution:
+  import Setup.*
 
-  for { details <- Setup.validConfigurations } {
+  for details <- Setup.validConfigurations do {
     it should s"return zip file containing working sbt folder with: ${details.show}" in {
       val backend: SttpBackend[Identity, Any] = HttpURLConnectionBackend()
 
@@ -113,55 +117,48 @@ class StarterServiceITTest extends BaseTest with ParallelTestExecution {
   }
 
   private def subTest(name: String): String = s"should have $name endpoint available"
-}
 
-case class GeneratedServiceUnderTest(serviceFactory: ServiceFactory, details: StarterDetails) {
-  import Setup._
+case class GeneratedServiceUnderTest(serviceFactory: ServiceFactory, details: StarterDetails):
+  import Setup.*
   import TestTimeouts.waitForTestsTimeout
 
-  def run(tests: List[TestFunction]): Unit = {
+  def run(tests: List[TestFunction]): Unit =
     val logger = RunLogger()
-    (for {
+    (for
       zipFile <- generateZipFile(details, logger)
       tempDir <- createTempDirectory()
-    } yield (zipFile, tempDir))
+    yield (zipFile, tempDir))
       .use { case (zipFile, tempDir) =>
         unzipFile(zipFile, tempDir, logger) >> spawnService(tempDir).use(service =>
           getPortFromService(service, logger).flatMap(port => runTests(port, tests, logger))
         )
       }
       .unsafeRunSync()
-  }
 
-  private def generateZipFile(details: StarterDetails, logger: RunLogger): Resource[IO, BFile] = {
-    Resource.make(for {
+  private def generateZipFile(details: StarterDetails, logger: RunLogger): Resource[IO, BFile] =
+    Resource.make(for
       zipFile <- ZipGenerator.service.generateZipFile(details).map(_.toScala)
       _ <- logger.log("* zip file was generated")
-    } yield zipFile)(zipFile => IO.blocking(zipFile.delete()))
-  }
+    yield zipFile)(zipFile => IO.blocking(zipFile.delete()))
 
-  private def createTempDirectory(): Resource[IO, BFile] = {
+  private def createTempDirectory(): Resource[IO, BFile] =
     Resource.make(IO.blocking(BFile.newTemporaryDirectory("sbtTesting")))(tempDir =>
       IO.blocking(tempDir.delete(swallowIOExceptions = true))
     )
-  }
 
-  private def unzipFile(zipFile: BFile, tempDir: BFile, logger: RunLogger): IO[Unit] = {
+  private def unzipFile(zipFile: BFile, tempDir: BFile, logger: RunLogger): IO[Unit] =
     IO.blocking(zipFile.unzipTo(tempDir)) >> logger.log("* zip file was unzipped")
-  }
 
-  private def spawnService(tempDir: BFile): Resource[IO, GeneratedService] = {
+  private def spawnService(tempDir: BFile): Resource[IO, GeneratedService] =
     Resource.make(serviceFactory.create(details.builder, tempDir))(_.close())
-  }
 
-  private def getPortFromService(service: GeneratedService, logger: RunLogger): IO[Integer] = {
-    for {
+  private def getPortFromService(service: GeneratedService, logger: RunLogger): IO[Integer] =
+    for
       port <- service.port
       _ <- logger.log(s"* service compiled, tested & started on port $port")
-    } yield port
-  }
+    yield port
 
-  private def runTests(port: Integer, tests: List[TestFunction], logger: RunLogger): IO[Unit] = {
+  private def runTests(port: Integer, tests: List[TestFunction], logger: RunLogger): IO[Unit] =
     tests
       .map(_(port))
       .parSequence
@@ -171,20 +168,14 @@ case class GeneratedServiceUnderTest(serviceFactory: ServiceFactory, details: St
           s"Only the following test steps were finished for configuration '${details.show}':$logger${System.lineSeparator()}${e.show}"
         )
       ) >> logger.log(s"* integration tests on port $port were finished")
-  }
-}
 
-object ZipGenerator {
-  val service: StarterService = {
+object ZipGenerator:
+  val service: StarterService =
     val cfg = StorageConfig(deleteTempFolder = true, tempPrefix = "generatedService")
-    val pg = new ProjectGenerator()
     val fm = new FilesManager(cfg)
-    val pf = new GeneratedFilesFormatter(fm)
-    new StarterService(pg, fm, pf)
-  }
-}
+    val gff = new GeneratedFilesFormatter(fm)
+    new StarterService(gff, fm)
 
-case class RunLogger(log: mutable.StringBuilder = new mutable.StringBuilder()) {
+case class RunLogger(log: mutable.StringBuilder = new mutable.StringBuilder()):
   def log(l: String): IO[Unit] = IO(log.append(System.lineSeparator()).append(l))
   override def toString: String = log.toString()
-}

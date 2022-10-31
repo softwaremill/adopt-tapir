@@ -6,13 +6,13 @@ import com.softwaremill.adopttapir.starter.StarterDetails
 import com.softwaremill.adopttapir.starter.formatting.GeneratedFilesFormatter
 import com.softwaremill.adopttapir.template.ProjectGenerator
 
-class ContentService(projectGenerator: ProjectGenerator, generatedFilesFormatter: GeneratedFilesFormatter) {
+final case class ContentService(generatedFilesFormatter: GeneratedFilesFormatter):
 
-  def generateContentTree(starterDetails: StarterDetails): IO[Directory] = {
+  def generateContentTree(starterDetails: StarterDetails): IO[Directory] =
     val projectName = starterDetails.projectName
-    val rawGeneratedFiles = projectGenerator.generate(starterDetails)
+    val rawGeneratedFiles = ProjectGenerator.generate(starterDetails)
 
-    for {
+    for
       formattedGeneratedFiles <- generatedFilesFormatter.format(rawGeneratedFiles)
       projectAsDirTrees <- IO(formattedGeneratedFiles.map(fgf => {
         val paths = fgf.relativePath.split('/').toList
@@ -21,6 +21,4 @@ class ContentService(projectGenerator: ProjectGenerator, generatedFilesFormatter
       }))
       projectAsTree <- IO(projectAsDirTrees.reduce(DirectoryMerger.apply))
       _ <- IO(Metrics.increasePreviewOperationMetricCounter(starterDetails))
-    } yield projectAsTree
-  }
-}
+    yield projectAsTree

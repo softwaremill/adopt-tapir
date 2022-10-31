@@ -9,25 +9,22 @@ import com.softwaremill.adopttapir.template.ProjectGenerator
 
 import java.io.File
 
-class StarterService(projectGenerator: ProjectGenerator, filesManager: FilesManager, generatedFilesFormatter: GeneratedFilesFormatter)
-    extends FLogging {
+class StarterService(generatedFilesFormatter: GeneratedFilesFormatter, filesManager: FilesManager) extends FLogging:
 
-  def generateZipFile(starterDetails: StarterDetails): IO[File] = {
+  def generateZipFile(starterDetails: StarterDetails): IO[File] =
     logger.info(s"received request: $starterDetails") *>
-      IO(generatedFilesFormatter.format(projectGenerator.generate(starterDetails)))
+      IO(generatedFilesFormatter.format(ProjectGenerator.generate(starterDetails)))
         .flatMap(formattedGeneratedFiles => {
           IO
             .blocking(filesManager.createTempDir())
             .bracket { tempDirectory =>
-              for {
+              for
                 tempDir <- tempDirectory
                 _ <- logger.debug("created temp dir: " + tempDir)
                 generatedFiles <- formattedGeneratedFiles
                 _ <- filesManager.createFiles(tempDir, generatedFiles)
                 zippedFile <- filesManager.zipDirectory(tempDir)
                 _ <- IO(Metrics.increaseZipGenerationMetricCounter(starterDetails))
-              } yield zippedFile
+              yield zippedFile
             }(release = tempDirectory => filesManager.deleteFilesAsStatedInConfig(tempDirectory))
         })
-  }
-}

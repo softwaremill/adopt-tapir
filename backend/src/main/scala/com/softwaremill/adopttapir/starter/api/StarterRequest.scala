@@ -1,7 +1,10 @@
 package com.softwaremill.adopttapir.starter.api
 
 import com.softwaremill.adopttapir.starter.{Builder, JsonImplementation, ScalaVersion, ServerEffect, ServerImplementation}
-import enumeratum.{CirceEnum, Enum, EnumEntry}
+import io.circe.{Decoder, Encoder}
+import io.circe.generic.semiauto.*
+import org.latestbit.circe.adt.codec.*
+import sttp.tapir.Schema
 
 case class StarterRequest(
     projectName: String,
@@ -13,113 +16,36 @@ case class StarterRequest(
     json: JsonImplementationRequest,
     scalaVersion: ScalaVersionRequest,
     builder: BuilderRequest
-)
+) derives Decoder,
+      Encoder.AsObject,
+      Schema
 
-object StarterRequest {}
-
-sealed trait EffectRequest extends EnumEntry {
-  def toModel: ServerEffect
-}
-
-object EffectRequest extends Enum[EffectRequest] with CirceEnum[EffectRequest] {
-
-  case object FutureEffect extends EffectRequest {
-    override def toModel: ServerEffect = ServerEffect.FutureEffect
-  }
-
-  case object IOEffect extends EffectRequest {
-    override def toModel: ServerEffect = ServerEffect.IOEffect
-  }
-
-  case object ZIOEffect extends EffectRequest {
-    override def toModel: ServerEffect = ServerEffect.ZIOEffect
-  }
-
-  override def values: IndexedSeq[EffectRequest] = findValues
-}
-
-sealed trait ServerImplementationRequest extends EnumEntry {
-  def toModel: ServerImplementation
-}
-
-object ServerImplementationRequest extends Enum[ServerImplementationRequest] with CirceEnum[ServerImplementationRequest] {
-  case object Netty extends ServerImplementationRequest {
-    override def toModel: ServerImplementation = ServerImplementation.Netty
-  }
-
-  case object Http4s extends ServerImplementationRequest {
-    override def toModel: ServerImplementation = ServerImplementation.Http4s
-  }
-
-  case object ZIOHttp extends ServerImplementationRequest {
-    override def toModel: ServerImplementation = ServerImplementation.ZIOHttp
-  }
-
-  override def values: IndexedSeq[ServerImplementationRequest] = findValues
-}
-
-sealed trait JsonImplementationRequest extends EnumEntry {
-  def toModel: JsonImplementation
-}
-
-/** Changes in JSON implementation have to be reflected in .github/workflows/adopt-tapir-ci.yml file so that running jobs in parallel is
-  * still possible
+/** Here I deviate from default circe marshallers to a specialized JsonTaggedAdt to serialize enums in a tags-constant only way. The reason
+  * for the switch is that with circe-core 0.14 I was not able to customize the derivation in any elegant way, not to mention any match with
+  * JsonTaggedAdt one liners. But if this improves with higher versions of circe, it would be advisable to fall back to circe in order to
+  * reduce dependencies.
   */
-object JsonImplementationRequest extends Enum[JsonImplementationRequest] with CirceEnum[JsonImplementationRequest] {
-  case object No extends JsonImplementationRequest {
-    override def toModel: JsonImplementation = JsonImplementation.WithoutJson
-  }
+enum EffectRequest(val toModel: ServerEffect) derives JsonTaggedAdt.PureEncoder, JsonTaggedAdt.PureDecoder, Schema:
+  case FutureEffect extends EffectRequest(ServerEffect.FutureEffect)
+  case IOEffect extends EffectRequest(ServerEffect.IOEffect)
+  case ZIOEffect extends EffectRequest(ServerEffect.ZIOEffect)
 
-  case object Circe extends JsonImplementationRequest {
-    override def toModel: JsonImplementation = JsonImplementation.Circe
-  }
+enum ServerImplementationRequest(val toModel: ServerImplementation) derives JsonTaggedAdt.PureEncoder, JsonTaggedAdt.PureDecoder, Schema:
+  case Netty extends ServerImplementationRequest(ServerImplementation.Netty)
+  case Http4s extends ServerImplementationRequest(ServerImplementation.Http4s)
+  case ZIOHttp extends ServerImplementationRequest(ServerImplementation.ZIOHttp)
 
-  case object UPickle extends JsonImplementationRequest {
-    override def toModel: JsonImplementation = JsonImplementation.UPickle
-  }
+enum JsonImplementationRequest(val toModel: JsonImplementation) derives JsonTaggedAdt.PureEncoder, JsonTaggedAdt.PureDecoder, Schema:
+  case No extends JsonImplementationRequest(JsonImplementation.WithoutJson)
+  case Circe extends JsonImplementationRequest(JsonImplementation.Circe)
+  case Jsoniter extends JsonImplementationRequest(JsonImplementation.Jsoniter)
+  case UPickle extends JsonImplementationRequest(JsonImplementation.UPickle)
+  case ZIOJson extends JsonImplementationRequest(JsonImplementation.ZIOJson)
 
-  case object Jsoniter extends JsonImplementationRequest {
-    override def toModel: JsonImplementation = JsonImplementation.Jsoniter
-  }
+enum ScalaVersionRequest(val toModel: ScalaVersion) derives JsonTaggedAdt.PureEncoder, JsonTaggedAdt.PureDecoder, Schema:
+  case Scala2 extends ScalaVersionRequest(ScalaVersion.Scala2)
+  case Scala3 extends ScalaVersionRequest(ScalaVersion.Scala3)
 
-  case object ZIOJson extends JsonImplementationRequest {
-    override def toModel: JsonImplementation = JsonImplementation.ZIOJson
-  }
-
-  override def values: IndexedSeq[JsonImplementationRequest] = findValues
-}
-
-sealed trait ScalaVersionRequest extends EnumEntry {
-  def toModel: ScalaVersion
-}
-
-/** Changes in Scala versions have to be reflected in .github/workflows/adopt-tapir-ci.yml file so that running jobs in parallel is still
-  * possible
-  */
-object ScalaVersionRequest extends Enum[ScalaVersionRequest] with CirceEnum[ScalaVersionRequest] {
-  case object Scala2 extends ScalaVersionRequest {
-    override def toModel: ScalaVersion = ScalaVersion.Scala2
-  }
-
-  case object Scala3 extends ScalaVersionRequest {
-    override def toModel: ScalaVersion = ScalaVersion.Scala3
-  }
-
-  override def values: IndexedSeq[ScalaVersionRequest] = findValues
-}
-
-sealed trait BuilderRequest extends EnumEntry {
-  def toModel: Builder
-}
-
-object BuilderRequest extends Enum[BuilderRequest] with CirceEnum[BuilderRequest] {
-  case object Sbt extends BuilderRequest {
-    override def toModel: Builder = Builder.Sbt
-  }
-
-  case object ScalaCli extends BuilderRequest {
-    override def toModel: Builder = Builder.ScalaCli
-  }
-
-  override def values: IndexedSeq[BuilderRequest] = findValues
-}
+enum BuilderRequest(val toModel: Builder) derives JsonTaggedAdt.PureEncoder, JsonTaggedAdt.PureDecoder, Schema:
+  case Sbt extends BuilderRequest(Builder.Sbt)
+  case ScalaCli extends BuilderRequest(Builder.ScalaCli)

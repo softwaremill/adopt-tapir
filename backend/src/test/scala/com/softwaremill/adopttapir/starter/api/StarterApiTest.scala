@@ -3,13 +3,13 @@ package com.softwaremill.adopttapir.starter.api
 import better.files.File
 import cats.effect.{IO, Resource}
 import com.softwaremill.adopttapir.http.Error_OUT
-import com.softwaremill.adopttapir.infrastructure.Json._
+import com.softwaremill.adopttapir.infrastructure.Json.*
 import com.softwaremill.adopttapir.starter.api.EffectRequest.FutureEffect
 import com.softwaremill.adopttapir.starter.api.JsonImplementationRequest.Jsoniter
 import com.softwaremill.adopttapir.starter.api.ScalaVersionRequest.Scala2
 import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Netty, ZIOHttp}
 import com.softwaremill.adopttapir.starter.api.StarterApiTest.{mainPath, validSbtRequest, validScalaCliRequest}
-import com.softwaremill.adopttapir.test.Rich.RichIO
+import com.softwaremill.adopttapir.test.RichIO.unwrap
 import com.softwaremill.adopttapir.test.{BaseTest, TestDependencies}
 import fs2.io.file.Files
 import io.circe.jawn
@@ -66,7 +66,7 @@ class StarterApiTest extends BaseTest with TestDependencies {
     }
   }
 
-  for { req <- Seq(validSbtRequest, validScalaCliRequest) } {
+  for req <- Seq(validSbtRequest, validScalaCliRequest) do {
     it should s"have relative paths associated with groupId in request for .scala files for ${req.builder} builder" in {
       // given
       val groupIdRelativePath = s"${req.groupId.replace('.', '/')}"
@@ -123,18 +123,18 @@ class StarterApiTest extends BaseTest with TestDependencies {
   }
 
   def checkStreamZipContent(fileStream: fs2.Stream[IO, Byte])(assertionOnUnpackedDirFn: File => Assertion): Unit = {
-    (for {
+    (for
       tempZipFile <- tempZipFile()
       tempDir <- tempDir()
-    } yield (tempZipFile, tempDir)).use { case (tempZipFile, tempDir) =>
-      for {
+    yield (tempZipFile, tempDir)).use { case (tempZipFile, tempDir) =>
+      for
         _ <- fileStream
           .through(Files[IO].writeAll(fs2.io.file.Path(tempZipFile.toJava.getPath)))
           .compile
           .drain
         _ <- IO.blocking(tempZipFile.unzipTo(tempDir))
         _ <- IO.blocking(assertionOnUnpackedDirFn(tempDir))
-      } yield ()
+      yield ()
 
     }.unwrap
   }

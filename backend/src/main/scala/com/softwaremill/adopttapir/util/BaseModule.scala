@@ -2,6 +2,5 @@ package com.softwaremill.adopttapir.util
 
 import com.softwaremill.adopttapir.config.Config
 
-trait BaseModule {
+trait BaseModule:
   def config: Config
-}

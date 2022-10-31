@@ -8,7 +8,7 @@ import org.scalatest.BeforeAndAfter
 
 import scala.util.Try
 
-class ZipArchiverTest extends BaseTest with BeforeAndAfter {
+class ZipArchiverTest extends BaseTest with BeforeAndAfter:
   var dirToZip: File = _
 
   before {
@@ -46,11 +46,10 @@ class ZipArchiverTest extends BaseTest with BeforeAndAfter {
   }
 
   private def checkZipEntry[A](filename: String, zippedFile: File)(applyFn: ZipFile => A) = {
-    for {
+    for
       channel <- new SeekableInMemoryByteChannel(zippedFile.byteArray).autoClosed
       zipFile <- new ZipFile(channel).autoClosed
-    } {
+    do {
       applyFn(zipFile)
     }
   }
-}

@@ -2,6 +2,7 @@ package com.softwaremill.adopttapir.starter.formatting
 
 import cats.effect.IO
 import com.softwaremill.adopttapir.starter.files.FilesManager
+import com.softwaremill.adopttapir.starter.files.StorageConfig
 import com.softwaremill.adopttapir.template.{CommonObjectTemplate, GeneratedFile}
 import com.typesafe.scalalogging.StrictLogging
 import org.scalafmt.interfaces.{Scalafmt, ScalafmtReporter}
@@ -9,7 +10,7 @@ import org.scalafmt.interfaces.{Scalafmt, ScalafmtReporter}
 import java.io.{OutputStreamWriter, PrintWriter}
 import java.nio.file.Path
 
-class GeneratedFilesFormatter(fm: FilesManager) extends StrictLogging {
+final case class GeneratedFilesFormatter(filesManager: FilesManager) extends StrictLogging:
 
   private val ScalaFileExtensions = Set(".scala", ".sbt")
 
@@ -34,34 +35,30 @@ class GeneratedFilesFormatter(fm: FilesManager) extends StrictLogging {
       .create(getClass.getClassLoader)
       .withReporter(scalafmtReporter)
 
-  def format(gfs: List[GeneratedFile]): IO[List[GeneratedFile]] = {
+  def format(gfs: List[GeneratedFile]): IO[List[GeneratedFile]] =
     findGeneratedFormatFile(gfs) match {
       case Some(formatFile) =>
-        IO.blocking(fm.createTempDir())
+        IO.blocking(filesManager.createTempDir())
           .bracket { tempDirectory =>
-            for {
+            for
               tempDir <- tempDirectory
-              formatFile <- fm.createFile(tempDir, formatFile)
+              formatFile <- filesManager.createFile(tempDir, formatFile)
               formattedFiles <- IO(formatScalaFiles(formatFile.toPath, gfs))
-            } yield formattedFiles
-          }(release = tempDirectory => fm.deleteFilesAsStatedInConfig(tempDirectory))
+            yield formattedFiles
+          }(release = tempDirectory => filesManager.deleteFilesAsStatedInConfig(tempDirectory))
       case None =>
         logger.error(s"Cannot find formatting file in generated project, scala files will NOT be formatted!")
         IO(gfs)
     }
-  }
 
-  private def findGeneratedFormatFile(gfs: List[GeneratedFile]): Option[GeneratedFile] = {
+  private def findGeneratedFormatFile(gfs: List[GeneratedFile]): Option[GeneratedFile] =
     gfs.find(_.relativePath.endsWith(CommonObjectTemplate.scalafmtConfigPath))
-  }
 
-  private def formatScalaFiles(scalaFormatPath: Path, gfs: List[GeneratedFile]): List[GeneratedFile] = {
+  private def formatScalaFiles(scalaFormatPath: Path, gfs: List[GeneratedFile]): List[GeneratedFile] =
     gfs.map {
       case gf if isScalaFilePath(gf.relativePath) =>
         gf.copy(content = scalafmt.format(scalaFormatPath, Path.of(gf.relativePath), gf.content))
       case gf => gf
     }
-  }
 
   private def isScalaFilePath(path: String): Boolean = ScalaFileExtensions.exists(e => path.endsWith(e))
-}

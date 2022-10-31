@@ -9,6 +9,10 @@ import sbtbuildinfo.{BuildInfoKey, BuildInfoOption}
 import scala.sys.process.Process
 import scala.util.Try
 
+
+val scala2Version = "2.13.10"
+val scala3Version = "3.2.0"
+
 val tapirVersion = "1.1.3"
 
 val http4sBlazeServerVersion = "0.23.12"
@@ -17,12 +21,12 @@ val circeVersion = "0.14.3"
 val circeGenericsExtrasVersion = "0.14.3"
 val sttpVersion = "3.8.3"
 val prometheusVersion = "0.16.0"
-val macwireVersion = "2.5.8"
-
 val scalafmtVersion = "3.5.8"
 val scalaLoggingVersion = "3.9.5"
 val logbackClassicVersion = "1.4.4"
 val scalaTestVersion = "3.2.14"
+val plokhotnyukJsoniterVersion = "2.17.6"
+val zioTestVersion = "2.0.0"
 
 val httpDependencies = Seq(
   "org.http4s" %% "http4s-blaze-server" % http4sBlazeServerVersion,
@@ -43,12 +47,10 @@ val monitoringDependencies = Seq(
 val jsonDependencies = Seq(
   "io.circe" %% "circe-core" % circeVersion,
   "io.circe" %% "circe-generic" % circeVersion,
-  "io.circe" %% "circe-generic-extras" % circeGenericsExtrasVersion,
   "io.circe" %% "circe-parser" % circeVersion,
-  "com.softwaremill.sttp.tapir" %% "tapir-enumeratum" % tapirVersion,
-  "com.beachape" %% "enumeratum-circe" % "1.7.0",
   "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % tapirVersion,
-  "com.softwaremill.sttp.client3" %% "circe" % sttpVersion
+  "com.softwaremill.sttp.client3" %% "circe" % sttpVersion,
+  "org.latestbit" %% "circe-tagged-adt-codec" % "0.10.1"
 )
 
 val loggingDependencies = Seq(
@@ -59,12 +61,12 @@ val loggingDependencies = Seq(
 )
 
 val fileDependencies = Seq(
-  "com.github.pathikrit" %% "better-files" % "3.9.1",
+  "com.github.pathikrit" %% "better-files" % "3.9.1" cross CrossVersion.for3Use2_13,
   "org.apache.commons" % "commons-compress" % "1.21"
 )
 
 val configDependencies = Seq(
-  "com.github.pureconfig" %% "pureconfig" % "0.17.1"
+  "com.github.pureconfig" %% "pureconfig-core" % "0.17.1"
 )
 
 val baseDependencies = Seq(
@@ -77,12 +79,8 @@ val apiDocsDependencies = Seq(
   "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-bundle" % tapirVersion
 )
 
-val macwireDependencies = Seq(
-  "com.softwaremill.macwire" %% "macrosautocats" % macwireVersion
-).map(_ % Provided)
-
 val scalafmtStandaloneDependencies = Seq(
-  "org.scalameta" %% "scalafmt-dynamic" % scalafmtVersion
+  "org.scalameta" %% "scalafmt-dynamic" % scalafmtVersion cross CrossVersion.for3Use2_13
 )
 
 val unitTestingStack = Seq(
@@ -100,26 +98,27 @@ lazy val updateYarn = taskKey[Unit]("Update yarn")
 lazy val yarnTask = inputKey[Unit]("Run yarn with arguments")
 lazy val copyWebapp = taskKey[Unit]("Copy webapp")
 
-val scala2Version = "2.13.10"
-lazy val commonSettings = commonSmlBuildSettings ++ Seq(
-  organization := "com.softwaremill.adopttapir",
-  scalaVersion := scala2Version,
-  libraryDependencies ++= commonDependencies,
-  uiDirectory := (ThisBuild / baseDirectory).value / uiProjectName,
-  updateYarn := {
-    streams.value.log("Updating npm/yarn dependencies")
-    haltOnCmdResultError(Process("yarn install", uiDirectory.value).!)
-  },
-  yarnTask := {
-    val taskName = spaceDelimited("<arg>").parsed.mkString(" ")
-    updateYarn.value
-    val localYarnCommand = "yarn " + taskName
+lazy val commonSettings =
+  commonSmlBuildSettings ++
+    Seq(
+      organization := "com.softwaremill.adopttapir",
+      scalaVersion := scala3Version,
+      libraryDependencies ++= commonDependencies,
+      uiDirectory := (ThisBuild / baseDirectory).value / uiProjectName,
+      updateYarn := {
+        streams.value.log("Updating npm/yarn dependencies")
+        haltOnCmdResultError(Process("yarn install", uiDirectory.value).!)
+      },
+      yarnTask := {
+        val taskName = spaceDelimited("<arg>").parsed.mkString(" ")
+        updateYarn.value
+        val localYarnCommand = "yarn " + taskName
 
-    def runYarnTask() = Process(localYarnCommand, uiDirectory.value).!
+        def runYarnTask() = Process(localYarnCommand, uiDirectory.value).!
 
-    streams.value.log("Running yarn task: " + taskName)
-    haltOnCmdResultError(runYarnTask())
-  }
+        streams.value.log("Running yarn task: " + taskName)
+        haltOnCmdResultError(runYarnTask())
+      }
 )
 
 lazy val buildInfoSettings = Seq(
@@ -194,16 +193,24 @@ lazy val rootProject = (project in file("."))
   )
   .aggregate(backend, ui, templateDependencies)
 
-lazy val ItTest = config("ItTest") extend (Test)
+lazy val ItTest = config("ItTest") extend Test
 
 def itFilter(name: String): Boolean = name endsWith "ITTest"
 def unitFilter(name: String): Boolean = (name endsWith "Test") && !itFilter(name)
 
 lazy val backend: Project = (project in file("backend"))
   .configs(ItTest)
+  .settings(commonSettings)
+  .settings(
+    scalaVersion := scala3Version,
+    libraryDependencies ++=
+      httpDependencies
+        ++ jsonDependencies
+        ++ apiDocsDependencies
+        ++ monitoringDependencies
+  )
   .settings(
     inConfig(ItTest)(Defaults.testTasks),
-    libraryDependencies ++= httpDependencies ++ jsonDependencies ++ apiDocsDependencies ++ monitoringDependencies ++ macwireDependencies,
     Compile / mainClass := Some("com.softwaremill.adopttapir.Main"),
     copyWebapp := {
       val source = uiDirectory.value / "build"
@@ -215,30 +222,25 @@ lazy val backend: Project = (project in file("backend"))
     Test / testOptions := Seq(Tests.Filter(unitFilter)) ++ Seq(Tests.Argument("-P" + java.lang.Runtime.getRuntime.availableProcessors())),
     ItTest / testOptions := Seq(Tests.Filter(itFilter)) ++ Seq(
       Tests.Argument(
-        "-P" + sys.env.get("IT_TESTS_THREADS_NO").getOrElse(java.lang.Math.min(java.lang.Runtime.getRuntime.availableProcessors() / 2, 4))
+        "-P" + sys.env.getOrElse("IT_TESTS_THREADS_NO", java.lang.Math.min(java.lang.Runtime.getRuntime.availableProcessors() / 2, 4))
       )
     ),
     ItTest / logBuffered := false
   )
-  .dependsOn(templateDependencies)
-  .enablePlugins(BuildInfoPlugin)
-  .settings(commonSettings)
+  .settings(dockerSettings)
   .settings(Revolver.settings)
   .settings(buildInfoSettings)
   .settings(fatJarSettings)
   .enablePlugins(DockerPlugin)
   .enablePlugins(JavaServerAppPackaging)
   .enablePlugins(SbtTwirl)
-  .settings(dockerSettings)
+  .enablePlugins(BuildInfoPlugin)
+  .dependsOn(templateDependencies)
 
 lazy val ui = (project in file(uiProjectName))
   .settings(commonSettings)
   .settings(Test / test := (Test / test).dependsOn(yarnTask.toTask(" lint:check")).dependsOn(yarnTask.toTask(" test")).value)
   .settings(cleanFiles += baseDirectory.value / "build")
-
-val scala3Version = "3.2.0"
-val plokhotnyukJsoniterVersion = "2.17.6"
-val zioTestVersion = "2.0.0"
 
 lazy val templateDependencies: Project = project
   .settings(

@@ -6,24 +6,21 @@ import com.softwaremill.adopttapir.starter.{Builder, ScalaVersion, StarterDetail
 import com.softwaremill.adopttapir.template.scala.{EndpointsSpecView, EndpointsView, Import, MainView}
 import com.softwaremill.adopttapir.version.TemplateDependencyInfo
 
-case class GeneratedFile(
+final case class GeneratedFile(
     relativePath: String,
     content: String
 )
 
-class ProjectGenerator {
-  def generate(starterDetails: StarterDetails): List[GeneratedFile] = {
-    starterDetails.builder match {
+object ProjectGenerator:
+  def generate(starterDetails: StarterDetails): List[GeneratedFile] =
+    starterDetails.builder match
       case Builder.Sbt      => SbtProjectTemplate.generate(starterDetails)
       case Builder.ScalaCli => ScalaCliProjectTemplate.generate(starterDetails)
-    }
-  }
-}
 
 /** Twirl library was chosen for templating. Due to limitations in Twirl, some of arguments are passed as [[String]].<br> More advanced
   * rendering is done by dedicated objects `*View` e.g. @see [[EndpointsView]] or @[[MainView]].
   */
-abstract class ProjectTemplate {
+abstract class ProjectTemplate:
 
   import CommonObjectTemplate.StarterDetailsWithLegalizedGroupId
 
@@ -86,7 +83,7 @@ abstract class ProjectTemplate {
     val booksServerStub = EndpointsSpecView.getBookServerStub(starterDetails)
 
     val fileContent =
-      if (starterDetails.serverEffect == ZIOEffect) {
+      if starterDetails.serverEffect == ZIOEffect then {
         txt
           .EndpointsSpecZIO(
             starterDetails,
@@ -123,9 +120,10 @@ abstract class ProjectTemplate {
     prefixDir + "/" + groupId.split('.').mkString("/") + "/" + fileName
 
   private def toSortedList(set: Set[Import]): List[Import] = set.toList.sortBy(_.fullName)
-}
 
-object SbtProjectTemplate extends ProjectTemplate {
+end ProjectTemplate
+
+object SbtProjectTemplate extends ProjectTemplate:
   override def generate(starterDetails: StarterDetails): List[GeneratedFile] =
     super.generate(starterDetails) ::: List(getBuildSbt(starterDetails), buildProperties, pluginsSbt, sbtx, readme, gitignore)
 
@@ -161,9 +159,10 @@ object SbtProjectTemplate extends ProjectTemplate {
 
   private lazy val gitignore: GeneratedFile =
     GeneratedFile(".gitignore", txt.gitignore(List(".bloop", "target", "metals.sbt", "project/project")).toString())
-}
 
-object CommonObjectTemplate {
+end SbtProjectTemplate
+
+object CommonObjectTemplate:
   def templateResource(fileName: String): String = Resource.getAsString(s"template/$fileName")
 
   val scalafmtConfigPath = ".scalafmt.conf"
@@ -178,7 +177,7 @@ object CommonObjectTemplate {
     def legalize(packageNameSection: String): String = {
       val startsWithNumberRgx = "^\\d+.*$"
 
-      if (packageNameSection.matches(startsWithNumberRgx)) {
+      if packageNameSection.matches(startsWithNumberRgx) then {
         "_" + packageNameSection
       } else {
         packageNameSection
@@ -189,9 +188,10 @@ object CommonObjectTemplate {
 
     legalizeGroupId(starterDetails.groupId)
   }
-}
 
-private object ScalaCliProjectTemplate extends ProjectTemplate {
+end CommonObjectTemplate
+
+private object ScalaCliProjectTemplate extends ProjectTemplate:
   override def generate(starterDetails: StarterDetails): List[GeneratedFile] =
     super.generate(starterDetails) ::: List(getBuildScalaCli(starterDetails), getTestScalaCli(starterDetails), readme, gitignore)
 
@@ -216,4 +216,5 @@ private object ScalaCliProjectTemplate extends ProjectTemplate {
     GeneratedFile(CommonObjectTemplate.readMePath, CommonObjectTemplate.templateResource("README_scala-cli.md"))
 
   private lazy val gitignore: GeneratedFile = GeneratedFile(".gitignore", txt.gitignore(List(".bsp/", ".scala-build/")).toString())
-}
+
+end ScalaCliProjectTemplate

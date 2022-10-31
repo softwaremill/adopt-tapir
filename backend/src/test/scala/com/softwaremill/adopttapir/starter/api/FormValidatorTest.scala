@@ -9,7 +9,7 @@ import com.softwaremill.adopttapir.starter.api.StarterRequestGenerators.randomSt
 import com.softwaremill.adopttapir.starter.{Builder, ServerEffect, ServerImplementation, StarterDetails}
 import com.softwaremill.adopttapir.test.BaseTest
 
-class FormValidatorTest extends BaseTest {
+class FormValidatorTest extends BaseTest:
 
   "FormValidator" should "raise a problem with project name" in {
     // given
@@ -137,4 +137,3 @@ class FormValidatorTest extends BaseTest {
       ScalaVersionRequest.Scala2,
       BuilderRequest.Sbt
     )
-}

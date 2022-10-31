@@ -3,13 +3,12 @@ package com.softwaremill.adopttapir.template.scala
 import com.softwaremill.adopttapir.starter.{JsonImplementation, ScalaVersion, ServerEffect, StarterDetails}
 import com.softwaremill.adopttapir.template.scala.EndpointsView.Constants.{booksListingServerEndpoint, helloServerEndpoint}
 
-object EndpointsSpecView {
+object EndpointsSpecView:
 
-  def getHelloServerStub(starterDetails: StarterDetails): Code = {
+  def getHelloServerStub(starterDetails: StarterDetails): Code =
     Stub.prepareBackendStub(helloServerEndpoint, starterDetails.serverEffect)
-  }
 
-  def getBookServerStub(starterDetails: StarterDetails): Code = {
+  def getBookServerStub(starterDetails: StarterDetails): Code =
 
     val stubBooks = Stub
       .prepareBackendStub(booksListingServerEndpoint, starterDetails.serverEffect)
@@ -29,10 +28,9 @@ object EndpointsSpecView {
       case JsonImplementation.Jsoniter => stubBooks.addImports(Set(Import("sttp.client3.jsoniter._"), Import("Library._")))
       case JsonImplementation.ZIOJson  => stubBooks.addImports(Set(Import("sttp.client3.ziojson._"), Import("Library._")))
     }
-  }
 
-  object Stub {
-    def prepareBackendStub(endpoint: String, serverEffect: ServerEffect): Code = {
+  object Stub:
+    def prepareBackendStub(endpoint: String, serverEffect: ServerEffect): Code =
       val stub = serverEffect match {
         case ServerEffect.FutureEffect => "SttpBackendStub.asynchronousFuture"
         case ServerEffect.IOEffect     => "SttpBackendStub(new CatsMonadError[IO]())"
@@ -64,11 +62,9 @@ object EndpointsSpecView {
       }
 
       Code(body, imports)
-    }
-  }
 
-  object Unwrapper {
-    def prepareUnwrapper(effect: ServerEffect, scalaVersion: ScalaVersion): Code = {
+  object Unwrapper:
+    def prepareUnwrapper(effect: ServerEffect, scalaVersion: ScalaVersion): Code =
       def prepareBody(kind: String, unwrapFn: String): String = {
         case class ExtensionMethodVersion(prefix: String, codeBlockStart: String, codeBlockEnd: String)
         val scala2Extension = ExtensionMethodVersion("implicit class Unwrapper", " {", "}")
@@ -100,6 +96,3 @@ object EndpointsSpecView {
         case ServerEffect.ZIOEffect =>
           Code(prepareBody("ZIO[Any, Throwable, T]", "zio.Runtime.default.unsafeRun(t)"), Set(Import("zio.ZIO")))
       }
-    }
-  }
-}

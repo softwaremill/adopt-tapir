@@ -6,13 +6,13 @@ import com.softwaremill.adopttapir.starter.StarterDetails
 import java.io.{PrintWriter, StringWriter}
 import scala.util.Using
 
-object ShowHelpers {
-  implicit lazy val detailsShow = Show.show[StarterDetails](details =>
+object ShowHelpers:
+  implicit lazy val detailsShow: Show[StarterDetails] = Show.show[StarterDetails](details =>
     s"${details.serverEffect}/${details.serverImplementation}/docs=${details.addDocumentation}/metrics=${details.addMetrics}" +
       s"/json=${details.jsonImplementation}/scalaVersion=${details.scalaVersion}/builder=${details.builder}"
   )
 
-  implicit lazy val throwableShow = Show.show[Throwable](e =>
+  implicit lazy val throwableShow: Show[Throwable] = Show.show[Throwable](e =>
     Using.Manager { use =>
       val sw = use(new StringWriter())
       val pw = use(new PrintWriter(sw))
@@ -20,4 +20,3 @@ object ShowHelpers {
       sw.toString
     }.get
   )
-}

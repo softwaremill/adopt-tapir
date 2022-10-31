@@ -1,12 +1,12 @@
 package com.softwaremill.adopttapir.template.scala
 
 import com.softwaremill.adopttapir.starter.ServerEffect.{FutureEffect, IOEffect, ZIOEffect}
-import com.softwaremill.adopttapir.starter.ServerImplementation._
+import com.softwaremill.adopttapir.starter.ServerImplementation.*
 import com.softwaremill.adopttapir.starter.{ScalaVersion, StarterDetails}
 
-object MainView {
+object MainView:
 
-  def getProperMainContent(starterDetails: StarterDetails): String = {
+  def getProperMainContent(starterDetails: StarterDetails): String =
     starterDetails.scalaVersion match {
       case ScalaVersion.Scala2 =>
         starterDetails match {
@@ -36,8 +36,4 @@ object MainView {
             txt.MainZIOhttpZIOScala3(groupId, addDocumentation, addMetrics).toString()
           case _ => throw new UnsupportedOperationException(s"$starterDetails not supported")
         }
-
     }
-
-  }
-}

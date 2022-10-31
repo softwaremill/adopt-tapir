@@ -7,13 +7,12 @@ import com.softwaremill.adopttapir.starter.formatting.GeneratedFilesFormatter
 import com.softwaremill.adopttapir.template.ProjectGenerator
 
 @deprecated("Only for development purpose")
-object FileOperation extends IOApp {
+object FileOperation extends IOApp:
 
-  val service: StarterService = {
+  val service: StarterService =
     val cfg = Config.read.storageConfig.copy(deleteTempFolder = false)
-    val fm = new FilesManager(cfg)
-    new StarterService(new ProjectGenerator(), fm, new GeneratedFilesFormatter(fm))
-  }
+    val fm = FilesManager(cfg)
+    new StarterService(GeneratedFilesFormatter(fm), fm)
 
   override def run(args: List[String]): IO[ExitCode] = {
     val details = StarterDetails(
@@ -28,7 +27,7 @@ object FileOperation extends IOApp {
       Builder.ScalaCli
     )
 
-    for {
+    for
       file <- service.generateZipFile(details)
       _ <- IO.println {
         val str = file.toString
@@ -37,6 +36,5 @@ object FileOperation extends IOApp {
           "Zipped file: " + str
       }
       exitCode <- IO(ExitCode.Success)
-    } yield exitCode
+    yield exitCode
   }
-}
