@@ -20,7 +20,10 @@ case class StarterRequest(
       Encoder.AsObject,
       Schema
 
-/** We use JsonTaggedAdt to serialize starter request enums in a pure, tags-constant only way.
+/** Here I deviate from default circe marshallers to a specialized JsonTaggedAdt to serialize enums in a tags-constant only way. The reason
+  * for the switch is that with circe-core 0.14 I was not able to customize the derivation in any elegant way, not to mention any match with
+  * JsonTaggedAdt one liners. But if this improves with higher versions of circe, it would be advisable to fall back to circe in order to
+  * reduce dependencies.
   */
 enum EffectRequest(val toModel: ServerEffect) derives JsonTaggedAdt.PureEncoder, JsonTaggedAdt.PureDecoder, Schema:
   case FutureEffect extends EffectRequest(ServerEffect.FutureEffect)
