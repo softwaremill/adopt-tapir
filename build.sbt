@@ -9,11 +9,10 @@ import sbtbuildinfo.{BuildInfoKey, BuildInfoOption}
 import scala.sys.process.Process
 import scala.util.Try
 
-
 val scala2Version = "2.13.10"
 val scala3Version = "3.2.0"
 
-val tapirVersion = "1.1.3"
+val tapirVersion = "1.1.4"
 
 val http4sBlazeServerVersion = "0.23.12"
 val http4sCirceVersion = "0.23.16"
@@ -119,7 +118,7 @@ lazy val commonSettings =
         streams.value.log("Running yarn task: " + taskName)
         haltOnCmdResultError(runYarnTask())
       }
-)
+    )
 
 lazy val buildInfoSettings = Seq(
   buildInfoKeys := Seq[BuildInfoKey](
