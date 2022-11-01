@@ -9,7 +9,6 @@ import sbtbuildinfo.{BuildInfoKey, BuildInfoOption}
 import scala.sys.process.Process
 import scala.util.Try
 
-
 val scala2Version = "2.13.10"
 val scala3Version = "3.2.0"
 
@@ -62,7 +61,7 @@ val loggingDependencies = Seq(
 
 val fileDependencies = Seq(
   "com.github.pathikrit" %% "better-files" % "3.9.1" cross CrossVersion.for3Use2_13,
-  "org.apache.commons" % "commons-compress" % "1.21"
+  "org.apache.commons" % "commons-compress" % "1.22"
 )
 
 val configDependencies = Seq(
@@ -119,7 +118,7 @@ lazy val commonSettings =
         streams.value.log("Running yarn task: " + taskName)
         haltOnCmdResultError(runYarnTask())
       }
-)
+    )
 
 lazy val buildInfoSettings = Seq(
   buildInfoKeys := Seq[BuildInfoKey](
