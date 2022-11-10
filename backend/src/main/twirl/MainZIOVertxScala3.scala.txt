@@ -1,0 +1,6 @@
+@(groupId: String, addDocumentation: Boolean, addMetrics: Boolean)
+package @groupId
+
+// TODO: template
+
+

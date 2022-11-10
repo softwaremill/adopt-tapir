@@ -34,6 +34,7 @@ enum ServerImplementationRequest(val toModel: ServerImplementation) derives Json
   case Netty extends ServerImplementationRequest(ServerImplementation.Netty)
   case Http4s extends ServerImplementationRequest(ServerImplementation.Http4s)
   case ZIOHttp extends ServerImplementationRequest(ServerImplementation.ZIOHttp)
+  case Vertx extends ServerImplementationRequest(ServerImplementation.Vertx)
 
 enum JsonImplementationRequest(val toModel: JsonImplementation) derives JsonTaggedAdt.PureEncoder, JsonTaggedAdt.PureDecoder, Schema:
   case No extends JsonImplementationRequest(JsonImplementation.WithoutJson)

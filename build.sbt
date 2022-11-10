@@ -264,7 +264,10 @@ lazy val templateDependencies: Project = project
       "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % tapirVersion % Provided,
       "org.http4s" %% "http4s-blaze-server" % http4sBlazeServerVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-http4s-server-zio" % tapirVersion % Provided,
-      "com.softwaremill.sttp.tapir" %% "tapir-zio-http-server" % tapirVersion % Provided
+      "com.softwaremill.sttp.tapir" %% "tapir-zio-http-server" % tapirVersion % Provided,
+      "com.softwaremill.sttp.tapir" %% "tapir-vertx-server" % tapirVersion % Provided,
+      "com.softwaremill.sttp.tapir" %% "tapir-vertx-server-cats" % tapirVersion % Provided,
+      "com.softwaremill.sttp.tapir" %% "tapir-vertx-server-zio" % tapirVersion % Provided
     ),
     buildInfoKeys := Seq[BuildInfoKey](
       "scala2Version" -> scala2Version,
