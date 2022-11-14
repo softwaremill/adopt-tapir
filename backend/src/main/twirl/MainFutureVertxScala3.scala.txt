@@ -1,4 +1,45 @@
 @(groupId: String, addDocumentation: Boolean, addMetrics: Boolean)
 package @groupId
 
-// TODO: template
+import io.vertx.core.Vertx
+import io.vertx.ext.web.Router
+import sttp.tapir.server.vertx.@if(addMetrics){{VertxFutureServerInterpreter, VertxFutureServerOptions}}else{VertxFutureServerInterpreter}
+import sttp.tapir.server.vertx.VertxFutureServerInterpreter.VertxFutureToScalaFuture
+
+import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.duration.Duration
+import ExecutionContext.Implicits.global
+import scala.io.StdIn
+
+object Main {
+  def main(args: Array[String]): Unit = {
+    @if(addMetrics) {
+    val serverOptions = VertxFutureServerOptions.customiseInterceptors
+      .metricsInterceptor(Endpoints.prometheusMetrics.metricsInterceptor())
+      .options
+    }
+    val port = sys.env.get("http.port").map(_.toInt).getOrElse(8080)
+
+    val vertx = Vertx.vertx()
+    val server = vertx.createHttpServer()
+    val router = Router.router(vertx)
+
+    Endpoints.all
+      .foreach(endpoint => {
+        VertxFutureServerInterpreter(@if(addMetrics) {serverOptions}).route(endpoint)
+          .apply(router) // your endpoint is now attached to the router, and the route has been created
+      })
+
+    val program = for {
+      binding <- server.requestHandler(router).listen(port).asScala
+      _ <- Future {
+        println(s"@if(addDocumentation){Go to http://localhost:${port}/docs to open SwaggerUI. }else{Server started at http://localhost:${port}. }Press ENTER key to exit.")
+        StdIn.readLine()
+      }
+      stop <- binding.close().asScala
+    } yield stop
+
+    Await.result(program, Duration.Inf)
+  }
+}
+
