@@ -55,7 +55,7 @@ export const EFFECT_IMPLEMENTATIONS_OPTIONS: FormSelectOption<EffectImplementati
     value: EffectImplementation.ZIOHttp,
   },
   {
-    label: 'Vertx',
+    label: 'Vert.X',
     value: EffectImplementation.Vertx,
   },
 ];
