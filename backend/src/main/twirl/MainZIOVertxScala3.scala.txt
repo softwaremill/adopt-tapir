@@ -1,6 +1,44 @@
 @(groupId: String, addDocumentation: Boolean, addMetrics: Boolean)
 package @groupId
 
-// TODO: template
+import io.vertx.core.Vertx
+import io.vertx.ext.web.Router
+import sttp.tapir.server.vertx.zio.@if(addMetrics){{VertxZioServerInterpreter, VertxZioServerOptions}}else{VertxZioServerInterpreter}
+import sttp.tapir.server.vertx.zio.VertxZioServerInterpreter.VertxFutureToRIO
+import zio.{Console, Scope, ZIO, ZIOAppArgs, ZIOAppDefault}
 
 
+object Main extends ZIOAppDefault {
+  override implicit val runtime: zio.Runtime[Any] = zio.Runtime.default
+
+  override def run: ZIO[Any with ZIOAppArgs with Scope, Any, Any] = {
+
+    val port = sys.env.get("http.port").map(_.toInt).getOrElse(8080)
+    val vertx = Vertx.vertx()
+    val server = vertx.createHttpServer()
+    val router = Router.router(vertx)
+
+    (for {
+      serverStart <- ZIO
+        .attempt {
+          @if(addMetrics) {
+          val serverOptions = VertxZioServerOptions
+            .customiseInterceptors
+            .metricsInterceptor(Endpoints.prometheusMetrics.metricsInterceptor())
+            .options
+          }
+          Endpoints.all
+            .foreach(endpoint => {
+              VertxZioServerInterpreter(@if(addMetrics) {serverOptions})
+                .route(endpoint)
+                .apply(router)
+            })
+          server.requestHandler(router).listen(port)
+        }
+        .flatMap(_.asRIO)
+      _ <- Console.printLine(s"@if(addDocumentation){Go to http://localhost:${port}/docs to open SwaggerUI. }else{Server started at http://localhost:${port}. }Press ENTER key to exit.")
+      _ <- Console.readLine
+    } yield serverStart)
+      .exitCode
+  }
+}
