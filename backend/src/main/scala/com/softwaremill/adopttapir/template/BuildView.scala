@@ -131,7 +131,8 @@ abstract class BuildView:
     )
 
     def ioVertex(): List[ScalaDependency] = List(
-      ScalaDependency("com.softwaremill.sttp.tapir", "tapir-vertx-server-cats", getTapirVersion())
+      ScalaDependency("com.softwaremill.sttp.tapir", "tapir-vertx-server-cats", getTapirVersion()),
+      ScalaDependency("com.softwaremill.sttp.tapir", "tapir-cats", getTapirVersion())
     )
     
     def ZIOVertex(): List[ScalaDependency] = List(
