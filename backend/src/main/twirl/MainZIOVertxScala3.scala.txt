@@ -34,9 +34,8 @@ object Main extends ZIOAppDefault {
                 .apply(router)
             })
           server.requestHandler(router).listen(port)
-        }
-        .flatMap(_.asRIO)
-      _ <- Console.printLine(s"@if(addDocumentation){Go to http://localhost:${port}/docs to open SwaggerUI. }else{Server started at http://localhost:${port}. }Press ENTER key to exit.")
+        }.flatMap(_.asRIO)
+      _ <- Console.printLine(s"@if(addDocumentation){Go to http://localhost:${serverStart.actualPort()}/docs to open SwaggerUI. }else{Server started at http://localhost:${serverStart.actualPort()}. }Press ENTER key to exit.")
       _ <- Console.readLine
     } yield serverStart)
       .exitCode
