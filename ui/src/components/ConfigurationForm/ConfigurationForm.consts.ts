@@ -56,7 +56,7 @@ export const EFFECT_IMPLEMENTATIONS_OPTIONS: FormSelectOption<EffectImplementati
   },
   {
     label: 'Vert.X',
-    value: EffectImplementation.Vertx,
+    value: EffectImplementation.VertX,
   },
 ];
 

@@ -1,7 +1,7 @@
 package com.softwaremill.adopttapir.template
 
 import com.softwaremill.adopttapir.starter.ServerEffect.{FutureEffect, IOEffect, ZIOEffect}
-import com.softwaremill.adopttapir.starter.ServerImplementation.{Http4s, Netty, ZIOHttp, Vertx}
+import com.softwaremill.adopttapir.starter.ServerImplementation.{Http4s, Netty, ZIOHttp, VertX}
 import com.softwaremill.adopttapir.starter.{JsonImplementation, ServerEffect, StarterDetails}
 import Dependency.{JavaDependency, ScalaDependency, ScalaTestDependency, constantTapirVersion}
 import com.softwaremill.adopttapir.version.TemplateDependencyInfo
@@ -93,13 +93,13 @@ abstract class BuildView:
   private def getHttpDependencies(starterDetails: StarterDetails): List[Dependency] =
     starterDetails match {
       case StarterDetails(_, _, FutureEffect, Netty, _, _, _, _, _) => HttpDependencies.netty()
-      case StarterDetails(_, _, FutureEffect, Vertx, _, _, _, _, _) => HttpDependencies.vertx()
+      case StarterDetails(_, _, FutureEffect, VertX, _, _, _, _, _) => HttpDependencies.vertX()
       case StarterDetails(_, _, IOEffect, Http4s, _, _, _, _, _)    => HttpDependencies.http4s()
       case StarterDetails(_, _, IOEffect, Netty, _, _, _, _, _)     => HttpDependencies.ioNetty()
-      case StarterDetails(_, _, IOEffect, Vertx, _, _, _, _, _)     => HttpDependencies.ioVertex()
+      case StarterDetails(_, _, IOEffect, VertX, _, _, _, _, _)     => HttpDependencies.ioVerteX()
       case StarterDetails(_, _, ZIOEffect, Http4s, _, _, _, _, _)   => HttpDependencies.http4sZIO()
       case StarterDetails(_, _, ZIOEffect, ZIOHttp, _, _, _, _, _)  => HttpDependencies.ZIOHttp()
-      case StarterDetails(_, _, ZIOEffect, Vertx, _, _, _, _, _)  => HttpDependencies.ZIOVertex()
+      case StarterDetails(_, _, ZIOEffect, VertX, _, _, _, _, _)  => HttpDependencies.ZIOVerteX()
       case other: StarterDetails => throw new UnsupportedOperationException(s"Cannot pick dependencies for $other")
     }
 
@@ -126,16 +126,16 @@ abstract class BuildView:
       ScalaDependency("com.softwaremill.sttp.tapir", "tapir-zio-http-server", getTapirVersion())
     )
 
-    def vertx(): List[ScalaDependency] = List(
+    def vertX(): List[ScalaDependency] = List(
       ScalaDependency("com.softwaremill.sttp.tapir", "tapir-vertx-server", getTapirVersion())
     )
 
-    def ioVertex(): List[ScalaDependency] = List(
+    def ioVerteX(): List[ScalaDependency] = List(
       ScalaDependency("com.softwaremill.sttp.tapir", "tapir-vertx-server-cats", getTapirVersion()),
       ScalaDependency("com.softwaremill.sttp.tapir", "tapir-cats", getTapirVersion())
     )
-    
-    def ZIOVertex(): List[ScalaDependency] = List(
+
+    def ZIOVerteX(): List[ScalaDependency] = List(
       ScalaDependency("com.softwaremill.sttp.tapir", "tapir-vertx-server-zio", getTapirVersion())
     )
 

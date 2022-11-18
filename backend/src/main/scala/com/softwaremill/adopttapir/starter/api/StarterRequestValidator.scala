@@ -7,7 +7,7 @@ import com.softwaremill.adopttapir.starter.StarterDetails
 import com.softwaremill.adopttapir.starter.api.EffectRequest.{FutureEffect, IOEffect, ZIOEffect}
 import com.softwaremill.adopttapir.starter.api.JsonImplementationRequest.ZIOJson
 import com.softwaremill.adopttapir.starter.api.RequestValidation.{GroupIdShouldFollowJavaPackageConvention, ProjectNameShouldMatchRegex}
-import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Http4s, Netty, ZIOHttp, Vertx}
+import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Http4s, Netty, ZIOHttp, VertX}
 
 sealed trait RequestValidation:
   def errMessage: String
@@ -96,15 +96,15 @@ sealed trait FormValidator:
   ): ValidatedNec[RequestValidation, (EffectRequest, ServerImplementationRequest)] =
     (effect, serverImplementation) match {
       case t @ (FutureEffect, Netty) => t.validNec
-      case t @ (FutureEffect, Vertx) => t.validNec
+      case t @ (FutureEffect, VertX) => t.validNec
       case (FutureEffect, _)         => RequestValidation.FutureEffectWillWorkOnlyWithNetty(effect, serverImplementation).invalidNec
       case t @ (IOEffect, Http4s)    => t.validNec
       case t @ (IOEffect, Netty)     => t.validNec
-      case t @ (IOEffect, Vertx)     => t.validNec
+      case t @ (IOEffect, VertX)     => t.validNec
       case (IOEffect, _)             => RequestValidation.IOEffectWillWorkOnlyWithHttp4sAndNetty(effect, serverImplementation).invalidNec
       case t @ (ZIOEffect, Http4s)   => t.validNec
       case t @ (ZIOEffect, ZIOHttp)  => t.validNec
-      case t @ (ZIOEffect, Vertx)  => t.validNec
+      case t @ (ZIOEffect, VertX)  => t.validNec
       case (ZIOEffect, _)            => RequestValidation.ZIOEffectWillWorkOnlyWithHttp4sAndZIOHttp(effect, serverImplementation).invalidNec
     }
 
@@ -114,7 +114,7 @@ sealed trait FormValidator:
       addMetrics: Boolean
   ): ValidatedNec[RequestValidation, Boolean] =
     (effect, serverImplementation, addMetrics) match {
-      case t @ (_, Http4s | ZIOHttp | Netty | Vertx, _) => t._3.validNec
+      case t @ (_, Http4s | ZIOHttp | Netty | VertX, _) => t._3.validNec
     }
 
   private def validateEffectWithJson(

@@ -10,28 +10,28 @@ import type { FormRadioOption } from '../../FormRadioGroup';
 describe('configuration form helpers', () => {
   describe('.getAvailableEffectImplementations()', () => {
     const cases: [EffectType, ScalaVersion, EffectImplementation[]][] = [
-      [EffectType.Future, ScalaVersion.Scala2, [EffectImplementation.Netty, EffectImplementation.Vertx]],
+      [EffectType.Future, ScalaVersion.Scala2, [EffectImplementation.Netty, EffectImplementation.VertX]],
       [
         EffectType.IO,
         ScalaVersion.Scala2,
-        [EffectImplementation.Http4s, EffectImplementation.Netty, EffectImplementation.Vertx],
+        [EffectImplementation.Http4s, EffectImplementation.Netty, EffectImplementation.VertX],
       ],
       [
         EffectType.ZIO,
         ScalaVersion.Scala2,
-        [EffectImplementation.Http4s, EffectImplementation.ZIOHttp, EffectImplementation.Vertx],
+        [EffectImplementation.Http4s, EffectImplementation.ZIOHttp, EffectImplementation.VertX],
       ],
 
-      [EffectType.Future, ScalaVersion.Scala3, [EffectImplementation.Netty, EffectImplementation.Vertx]],
+      [EffectType.Future, ScalaVersion.Scala3, [EffectImplementation.Netty, EffectImplementation.VertX]],
       [
         EffectType.IO,
         ScalaVersion.Scala3,
-        [EffectImplementation.Http4s, EffectImplementation.Netty, EffectImplementation.Vertx],
+        [EffectImplementation.Http4s, EffectImplementation.Netty, EffectImplementation.VertX],
       ],
       [
         EffectType.ZIO,
         ScalaVersion.Scala3,
-        [EffectImplementation.Http4s, EffectImplementation.ZIOHttp, EffectImplementation.Vertx],
+        [EffectImplementation.Http4s, EffectImplementation.ZIOHttp, EffectImplementation.VertX],
       ],
     ];
 
@@ -55,7 +55,7 @@ describe('configuration form helpers', () => {
           },
           {
             label: 'Vert.X',
-            value: EffectImplementation.Vertx,
+            value: EffectImplementation.VertX,
           },
         ],
       ],
@@ -73,7 +73,7 @@ describe('configuration form helpers', () => {
           },
           {
             label: 'Vert.X',
-            value: EffectImplementation.Vertx,
+            value: EffectImplementation.VertX,
           },
         ],
       ],
@@ -91,7 +91,7 @@ describe('configuration form helpers', () => {
           },
           {
             label: 'Vert.X',
-            value: EffectImplementation.Vertx,
+            value: EffectImplementation.VertX,
           },
         ],
       ],
@@ -106,7 +106,7 @@ describe('configuration form helpers', () => {
           },
           {
             label: 'Vert.X',
-            value: EffectImplementation.Vertx,
+            value: EffectImplementation.VertX,
           },
         ],
       ],
@@ -124,7 +124,7 @@ describe('configuration form helpers', () => {
           },
           {
             label: 'Vert.X',
-            value: EffectImplementation.Vertx,
+            value: EffectImplementation.VertX,
           },
         ],
       ],
@@ -142,7 +142,7 @@ describe('configuration form helpers', () => {
           },
           {
             label: 'Vert.X',
-            value: EffectImplementation.Vertx,
+            value: EffectImplementation.VertX,
           },
         ],
       ],
