@@ -10,13 +10,29 @@ import type { FormRadioOption } from '../../FormRadioGroup';
 describe('configuration form helpers', () => {
   describe('.getAvailableEffectImplementations()', () => {
     const cases: [EffectType, ScalaVersion, EffectImplementation[]][] = [
-      [EffectType.Future, ScalaVersion.Scala2, [EffectImplementation.Netty]],
-      [EffectType.IO, ScalaVersion.Scala2, [EffectImplementation.Http4s, EffectImplementation.Netty]],
-      [EffectType.ZIO, ScalaVersion.Scala2, [EffectImplementation.Http4s, EffectImplementation.ZIOHttp]],
+      [EffectType.Future, ScalaVersion.Scala2, [EffectImplementation.Netty, EffectImplementation.VertX]],
+      [
+        EffectType.IO,
+        ScalaVersion.Scala2,
+        [EffectImplementation.Http4s, EffectImplementation.Netty, EffectImplementation.VertX],
+      ],
+      [
+        EffectType.ZIO,
+        ScalaVersion.Scala2,
+        [EffectImplementation.Http4s, EffectImplementation.ZIOHttp, EffectImplementation.VertX],
+      ],
 
-      [EffectType.Future, ScalaVersion.Scala3, [EffectImplementation.Netty]],
-      [EffectType.IO, ScalaVersion.Scala3, [EffectImplementation.Http4s, EffectImplementation.Netty]],
-      [EffectType.ZIO, ScalaVersion.Scala3, [EffectImplementation.Http4s, EffectImplementation.ZIOHttp]],
+      [EffectType.Future, ScalaVersion.Scala3, [EffectImplementation.Netty, EffectImplementation.VertX]],
+      [
+        EffectType.IO,
+        ScalaVersion.Scala3,
+        [EffectImplementation.Http4s, EffectImplementation.Netty, EffectImplementation.VertX],
+      ],
+      [
+        EffectType.ZIO,
+        ScalaVersion.Scala3,
+        [EffectImplementation.Http4s, EffectImplementation.ZIOHttp, EffectImplementation.VertX],
+      ],
     ];
 
     test.each(cases)(
@@ -37,6 +53,10 @@ describe('configuration form helpers', () => {
             label: 'Netty',
             value: EffectImplementation.Netty,
           },
+          {
+            label: 'Vert.X',
+            value: EffectImplementation.VertX,
+          },
         ],
       ],
       [
@@ -51,6 +71,10 @@ describe('configuration form helpers', () => {
             label: 'Netty',
             value: EffectImplementation.Netty,
           },
+          {
+            label: 'Vert.X',
+            value: EffectImplementation.VertX,
+          },
         ],
       ],
       [
@@ -64,6 +88,10 @@ describe('configuration form helpers', () => {
           {
             label: 'ZIO Http',
             value: EffectImplementation.ZIOHttp,
+          },
+          {
+            label: 'Vert.X',
+            value: EffectImplementation.VertX,
           },
         ],
       ],
@@ -76,6 +104,10 @@ describe('configuration form helpers', () => {
             label: 'Netty',
             value: EffectImplementation.Netty,
           },
+          {
+            label: 'Vert.X',
+            value: EffectImplementation.VertX,
+          },
         ],
       ],
       [
@@ -90,6 +122,10 @@ describe('configuration form helpers', () => {
             label: 'Netty',
             value: EffectImplementation.Netty,
           },
+          {
+            label: 'Vert.X',
+            value: EffectImplementation.VertX,
+          },
         ],
       ],
       [
@@ -103,6 +139,10 @@ describe('configuration form helpers', () => {
           {
             label: 'ZIO Http',
             value: EffectImplementation.ZIOHttp,
+          },
+          {
+            label: 'Vert.X',
+            value: EffectImplementation.VertX,
           },
         ],
       ],

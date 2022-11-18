@@ -54,6 +54,10 @@ export const EFFECT_IMPLEMENTATIONS_OPTIONS: FormSelectOption<EffectImplementati
     label: 'ZIO Http',
     value: EffectImplementation.ZIOHttp,
   },
+  {
+    label: 'Vert.X',
+    value: EffectImplementation.VertX,
+  },
 ];
 
 export const ENDPOINTS_OPTIONS: FormRadioOption<boolean>[] = [

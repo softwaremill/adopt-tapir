@@ -8,9 +8,9 @@ import type { FormRadioOption } from '../FormRadioGroup';
  */
 
 const effectTypeImplementationMap: Record<EffectType, EffectImplementation[]> = {
-  [EffectType.Future]: [EffectImplementation.Netty],
-  [EffectType.IO]: [EffectImplementation.Http4s, EffectImplementation.Netty],
-  [EffectType.ZIO]: [EffectImplementation.Http4s, EffectImplementation.ZIOHttp],
+  [EffectType.Future]: [EffectImplementation.Netty, EffectImplementation.VertX],
+  [EffectType.IO]: [EffectImplementation.Http4s, EffectImplementation.Netty, EffectImplementation.VertX],
+  [EffectType.ZIO]: [EffectImplementation.Http4s, EffectImplementation.ZIOHttp, EffectImplementation.VertX],
 };
 
 const mapEffectTypeToEffectImplementation = (effectType: EffectType): EffectImplementation[] => {

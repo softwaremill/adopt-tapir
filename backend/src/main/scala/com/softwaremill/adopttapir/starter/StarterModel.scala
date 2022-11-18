@@ -19,7 +19,7 @@ final case class StarterDetails(
 )
 
 enum ServerImplementation:
-  case Netty, Http4s, ZIOHttp
+  case Netty, Http4s, ZIOHttp, VertX
 
 enum ServerEffect:
   case FutureEffect, IOEffect, ZIOEffect
