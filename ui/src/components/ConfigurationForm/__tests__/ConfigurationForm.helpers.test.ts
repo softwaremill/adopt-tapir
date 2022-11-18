@@ -11,12 +11,28 @@ describe('configuration form helpers', () => {
   describe('.getAvailableEffectImplementations()', () => {
     const cases: [EffectType, ScalaVersion, EffectImplementation[]][] = [
       [EffectType.Future, ScalaVersion.Scala2, [EffectImplementation.Netty, EffectImplementation.Vertx]],
-      [EffectType.IO, ScalaVersion.Scala2, [EffectImplementation.Http4s, EffectImplementation.Netty, EffectImplementation.Vertx]],
-      [EffectType.ZIO, ScalaVersion.Scala2, [EffectImplementation.Http4s, EffectImplementation.ZIOHttp, EffectImplementation.Vertx]],
+      [
+        EffectType.IO,
+        ScalaVersion.Scala2,
+        [EffectImplementation.Http4s, EffectImplementation.Netty, EffectImplementation.Vertx],
+      ],
+      [
+        EffectType.ZIO,
+        ScalaVersion.Scala2,
+        [EffectImplementation.Http4s, EffectImplementation.ZIOHttp, EffectImplementation.Vertx],
+      ],
 
       [EffectType.Future, ScalaVersion.Scala3, [EffectImplementation.Netty, EffectImplementation.Vertx]],
-      [EffectType.IO, ScalaVersion.Scala3, [EffectImplementation.Http4s, EffectImplementation.Netty, EffectImplementation.Vertx]],
-      [EffectType.ZIO, ScalaVersion.Scala3, [EffectImplementation.Http4s, EffectImplementation.ZIOHttp, EffectImplementation.Vertx]],
+      [
+        EffectType.IO,
+        ScalaVersion.Scala3,
+        [EffectImplementation.Http4s, EffectImplementation.Netty, EffectImplementation.Vertx],
+      ],
+      [
+        EffectType.ZIO,
+        ScalaVersion.Scala3,
+        [EffectImplementation.Http4s, EffectImplementation.ZIOHttp, EffectImplementation.Vertx],
+      ],
     ];
 
     test.each(cases)(

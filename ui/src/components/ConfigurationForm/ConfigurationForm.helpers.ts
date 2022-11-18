@@ -1,7 +1,7 @@
-import {EffectImplementation, EffectType, JSONImplementation} from 'api/starter';
-import {EFFECT_IMPLEMENTATIONS_OPTIONS, JSON_OUTPUT_OPTIONS} from './ConfigurationForm.consts';
-import type {FormSelectOption} from '../FormSelect';
-import type {FormRadioOption} from '../FormRadioGroup';
+import { EffectImplementation, EffectType, JSONImplementation } from 'api/starter';
+import { EFFECT_IMPLEMENTATIONS_OPTIONS, JSON_OUTPUT_OPTIONS } from './ConfigurationForm.consts';
+import type { FormSelectOption } from '../FormSelect';
+import type { FormRadioOption } from '../FormRadioGroup';
 
 /**
  * Effect type to effect implementation mapping
