@@ -28,7 +28,7 @@ object Main {
     Endpoints.all
       .foreach(endpoint => {
         VertxFutureServerInterpreter(@if(addMetrics) {serverOptions}).route(endpoint)
-          .apply(router) // your endpoint is now attached to the router, and the route has been created
+          .apply(router)
       })
 
     val program = for {
