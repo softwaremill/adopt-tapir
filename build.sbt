@@ -12,7 +12,7 @@ import scala.util.Try
 val scala2Version = "2.13.10"
 val scala3Version = "3.2.1"
 
-val tapirVersion = "1.2.2"
+val tapirVersion = "1.2.4"
 
 val http4sBlazeServerVersion = "0.23.13"
 val http4sCirceVersion = "0.23.16"
@@ -25,7 +25,7 @@ val scalaLoggingVersion = "3.9.5"
 val logbackClassicVersion = "1.4.5"
 val scalaTestVersion = "3.2.14"
 val plokhotnyukJsoniterVersion = "2.20.1"
-val zioTestVersion = "2.0.0"
+val zioTestVersion = "2.0.5"
 
 val httpDependencies = Seq(
   "org.http4s" %% "http4s-blaze-server" % http4sBlazeServerVersion,
