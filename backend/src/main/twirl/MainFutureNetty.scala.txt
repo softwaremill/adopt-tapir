@@ -15,7 +15,7 @@ object Main {
       .metricsInterceptor(Endpoints.prometheusMetrics.metricsInterceptor())
       .options
     }
-    val port = sys.env.get("http.port").map(_.toInt).getOrElse(8080)
+    val port = sys.env.get("HTTP_PORT").flatMap(_.toIntOption).getOrElse(8080)
     val program = for {
       binding <- NettyFutureServer(@if(addMetrics) {serverOptions}).port(port).addEndpoints(Endpoints.all).start()
       _ <- Future {
