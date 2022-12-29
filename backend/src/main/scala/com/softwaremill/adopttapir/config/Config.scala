@@ -2,6 +2,7 @@ package com.softwaremill.adopttapir.config
 
 import cats.effect.IO
 import com.softwaremill.adopttapir.http.HttpConfig
+import com.softwaremill.adopttapir.infrastructure.CorrelationId
 import com.softwaremill.adopttapir.logging.FLogging
 import com.softwaremill.adopttapir.starter.files.StorageConfig
 import com.softwaremill.adopttapir.version.BuildInfo
@@ -14,7 +15,7 @@ import scala.collection.immutable.TreeMap
 final case class Config(api: HttpConfig, storageConfig: StorageConfig) derives ConfigReader
 
 object Config extends FLogging:
-  private def log(config: Config): IO[Unit] =
+  private def log(config: Config)(using CorrelationId): IO[Unit] =
     val baseInfo = s"""
                       |Adopt-tapir configuration:
                       |-----------------------
@@ -31,7 +32,7 @@ object Config extends FLogging:
 
     logger.info(info)
 
-  def read: IO[Config] = for
+  def read(using CorrelationId): IO[Config] = for
     config <- IO(ConfigSource.default.loadOrThrow[Config])
     _ <- log(config)
   yield config

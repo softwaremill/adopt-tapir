@@ -2,6 +2,7 @@ package com.softwaremill.adopttapir.starter.formatting
 
 import cats.effect.{IO, Resource}
 import cats.effect.std.Dispatcher
+import com.softwaremill.adopttapir.infrastructure.CorrelationId
 import com.softwaremill.adopttapir.logging.FLogging
 import com.softwaremill.adopttapir.starter.files.FilesManager
 import com.softwaremill.adopttapir.starter.files.StorageConfig
@@ -11,7 +12,7 @@ import org.scalafmt.interfaces.{Scalafmt, ScalafmtReporter}
 import java.io.{OutputStreamWriter, PrintWriter}
 import java.nio.file.Path
 
-final case class GeneratedFilesFormatter private (filesManager: FilesManager, scalafmt: Scalafmt) extends FLogging:
+final case class GeneratedFilesFormatter private (filesManager: FilesManager, scalafmt: Scalafmt)(using CorrelationId) extends FLogging:
 
   private val ScalaFileExtensions = Set(".scala", ".sbt")
 
@@ -45,7 +46,7 @@ final case class GeneratedFilesFormatter private (filesManager: FilesManager, sc
 
 object GeneratedFilesFormatter extends FLogging:
 
-  private val scalafmtReporter: Resource[IO, ScalafmtReporter] =
+  private def scalafmtReporter(using CorrelationId): Resource[IO, ScalafmtReporter] =
     for dispatcher <- Dispatcher.parallel[IO]
     yield new ScalafmtReporter {
       override def error(file: Path, message: String): Unit = dispatcher.unsafeRunSync(logger.error(s"Error: $file: $message."))
@@ -62,7 +63,7 @@ object GeneratedFilesFormatter extends FLogging:
       override def downloadOutputStreamWriter(): OutputStreamWriter = OutputStreamWriter(System.out)
     }
 
-  private def initScalafmt = scalafmtReporter.flatMap(reporter =>
+  private def initScalafmt(using CorrelationId) = scalafmtReporter.flatMap(reporter =>
     Resource.make(
       IO.blocking(
         Scalafmt
@@ -72,5 +73,5 @@ object GeneratedFilesFormatter extends FLogging:
     )(s => IO(s.clear()))
   )
 
-  def create(filesManager: FilesManager): Resource[IO, GeneratedFilesFormatter] =
+  def create(filesManager: FilesManager)(using CorrelationId): Resource[IO, GeneratedFilesFormatter] =
     initScalafmt.map(GeneratedFilesFormatter(filesManager, _))

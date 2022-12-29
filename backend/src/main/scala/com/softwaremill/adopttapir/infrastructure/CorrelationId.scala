@@ -1,43 +1,38 @@
 package com.softwaremill.adopttapir.infrastructure
 
+import cats.effect.std.Random
 import cats.effect.{IO, IOLocal}
 import sttp.capabilities.Effect
 import sttp.client3.*
 import sttp.monad.MonadError
 import sttp.tapir.server.interceptor.{EndpointInterceptor, RequestHandler, RequestInterceptor, Responder}
+import cats.syntax.all.*
 
-import scala.util.Random
+final class CorrelationId private (localCid: IOLocal[Option[String]], random: Random[IO]):
 
-object CorrelationId:
-  private val localCid =
-    import cats.effect.unsafe.implicits.global
-    IOLocal(None: Option[String]).unsafeRunSync()
-
-  private val random = new Random()
-  private def generate(): String =
-    def randomUpperCaseChar() = (random.nextInt(91 - 65) + 65).toChar
-    def segment = (1 to 3).map(_ => randomUpperCaseChar()).mkString
-    s"$segment-$segment-$segment"
+  lazy val chars = 'A' to 'Z'
+  private def generate(): IO[String] =
+    def randomUpperCaseChar() = random.nextIntBounded(chars.size).map(chars.apply)
+    def segment = randomUpperCaseChar().replicateA(3).map(_.mkString)
+    segment.replicateA(3).map(_.mkString("-"))
 
   def get: IO[Option[String]] = localCid.get
   def set(v: Option[String]): IO[Unit] = localCid.set(v)
-  def setOrNew(v: Option[String]): IO[Unit] = localCid.set(Some(v.getOrElse(generate())))
+  def setOrNew(v: Option[String]): IO[Unit] = v.fold(generate())(_.pure[IO]).flatMap(cid => localCid.set(cid.some))
 
-// covariance improves type inference, see: https://groups.google.com/g/scala-language/c/dQEomVCH3CI
-trait CorrelationIdSource[+F[_]]:
-  def get: F[Option[String]]
-  def map[T](f: Option[String] => T): F[T]
+object CorrelationId:
 
-object CorrelationIdSource:
-  given CorrelationIdSource[IO] = new CorrelationIdSource[IO] {
-    override def get: IO[Option[String]] = CorrelationId.get
-    override def map[T](f: Option[String] => T): IO[T] = get.map(f)
-  }
+  def init: IO[CorrelationId] = for
+    random <- Random.scalaUtilRandom[IO]
+    local <- IOLocal[Option[String]](None)
+  yield CorrelationId(local, random)
 
-/** An sttp backend wrapper, which sets the current correlation id on all outgoing requests. */
-class SetCorrelationIdBackend[P](delegate: SttpBackend[IO, P]) extends SttpBackend[IO, P]:
+//** An sttp backend wrapper, which sets the current correlation id on all outgoing requests. */
+class SetCorrelationIdBackend[P](delegate: SttpBackend[IO, P])(using correlationId: CorrelationId) extends SttpBackend[IO, P]:
+  import CorrelationIdInterceptor.*
+
   override def send[T, R >: P with Effect[IO]](request: Request[T, R]): IO[Response[T]] =
-    CorrelationId.get
+    correlationId.get
       .map {
         case Some(cid) => request.header(CorrelationIdInterceptor.HeaderName, cid)
         case None      => request
@@ -49,14 +44,18 @@ class SetCorrelationIdBackend[P](delegate: SttpBackend[IO, P]) extends SttpBacke
   override def responseMonad: MonadError[IO] = delegate.responseMonad
 
 /** A tapir interceptor, which reads the correlation id from the headers; if it's absent, generates a new one. */
-object CorrelationIdInterceptor extends RequestInterceptor[IO]:
-  val HeaderName: String = "X-Correlation-ID"
+class CorrelationIdInterceptor private (using correlationId: CorrelationId) extends RequestInterceptor[IO]:
+  import CorrelationIdInterceptor.*
 
   override def apply[R, B](
       responder: Responder[IO, B],
       requestHandler: EndpointInterceptor[IO] => RequestHandler[IO, R, B]
   ): RequestHandler[IO, R, B] =
     RequestHandler.from { case (request, endpoints, monad) =>
-      val set = CorrelationId.setOrNew(request.header(HeaderName))
+      val set = correlationId.setOrNew(request.header(HeaderName))
       set >> requestHandler(EndpointInterceptor.noop)(request, endpoints)(monad)
     }
+
+object CorrelationIdInterceptor:
+  val HeaderName: String = "X-Correlation-ID"
+  def create(using c: CorrelationId) = CorrelationIdInterceptor()

@@ -2,6 +2,7 @@ package com.softwaremill.adopttapir.starter
 
 import cats.effect.{ExitCode, IO, IOApp, Resource}
 import com.softwaremill.adopttapir.config.Config
+import com.softwaremill.adopttapir.infrastructure.CorrelationId
 import com.softwaremill.adopttapir.metrics.Metrics
 import com.softwaremill.adopttapir.starter.files.FilesManager
 import com.softwaremill.adopttapir.starter.formatting.GeneratedFilesFormatter
@@ -11,6 +12,7 @@ import com.softwaremill.adopttapir.template.ProjectGenerator
 object FileOperation extends IOApp:
 
   val createService: Resource[IO, StarterService] = for {
+    given CorrelationId <- Resource.eval(CorrelationId.init)
     cfg <- Resource.eval(Config.read.map(_.storageConfig.copy(deleteTempFolder = false)))
     fm = FilesManager(cfg)
     given Metrics <- Resource.eval(Metrics.init())
