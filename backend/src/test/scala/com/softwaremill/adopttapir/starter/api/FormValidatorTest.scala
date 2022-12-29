@@ -52,13 +52,11 @@ class FormValidatorTest extends BaseTest:
 
   it should "raise a problem when effect will not match implementation" in {
     FormValidator.validate(randomStarterRequest(FutureEffect, ZIOHttp)).left.value.msg should
-      include("Picked FutureEffect with ZIOHttp - Future effect will work only with Netty")
+      include("Picked FutureEffect with ZIOHttp - Future effect will work only with: Netty, Vert.X")
     FormValidator.validate(randomStarterRequest(FutureEffect, Http4s)).left.value.msg should
-      include("Picked FutureEffect with Http4s - Future effect will work only with Netty")
+      include("Picked FutureEffect with Http4s - Future effect will work only with: Netty, Vert.X")
     FormValidator.validate(randomStarterRequest(IOEffect, ZIOHttp)).left.value.msg should
-      include("Picked IOEffect with ZIOHttp - IO effect will work only with Http4 and Netty")
-    FormValidator.validate(randomStarterRequest(ZIOEffect, Netty)).left.value.msg should
-      include("Picked ZIOEffect with Netty - ZIO effect will work only with Http4s and ZIOHttp")
+      include("Picked IOEffect with ZIOHttp - IO effect will work only with: Netty, Vert.X, Http4s")
   }
 
   it should "not raise a problem with Effect and Implementation" in {

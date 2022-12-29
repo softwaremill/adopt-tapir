@@ -18,11 +18,24 @@ final case class StarterDetails(
     builder: Builder
 )
 
-enum ServerImplementation:
-  case Netty, Http4s, ZIOHttp, VertX
+object ServerEffectAndImplementation {
+  def unapply(starterDetails: StarterDetails): (ServerEffect, ServerImplementation) =
+    starterDetails match {
+      case StarterDetails(_, _, serverEffect, serverImplementation, _, _, _, _, _) =>
+        (serverEffect, serverImplementation)
+    }
+}
 
-enum ServerEffect:
-  case FutureEffect, IOEffect, ZIOEffect
+enum ServerImplementation(val name: String):
+  case Netty extends ServerImplementation("Netty")
+  case Http4s extends ServerImplementation("Http4s")
+  case ZIOHttp extends ServerImplementation("ZIO Http")
+  case VertX extends ServerImplementation("Vert.X")
+
+enum ServerEffect(val name: String):
+  case FutureEffect extends ServerEffect("Future")
+  case IOEffect extends ServerEffect("IO")
+  case ZIOEffect extends ServerEffect("ZIO")
 
 enum JsonImplementation:
   case WithoutJson, Circe, UPickle, Jsoniter, ZIOJson
