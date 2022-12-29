@@ -1,0 +1,38 @@
+@(groupId: String, addDocumentation: Boolean, addMetrics: Boolean)
+package @groupId
+
+import zio.{Console, Scope, ZIO, ZIOAppArgs, ZIOAppDefault}
+import sttp.tapir.server.netty.zio.NettyZioServer
+import sttp.tapir.server.netty.zio.NettyZioServerOptions
+import sttp.tapir.server.netty.NettyOptions
+import zio.ExitCode
+
+object Main extends ZIOAppDefault {
+  override implicit val runtime: zio.Runtime[Any] = zio.Runtime.default
+
+  override def run: ZIO[Any with ZIOAppArgs with Scope, Any, Any] = {
+
+    val port = sys.env.get("HTTP_PORT").flatMap(_.toIntOption).getOrElse(8080)
+
+    @if(addMetrics){
+    val options = NettyZioServerOptions
+    .customiseInterceptors[Any]
+    .metricsInterceptor(Endpoints.prometheusMetrics.metricsInterceptor())
+    .options
+    .nettyOptions(NettyOptions.default.port(port))
+    } else {
+    val options = NettyZioServerOptions
+    .default[Any]
+    .nettyOptions(NettyOptions.default.port(port))
+    }
+
+    val server = NettyZioServer(options)
+
+    for {
+      bind <- server.addEndpoints(Endpoints.all).start()
+      _ <- Console.printLine(s"@if(addDocumentation){Go to http://localhost:${bind.port}/docs to open SwaggerUI. }else{Server started at http://localhost:${bind.port}. }Press ENTER key to exit.")
+      _ <- Console.readLine
+      _ <- bind.stop()
+    } yield ExitCode.success
+  }
+}

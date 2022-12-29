@@ -5,6 +5,7 @@ import com.softwaremill.adopttapir.starter.ServerImplementation.{Http4s, Netty, 
 import com.softwaremill.adopttapir.starter.{JsonImplementation, ServerEffect, StarterDetails}
 import Dependency.{JavaDependency, ScalaDependency, ScalaTestDependency, constantTapirVersion}
 import com.softwaremill.adopttapir.version.TemplateDependencyInfo
+import com.softwaremill.adopttapir.starter.ServerEffectAndImplementation
 
 abstract class BuildView:
   def getAllDependencies(starterDetails: StarterDetails): List[Dependency] =
@@ -92,14 +93,15 @@ abstract class BuildView:
 
   private def getHttpDependencies(starterDetails: StarterDetails): List[Dependency] =
     starterDetails match {
-      case StarterDetails(_, _, FutureEffect, Netty, _, _, _, _, _) => HttpDependencies.netty()
-      case StarterDetails(_, _, FutureEffect, VertX, _, _, _, _, _) => HttpDependencies.vertX()
-      case StarterDetails(_, _, IOEffect, Http4s, _, _, _, _, _)    => HttpDependencies.http4s()
-      case StarterDetails(_, _, IOEffect, Netty, _, _, _, _, _)     => HttpDependencies.ioNetty()
-      case StarterDetails(_, _, IOEffect, VertX, _, _, _, _, _)     => HttpDependencies.ioVerteX()
-      case StarterDetails(_, _, ZIOEffect, Http4s, _, _, _, _, _)   => HttpDependencies.http4sZIO()
-      case StarterDetails(_, _, ZIOEffect, ZIOHttp, _, _, _, _, _)  => HttpDependencies.ZIOHttp()
-      case StarterDetails(_, _, ZIOEffect, VertX, _, _, _, _, _)  => HttpDependencies.ZIOVerteX()
+      case ServerEffectAndImplementation(FutureEffect, Netty) => HttpDependencies.netty()
+      case ServerEffectAndImplementation(FutureEffect, VertX) => HttpDependencies.vertX()
+      case ServerEffectAndImplementation(IOEffect, Http4s)    => HttpDependencies.http4s()
+      case ServerEffectAndImplementation(IOEffect, Netty)     => HttpDependencies.ioNetty()
+      case ServerEffectAndImplementation(IOEffect, VertX)     => HttpDependencies.ioVerteX()
+      case ServerEffectAndImplementation(ZIOEffect, Http4s)   => HttpDependencies.http4sZIO()
+      case ServerEffectAndImplementation(ZIOEffect, ZIOHttp)  => HttpDependencies.ZIOHttp()
+      case ServerEffectAndImplementation(ZIOEffect, VertX)    => HttpDependencies.ZIOVerteX()
+      case ServerEffectAndImplementation(ZIOEffect, Netty)    => HttpDependencies.ZIONetty()
       case other: StarterDetails => throw new UnsupportedOperationException(s"Cannot pick dependencies for $other")
     }
 
@@ -137,6 +139,10 @@ abstract class BuildView:
 
     def ZIOVerteX(): List[ScalaDependency] = List(
       ScalaDependency("com.softwaremill.sttp.tapir", "tapir-vertx-server-zio", getTapirVersion())
+    )
+
+    def ZIONetty(): List[ScalaDependency] = List(
+      ScalaDependency("com.softwaremill.sttp.tapir", "tapir-netty-server-zio", getTapirVersion())
     )
 
 end BuildView

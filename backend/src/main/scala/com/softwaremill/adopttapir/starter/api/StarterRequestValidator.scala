@@ -8,6 +8,7 @@ import com.softwaremill.adopttapir.starter.api.EffectRequest.{FutureEffect, IOEf
 import com.softwaremill.adopttapir.starter.api.JsonImplementationRequest.ZIOJson
 import com.softwaremill.adopttapir.starter.api.RequestValidation.{GroupIdShouldFollowJavaPackageConvention, ProjectNameShouldMatchRegex}
 import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Http4s, Netty, ZIOHttp, VertX}
+import cats.data.Validated
 
 sealed trait RequestValidation:
   def errMessage: String
@@ -30,20 +31,11 @@ object RequestValidation:
     val implementation: ServerImplementationRequest
     protected val prefixMessage: String = s"Picked $effect with $implementation -"
 
-  case class FutureEffectWillWorkOnlyWithNetty(effect: EffectRequest, implementation: ServerImplementationRequest)
+  case class EffectWithIllegalServerImplementation(effect: EffectRequest, implementation: ServerImplementationRequest)
       extends EffectValidation
       with RequestValidation:
-    override val errMessage: String = s"$prefixMessage Future effect will work only with Netty"
-
-  case class IOEffectWillWorkOnlyWithHttp4sAndNetty(effect: EffectRequest, implementation: ServerImplementationRequest)
-      extends EffectValidation
-      with RequestValidation:
-    override val errMessage: String = s"$prefixMessage IO effect will work only with Http4 and Netty"
-
-  case class ZIOEffectWillWorkOnlyWithHttp4sAndZIOHttp(effect: EffectRequest, implementation: ServerImplementationRequest)
-      extends EffectValidation
-      with RequestValidation:
-    override val errMessage: String = s"$prefixMessage ZIO effect will work only with Http4s and ZIOHttp"
+    override val errMessage: String =
+      s"$prefixMessage ${effect.toModel.name} effect will work only with: ${effect.legalServerImplementations.map(_.name).mkString(", ")}"
 
   case class MetricsNotSupportedForNettyServerImplementation(effect: EffectRequest, implementation: ServerImplementationRequest)
       extends EffectValidation
@@ -94,19 +86,11 @@ sealed trait FormValidator:
       effect: EffectRequest,
       serverImplementation: ServerImplementationRequest
   ): ValidatedNec[RequestValidation, (EffectRequest, ServerImplementationRequest)] =
-    (effect, serverImplementation) match {
-      case t @ (FutureEffect, Netty) => t.validNec
-      case t @ (FutureEffect, VertX) => t.validNec
-      case (FutureEffect, _)         => RequestValidation.FutureEffectWillWorkOnlyWithNetty(effect, serverImplementation).invalidNec
-      case t @ (IOEffect, Http4s)    => t.validNec
-      case t @ (IOEffect, Netty)     => t.validNec
-      case t @ (IOEffect, VertX)     => t.validNec
-      case (IOEffect, _)             => RequestValidation.IOEffectWillWorkOnlyWithHttp4sAndNetty(effect, serverImplementation).invalidNec
-      case t @ (ZIOEffect, Http4s)   => t.validNec
-      case t @ (ZIOEffect, ZIOHttp)  => t.validNec
-      case t @ (ZIOEffect, VertX)  => t.validNec
-      case (ZIOEffect, _)            => RequestValidation.ZIOEffectWillWorkOnlyWithHttp4sAndZIOHttp(effect, serverImplementation).invalidNec
-    }
+    Validated.condNec(
+      effect.legalServerImplementations.contains(serverImplementation.toModel),
+      (effect, serverImplementation),
+      RequestValidation.EffectWithIllegalServerImplementation(effect, serverImplementation)
+    )
 
   private def validateMetrics(
       effect: EffectRequest,

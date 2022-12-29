@@ -142,7 +142,7 @@ describe('configuration consts', () => {
         [EffectType.IO, ScalaVersion.Scala2, EffectImplementation.Http4s, true],
         [EffectType.IO, ScalaVersion.Scala2, EffectImplementation.ZIOHttp, false],
 
-        [EffectType.ZIO, ScalaVersion.Scala2, EffectImplementation.Netty, false],
+        [EffectType.ZIO, ScalaVersion.Scala2, EffectImplementation.Netty, true],
         [EffectType.ZIO, ScalaVersion.Scala2, EffectImplementation.Http4s, true],
         [EffectType.ZIO, ScalaVersion.Scala2, EffectImplementation.ZIOHttp, true],
 
@@ -155,7 +155,7 @@ describe('configuration consts', () => {
         [EffectType.IO, ScalaVersion.Scala3, EffectImplementation.Http4s, true],
         [EffectType.IO, ScalaVersion.Scala3, EffectImplementation.ZIOHttp, false],
 
-        [EffectType.ZIO, ScalaVersion.Scala3, EffectImplementation.Netty, false],
+        [EffectType.ZIO, ScalaVersion.Scala3, EffectImplementation.Netty, true],
         [EffectType.ZIO, ScalaVersion.Scala3, EffectImplementation.Http4s, true],
         [EffectType.ZIO, ScalaVersion.Scala3, EffectImplementation.ZIOHttp, true],
       ];
@@ -168,7 +168,7 @@ describe('configuration consts', () => {
       }));
 
       test.each(cases)(
-        'should return $expected based on effect type [$effectType], scala version [$scalaVersion] and effect implementatiom [$effectImplementation] combination validity',
+        'should return $expected based on effect type [$effectType], scala version [$scalaVersion] and effect implementation [$effectImplementation] combination validity',
         ({ effectType, scalaVersion, effectImplementation, expected }) => {
           expect(
             effectImplementationSchema.isValidSync({

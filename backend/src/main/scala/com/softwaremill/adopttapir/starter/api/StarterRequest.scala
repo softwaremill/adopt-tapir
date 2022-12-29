@@ -25,10 +25,37 @@ case class StarterRequest(
   * JsonTaggedAdt one liners. But if this improves with higher versions of circe, it would be advisable to fall back to circe in order to
   * reduce dependencies.
   */
-enum EffectRequest(val toModel: ServerEffect) derives JsonTaggedAdt.PureEncoder, JsonTaggedAdt.PureDecoder, Schema:
-  case FutureEffect extends EffectRequest(ServerEffect.FutureEffect)
-  case IOEffect extends EffectRequest(ServerEffect.IOEffect)
-  case ZIOEffect extends EffectRequest(ServerEffect.ZIOEffect)
+enum EffectRequest(val toModel: ServerEffect, val legalServerImplementations: Set[ServerImplementation])
+    derives JsonTaggedAdt.PureEncoder,
+      JsonTaggedAdt.PureDecoder,
+      Schema:
+  case FutureEffect
+      extends EffectRequest(
+        ServerEffect.FutureEffect,
+        legalServerImplementations = Set(
+          ServerImplementation.Netty,
+          ServerImplementation.VertX
+        )
+      )
+  case IOEffect
+      extends EffectRequest(
+        ServerEffect.IOEffect,
+        legalServerImplementations = Set(
+          ServerImplementation.Netty,
+          ServerImplementation.VertX,
+          ServerImplementation.Http4s
+        )
+      )
+  case ZIOEffect
+      extends EffectRequest(
+        ServerEffect.ZIOEffect,
+        legalServerImplementations = Set(
+          ServerImplementation.Netty,
+          ServerImplementation.VertX,
+          ServerImplementation.Http4s,
+          ServerImplementation.ZIOHttp
+        )
+      )
 
 enum ServerImplementationRequest(val toModel: ServerImplementation) derives JsonTaggedAdt.PureEncoder, JsonTaggedAdt.PureDecoder, Schema:
   case Netty extends ServerImplementationRequest(ServerImplementation.Netty)
