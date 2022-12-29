@@ -15,7 +15,7 @@ trait TestDependencies extends BeforeAndAfterAll:
   self: Suite with BaseTest =>
   var dependencies: Dependencies = _
   var releaseDependencies: IO[Unit] = _
-  val TestConfig: Config = Config.read
+  val TestConfig: Config = Config.read.unsafeRunSync()
 
   private val stub: SttpBackendStub[IO, Fs2Streams[IO]] = HttpClientFs2Backend.stub[IO]
 

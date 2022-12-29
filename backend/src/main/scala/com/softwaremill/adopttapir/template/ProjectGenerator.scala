@@ -5,6 +5,7 @@ import com.softwaremill.adopttapir.starter.ServerEffect.ZIOEffect
 import com.softwaremill.adopttapir.starter.{Builder, ScalaVersion, StarterDetails}
 import com.softwaremill.adopttapir.template.scala.{EndpointsSpecView, EndpointsView, Import, MainView}
 import com.softwaremill.adopttapir.version.TemplateDependencyInfo
+import cats.syntax.all.*
 
 final case class GeneratedFile(
     relativePath: String,
@@ -12,7 +13,7 @@ final case class GeneratedFile(
 )
 
 object ProjectGenerator:
-  def generate(starterDetails: StarterDetails): List[GeneratedFile] =
+  def generate(starterDetails: StarterDetails): Either[UnsupportedOperationException, List[GeneratedFile]] =
     starterDetails.builder match
       case Builder.Sbt      => SbtProjectTemplate.generate(starterDetails)
       case Builder.ScalaCli => ScalaCliProjectTemplate.generate(starterDetails)
@@ -24,23 +25,30 @@ abstract class ProjectTemplate:
 
   import CommonObjectTemplate.StarterDetailsWithLegalizedGroupId
 
-  def generate(starterDetails: StarterDetails): List[GeneratedFile] = {
+  def generate(starterDetails: StarterDetails): Either[UnsupportedOperationException, List[GeneratedFile]] = {
     // common project elements regardless of the builder type
-    List(
-      getMain(starterDetails),
-      getEndpoints(starterDetails),
-      getEndpointsSpec(starterDetails),
-      scalafmtConf(starterDetails.scalaVersion)
+    getMain(starterDetails).map(main =>
+      List(
+        main,
+        getEndpoints(starterDetails),
+        getEndpointsSpec(starterDetails),
+        scalafmtConf(starterDetails.scalaVersion)
+      )
     )
+
   }
 
-  private def getMain(starterDetails: StarterDetails): GeneratedFile = {
+  private def getMain(starterDetails: StarterDetails): Either[UnsupportedOperationException, GeneratedFile] = {
     val groupId = starterDetails.legalizedGroupId
 
-    GeneratedFile(
-      pathUnderPackage("src/main/scala", groupId, "Main.scala"),
-      MainView.getProperMainContent(starterDetails)
-    )
+    MainView
+      .getProperMainContent(starterDetails)
+      .map(content =>
+        GeneratedFile(
+          pathUnderPackage("src/main/scala", groupId, "Main.scala"),
+          content
+        )
+      )
   }
 
   private def getEndpoints(starterDetails: StarterDetails): GeneratedFile = {
@@ -124,24 +132,32 @@ abstract class ProjectTemplate:
 end ProjectTemplate
 
 object SbtProjectTemplate extends ProjectTemplate:
-  override def generate(starterDetails: StarterDetails): List[GeneratedFile] =
-    super.generate(starterDetails) ::: List(getBuildSbt(starterDetails), buildProperties, pluginsSbt, sbtx, readme, gitignore)
+  override def generate(starterDetails: StarterDetails): Either[UnsupportedOperationException, List[GeneratedFile]] =
+    for
+      common <- super.generate(starterDetails)
+      build <- getBuildSbt(starterDetails)
+    yield common ::: List(build, buildProperties, pluginsSbt, sbtx, readme, gitignore)
 
   lazy val sbtxFile = "sbtx"
 
-  private def getBuildSbt(starterDetails: StarterDetails): GeneratedFile = {
-    val content = txt
-      .sbtBuild(
-        starterDetails.projectName,
-        starterDetails.groupId,
-        starterDetails.scalaVersion.value,
-        TemplateDependencyInfo.tapirVersion,
-        (BuildSbtView.getAllDependencies _).andThen(BuildSbtView.format)(starterDetails),
-        starterDetails.serverEffect == ZIOEffect
-      )
-      .toString()
+  private def getBuildSbt(starterDetails: StarterDetails): Either[UnsupportedOperationException, GeneratedFile] = {
+    BuildSbtView
+      .getAllDependencies(starterDetails)
+      .map(BuildSbtView.format)
+      .map(dependencies =>
+        val content = txt
+          .sbtBuild(
+            starterDetails.projectName,
+            starterDetails.groupId,
+            starterDetails.scalaVersion.value,
+            TemplateDependencyInfo.tapirVersion,
+            dependencies,
+            starterDetails.serverEffect == ZIOEffect
+          )
+          .toString()
 
-    GeneratedFile("build.sbt", content)
+        GeneratedFile("build.sbt", content)
+      )
   }
 
   private lazy val buildProperties: GeneratedFile = GeneratedFile(
@@ -192,19 +208,28 @@ object CommonObjectTemplate:
 end CommonObjectTemplate
 
 private object ScalaCliProjectTemplate extends ProjectTemplate:
-  override def generate(starterDetails: StarterDetails): List[GeneratedFile] =
-    super.generate(starterDetails) ::: List(getBuildScalaCli(starterDetails), getTestScalaCli(starterDetails), readme, gitignore)
+  override def generate(starterDetails: StarterDetails): Either[UnsupportedOperationException, List[GeneratedFile]] =
+    for
+      common <- super.generate(starterDetails)
+      build <- getBuildScalaCli(starterDetails)
+    yield common ::: List(build, getTestScalaCli(starterDetails), readme, gitignore)
 
-  private def getBuildScalaCli(starterDetails: StarterDetails): GeneratedFile = {
-    val content = txt
-      .scalaCliBuild(
-        starterDetails.projectName,
-        starterDetails.groupId,
-        starterDetails.scalaVersion.value,
-        (BuildScalaCliView.getMainDependencies _).andThen(BuildScalaCliView.format)(starterDetails)
+  private def getBuildScalaCli(starterDetails: StarterDetails): Either[UnsupportedOperationException, GeneratedFile] = {
+    BuildScalaCliView
+      .getMainDependencies(starterDetails)
+      .map(BuildScalaCliView.format)
+      .map(dependencies =>
+        val content = txt
+          .scalaCliBuild(
+            starterDetails.projectName,
+            starterDetails.groupId,
+            starterDetails.scalaVersion.value,
+            dependencies
+          )
+          .toString()
+        GeneratedFile("build.scala", content)
       )
-      .toString()
-    GeneratedFile("build.scala", content)
+
   }
 
   private def getTestScalaCli(starterDetails: StarterDetails): GeneratedFile = {
