@@ -6,22 +6,24 @@ import com.softwaremill.adopttapir.starter.{JsonImplementation, ServerEffect, St
 import Dependency.{JavaDependency, ScalaDependency, ScalaTestDependency, constantTapirVersion}
 import com.softwaremill.adopttapir.version.TemplateDependencyInfo
 import com.softwaremill.adopttapir.starter.ServerEffectAndImplementation
+import cats.syntax.all.*
 
 abstract class BuildView:
-  def getAllDependencies(starterDetails: StarterDetails): List[Dependency] =
-    getMainDependencies(starterDetails) ++ getAllTestDependencies(starterDetails)
+  def getAllDependencies(starterDetails: StarterDetails): Either[UnsupportedOperationException, List[Dependency]] =
+    getMainDependencies(starterDetails).map(_ ++ getAllTestDependencies(starterDetails))
 
-  def getMainDependencies(starterDetails: StarterDetails): List[Dependency] =
-    val httpDependencies = getHttpDependencies(starterDetails)
-    val monitoringDependencies = Nil
-    val jsonDependencies = getJsonDependencies(starterDetails)
-    val docsDependencies = getDocsDependencies(starterDetails)
-    val metricsDependencies = getMetricsDependencies(starterDetails)
-    val baseDependencies = List(
-      JavaDependency("ch.qos.logback", "logback-classic", TemplateDependencyInfo.logbackClassicVersion)
-    )
+  def getMainDependencies(starterDetails: StarterDetails): Either[UnsupportedOperationException, List[Dependency]] =
+    getHttpDependencies(starterDetails).map { httpDependencies =>
+      val monitoringDependencies = Nil
+      val jsonDependencies = getJsonDependencies(starterDetails)
+      val docsDependencies = getDocsDependencies(starterDetails)
+      val metricsDependencies = getMetricsDependencies(starterDetails)
+      val baseDependencies = List(
+        JavaDependency("ch.qos.logback", "logback-classic", TemplateDependencyInfo.logbackClassicVersion)
+      )
 
-    httpDependencies ++ metricsDependencies ++ docsDependencies ++ monitoringDependencies ++ jsonDependencies ++ baseDependencies
+      httpDependencies ++ metricsDependencies ++ docsDependencies ++ monitoringDependencies ++ jsonDependencies ++ baseDependencies
+    }
 
   def getAllTestDependencies(starterDetails: StarterDetails): List[Dependency] =
     ScalaTestDependency("com.softwaremill.sttp.tapir", "tapir-sttp-stub-server", getTapirVersion()) ::
@@ -91,18 +93,18 @@ abstract class BuildView:
         List(ScalaTestDependency("com.softwaremill.sttp.client3", "zio-json", TemplateDependencyInfo.sttpVersion))
     }
 
-  private def getHttpDependencies(starterDetails: StarterDetails): List[Dependency] =
+  private def getHttpDependencies(starterDetails: StarterDetails): Either[UnsupportedOperationException, List[Dependency]] =
     starterDetails match {
-      case ServerEffectAndImplementation(FutureEffect, Netty) => HttpDependencies.netty()
-      case ServerEffectAndImplementation(FutureEffect, VertX) => HttpDependencies.vertX()
-      case ServerEffectAndImplementation(IOEffect, Http4s)    => HttpDependencies.http4s()
-      case ServerEffectAndImplementation(IOEffect, Netty)     => HttpDependencies.ioNetty()
-      case ServerEffectAndImplementation(IOEffect, VertX)     => HttpDependencies.ioVerteX()
-      case ServerEffectAndImplementation(ZIOEffect, Http4s)   => HttpDependencies.http4sZIO()
-      case ServerEffectAndImplementation(ZIOEffect, ZIOHttp)  => HttpDependencies.ZIOHttp()
-      case ServerEffectAndImplementation(ZIOEffect, VertX)    => HttpDependencies.ZIOVerteX()
-      case ServerEffectAndImplementation(ZIOEffect, Netty)    => HttpDependencies.ZIONetty()
-      case other: StarterDetails => throw new UnsupportedOperationException(s"Cannot pick dependencies for $other")
+      case ServerEffectAndImplementation(FutureEffect, Netty) => HttpDependencies.netty().asRight
+      case ServerEffectAndImplementation(FutureEffect, VertX) => HttpDependencies.vertX().asRight
+      case ServerEffectAndImplementation(IOEffect, Http4s)    => HttpDependencies.http4s().asRight
+      case ServerEffectAndImplementation(IOEffect, Netty)     => HttpDependencies.ioNetty().asRight
+      case ServerEffectAndImplementation(IOEffect, VertX)     => HttpDependencies.ioVerteX().asRight
+      case ServerEffectAndImplementation(ZIOEffect, Http4s)   => HttpDependencies.http4sZIO().asRight
+      case ServerEffectAndImplementation(ZIOEffect, ZIOHttp)  => HttpDependencies.ZIOHttp().asRight
+      case ServerEffectAndImplementation(ZIOEffect, VertX)    => HttpDependencies.ZIOVerteX().asRight
+      case ServerEffectAndImplementation(ZIOEffect, Netty)    => HttpDependencies.ZIONetty().asRight
+      case other: StarterDetails => UnsupportedOperationException(s"Cannot pick dependencies for $other").asLeft
     }
 
   object HttpDependencies:

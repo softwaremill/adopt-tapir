@@ -1,11 +1,12 @@
 package com.softwaremill.adopttapir.starter
 
-import better.files.{FileExtensions, File => BFile}
+import better.files.{FileExtensions, File as BFile}
 import cats.effect.unsafe.implicits.global
 import cats.effect.{IO, Resource}
 import cats.instances.list.*
 import cats.syntax.parallel.*
 import cats.syntax.show.*
+import com.softwaremill.adopttapir.metrics.Metrics
 import com.softwaremill.adopttapir.starter.api.*
 import com.softwaremill.adopttapir.starter.files.{FilesManager, StorageConfig}
 import com.softwaremill.adopttapir.starter.formatting.GeneratedFilesFormatter
@@ -136,10 +137,12 @@ case class GeneratedServiceUnderTest(serviceFactory: ServiceFactory, details: St
       .unsafeRunSync()
 
   private def generateZipFile(details: StarterDetails, logger: RunLogger): Resource[IO, BFile] =
-    Resource.make(for
-      zipFile <- ZipGenerator.service.generateZipFile(details).map(_.toScala)
-      _ <- logger.log("* zip file was generated")
-    yield zipFile)(zipFile => IO.blocking(zipFile.delete()))
+    ZipGenerator.service.flatMap(generator =>
+      Resource.make(for
+        zipFile <- generator.generateZipFile(details).map(_.toScala)
+        _ <- logger.log("* zip file was generated")
+      yield zipFile)(zipFile => IO.blocking(zipFile.delete()))
+    )
 
   private def createTempDirectory(): Resource[IO, BFile] =
     Resource.make(IO.blocking(BFile.newTemporaryDirectory("sbtTesting")))(tempDir =>
@@ -170,11 +173,11 @@ case class GeneratedServiceUnderTest(serviceFactory: ServiceFactory, details: St
       ) >> logger.log(s"* integration tests on port $port were finished")
 
 object ZipGenerator:
-  val service: StarterService =
+  val service: Resource[IO, StarterService] =
     val cfg = StorageConfig(deleteTempFolder = true, tempPrefix = "generatedService")
     val fm = new FilesManager(cfg)
-    val gff = new GeneratedFilesFormatter(fm)
-    new StarterService(gff, fm)
+    val m = Metrics.noop
+    GeneratedFilesFormatter.create(fm).map(StarterService(_, fm)(using m))
 
 case class RunLogger(log: mutable.StringBuilder = new mutable.StringBuilder()):
   def log(l: String): IO[Unit] = IO(log.append(System.lineSeparator()).append(l))

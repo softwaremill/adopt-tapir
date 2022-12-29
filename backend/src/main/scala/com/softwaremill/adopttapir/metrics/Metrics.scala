@@ -1,43 +1,52 @@
 package com.softwaremill.adopttapir.metrics
 
+import cats.effect.IO
 import com.softwaremill.adopttapir.starter.ScalaVersion.*
 import com.softwaremill.adopttapir.starter.*
 import io.prometheus.client.{Counter, hotspot}
+import cats.syntax.all.*
 
-object Metrics:
-  def init(): Unit = hotspot.DefaultExports.initialize()
+trait Metrics {
+  def increaseMetricCounter(details: StarterDetails, operation: String): IO[Unit]
+}
 
-  def increaseZipGenerationMetricCounter(details: StarterDetails): Unit =
-    increaseMetricCounter(details, "generate")
+private class LiveMetrics(generatedStarterCounter: Counter) extends Metrics:
 
-  def increasePreviewOperationMetricCounter(details: StarterDetails): Unit =
-    increaseMetricCounter(details, "preview")
+  import Metrics._
 
-  private def increaseMetricCounter(details: StarterDetails, operation: String): Unit =
+  override def increaseMetricCounter(details: StarterDetails, operation: String): IO[Unit] =
     val labelValues = details.productElementNames
       .zip(details.productIterator.toList)
       .filterNot { case (name, _) => excludedStarterDetailsFields.contains(name) }
       .map(_._2.toString)
       .toList :+ operation
 
-    generatedStarterCounter
-      .labels(labelValues: _*)
-      .inc()
+    IO(
+      generatedStarterCounter
+        .labels(labelValues: _*)
+        .inc()
+    )
 
-  private lazy val generatedStarterCounter: Counter =
-    Counter
-      .build()
-      .name(s"adopt_tapir_starter_generated_total")
-      .labelNames(starterDetailsLabels: _*)
-      .help(
-        s"""Total generated starters with given parameters ${starterDetailsLabels.map(n => s"\"$n\"").mkString(", ")}"""
-      )
-      .register()
+end LiveMetrics
 
-  private lazy val excludedStarterDetailsFields: Set[String] = Set("projectName", "groupId")
-  private lazy val additionalLabels = Array("operation")
+object Metrics:
+  private[metrics] lazy val excludedStarterDetailsFields: Set[String] = Set("projectName", "groupId")
+  private[metrics] lazy val additionalLabels = Array("operation")
 
-  private lazy val starterDetailsLabels: Array[String] = {
+  val noop: Metrics = new Metrics:
+    override def increaseMetricCounter(details: StarterDetails, operation: String): IO[Unit] = IO.unit
+  def init(): IO[Metrics] = for
+    _ <- IO(hotspot.DefaultExports.initialize())
+    starterCounter <- generateStarterCounter
+  yield LiveMetrics(starterCounter)
+
+  def increaseZipGenerationMetricCounter(details: StarterDetails)(using m: Metrics): IO[Unit] =
+    m.increaseMetricCounter(details, "generate")
+
+  def increasePreviewOperationMetricCounter(details: StarterDetails)(using m: Metrics): IO[Unit] =
+    m.increaseMetricCounter(details, "preview")
+
+  private lazy val starterDetailsLabels: IO[Array[String]] = {
     val fakeInstance: StarterDetails =
       StarterDetails(
         "",
@@ -51,14 +60,29 @@ object Metrics:
         Builder.Sbt
       )
 
-    val labels = fakeInstance.productElementNames.toArray.filterNot(excludedStarterDetailsFields.contains) :++ additionalLabels
-    require(
-      labels.length == fakeInstance.productElementNames.length - excludedStarterDetailsFields.size + additionalLabels.length,
-      s"One of fields $excludedStarterDetailsFields no longer exists in ${fakeInstance.productElementNames.toList
-          .mkString("StarterDetails(", ",", ")")}"
+    IO {
+      fakeInstance.productElementNames.toArray.filterNot(excludedStarterDetailsFields.contains) :++ additionalLabels
+    }.flatTap(labels =>
+      IO.raiseError(
+        IllegalArgumentException(
+          s"One of fields $excludedStarterDetailsFields no longer exists in ${fakeInstance.productElementNames.toList
+              .mkString("StarterDetails(", ",", ")")}"
+        )
+      ).unlessA(
+        labels.length == fakeInstance.productElementNames.length - excludedStarterDetailsFields.size + additionalLabels.length
+      )
     )
-
-    labels
   }
 
-end Metrics
+  private lazy val generateStarterCounter: IO[Counter] = starterDetailsLabels.flatMap(labels =>
+    IO(
+      Counter
+        .build()
+        .name(s"adopt_tapir_starter_generated_total")
+        .labelNames(labels: _*)
+        .help(
+          s"""Total generated starters with given parameters ${labels.map(n => s"\"$n\"").mkString(", ")}"""
+        )
+        .register()
+    )
+  )

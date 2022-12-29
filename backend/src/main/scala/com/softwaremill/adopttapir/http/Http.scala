@@ -1,7 +1,7 @@
 package com.softwaremill.adopttapir.http
 
 import cats.effect.IO
-import cats.implicits.*
+import cats.syntax.all.*
 import com.softwaremill.adopttapir.*
 import com.softwaremill.adopttapir.infrastructure.Json.*
 import com.softwaremill.adopttapir.logging.FLogging

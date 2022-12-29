@@ -8,7 +8,7 @@ trait FLogging:
   private val delegate = Logger(LoggerFactory.getLogger(getClass.getName))
   protected def logger: FLogger = new FLogger(delegate)
 
-class FLogger(delegate: Logger):
+class FLogger private[logging] (delegate: Logger):
   private val MDCKey = "cid"
   private def withMDC[F[_]: CorrelationIdSource, T](t: => T): F[T] =
     summon[CorrelationIdSource[F]].map { cid =>
