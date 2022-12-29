@@ -18,7 +18,7 @@ import scala.io.StdIn
     .metricsInterceptor(Endpoints.prometheusMetrics.metricsInterceptor())
     .options
   }
-  val port = sys.env.get("http.port").map(_.toInt).getOrElse(8080)
+  val port = sys.env.get("HTTP_PORT").flatMap(_.toIntOption).getOrElse(8080)
 
   val vertx = Vertx.vertx()
   val server = vertx.createHttpServer()

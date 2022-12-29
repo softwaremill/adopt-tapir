@@ -6,10 +6,9 @@ import cats.effect.{ExitCode, IO, IOApp}
 import sttp.tapir.server.netty.cats.@if(addMetrics){{NettyCatsServer, NettyCatsServerOptions}}else{NettyCatsServer}
 
 @if(addMetrics){import java.net.InetSocketAddress}
-import scala.io.StdIn
 
 object Main extends IOApp:
-  val port = sys.env.get("http.port").map(_.toInt).getOrElse(8080)
+  val port = sys.env.get("HTTP_PORT").flatMap(_.toIntOption).getOrElse(8080)
 
   override def run(args: List[String]): IO[ExitCode] =
     @if(addMetrics){
@@ -29,10 +28,8 @@ object Main extends IOApp:
             .host("localhost")
             .addEndpoints(Endpoints.all)
             .start()
-          _ <- IO.blocking {
-            println(s"@if(addDocumentation){Go to http://localhost:${bind.port}/docs to open SwaggerUI. }else{Server started at http://localhost:${bind.port}. }Press ENTER key to exit.")
-            StdIn.readLine()
-          }
+          _ <- IO.println(s"@if(addDocumentation){Go to http://localhost:${bind.port}/docs to open SwaggerUI. }else{Server started at http://localhost:${bind.port}. }Press ENTER key to exit.")
+          _ <- IO.readLine
           _ <- bind.stop()
         yield bind
       }
