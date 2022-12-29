@@ -4,6 +4,7 @@ import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import com.softwaremill.adopttapir.config.Config
 import com.softwaremill.adopttapir.Dependencies
+import com.softwaremill.adopttapir.infrastructure.CorrelationId
 import org.scalatest.{BeforeAndAfterAll, Suite}
 import sttp.capabilities.fs2.Fs2Streams
 import sttp.client3.SttpBackend
@@ -13,6 +14,8 @@ import sttp.tapir.server.stub.TapirStubInterpreter
 
 trait TestDependencies extends BeforeAndAfterAll:
   self: Suite with BaseTest =>
+  given CorrelationId = CorrelationId.init.unsafeRunSync()
+
   var dependencies: Dependencies = _
   var releaseDependencies: IO[Unit] = _
   val TestConfig: Config = Config.read.unsafeRunSync()

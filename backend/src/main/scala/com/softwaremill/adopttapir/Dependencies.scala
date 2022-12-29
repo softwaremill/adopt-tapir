@@ -5,6 +5,7 @@ import cats.effect.{IO, Resource}
 import cats.syntax.all.*
 import com.softwaremill.adopttapir.config.Config
 import com.softwaremill.adopttapir.http.{Http, HttpApi, HttpConfig}
+import com.softwaremill.adopttapir.infrastructure.CorrelationId
 import com.softwaremill.adopttapir.metrics.{Metrics, VersionApi}
 import com.softwaremill.adopttapir.starter.StarterService
 import com.softwaremill.adopttapir.starter.files.FilesManager
@@ -19,13 +20,13 @@ object Dependencies:
 
   private type ConfigReader[A] = ReaderT[Resource[IO, *], Config, A]
 
-  private val filesManagerReader: ConfigReader[FilesManager] =
-    Reader((config: Config) => FilesManager(config.storageConfig)).lift[Resource[IO, *]]
+  private def starterApiReader(http: Http)(using Metrics, CorrelationId): ConfigReader[StarterApi] =
+    val filesManagerReader: ConfigReader[FilesManager] =
+      Reader((config: Config) => FilesManager(config.storageConfig)).lift[Resource[IO, *]]
 
-  private val generatedFilesFormatterReader: ConfigReader[GeneratedFilesFormatter] =
-    filesManagerReader.flatMapF(fm => GeneratedFilesFormatter.create(fm))
+    val generatedFilesFormatterReader: ConfigReader[GeneratedFilesFormatter] =
+      filesManagerReader.flatMapF(fm => GeneratedFilesFormatter.create(fm))
 
-  private def starterApiReader(http: Http)(using Metrics): ConfigReader[StarterApi] =
     val starterServiceReader: ConfigReader[StarterService] =
       for
         fm <- filesManagerReader
@@ -40,7 +41,7 @@ object Dependencies:
       contentService <- contentServiceReader
     yield StarterApi(http, starterService, contentService)
 
-  private def httpApiReader(http: Http, prometheusMetrics: PrometheusMetrics[IO])(using Metrics): ConfigReader[HttpApi] =
+  private def httpApiReader(http: Http, prometheusMetrics: PrometheusMetrics[IO])(using Metrics, CorrelationId): ConfigReader[HttpApi] =
     for
       httpConfig <- Reader((config: Config) => config.api).lift[Resource[IO, *]]
       starterApi <- starterApiReader(http)
@@ -49,7 +50,7 @@ object Dependencies:
 
   def wire(
       config: Config
-  ): Resource[IO, Dependencies] =
+  )(using CorrelationId): Resource[IO, Dependencies] =
     val prometheusMetrics = PrometheusMetrics.default[IO]("adopt_tapir")
     val http = Http()
     for

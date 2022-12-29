@@ -8,14 +8,17 @@ import com.softwaremill.adopttapir.starter.{Setup, StarterDetails}
 import com.softwaremill.adopttapir.template.ProjectGenerator
 import com.softwaremill.adopttapir.test.BaseTest
 import cats.effect.unsafe.implicits.global
+import com.softwaremill.adopttapir.infrastructure.CorrelationId
 import com.softwaremill.adopttapir.metrics.Metrics
 class ContentServiceTest extends BaseTest:
 
   object ContentServiceTest:
     val service: Resource[IO, ContentService] =
       val sc = StorageConfig(deleteTempFolder = true, tempPrefix = "generatedService")
-      val metrics = Metrics.noop
-      GeneratedFilesFormatter.create(FilesManager(sc)).map(ContentService(_)(using metrics))
+      for
+        given CorrelationId <- Resource.eval(CorrelationId.init)
+        service <- GeneratedFilesFormatter.create(FilesManager(sc)).map(ContentService(_)(using Metrics.noop))
+      yield service
 
   import ContentServiceTest._
 

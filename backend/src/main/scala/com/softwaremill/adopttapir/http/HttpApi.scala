@@ -1,7 +1,7 @@
 package com.softwaremill.adopttapir.http
 
 import cats.effect.{IO, Resource}
-import com.softwaremill.adopttapir.infrastructure.CorrelationIdInterceptor
+import com.softwaremill.adopttapir.infrastructure.{CorrelationIdInterceptor, CorrelationId}
 import com.softwaremill.adopttapir.logging.FLogging
 import com.softwaremill.adopttapir.util.ServerEndpoints
 import org.http4s.HttpRoutes
@@ -32,23 +32,24 @@ class HttpApi(
     adminEndpoints: ServerEndpoints,
     prometheusMetrics: PrometheusMetrics[IO],
     config: HttpConfig
-) extends FLogging:
+)(using c: CorrelationId)
+    extends FLogging:
 
   private val apiContextPath = List("api", "v1")
 
   private val serverOptions: Http4sServerOptions[IO] = Http4sServerOptions
     .customiseInterceptors[IO]
-    .prependInterceptor(CorrelationIdInterceptor)
+    .prependInterceptor(CorrelationIdInterceptor.create)
     // all errors are formatted as json, and there are no other additional http4s routes
     .defaultHandlers(msg => ValuedEndpointOutput(http.jsonErrorOutOutput, Error_OUT(msg)), notFoundWhenRejected = true)
     .serverLog {
       // using a context-aware logger for http logging
       Http4sServerOptions
         .defaultServerLog[IO]
-        .doLogWhenHandled((msg, e) => e.fold(logger.debug[IO](msg))(logger.debug(msg, _)))
-        .doLogAllDecodeFailures((msg, e) => e.fold(logger.debug[IO](msg))(logger.debug(msg, _)))
-        .doLogExceptions((msg, e) => logger.error[IO](msg, e))
-        .doLogWhenReceived(msg => logger.debug[IO](msg))
+        .doLogWhenHandled((msg, e) => e.fold(logger.debug(msg))(logger.debug(msg, _)))
+        .doLogAllDecodeFailures((msg, e) => e.fold(logger.debug(msg))(logger.debug(msg, _)))
+        .doLogExceptions((msg, e) => logger.error(msg, e))
+        .doLogWhenReceived(msg => logger.debug(msg))
     }
     .corsInterceptor(CORSInterceptor.default[IO])
     .metricsInterceptor(prometheusMetrics.metricsInterceptor())

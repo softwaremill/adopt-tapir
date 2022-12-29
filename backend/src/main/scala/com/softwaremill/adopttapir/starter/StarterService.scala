@@ -7,10 +7,12 @@ import com.softwaremill.adopttapir.starter.files.FilesManager
 import com.softwaremill.adopttapir.starter.formatting.GeneratedFilesFormatter
 import com.softwaremill.adopttapir.template.ProjectGenerator
 import cats.syntax.all.*
+import com.softwaremill.adopttapir.infrastructure.CorrelationId
 
 import java.io.File
 
-class StarterService(generatedFilesFormatter: GeneratedFilesFormatter, filesManager: FilesManager)(using Metrics) extends FLogging:
+class StarterService(generatedFilesFormatter: GeneratedFilesFormatter, filesManager: FilesManager)(using Metrics, CorrelationId)
+    extends FLogging:
 
   def generateZipFile(starterDetails: StarterDetails): IO[File] =
     for {
