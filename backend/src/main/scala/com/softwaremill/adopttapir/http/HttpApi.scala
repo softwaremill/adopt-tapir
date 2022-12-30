@@ -17,6 +17,7 @@ import sttp.tapir.server.model.ValuedEndpointOutput
 import sttp.tapir.static.ResourcesOptions
 import sttp.tapir.swagger.SwaggerUIOptions
 import sttp.tapir.swagger.bundle.SwaggerInterpreter
+import scala.util.chaining.*
 
 /** Interprets the endpoint descriptions (defined using tapir) as http4s routes, adding CORS, metrics, api docs support.
   *
@@ -86,15 +87,16 @@ class HttpApi(
 
   /** The resource describing the HTTP server; binds when the resource is allocated. */
   lazy val resource: Resource[IO, (org.http4s.server.Server, org.http4s.server.Server)] =
-    def resource(routes: HttpRoutes[IO], port: Int) =
+    def resource(routes: HttpRoutes[IO], port: Int, banner: Option[String]) =
       BlazeServerBuilder[IO]
         .bindHttp(port, config.host.toString)
         .withHttpApp(routes.orNotFound)
+        .pipe(s => banner.fold(s.withoutBanner)(b => s.withBanner(b.linesIterator.toSeq)))
         .resource
 
     for
-      public <- resource(publicRoutes, config.port.value)
-      admin <- resource(adminRoutes, config.adminPort.value)
+      public <- resource(publicRoutes, config.port.value, Some(Banner.text))
+      admin <- resource(adminRoutes, config.adminPort.value, None)
     yield (public, admin)
 
 end HttpApi
