@@ -6,6 +6,15 @@ target/
 *.log
 .DS_Store
 data/
-*.bloop
-*.metals
 .bsp
+.vscode
+
+node_modules
+
+## Metals
+.bsp/**
+.jvmopts
+.metals/**
+.sbtopts
+**/.bloop/**
+**/metals.sbt
