@@ -19,7 +19,12 @@ describe('configuration form helpers', () => {
       [
         EffectType.ZIO,
         ScalaVersion.Scala2,
-        [EffectImplementation.Http4s, EffectImplementation.ZIOHttp, EffectImplementation.VertX],
+        [
+          EffectImplementation.Netty,
+          EffectImplementation.Http4s,
+          EffectImplementation.ZIOHttp,
+          EffectImplementation.VertX,
+        ],
       ],
 
       [EffectType.Future, ScalaVersion.Scala3, [EffectImplementation.Netty, EffectImplementation.VertX]],
@@ -31,7 +36,12 @@ describe('configuration form helpers', () => {
       [
         EffectType.ZIO,
         ScalaVersion.Scala3,
-        [EffectImplementation.Http4s, EffectImplementation.ZIOHttp, EffectImplementation.VertX],
+        [
+          EffectImplementation.Netty,
+          EffectImplementation.Http4s,
+          EffectImplementation.ZIOHttp,
+          EffectImplementation.VertX,
+        ],
       ],
     ];
 
@@ -81,6 +91,10 @@ describe('configuration form helpers', () => {
         EffectType.ZIO,
         ScalaVersion.Scala2,
         [
+          {
+            label: 'Netty',
+            value: EffectImplementation.Netty,
+          },
           {
             label: 'http4s',
             value: EffectImplementation.Http4s,
@@ -132,6 +146,10 @@ describe('configuration form helpers', () => {
         EffectType.ZIO,
         ScalaVersion.Scala3,
         [
+          {
+            label: 'Netty',
+            value: EffectImplementation.Netty,
+          },
           {
             label: 'http4s',
             value: EffectImplementation.Http4s,

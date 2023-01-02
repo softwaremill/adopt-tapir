@@ -31,6 +31,10 @@ jobs:
           java-version: 17
           cache: 'sbt'
 
+      - name: Check formatting
+        id: check-formatting
+        run: sbt scalafmtCheckAll
+
       - name: Run unit tests & lint
         id: run-unit-tests
         run: sbt test

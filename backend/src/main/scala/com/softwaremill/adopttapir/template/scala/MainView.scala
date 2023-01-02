@@ -22,6 +22,8 @@ object MainView:
             txt.MainIOVertx(groupId, addDocumentation, addMetrics).toString()
           case StarterDetails(_, groupId, ZIOEffect, Http4s, addDocumentation, addMetrics, _, _, _) =>
             txt.MainZIOHttp4s(groupId, addDocumentation, addMetrics).toString()
+          case StarterDetails(_, groupId, ZIOEffect, Netty, addDocumentation, addMetrics, _, _, _) =>
+            txt.MainZIONetty(groupId, addDocumentation, addMetrics).toString()
           case StarterDetails(_, groupId, ZIOEffect, ZIOHttp, addDocumentation, addMetrics, _, _, _) =>
             txt.MainZIOhttpZIO(groupId, addDocumentation, addMetrics).toString()
           case StarterDetails(_, groupId, ZIOEffect, VertX, addDocumentation, addMetrics, _, _, _) =>
@@ -42,6 +44,8 @@ object MainView:
             txt.MainIOVertxScala3(groupId, addDocumentation, addMetrics).toString()
           case StarterDetails(_, groupId, ZIOEffect, Http4s, addDocumentation, addMetrics, _, _, _) =>
             txt.MainZIOHttp4sScala3(groupId, addDocumentation, addMetrics).toString()
+          case StarterDetails(_, groupId, ZIOEffect, Netty, addDocumentation, addMetrics, _, _, _) =>
+            txt.MainZIONettyScala3(groupId, addDocumentation, addMetrics).toString()
           case StarterDetails(_, groupId, ZIOEffect, ZIOHttp, addDocumentation, addMetrics, _, _, _) =>
             txt.MainZIOhttpZIOScala3(groupId, addDocumentation, addMetrics).toString()
           case StarterDetails(_, groupId, ZIOEffect, VertX, addDocumentation, addMetrics, _, _, _) =>

@@ -81,7 +81,7 @@ class StarterServiceITTest extends BaseTest with ParallelTestExecution:
             basicRequest.response(asStringAlways).get(uri"http://localhost:$port/hello?name=Frodo").send(backend).body
 
           result shouldBe "Hello Frodo"
-          info(subTest("helo"))
+          info(subTest("hello"))
         }
       )
 

@@ -9,8 +9,8 @@ To start the backend:
 ```
 
 #### Call tests
-Project contains two types of tests unit and resource heavy tests. The latter is limited to max 2 parallel executions
-so that they are not exhausting available resources and as a result fail with timeout. As a result one needs to specify
+The project contains two types of tests unit and resource-heavy tests. The latter is limited to max 2 parallel executions
+so that they are not exhausting available resources and as a result fail with a timeout. As a result one needs to specify
 that additional group needs to be called:
 
 ```shell

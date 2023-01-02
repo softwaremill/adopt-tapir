@@ -103,7 +103,7 @@ class StarterApiTest extends BaseTest with TestDependencies {
     // then
     ex.statusCode.code shouldBe 400
     jawn.decode[Error_OUT](ex.body).value.error should include(
-      "Picked FutureEffect with ZIOHttp - Future effect will work only with Netty"
+      "Picked FutureEffect with ZIOHttp - Future effect will work only with: Netty, Vert.X"
     )
   }
 
