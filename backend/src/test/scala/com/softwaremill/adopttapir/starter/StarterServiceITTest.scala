@@ -6,6 +6,7 @@ import cats.effect.{IO, Resource}
 import cats.instances.list.*
 import cats.syntax.parallel.*
 import cats.syntax.show.*
+import com.softwaremill.adopttapir.infrastructure.CorrelationId
 import com.softwaremill.adopttapir.metrics.Metrics
 import com.softwaremill.adopttapir.starter.api.*
 import com.softwaremill.adopttapir.starter.files.{FilesManager, StorageConfig}
@@ -176,8 +177,10 @@ object ZipGenerator:
   val service: Resource[IO, StarterService] =
     val cfg = StorageConfig(deleteTempFolder = true, tempPrefix = "generatedService")
     val fm = new FilesManager(cfg)
-    val m = Metrics.noop
-    GeneratedFilesFormatter.create(fm).map(StarterService(_, fm)(using m))
+    for
+      given CorrelationId <- Resource.eval(CorrelationId.init)
+      service <- GeneratedFilesFormatter.create(fm).map(StarterService(_, fm)(using Metrics.noop))
+    yield service
 
 case class RunLogger(log: mutable.StringBuilder = new mutable.StringBuilder()):
   def log(l: String): IO[Unit] = IO(log.append(System.lineSeparator()).append(l))
