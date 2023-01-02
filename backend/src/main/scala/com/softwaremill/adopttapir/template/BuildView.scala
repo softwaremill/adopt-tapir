@@ -99,7 +99,7 @@ abstract class BuildView:
       case StarterDetails(_, _, IOEffect, VertX, _, _, _, _, _)     => HttpDependencies.ioVerteX()
       case StarterDetails(_, _, ZIOEffect, Http4s, _, _, _, _, _)   => HttpDependencies.http4sZIO()
       case StarterDetails(_, _, ZIOEffect, ZIOHttp, _, _, _, _, _)  => HttpDependencies.ZIOHttp()
-      case StarterDetails(_, _, ZIOEffect, VertX, _, _, _, _, _)  => HttpDependencies.ZIOVerteX()
+      case StarterDetails(_, _, ZIOEffect, VertX, _, _, _, _, _)    => HttpDependencies.ZIOVerteX()
       case other: StarterDetails => throw new UnsupportedOperationException(s"Cannot pick dependencies for $other")
     }
 

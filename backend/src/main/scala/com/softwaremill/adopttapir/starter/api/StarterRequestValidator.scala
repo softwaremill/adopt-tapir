@@ -104,7 +104,7 @@ sealed trait FormValidator:
       case (IOEffect, _)             => RequestValidation.IOEffectWillWorkOnlyWithHttp4sAndNetty(effect, serverImplementation).invalidNec
       case t @ (ZIOEffect, Http4s)   => t.validNec
       case t @ (ZIOEffect, ZIOHttp)  => t.validNec
-      case t @ (ZIOEffect, VertX)  => t.validNec
+      case t @ (ZIOEffect, VertX)    => t.validNec
       case (ZIOEffect, _)            => RequestValidation.ZIOEffectWillWorkOnlyWithHttp4sAndZIOHttp(effect, serverImplementation).invalidNec
     }
 
