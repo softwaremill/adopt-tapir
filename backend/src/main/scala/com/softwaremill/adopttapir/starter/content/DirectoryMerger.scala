@@ -4,15 +4,14 @@ import cats.syntax.all.*
 
 object DirectoryMerger:
 
-  def apply(topDirName: String, pathNames: List[String], content: String): Either[IllegalStateException, Directory] = for
-    _ <- Either
-      .cond(pathNames.nonEmpty, (), IllegalStateException("`pathNames` list cannot be empty!"))
-    pathsWithRootDir = List(topDirName) ++ pathNames
-    directory <- createTreeRec(pathsWithRootDir, content).flatMap {
-      case File(_, _)          => IllegalStateException("Top element of created tree cannot be a `File`!").asLeft
-      case d @ Directory(_, _) => d.asRight
-    }
-  yield directory
+  def apply(topDirName: String, pathNames: List[String], content: String): Either[IllegalStateException, Directory] =
+    if pathNames.nonEmpty then
+      val pathsWithRootDir = List(topDirName) ++ pathNames
+      createTreeRec(pathsWithRootDir, content).flatMap {
+        case File(_, _)          => IllegalStateException("Top element of created tree cannot be a `File`!").asLeft
+        case d @ Directory(_, _) => d.asRight
+      }
+    else IllegalStateException("`pathNames` list cannot be empty!").asLeft
 
   private def createTreeRec(pathNames: List[String], content: String): Either[IllegalStateException, Node] =
     pathNames match {
