@@ -16,15 +16,15 @@ class StarterService(generatedFilesFormatter: GeneratedFilesFormatter, filesMana
 
   def generateZipFile(starterDetails: StarterDetails): IO[File] =
     for {
-      _ <- logger.info(s"received request: $starterDetails")
-      generatedFiles <- ProjectGenerator.generate(starterDetails).liftTo[IO]
+      _ <- logger.info(s"Received request: $starterDetails")
+      generatedFiles <- IO(ProjectGenerator.generate(starterDetails))
       formattedGeneratedFiles <- generatedFilesFormatter.format(generatedFiles)
       file <- IO
         .blocking(filesManager.createTempDir())
         .bracket { tempDirectory =>
           for
             tempDir <- tempDirectory
-            _ <- logger.debug("created temp dir: " + tempDir)
+            _ <- logger.debug("Created temp dir: " + tempDir)
             _ <- filesManager.createFiles(tempDir, formattedGeneratedFiles)
             zippedFile <- filesManager.zipDirectory(tempDir)
             _ <- Metrics.increaseZipGenerationMetricCounter(starterDetails)

@@ -4,7 +4,7 @@ import cats.effect.IO
 import com.softwaremill.adopttapir.infrastructure.CorrelationId
 import com.typesafe.scalalogging.Logger
 import org.slf4j.{LoggerFactory, MDC}
-import cats.syntax.all.*
+
 trait FLogging:
   private val delegate = Logger(LoggerFactory.getLogger(getClass.getName))
   protected def logger: FLogger = new FLogger(delegate)

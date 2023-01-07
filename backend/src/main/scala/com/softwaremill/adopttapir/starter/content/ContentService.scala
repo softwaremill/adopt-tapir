@@ -13,18 +13,13 @@ final case class ContentService(generatedFilesFormatter: GeneratedFilesFormatter
     val projectName = starterDetails.projectName
 
     for
-      rawGeneratedFiles <- ProjectGenerator.generate(starterDetails).liftTo[IO]
+      rawGeneratedFiles <- IO(ProjectGenerator.generate(starterDetails))
       formattedGeneratedFiles <- generatedFilesFormatter.format(rawGeneratedFiles)
-      projectAsDirTrees <- formattedGeneratedFiles
-        .traverse(fgf => {
-          val paths = fgf.relativePath.split('/').toList
-          val content = fgf.content
-          DirectoryMerger(projectName, paths, content)
-        })
-        .liftTo[IO]
-      projectAsTree <- projectAsDirTrees.toNel match
-        case None => IO.raiseError(AssertionError("List of generated files is empty"))
-        case Some(nel) =>
-          nel.tail.foldLeftM(nel.head)(DirectoryMerger.apply).liftTo[IO]
-      _ <- Metrics.increasePreviewOperationMetricCounter(starterDetails)
+      projectAsDirTrees <- IO(formattedGeneratedFiles.map(fgf => {
+        val paths = fgf.relativePath.split('/').toList
+        val content = fgf.content
+        DirectoryMerger(projectName, paths, content)
+      }))
+      projectAsTree <- IO(projectAsDirTrees.reduce(DirectoryMerger.apply))
+      _ <- IO(Metrics.increasePreviewOperationMetricCounter(starterDetails))
     yield projectAsTree

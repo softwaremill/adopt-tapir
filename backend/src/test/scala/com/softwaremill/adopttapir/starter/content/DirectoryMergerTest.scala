@@ -1,12 +1,8 @@
 package com.softwaremill.adopttapir.starter.content
 
 import com.softwaremill.adopttapir.test.BaseTest
-import cats.syntax.all.*
-import org.scalatest.EitherValues
 
-import scala.Left
-
-class DirectoryMergerTest extends BaseTest with EitherValues {
+class DirectoryMergerTest extends BaseTest {
 
   object DirectoryMergerTest {
     val TopDirName: String = "top-dir-name"
@@ -22,12 +18,12 @@ class DirectoryMergerTest extends BaseTest with EitherValues {
 
   import DirectoryMergerTest._
 
-  "createTree" should "return Left if `pathsNames` is empty" in {
-    DirectoryMerger(
+  "createTree" should "throw if `pathsNames` is empty" in {
+    an[AssertionError] should be thrownBy DirectoryMerger(
       TopDirName,
       EmptyPathList,
       EmptyContent
-    ).swap.value.getMessage shouldBe "`pathNames` list cannot be empty!"
+    )
   }
 
   "createTree" should "create single dir / single file structure" in {
@@ -36,7 +32,7 @@ class DirectoryMergerTest extends BaseTest with EitherValues {
       TopDirName,
       List(fileName),
       EmptyContent
-    ) should be(Right(Directory(name = TopDirName, content = List(File(name = fileName, content = EmptyContent)))))
+    ) should be(Directory(name = TopDirName, content = List(File(name = fileName, content = EmptyContent))))
   }
 
   "createTree" should "create multiple dirs / single file structure" in {
@@ -46,17 +42,15 @@ class DirectoryMergerTest extends BaseTest with EitherValues {
       List(dirName1, dirName2, dirName3, fileName),
       NonEmptyContent
     ) should be(
-      Right(
-        Directory(
-          name = TopDirName,
-          content = List(
-            Directory(
-              name = dirName1,
-              content = List(
-                Directory(
-                  name = dirName2,
-                  content = List(Directory(name = dirName3, content = List(File(name = fileName, content = NonEmptyContent))))
-                )
+      Directory(
+        name = TopDirName,
+        content = List(
+          Directory(
+            name = dirName1,
+            content = List(
+              Directory(
+                name = dirName2,
+                content = List(Directory(name = dirName3, content = List(File(name = fileName, content = NonEmptyContent))))
               )
             )
           )
@@ -69,37 +63,34 @@ class DirectoryMergerTest extends BaseTest with EitherValues {
     val (dirWithSomeName, dirWithDifferentName) =
       (Directory(name = DirName, EmptyNodesList), Directory(name = DifferentDirName, EmptyNodesList))
 
-    DirectoryMerger(
-      dirWithSomeName,
-      dirWithDifferentName
-    ).swap.value.getMessage shouldBe "names of directories to merge cannot be different!"
+    an[AssertionError] should be thrownBy DirectoryMerger(dirWithSomeName, dirWithDifferentName)
   }
 
   "merge" should "produce empty dir if both dirs to merge are empty" in {
     val (noFilesDir, anotherNoFilesDir) = (Directory(name = DirName, EmptyNodesList), Directory(name = DirName, EmptyNodesList))
 
-    DirectoryMerger(noFilesDir, anotherNoFilesDir) should be(Right(noFilesDir))
+    DirectoryMerger(noFilesDir, anotherNoFilesDir) should be(noFilesDir)
   }
 
   "merge" should "produce dir with one file if one of the dirs to has one file" in {
     val (dirWithFile, dirWithNoFiles) =
       (Directory(name = DirName, List(File(FileName, NonEmptyContent))), Directory(name = DirName, EmptyNodesList))
 
-    DirectoryMerger(dirWithFile, dirWithNoFiles) should be(Right(dirWithFile))
-    DirectoryMerger(dirWithNoFiles, dirWithFile) should be(Right(dirWithFile))
+    DirectoryMerger(dirWithFile, dirWithNoFiles) should be(dirWithFile)
+    DirectoryMerger(dirWithNoFiles, dirWithFile) should be(dirWithFile)
   }
 
   "merge" should "override second file if both files is dirs have the same name" in {
     val (dirWithNonEmptyContentFile, dirWithEmptyContentFile) =
       (Directory(name = DirName, List(File(FileName, NonEmptyContent))), Directory(name = DirName, List(File(FileName, EmptyContent))))
 
-    DirectoryMerger(dirWithNonEmptyContentFile, dirWithEmptyContentFile) should be(Right(dirWithNonEmptyContentFile))
-    DirectoryMerger(dirWithEmptyContentFile, dirWithNonEmptyContentFile) should be(Right(dirWithEmptyContentFile))
+    DirectoryMerger(dirWithNonEmptyContentFile, dirWithEmptyContentFile) should be(dirWithNonEmptyContentFile)
+    DirectoryMerger(dirWithEmptyContentFile, dirWithNonEmptyContentFile) should be(dirWithEmptyContentFile)
   }
 
   "merge" should "create proper project structure when project like files are given" in {
     val projectName = "project-name"
-    val Right(head :: tail) = List(
+    val files = List(
       DirectoryMerger(projectName, "src/main/scala/group/id/Main.scala".split('/').toList, "package group.id..."),
       DirectoryMerger(projectName, "src/main/scala/group/id/Endpoints.scala".split('/').toList, "package group.id..."),
       DirectoryMerger(projectName, "src/test/scala/group/id/EndpointsSpec.scala".split('/').toList, "package group.id..."),
@@ -109,55 +100,53 @@ class DirectoryMergerTest extends BaseTest with EitherValues {
       DirectoryMerger(projectName, List("project", "plugins.sbt"), "addSbtPlugin(\"org.scalameta\" % \"sbt-scalafmt\" % \"2.4.6\")..."),
       DirectoryMerger(projectName, List("sbtx"), "#!/usr/bin/env bash..."),
       DirectoryMerger(projectName, List("README.md"), "## Quick start...")
-    ).sequence: @unchecked
+    )
 
-    tail.foldLeftM(head)(DirectoryMerger.apply) should be(
-      Right(
-        Directory(
-          projectName,
-          List(
-            Directory(
-              "src",
-              List(
-                Directory(
-                  "test",
-                  List(
-                    Directory(
-                      "scala",
-                      List(Directory("group", List(Directory("id", List(File("EndpointsSpec.scala", "package group.id..."))))))
-                    )
+    files.reduce(DirectoryMerger.apply) should be(
+      Directory(
+        projectName,
+        List(
+          Directory(
+            "src",
+            List(
+              Directory(
+                "test",
+                List(
+                  Directory(
+                    "scala",
+                    List(Directory("group", List(Directory("id", List(File("EndpointsSpec.scala", "package group.id..."))))))
                   )
-                ),
-                Directory(
-                  "main",
-                  List(
-                    Directory(
-                      "scala",
-                      List(
-                        Directory(
-                          "group",
-                          List(
-                            Directory("id", List(File("Main.scala", "package group.id..."), File("Endpoints.scala", "package group.id...")))
-                          )
+                )
+              ),
+              Directory(
+                "main",
+                List(
+                  Directory(
+                    "scala",
+                    List(
+                      Directory(
+                        "group",
+                        List(
+                          Directory("id", List(File("Main.scala", "package group.id..."), File("Endpoints.scala", "package group.id...")))
                         )
                       )
                     )
                   )
                 )
               )
-            ),
-            File("sbtx", "#!/usr/bin/env bash..."),
-            Directory(
-              "project",
-              List(
-                File("plugins.sbt", "addSbtPlugin(\"org.scalameta\" % \"sbt-scalafmt\" % \"2.4.6\")..."),
-                File("build.properties", "sbt.version=1.7.1...")
-              )
-            ),
-            File("build.sbt", "val tapirVersion = \"1.0.6\"..."),
-            File("README.md", "## Quick start..."),
-            File(".scalafmt.conf", "version = 3.5.8...")
-          )
+            )
+          ),
+          File("sbtx", "#!/usr/bin/env bash..."),
+          Directory(
+            "project",
+            List(
+              File("plugins.sbt", "addSbtPlugin(\"org.scalameta\" % \"sbt-scalafmt\" % \"2.4.6\")..."),
+              File("build.properties", "sbt.version=1.7.1...")
+            )
+          ),
+          File("build.sbt", "val tapirVersion = \"1.0.6\"..."),
+          File("README.md", "## Quick start..."),
+          File(".scalafmt.conf", "version = 3.5.8...")
         )
       )
     )

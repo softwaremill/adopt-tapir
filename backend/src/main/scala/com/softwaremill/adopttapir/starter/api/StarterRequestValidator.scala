@@ -14,11 +14,6 @@ sealed trait RequestValidation:
   def errMessage: String
 
 object RequestValidation:
-  case class NotInSemverNotation(input: String) extends RequestValidation:
-    override val errMessage: String = s"Provided input: `$input` is not in semantic versioning notation"
-
-  case class ProjectNameShouldBeLowerCaseWritten(input: String) extends RequestValidation:
-    override val errMessage: String = s"Project name: `$input` should be written with lowercase"
 
   case class ProjectNameShouldMatchRegex(input: String, regex: String) extends RequestValidation:
     override val errMessage: String = s"Project name: `$input` should match regex: `$regex`"
@@ -36,11 +31,6 @@ object RequestValidation:
       with RequestValidation:
     override val errMessage: String =
       s"$prefixMessage ${effect.toModel.name} effect will work only with: ${effect.legalServerImplementations.map(_.name).mkString(", ")}"
-
-  case class MetricsNotSupportedForNettyServerImplementation(effect: EffectRequest, implementation: ServerImplementationRequest)
-      extends EffectValidation
-      with RequestValidation:
-    override val errMessage: String = s"$prefixMessage Metrics not supported for ${ServerImplementationRequest.Netty} server implementation"
 
   case object ZIOJsonWillWorkOnlyWithZIOEffect extends RequestValidation:
     override val errMessage: String = s"ZIOJson will work only with ZIO effect"
