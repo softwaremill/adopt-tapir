@@ -2,7 +2,7 @@ package com.softwaremill.adopttapir.starter.api
 
 import cats.data.{EitherT, NonEmptyList}
 import cats.effect.IO
-import cats.implicits.toBifunctorOps
+import cats.syntax.all.*
 import com.softwaremill.adopttapir.Fail
 import com.softwaremill.adopttapir.http.Http
 import com.softwaremill.adopttapir.infrastructure.Json._

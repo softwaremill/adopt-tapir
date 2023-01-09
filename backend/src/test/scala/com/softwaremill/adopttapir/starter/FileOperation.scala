@@ -1,7 +1,9 @@
 package com.softwaremill.adopttapir.starter
 
-import cats.effect.{ExitCode, IO, IOApp}
+import cats.effect.{ExitCode, IO, IOApp, Resource}
 import com.softwaremill.adopttapir.config.Config
+import com.softwaremill.adopttapir.infrastructure.CorrelationId
+import com.softwaremill.adopttapir.metrics.Metrics
 import com.softwaremill.adopttapir.starter.files.FilesManager
 import com.softwaremill.adopttapir.starter.formatting.GeneratedFilesFormatter
 import com.softwaremill.adopttapir.template.ProjectGenerator
@@ -9,10 +11,13 @@ import com.softwaremill.adopttapir.template.ProjectGenerator
 @deprecated("Only for development purpose")
 object FileOperation extends IOApp:
 
-  val service: StarterService =
-    val cfg = Config.read.storageConfig.copy(deleteTempFolder = false)
-    val fm = FilesManager(cfg)
-    new StarterService(GeneratedFilesFormatter(fm), fm)
+  val createService: Resource[IO, StarterService] = for {
+    given CorrelationId <- Resource.eval(CorrelationId.init)
+    cfg <- Resource.eval(Config.read.map(_.storageConfig.copy(deleteTempFolder = false)))
+    fm = FilesManager(cfg)
+    given Metrics <- Resource.eval(Metrics.init())
+    formatter <- GeneratedFilesFormatter.create(fm)
+  } yield StarterService(formatter, fm)
 
   override def run(args: List[String]): IO[ExitCode] = {
     val details = StarterDetails(
@@ -27,14 +32,16 @@ object FileOperation extends IOApp:
       Builder.ScalaCli
     )
 
-    for
-      file <- service.generateZipFile(details)
-      _ <- IO.println {
-        val str = file.toString
-        val index = str.lastIndexOf('_')
-        "Directory: " + str.substring(0, index) + "\n" +
-          "Zipped file: " + str
-      }
-      exitCode <- IO(ExitCode.Success)
-    yield exitCode
+    createService.use(service =>
+      for
+        file <- service.generateZipFile(details)
+        _ <- IO.println {
+          val str = file.toString
+          val index = str.lastIndexOf('_')
+          "Directory: " + str.substring(0, index) + "\n" +
+            "Zipped file: " + str
+        }
+        exitCode <- IO(ExitCode.Success)
+      yield exitCode
+    )
   }

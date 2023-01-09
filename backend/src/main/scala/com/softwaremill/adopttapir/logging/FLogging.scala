@@ -1,6 +1,7 @@
 package com.softwaremill.adopttapir.logging
 
-import com.softwaremill.adopttapir.infrastructure.CorrelationIdSource
+import cats.effect.IO
+import com.softwaremill.adopttapir.infrastructure.CorrelationId
 import com.typesafe.scalalogging.Logger
 import org.slf4j.{LoggerFactory, MDC}
 
@@ -8,20 +9,22 @@ trait FLogging:
   private val delegate = Logger(LoggerFactory.getLogger(getClass.getName))
   protected def logger: FLogger = new FLogger(delegate)
 
-class FLogger(delegate: Logger):
+class FLogger private[logging] (delegate: Logger):
   private val MDCKey = "cid"
-  private def withMDC[F[_]: CorrelationIdSource, T](t: => T): F[T] =
-    summon[CorrelationIdSource[F]].map { cid =>
-      cid.foreach(x => MDC.put(MDCKey, x))
-      try t
-      finally MDC.remove(MDCKey)
+  private def withMDC[T](t: => T)(using cid: CorrelationId): IO[T] =
+    val iot = IO(t)
+
+    cid.get.flatMap { cid =>
+      cid
+        .fold(iot)(x => IO(MDC.put(MDCKey, x)) *> iot)
+        .guarantee(IO(MDC.remove(MDCKey)))
     }
 
-  def debug[F[_]: CorrelationIdSource](message: String): F[Unit] = withMDC(delegate.debug(message))
-  def debug[F[_]: CorrelationIdSource](message: String, cause: Throwable): F[Unit] = withMDC(delegate.debug(message, cause))
-  def info[F[_]: CorrelationIdSource](message: String): F[Unit] = withMDC(delegate.info(message))
-  def info[F[_]: CorrelationIdSource](message: String, cause: Throwable): F[Unit] = withMDC(delegate.info(message, cause))
-  def warn[F[_]: CorrelationIdSource](message: String): F[Unit] = withMDC(delegate.warn(message))
-  def warn[F[_]: CorrelationIdSource](message: String, cause: Throwable): F[Unit] = withMDC(delegate.warn(message, cause))
-  def error[F[_]: CorrelationIdSource](message: String): F[Unit] = withMDC(delegate.error(message))
-  def error[F[_]: CorrelationIdSource](message: String, cause: Throwable): F[Unit] = withMDC(delegate.error(message, cause))
+  def debug(message: String)(using cid: CorrelationId): IO[Unit] = withMDC(delegate.debug(message))
+  def debug(message: String, cause: Throwable)(using cid: CorrelationId): IO[Unit] = withMDC(delegate.debug(message, cause))
+  def info(message: String)(using cid: CorrelationId): IO[Unit] = withMDC(delegate.info(message))
+  def info(message: String, cause: Throwable)(using cid: CorrelationId): IO[Unit] = withMDC(delegate.info(message, cause))
+  def warn(message: String)(using cid: CorrelationId): IO[Unit] = withMDC(delegate.warn(message))
+  def warn(message: String, cause: Throwable)(using cid: CorrelationId): IO[Unit] = withMDC(delegate.warn(message, cause))
+  def error(message: String)(using cid: CorrelationId): IO[Unit] = withMDC(delegate.error(message))
+  def error(message: String, cause: Throwable)(using cid: CorrelationId): IO[Unit] = withMDC(delegate.error(message, cause))

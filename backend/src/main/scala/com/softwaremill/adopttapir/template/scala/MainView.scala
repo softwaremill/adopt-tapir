@@ -28,7 +28,7 @@ object MainView:
             txt.MainZIOhttpZIO(groupId, addDocumentation, addMetrics).toString()
           case StarterDetails(_, groupId, ZIOEffect, VertX, addDocumentation, addMetrics, _, _, _) =>
             txt.MainZIOVertx(groupId, addDocumentation, addMetrics).toString()
-          case _ => throw new UnsupportedOperationException(s"$starterDetails not supported")
+          case _ => throw UnsupportedOperationException(s"$starterDetails not supported")
         }
       case ScalaVersion.Scala3 =>
         starterDetails match {
@@ -50,6 +50,6 @@ object MainView:
             txt.MainZIOhttpZIOScala3(groupId, addDocumentation, addMetrics).toString()
           case StarterDetails(_, groupId, ZIOEffect, VertX, addDocumentation, addMetrics, _, _, _) =>
             txt.MainZIOVertxScala3(groupId, addDocumentation, addMetrics).toString()
-          case _ => throw new UnsupportedOperationException(s"$starterDetails not supported")
+          case _ => throw UnsupportedOperationException(s"$starterDetails not supported")
         }
     }

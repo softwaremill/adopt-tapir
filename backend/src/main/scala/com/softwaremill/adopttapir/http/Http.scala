@@ -1,13 +1,14 @@
 package com.softwaremill.adopttapir.http
 
 import cats.effect.IO
-import cats.implicits.*
+import cats.syntax.all.*
 import com.softwaremill.adopttapir.*
+import com.softwaremill.adopttapir.infrastructure.CorrelationId
 import com.softwaremill.adopttapir.infrastructure.Json.*
 import com.softwaremill.adopttapir.logging.FLogging
 import com.softwaremill.adopttapir.util.Constants
 import com.softwaremill.tagging.*
-import io.circe.{Printer, Encoder, Decoder}
+import io.circe.{Decoder, Encoder, Printer}
 import sttp.model.StatusCode
 import sttp.tapir.Codec.PlainCodec
 import sttp.tapir.json.circe.TapirJsonCirce
@@ -16,7 +17,7 @@ import sttp.tapir.generic.Configuration as TapirConfiguration
 import io.circe.generic.semiauto.*
 
 /** Helper class for defining HTTP endpoints. Import the members of this class when defining an HTTP API using tapir. */
-class Http() extends Tapir, TapirJsonCirce, FLogging:
+class Http(using CorrelationId) extends Tapir, TapirJsonCirce, FLogging:
 
   given TapirConfiguration =
     TapirConfiguration.default
@@ -47,7 +48,7 @@ class Http() extends Tapir, TapirJsonCirce, FLogging:
     def toOut: IO[Either[(StatusCode, Error_OUT), T]] =
       io.map(t => t.asRight[(StatusCode, Error_OUT)]).recoverWith { case f: Fail =>
         val (statusCode, message) = failToResponseData(f)
-        logger.warn[IO](s"Request fail: ${message.error}").map(_ => (statusCode, message).asLeft[T])
+        logger.warn(s"Request fail: ${message.error}").map(_ => (statusCode, message).asLeft[T])
       }
 
   override def jsonPrinter: Printer = noNullsPrinter

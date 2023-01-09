@@ -5,14 +5,15 @@ import com.softwaremill.adopttapir.metrics.Metrics
 import com.softwaremill.adopttapir.starter.StarterDetails
 import com.softwaremill.adopttapir.starter.formatting.GeneratedFilesFormatter
 import com.softwaremill.adopttapir.template.ProjectGenerator
+import cats.syntax.all.*
 
-final case class ContentService(generatedFilesFormatter: GeneratedFilesFormatter):
+final case class ContentService(generatedFilesFormatter: GeneratedFilesFormatter)(using Metrics):
 
   def generateContentTree(starterDetails: StarterDetails): IO[Directory] =
     val projectName = starterDetails.projectName
-    val rawGeneratedFiles = ProjectGenerator.generate(starterDetails)
 
     for
+      rawGeneratedFiles <- IO(ProjectGenerator.generate(starterDetails))
       formattedGeneratedFiles <- generatedFilesFormatter.format(rawGeneratedFiles)
       projectAsDirTrees <- IO(formattedGeneratedFiles.map(fgf => {
         val paths = fgf.relativePath.split('/').toList

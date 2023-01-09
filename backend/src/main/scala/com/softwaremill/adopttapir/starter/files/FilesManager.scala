@@ -4,7 +4,7 @@ import cats.syntax.all.*
 import better.files.File.newTemporaryDirectory
 import better.files.{File => BFile}
 import cats.effect.IO
-import cats.implicits.toTraverseOps
+import cats.syntax.all.*
 import com.softwaremill.adopttapir.template.GeneratedFile
 import com.softwaremill.adopttapir.util.ZipArchiver
 
