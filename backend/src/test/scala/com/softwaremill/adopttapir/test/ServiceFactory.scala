@@ -87,7 +87,7 @@ class ServiceFactory:
         // forward std input to forked process - https://www.scala-sbt.org/1.x/docs/Forking.html#Configuring+Input
         "set run / connectInput := true",
         ";compile ;test ;run"
-      ).spawn(cwd = os.Path(tempDir.toJava), env = Map("http.port" -> "0"), mergeErrIntoOut = true)
+      ).spawn(cwd = os.Path(tempDir.toJava), env = Map("HTTP_PORT" -> "0"), mergeErrIntoOut = true)
     }
 
   private case class ScalaCliService(tempDir: better.files.File) extends GeneratedService:
@@ -104,4 +104,4 @@ class ServiceFactory:
       )
 
       os.proc("scala-cli", "run", ".")
-        .spawn(cwd = os.Path(tempDir.toJava), env = Map("http.port" -> "0"), mergeErrIntoOut = true)
+        .spawn(cwd = os.Path(tempDir.toJava), env = Map("HTTP_PORT" -> "0"), mergeErrIntoOut = true)
