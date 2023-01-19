@@ -14,7 +14,6 @@ val scala3Version = "3.2.1"
 
 val tapirVersion = "1.2.6"
 
-val http4sBlazeServerVersion = "0.23.13"
 val http4sEmberServerVersion = "0.23.18"
 val http4sCirceVersion = "0.23.18"
 val circeVersion = "0.14.3"
@@ -278,7 +277,7 @@ lazy val templateDependencies: Project = project
       "tapirVersion" -> tapirVersion,
       "logbackClassicVersion" -> logbackClassicVersion,
       "scalaTestVersion" -> scalaTestVersion,
-      "http4sBlazeServerVersion" -> http4sBlazeServerVersion,
+      "http4sEmberServerVersion" -> http4sEmberServerVersion,
       "zioTestVersion" -> zioTestVersion,
       "scalafmtVersion" -> scalafmtVersion,
       "sbtVersion" -> sbtVersion.value
