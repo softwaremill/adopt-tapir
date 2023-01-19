@@ -15,6 +15,7 @@ val scala3Version = "3.2.1"
 val tapirVersion = "1.2.6"
 
 val http4sBlazeServerVersion = "0.23.13"
+val http4sEmberServerVersion = "0.23.18"
 val http4sCirceVersion = "0.23.18"
 val circeVersion = "0.14.3"
 val circeGenericsExtrasVersion = "0.14.3"
@@ -28,7 +29,7 @@ val plokhotnyukJsoniterVersion = "2.20.3"
 val zioTestVersion = "2.0.5"
 
 val httpDependencies = Seq(
-  "org.http4s" %% "http4s-blaze-server" % http4sBlazeServerVersion,
+  "org.http4s" %% "http4s-ember-server" % http4sEmberServerVersion,
   "org.http4s" %% "http4s-circe" % http4sCirceVersion,
   "com.softwaremill.sttp.client3" %% "async-http-client-backend-fs2" % sttpVersion,
   "com.softwaremill.sttp.client3" %% "slf4j-backend" % sttpVersion,
@@ -262,7 +263,7 @@ lazy val templateDependencies: Project = project
       "com.softwaremill.sttp.tapir" %% "tapir-cats" % tapirVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-netty-server-cats" % tapirVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % tapirVersion % Provided,
-      "org.http4s" %% "http4s-blaze-server" % http4sBlazeServerVersion % Provided,
+      "org.http4s" %% "http4s-ember-server" % http4sEmberServerVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-http4s-server-zio" % tapirVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-zio-http-server" % tapirVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-vertx-server" % tapirVersion % Provided,

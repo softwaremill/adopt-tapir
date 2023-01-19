@@ -1,11 +1,12 @@
 package com.softwaremill.adopttapir.http
 
 import cats.effect.{IO, Resource}
-import com.softwaremill.adopttapir.infrastructure.{CorrelationIdInterceptor, CorrelationId}
+import com.comcast.ip4s.Port
+import com.softwaremill.adopttapir.infrastructure.{CorrelationId, CorrelationIdInterceptor}
 import com.softwaremill.adopttapir.logging.FLogging
 import com.softwaremill.adopttapir.util.ServerEndpoints
 import org.http4s.HttpRoutes
-import org.http4s.blaze.server.BlazeServerBuilder
+import org.http4s.ember.server.EmberServerBuilder
 import sttp.capabilities.fs2.Fs2Streams
 import sttp.tapir.*
 import sttp.tapir.server.ServerEndpoint
@@ -16,6 +17,7 @@ import sttp.tapir.server.model.ValuedEndpointOutput
 import sttp.tapir.static.ResourcesOptions
 import sttp.tapir.swagger.SwaggerUIOptions
 import sttp.tapir.swagger.bundle.SwaggerInterpreter
+
 import scala.util.chaining.*
 
 /** Interprets the endpoint descriptions (defined using tapir) as http4s routes, adding CORS, metrics, api docs support.
@@ -86,16 +88,17 @@ class HttpApi(
 
   /** The resource describing the HTTP server; binds when the resource is allocated. */
   lazy val resource: Resource[IO, (org.http4s.server.Server, org.http4s.server.Server)] =
-    def resource(routes: HttpRoutes[IO], port: Int, banner: Option[String]) =
-      BlazeServerBuilder[IO]
-        .bindHttp(port, config.host.toString)
+    def resource(routes: HttpRoutes[IO], port: Port) =
+      EmberServerBuilder
+        .default[IO]
+        .withPort(port)
+        .withHost(config.host)
         .withHttpApp(routes.orNotFound)
-        .pipe(s => banner.fold(s.withoutBanner)(b => s.withBanner(b.linesIterator.toSeq)))
-        .resource
+        .build
 
     for
-      public <- resource(publicRoutes, config.port.value, Some(Banner.text))
-      admin <- resource(adminRoutes, config.adminPort.value, None)
+      public <- resource(publicRoutes, config.port)
+      admin <- resource(adminRoutes, config.adminPort)
     yield (public, admin)
 
 end HttpApi
