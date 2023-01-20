@@ -1,7 +1,8 @@
 @(groupId: String, addDocumentation: Boolean, addMetrics: Boolean)
 package @groupId
 
-import org.http4s.blaze.server.BlazeServerBuilder
+import com.comcast.ip4s.{Host, IpLiteralSyntax, Port}
+import org.http4s.ember.server.EmberServerBuilder
 import org.http4s.server.Router@if(addMetrics){
 import sttp.tapir.server.http4s.Http4sServerOptions}
 import sttp.tapir.server.http4s.ztapir.ZHttp4sServerInterpreter
@@ -21,14 +22,19 @@ object Main extends ZIOAppDefault {
     val routes = ZHttp4sServerInterpreter().from(Endpoints.all).toRoutes
     }
 
-    val port = sys.env.get("HTTP_PORT").flatMap(_.toIntOption).getOrElse(8080)
+    val port = sys.env
+      .get("HTTP_PORT")
+      .flatMap(_.toIntOption)
+      .flatMap(Port.fromInt)
+      .getOrElse(port"8080")
 
-    ZIO.executor.flatMap{ executor =>
-      BlazeServerBuilder[Task]
-        .withExecutionContext(executor.asExecutionContext)
-        .bindHttp(port, "localhost")
-        .withHttpApp(Router("/" -> (routes)).orNotFound)
-        .resource
+    ZIO.executor.flatMap{ _ =>
+      EmberServerBuilder
+        .default[Task]
+        .withHost(Host.fromString("localhost").get)
+        .withPort(port)
+        .withHttpApp(Router("/" -> routes).orNotFound)
+        .build
         .use { server =>
           for {
             _ <- Console.printLine(s"@if(addDocumentation){Go to http://localhost:${server.address.getPort}/docs to open SwaggerUI. }else{Server started at http://localhost:${server.address.getPort}. }Press ENTER key to exit.")

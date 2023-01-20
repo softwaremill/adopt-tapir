@@ -118,7 +118,7 @@ abstract class BuildView:
 
     def http4s(): List[ScalaDependency] = List(
       ScalaDependency("com.softwaremill.sttp.tapir", "tapir-http4s-server", getTapirVersion()),
-      ScalaDependency("org.http4s", "http4s-blaze-server", TemplateDependencyInfo.http4sBlazeServerVersion)
+      ScalaDependency("org.http4s", "http4s-ember-server", TemplateDependencyInfo.http4sEmberServerVersion)
     )
 
     def http4sZIO(): List[ScalaDependency] =

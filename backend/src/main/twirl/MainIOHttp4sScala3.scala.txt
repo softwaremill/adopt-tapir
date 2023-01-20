@@ -2,7 +2,8 @@
 package @groupId
 
 import cats.effect.{ExitCode, IO, IOApp}
-import org.http4s.blaze.server.BlazeServerBuilder
+import com.comcast.ip4s.{Host, Port, port}
+import org.http4s.ember.server.EmberServerBuilder
 import org.http4s.server.Router
 import sttp.tapir.server.http4s.@if(addMetrics){{Http4sServerInterpreter, Http4sServerOptions}}else{Http4sServerInterpreter}
 
@@ -19,12 +20,18 @@ object Main extends IOApp:
     val routes = Http4sServerInterpreter[IO]().toRoutes(Endpoints.all)
     }
 
-    val port = sys.env.get("HTTP_PORT").flatMap(_.toIntOption).getOrElse(8080)
+    val port = sys.env
+      .get("HTTP_PORT")
+      .flatMap(_.toIntOption)
+      .flatMap(Port.fromInt)
+      .getOrElse(port"8080")
 
-    BlazeServerBuilder[IO]
-      .bindHttp(port, "localhost")
+    EmberServerBuilder
+      .default[IO]
+      .withHost(Host.fromString("localhost").get)
+      .withPort(port)
       .withHttpApp(Router("/" -> routes).orNotFound)
-      .resource
+      .build
       .use { server =>
         for {
           _ <- IO.println(s"@if(addDocumentation){Go to http://localhost:${server.address.getPort}/docs to open SwaggerUI. }else{Server started at http://localhost:${server.address.getPort}. }Press ENTER key to exit.")
