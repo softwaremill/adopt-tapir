@@ -94,7 +94,7 @@ jobs:
 
       - name: Build docker image locally
         id: build-docker-image-locally
-        run: sbt docker:publishLocal
+        run: sbt -Dsbt.task.timings=true docker:publishLocal
 
   deploy:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
@@ -131,4 +131,4 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Publish docker image
-        run: sbt -Dsbt.task.timings=true  backend/docker:publish
+        run: sbt -Dsbt.task.timings=true backend/docker:publish
