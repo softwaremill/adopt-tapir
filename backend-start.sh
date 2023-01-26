@@ -1,3 +1,3 @@
 #!/bin/bash
 
-sbt "~backend/reStart"
+sbt -Dsbt.task.timings=true "~backend/reStart"
