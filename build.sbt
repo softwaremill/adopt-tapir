@@ -159,7 +159,7 @@ lazy val dockerSettings = Seq(
   Docker / packageName := "adopttapir",
   dockerUsername := Some("softwaremill"),
   dockerUpdateLatest := true,
-  Docker / publish := (Docker / publish).dependsOn(copyWebapp).value,
+  Docker / publishLocal := (Docker / publishLocal).dependsOn(copyWebapp).value,
   Docker / version := git.gitDescribedVersion.value
     .map(versionWithTimestamp)
     .getOrElse(git.formattedShaVersion.value.map(versionWithTimestamp).getOrElse("latest")),
