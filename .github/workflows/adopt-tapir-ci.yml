@@ -131,4 +131,4 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Publish docker image
-        run: sbt backend/docker:publish
+        run: sbt -Dsbt.task.timings=true  backend/docker:publish
