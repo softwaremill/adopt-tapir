@@ -16,7 +16,7 @@ val tapirVersion = "1.2.6"
 
 val http4sEmberServerVersion = "0.23.18"
 val http4sCirceVersion = "0.23.18"
-val circeVersion = "0.14.3"
+val circeVersion = "0.14.4"
 val circeGenericsExtrasVersion = "0.14.3"
 val sttpVersion = "3.8.8"
 val prometheusVersion = "0.16.0"
