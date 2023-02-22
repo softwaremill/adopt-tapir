@@ -73,7 +73,7 @@ class StarterServiceITTest extends BaseTest with ParallelTestExecution:
   import Setup.*
 
   for details <- Setup.validConfigurations do {
-    it should s"return zip file containing working sbt folder with: ${details.show}" in {
+    it should s"work using the configuration: ${details.show}" in {
       val backend: SttpBackend[Identity, Any] = HttpURLConnectionBackend()
 
       // define endpoints integration tests
