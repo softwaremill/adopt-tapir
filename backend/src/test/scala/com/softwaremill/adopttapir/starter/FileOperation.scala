@@ -29,7 +29,7 @@ object FileOperation extends IOApp:
       addMetrics = false,
       JsonImplementation.Circe,
       ScalaVersion.Scala2,
-      Builder.ScalaCli
+      Builder.Sbt
     )
 
     createService.use(service =>

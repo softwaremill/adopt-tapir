@@ -28,7 +28,7 @@ object Main extends ZIOAppDefault:
 
     (
       for
-        actualPort <- Server.install(app)
+        actualPort <- Server.serve(app.withDefaultErrorResponse)
         _ <- Console.printLine(s"@if(addDocumentation){Go to http://localhost:${actualPort}/docs to open SwaggerUI. }else{Server started at http://localhost:${actualPort}. }Press ENTER key to exit.")
         _ <- Console.readLine
       yield ()
