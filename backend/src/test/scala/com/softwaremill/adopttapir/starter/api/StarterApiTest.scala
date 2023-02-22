@@ -14,7 +14,7 @@ import com.softwaremill.adopttapir.test.{BaseTest, TestDependencies}
 import fs2.io.file.Files
 import io.circe.jawn
 import org.scalatest.Assertion
-import sttp.client3.{HttpError, Response}
+import sttp.client3.{HttpError, Response, SttpClientException}
 
 class StarterApiTest extends BaseTest with TestDependencies {
 
@@ -98,7 +98,8 @@ class StarterApiTest extends BaseTest with TestDependencies {
     val request = StarterRequestGenerators.randomStarterRequest().copy(effect = FutureEffect, implementation = ZIOHttp)
 
     // when
-    val ex = intercept[HttpError[String]](requests.requestZip(request))
+    val rootEx = intercept[SttpClientException](requests.requestZip(request))
+    val ex = rootEx.cause.asInstanceOf[HttpError[String]]
 
     // then
     ex.statusCode.code shouldBe 400
@@ -113,7 +114,8 @@ class StarterApiTest extends BaseTest with TestDependencies {
       StarterRequestGenerators.randomStarterRequest().copy(projectName = "Uppercase", effect = FutureEffect, implementation = Netty)
 
     // when
-    val ex = intercept[HttpError[String]](requests.requestZip(request))
+    val rootEx = intercept[SttpClientException](requests.requestZip(request))
+    val ex = rootEx.cause.asInstanceOf[HttpError[String]]
 
     // then
     ex.statusCode.code shouldBe 400

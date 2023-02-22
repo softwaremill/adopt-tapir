@@ -96,12 +96,12 @@ class ServiceFactory:
     override protected lazy val process: SubProcess =
       // one cannot chain multiple targets to scala-cli hence 'test' target (that implicitly calls compile) is called in
       // blocking manner and once it returns with success (0 exit code) the configuration is actually started
-      val compileAndTest = os.proc("scala-cli", "test", ".").call(cwd = os.Path(tempDir.toJava), mergeErrIntoOut = true)
+      val compileAndTest = os.proc("scala-cli", "--power", "test", ".").call(cwd = os.Path(tempDir.toJava), mergeErrIntoOut = true)
       assert(
         compileAndTest.exitCode == 0,
         s"Compilation and unit tests exited with [${compileAndTest.exitCode}] and output:${System
             .lineSeparator()}${compileAndTest.out.lines().mkString(System.lineSeparator())}"
       )
 
-      os.proc("scala-cli", "run", ".")
+      os.proc("scala-cli", "--power", "run", ".")
         .spawn(cwd = os.Path(tempDir.toJava), env = Map("HTTP_PORT" -> "0"), mergeErrIntoOut = true)

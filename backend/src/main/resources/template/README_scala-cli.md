@@ -4,10 +4,10 @@ If you don't have Scala CLI installed yet, please follow these [installation ins
 You can use the following commands to compile, test and run the project:
 
 ```shell
-scala-cli compile --test . # build the project ('--test' means that tests will be also compiled)
-scala-cli test . # run the tests
-scala-cli run . # run the application (Main)
-scala-cli fmt --check . # run scalaformat check on all scala files and print summary, removing '--check' fixes badly formatted files
+scala-cli --power compile --test . # build the project ('--test' means that tests will be also compiled)
+scala-cli --power test . # run the tests
+scala-cli --power run . # run the application (Main)
+scala-cli --power fmt --check . # run scalaformat check on all scala files and print summary, removing '--check' fixes badly formatted files
 ```
 
 To open project in the IDE (Metals / IntelliJ) run any of the `compile` or `test` command above and open the project.
