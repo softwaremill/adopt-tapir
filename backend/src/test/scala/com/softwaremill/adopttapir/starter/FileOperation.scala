@@ -25,11 +25,11 @@ object FileOperation extends IOApp:
       "com.mjoyit.experience",
       ServerEffect.ZIOEffect,
       ServerImplementation.ZIOHttp,
-      addDocumentation = true,
+      addDocumentation = false,
       addMetrics = false,
-      JsonImplementation.Circe,
+      JsonImplementation.ZIOJson,
       ScalaVersion.Scala2,
-      Builder.Sbt
+      Builder.ScalaCli
     )
 
     createService.use(service =>
