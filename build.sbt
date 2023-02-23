@@ -1,6 +1,4 @@
 import com.softwaremill.SbtSoftwareMillCommon.commonSmlBuildSettings
-import sbt.Keys._
-import sbt._
 import complete.DefaultParsers._
 import sbtbuildinfo.BuildInfoKey.action
 import sbtbuildinfo.BuildInfoKeys.{buildInfoKeys, buildInfoOptions, buildInfoPackage}
@@ -140,7 +138,6 @@ lazy val buildInfoSettings = Seq(
 
 lazy val fatJarSettings = Seq(
   assembly / assemblyJarName := "adopttapir.jar",
-  assembly := assembly.dependsOn(copyWebapp).value,
   assembly / assemblyMergeStrategy := {
     case PathList(ps @ _*) if ps.last endsWith "io.netty.versions.properties"       => MergeStrategy.first
     case PathList(ps @ _*) if ps.last endsWith "pom.properties"                     => MergeStrategy.first
@@ -159,7 +156,6 @@ lazy val dockerSettings = Seq(
   Docker / packageName := "adopttapir",
   dockerUsername := Some("softwaremill"),
   dockerUpdateLatest := true,
-  Docker / publishLocal := (Docker / publishLocal).dependsOn(copyWebapp).value,
   Docker / version := git.gitDescribedVersion.value
     .map(versionWithTimestamp)
     .getOrElse(git.formattedShaVersion.value.map(versionWithTimestamp).getOrElse("latest")),
@@ -218,6 +214,7 @@ lazy val backend: Project = (project in file("backend"))
       IO.copyDirectory(source, target)
     },
     copyWebapp := copyWebapp.dependsOn(yarnTask.toTask(" build")).value,
+    Compile / packageBin := ((Compile / packageBin) dependsOn copyWebapp).value,
     Test / testOptions := Seq(Tests.Filter(unitFilter)) ++ Seq(Tests.Argument("-P" + java.lang.Runtime.getRuntime.availableProcessors())),
     ItTest / testOptions := Seq(Tests.Filter(itFilter)) ++ Seq(
       Tests.Argument(
