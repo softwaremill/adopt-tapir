@@ -12,4 +12,4 @@ addSbtPlugin("com.github.sbt" % "sbt-git" % "2.0.1")
 
 addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.6.4")
 
-addSbtPlugin("com.typesafe.play" % "sbt-twirl" % "1.6.0-RC1")
+addSbtPlugin("com.typesafe.play" % "sbt-twirl" % "1.6.0-RC2")
