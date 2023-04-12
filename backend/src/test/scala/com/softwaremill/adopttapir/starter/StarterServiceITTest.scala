@@ -147,7 +147,7 @@ case class GeneratedServiceUnderTest(serviceFactory: ServiceFactory, details: St
       tempDir <- createTempDirectory()
     yield (zipFile, tempDir))
       .use { case (zipFile, tempDir) =>
-        unzipFile(zipFile, tempDir, logger) >> spawnService(tempDir).use(service =>
+        unzipFile(zipFile, tempDir, logger) >> spawnService(tempDir, details.projectName).use(service =>
           getPortFromService(service, logger).flatMap(port => runTests(port, tests, logger))
         )
       }
@@ -169,8 +169,8 @@ case class GeneratedServiceUnderTest(serviceFactory: ServiceFactory, details: St
   private def unzipFile(zipFile: BFile, tempDir: BFile, logger: RunLogger): IO[Unit] =
     IO.blocking(zipFile.unzipTo(tempDir)) >> logger.log("* zip file was unzipped")
 
-  private def spawnService(tempDir: BFile): Resource[IO, GeneratedService] =
-    Resource.make(serviceFactory.create(details.builder, tempDir))(_.close())
+  private def spawnService(tempDir: BFile, projectName: String): Resource[IO, GeneratedService] =
+    Resource.make(serviceFactory.create(details.builder, tempDir / projectName))(_.close())
 
   private def getPortFromService(service: GeneratedService, logger: RunLogger): IO[Integer] =
     for
