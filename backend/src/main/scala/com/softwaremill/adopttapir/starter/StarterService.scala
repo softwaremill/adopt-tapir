@@ -26,7 +26,7 @@ class StarterService(generatedFilesFormatter: GeneratedFilesFormatter, filesMana
             tempDir <- tempDirectory
             _ <- logger.debug("Created temp dir: " + tempDir)
             _ <- filesManager.createFiles(tempDir, formattedGeneratedFiles)
-            zippedFile <- filesManager.zipDirectory(tempDir)
+            zippedFile <- filesManager.zipDirectory(tempDir, zipRootDirName = starterDetails.projectName)
             _ <- Metrics.increaseZipGenerationMetricCounter(starterDetails)
           yield zippedFile
         }(release = tempDirectory => filesManager.deleteFilesAsStatedInConfig(tempDirectory))

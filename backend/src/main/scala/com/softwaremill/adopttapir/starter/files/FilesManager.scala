@@ -26,10 +26,10 @@ class FilesManager(config: StorageConfig):
       file.toJava
     }
 
-  def zipDirectory(directoryFile: File): IO[File] =
+  def zipDirectory(directoryFile: File, zipRootDirName: String): IO[File] =
     IO.blocking {
       val destination = BFile.newTemporaryFile(prefix = directoryFile.getName + "_", suffix = ".zip")
-      ZipArchiver().create(destination.path, directoryFile.toPath)
+      ZipArchiver().create(destination.path, directoryFile.toPath, zipRootDirName)
       destination.toJava
     }
 
