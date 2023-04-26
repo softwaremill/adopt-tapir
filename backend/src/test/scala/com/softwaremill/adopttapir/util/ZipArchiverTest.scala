@@ -26,10 +26,10 @@ class ZipArchiverTest extends BaseTest with BeforeAndAfter:
     val zippedFile: File = better.files.File.newTemporaryFile("ZipArchiverTest", ".zip").deleteOnExit()
 
     // when
-    ZipArchiver(Map(file.name -> ZipArchiver.chmod755)).create(zippedFile.path, dirToZip.path)
+    ZipArchiver(Map(file.name -> ZipArchiver.chmod755)).create(zippedFile.path, dirToZip.path, "root-dir")
 
     // then
-    checkZipEntry(file.name, zippedFile)(_.getEntry(file.name).getUnixMode shouldBe ZipArchiver.chmod755)
+    checkZipEntry(zippedFile)(_.getEntry(s"root-dir/${file.name}").getUnixMode shouldBe ZipArchiver.chmod755)
   }
 
   it should "not set unix file permission if it is NOT specified on Map" in {
@@ -39,13 +39,13 @@ class ZipArchiverTest extends BaseTest with BeforeAndAfter:
     val zippedFile: File = better.files.File.newTemporaryFile("ZipArchiverTest", ".zip").deleteOnExit()
 
     // when
-    ZipArchiver(Map("otherFile" -> ZipArchiver.chmod755)).create(zippedFile.path, dirToZip.path)
+    ZipArchiver(Map("otherFile" -> ZipArchiver.chmod755)).create(zippedFile.path, dirToZip.path, "root-dir")
 
     // then
-    checkZipEntry(file.name, zippedFile)(_.getEntry(file.name).getUnixMode shouldBe 0)
+    checkZipEntry(zippedFile)(_.getEntry(s"root-dir/${file.name}").getUnixMode shouldBe 0)
   }
 
-  private def checkZipEntry[A](filename: String, zippedFile: File)(applyFn: ZipFile => A) = {
+  private def checkZipEntry[A](zippedFile: File)(applyFn: ZipFile => A) = {
     for
       channel <- new SeekableInMemoryByteChannel(zippedFile.byteArray).autoClosed
       zipFile <- new ZipFile(channel).autoClosed

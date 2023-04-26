@@ -22,11 +22,13 @@ import scala.util.chaining.*
 
 /** Interprets the endpoint descriptions (defined using tapir) as http4s routes, adding CORS, metrics, api docs support.
   *
-  * The following endpoints are exposed:
+  * The following endpoints are exposed on `config.port`
   *   - `/api/v1` - the main API
   *   - `/api/v1/docs` - swagger UI for the main API
-  *   - `/admin` - admin API
   *   - `/` - serving frontend resources
+  *
+  * The following endpoints are exposed on `config.adminPort`
+  *   - `/` - admin API
   */
 class HttpApi(
     http: Http,

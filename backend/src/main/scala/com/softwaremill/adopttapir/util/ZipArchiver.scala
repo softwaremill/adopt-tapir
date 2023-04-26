@@ -9,7 +9,7 @@ import java.nio.file.Path
 trait ZipArchiver:
   protected val fileNameToPermissionsInHex: Map[String, Int]
 
-  def create(archivedPath: Path, directoryToZip: Path): Unit
+  def create(archivedPath: Path, directoryToZip: Path, zipRootDirName: String): Unit
 
 object ZipArchiver:
   val chmod755: Int = 0x1ed // 0755 written in hex as scala doesn't have octal notation
@@ -17,7 +17,7 @@ object ZipArchiver:
   def apply(fileNameToPermissions: Map[String, Int] = Map(sbtxFile -> chmod755)): ZipArchiver = new ZipArchiver() {
     override val fileNameToPermissionsInHex: Map[String, Int] = fileNameToPermissions
 
-    override def create(archivedPath: Path, directoryToZip: Path): Unit = {
+    override def create(archivedPath: Path, directoryToZip: Path, zipRootDirName: String): Unit = {
       val dir = directoryToZip.toFile.toScala
       val files = if dir.isDirectory then dir.children else Iterator(dir)
 
@@ -28,10 +28,10 @@ object ZipArchiver:
         name = input.parent.relativize(file).toString
       do {
         val relativeName = name.stripSuffix(file.fileSystem.getSeparator)
-        val entryName = if file.isDirectory then s"$relativeName/" else relativeName
+        val entryName = s"$zipRootDirName/" + (if file.isDirectory then s"$relativeName/" else relativeName)
 
         val entry: ZipArchiveEntry = output.createArchiveEntry(file.toJava, entryName).asInstanceOf[ZipArchiveEntry]
-        fileNameToPermissionsInHex.get(entryName).foreach {
+        fileNameToPermissionsInHex.get(relativeName).foreach {
           entry.setUnixMode
         }
 

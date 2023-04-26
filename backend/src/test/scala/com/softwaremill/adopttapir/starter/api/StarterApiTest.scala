@@ -14,7 +14,11 @@ import com.softwaremill.adopttapir.test.{BaseTest, TestDependencies}
 import fs2.io.file.Files
 import io.circe.jawn
 import org.scalatest.Assertion
-import sttp.client3.{HttpError, Response}
+import better.files.{DisposeableExtensions, File}
+import sttp.client3.{HttpError, Response, SttpClientException}
+import java.nio.file.attribute.PosixFilePermissions
+import org.apache.commons.compress.utils.SeekableInMemoryByteChannel
+import org.apache.commons.compress.archivers.zip.ZipFile
 
 class StarterApiTest extends BaseTest with TestDependencies {
 
@@ -40,6 +44,21 @@ class StarterApiTest extends BaseTest with TestDependencies {
         "README.md",
         ".gitignore"
       )
+    }
+  }
+
+  "/starter.zip" should "return a zip containing sbtx with permissions 755" in {
+    // given
+    val req = validSbtRequest
+
+    // when
+    val response: Response[fs2.Stream[IO, Byte]] = requests.requestZip(req)
+
+    // then
+    response.code.code shouldBe 200
+
+    checkStreamZip(response.body) { zippedFile =>
+      checkZipEntry(zippedFile)(_.getEntry(s"${req.projectName}/sbtx").getUnixMode shouldBe 493)
     }
   }
 
@@ -80,14 +99,17 @@ class StarterApiTest extends BaseTest with TestDependencies {
         val paths = unpackedDir.listRecursively.toList
           .collect {
             case f: File
-                if f.path.toString.endsWith(".scala") && !f.path
-                  .endsWith("build.scala") && !f.path.endsWith("build.test.scala") && f.isRegularFile =>
+                if f.path.toString.endsWith("README.md") ||
+                  f.path.toString.endsWith(".scala") && !f.path
+                    .endsWith("build.scala") && !f.path.endsWith("build.test.scala") && f.isRegularFile =>
               unpackedDir.relativize(f)
           }
+        val root = req.projectName
         paths.map(_.toString) should contain theSameElementsAs List(
-          s"$mainPath/$groupIdRelativePath/Main.scala",
-          s"src/main/scala/$groupIdRelativePath/Endpoints.scala",
-          s"src/test/scala/$groupIdRelativePath/EndpointsSpec.scala"
+          s"$root/README.md",
+          s"$root/$mainPath/$groupIdRelativePath/Main.scala",
+          s"$root/src/main/scala/$groupIdRelativePath/Endpoints.scala",
+          s"$root/src/test/scala/$groupIdRelativePath/EndpointsSpec.scala"
         )
       }
     }
@@ -98,7 +120,8 @@ class StarterApiTest extends BaseTest with TestDependencies {
     val request = StarterRequestGenerators.randomStarterRequest().copy(effect = FutureEffect, implementation = ZIOHttp)
 
     // when
-    val ex = intercept[HttpError[String]](requests.requestZip(request))
+    val rootEx = intercept[SttpClientException](requests.requestZip(request))
+    val ex = rootEx.cause.asInstanceOf[HttpError[String]]
 
     // then
     ex.statusCode.code shouldBe 400
@@ -113,13 +136,26 @@ class StarterApiTest extends BaseTest with TestDependencies {
       StarterRequestGenerators.randomStarterRequest().copy(projectName = "Uppercase", effect = FutureEffect, implementation = Netty)
 
     // when
-    val ex = intercept[HttpError[String]](requests.requestZip(request))
+    val rootEx = intercept[SttpClientException](requests.requestZip(request))
+    val ex = rootEx.cause.asInstanceOf[HttpError[String]]
 
     // then
     ex.statusCode.code shouldBe 400
     jawn.decode[Error_OUT](ex.body).value.error should include(
       "Project name: `Uppercase` should match regex: `^[a-z0-9_]$|^[a-z0-9_]+[a-z0-9_-]*[a-z0-9_]+$`"
     )
+  }
+
+  def checkStreamZip[A](fileStream: fs2.Stream[IO, Byte])(assertionOnZipFn: File => A): Unit = {
+    tempZipFile().use { case tempZipFile =>
+      for
+        _ <- fileStream
+          .through(Files[IO].writeAll(fs2.io.file.Path(tempZipFile.toJava.getPath)))
+          .compile
+          .drain
+        _ <- IO.blocking(assertionOnZipFn(tempZipFile))
+      yield ()
+    }.unwrap
   }
 
   def checkStreamZipContent(fileStream: fs2.Stream[IO, Byte])(assertionOnUnpackedDirFn: File => Assertion): Unit = {
@@ -144,6 +180,15 @@ class StarterApiTest extends BaseTest with TestDependencies {
 
   private def tempDir(): Resource[IO, File] = Resource
     .make(IO.blocking(better.files.File.newTemporaryDirectory("starterApiTest")))(f => IO.blocking(f.delete()))
+}
+
+private def checkZipEntry[A](zippedFile: File)(applyFn: ZipFile => A) = {
+  for
+    channel <- new SeekableInMemoryByteChannel(zippedFile.byteArray).autoClosed
+    zipFile <- new ZipFile(channel).autoClosed
+  do {
+    applyFn(zipFile)
+  }
 }
 
 object StarterApiTest {

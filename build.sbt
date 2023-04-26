@@ -1,6 +1,4 @@
 import com.softwaremill.SbtSoftwareMillCommon.commonSmlBuildSettings
-import sbt.Keys._
-import sbt._
 import complete.DefaultParsers._
 import sbtbuildinfo.BuildInfoKey.action
 import sbtbuildinfo.BuildInfoKeys.{buildInfoKeys, buildInfoOptions, buildInfoPackage}
@@ -10,21 +8,21 @@ import scala.sys.process.Process
 import scala.util.Try
 
 val scala2Version = "2.13.10"
-val scala3Version = "3.2.1"
+val scala3Version = "3.2.2"
 
-val tapirVersion = "1.2.6"
+val tapirVersion = "1.2.9"
 
 val http4sEmberServerVersion = "0.23.18"
 val http4sCirceVersion = "0.23.18"
-val circeVersion = "0.14.4"
+val circeVersion = "0.14.5"
 val circeGenericsExtrasVersion = "0.14.3"
-val sttpVersion = "3.8.8"
+val sttpVersion = "3.8.13"
 val prometheusVersion = "0.16.0"
-val scalafmtVersion = "3.7.0"
+val scalafmtVersion = "3.7.3"
 val scalaLoggingVersion = "3.9.5"
-val logbackClassicVersion = "1.4.5"
+val logbackClassicVersion = "1.4.7"
 val scalaTestVersion = "3.2.15"
-val plokhotnyukJsoniterVersion = "2.20.3"
+val plokhotnyukJsoniterVersion = "2.23.0"
 val zioTestVersion = "2.0.5"
 
 val httpDependencies = Seq(
@@ -56,22 +54,22 @@ val loggingDependencies = Seq(
   "com.typesafe.scala-logging" %% "scala-logging" % scalaLoggingVersion,
   "ch.qos.logback" % "logback-classic" % logbackClassicVersion,
   "org.codehaus.janino" % "janino" % "3.1.9" % Runtime,
-  "net.logstash.logback" % "logstash-logback-encoder" % "7.2" % Runtime
+  "net.logstash.logback" % "logstash-logback-encoder" % "7.3" % Runtime
 )
 
 val fileDependencies = Seq(
-  "com.github.pathikrit" %% "better-files" % "3.9.1" cross CrossVersion.for3Use2_13,
-  "org.apache.commons" % "commons-compress" % "1.22"
+  "com.github.pathikrit" %% "better-files" % "3.9.2" cross CrossVersion.for3Use2_13,
+  "org.apache.commons" % "commons-compress" % "1.23.0"
 )
 
 val configDependencies = Seq(
-  "com.github.pureconfig" %% "pureconfig-core" % "0.17.2"
+  "com.github.pureconfig" %% "pureconfig-core" % "0.17.3"
 )
 
 val baseDependencies = Seq(
-  "org.typelevel" %% "cats-effect" % "3.4.5",
+  "org.typelevel" %% "cats-effect" % "3.4.9",
   "com.softwaremill.common" %% "tagging" % "2.3.4",
-  "com.softwaremill.quicklens" %% "quicklens" % "1.9.0"
+  "com.softwaremill.quicklens" %% "quicklens" % "1.9.2"
 )
 
 val apiDocsDependencies = Seq(
@@ -85,7 +83,7 @@ val scalafmtStandaloneDependencies = Seq(
 val unitTestingStack = Seq(
   "org.scalatest" %% "scalatest" % scalaTestVersion % Test,
   "org.scalacheck" %% "scalacheck" % "1.17.0" % Test,
-  "com.lihaoyi" %% "os-lib" % "0.9.0" % Test
+  "com.lihaoyi" %% "os-lib" % "0.9.1" % Test
 )
 
 val commonDependencies =
@@ -140,7 +138,6 @@ lazy val buildInfoSettings = Seq(
 
 lazy val fatJarSettings = Seq(
   assembly / assemblyJarName := "adopttapir.jar",
-  assembly := assembly.dependsOn(copyWebapp).value,
   assembly / assemblyMergeStrategy := {
     case PathList(ps @ _*) if ps.last endsWith "io.netty.versions.properties"       => MergeStrategy.first
     case PathList(ps @ _*) if ps.last endsWith "pom.properties"                     => MergeStrategy.first
@@ -159,7 +156,6 @@ lazy val dockerSettings = Seq(
   Docker / packageName := "adopttapir",
   dockerUsername := Some("softwaremill"),
   dockerUpdateLatest := true,
-  Docker / publishLocal := (Docker / publishLocal).dependsOn(copyWebapp).value,
   Docker / version := git.gitDescribedVersion.value
     .map(versionWithTimestamp)
     .getOrElse(git.formattedShaVersion.value.map(versionWithTimestamp).getOrElse("latest")),
@@ -218,6 +214,7 @@ lazy val backend: Project = (project in file("backend"))
       IO.copyDirectory(source, target)
     },
     copyWebapp := copyWebapp.dependsOn(yarnTask.toTask(" build")).value,
+    Compile / packageBin := ((Compile / packageBin) dependsOn copyWebapp).value,
     Test / testOptions := Seq(Tests.Filter(unitFilter)) ++ Seq(Tests.Argument("-P" + java.lang.Runtime.getRuntime.availableProcessors())),
     ItTest / testOptions := Seq(Tests.Filter(itFilter)) ++ Seq(
       Tests.Argument(
