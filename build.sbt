@@ -23,7 +23,7 @@ val scalaLoggingVersion = "3.9.5"
 val logbackClassicVersion = "1.4.7"
 val scalaTestVersion = "3.2.15"
 val plokhotnyukJsoniterVersion = "2.23.0"
-val zioTestVersion = "2.0.5"
+val zioTestVersion = "2.0.13"
 
 val httpDependencies = Seq(
   "org.http4s" %% "http4s-ember-server" % http4sEmberServerVersion,
