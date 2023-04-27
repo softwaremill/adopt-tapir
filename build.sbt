@@ -20,9 +20,9 @@ val sttpVersion = "3.8.13"
 val prometheusVersion = "0.16.0"
 val scalafmtVersion = "3.7.3"
 val scalaLoggingVersion = "3.9.5"
-val logbackClassicVersion = "1.4.6"
+val logbackClassicVersion = "1.4.7"
 val scalaTestVersion = "3.2.15"
-val plokhotnyukJsoniterVersion = "2.22.2"
+val plokhotnyukJsoniterVersion = "2.23.0"
 val zioTestVersion = "2.0.5"
 
 val httpDependencies = Seq(
@@ -63,13 +63,13 @@ val fileDependencies = Seq(
 )
 
 val configDependencies = Seq(
-  "com.github.pureconfig" %% "pureconfig-core" % "0.17.2"
+  "com.github.pureconfig" %% "pureconfig-core" % "0.17.3"
 )
 
 val baseDependencies = Seq(
-  "org.typelevel" %% "cats-effect" % "3.4.8",
+  "org.typelevel" %% "cats-effect" % "3.4.9",
   "com.softwaremill.common" %% "tagging" % "2.3.4",
-  "com.softwaremill.quicklens" %% "quicklens" % "1.9.1"
+  "com.softwaremill.quicklens" %% "quicklens" % "1.9.2"
 )
 
 val apiDocsDependencies = Seq(
