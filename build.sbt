@@ -16,7 +16,7 @@ val http4sEmberServerVersion = "0.23.18"
 val http4sCirceVersion = "0.23.18"
 val circeVersion = "0.14.5"
 val circeGenericsExtrasVersion = "0.14.3"
-val sttpVersion = "3.8.13"
+val sttpVersion = "3.8.15"
 val prometheusVersion = "0.16.0"
 val scalafmtVersion = "3.7.3"
 val scalaLoggingVersion = "3.9.5"
@@ -254,7 +254,7 @@ lazy val templateDependencies: Project = project
       "com.softwaremill.sttp.tapir" %% "tapir-json-zio" % tapirVersion % Provided,
       "com.softwaremill.sttp.client3" %% "circe" % sttpVersion % Provided,
       "com.softwaremill.sttp.client3" %% "jsoniter" % sttpVersion % Provided,
-      "com.softwaremill.sttp.client3" %% "zio-json" % sttpVersion % Provided,
+      "com.softwaremill.sttp.client3" %% "zio-json" % "3.8.13" % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-netty-server" % tapirVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-cats" % tapirVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-netty-server-cats" % tapirVersion % Provided,
