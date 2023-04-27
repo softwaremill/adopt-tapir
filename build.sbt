@@ -16,14 +16,14 @@ val http4sEmberServerVersion = "0.23.18"
 val http4sCirceVersion = "0.23.18"
 val circeVersion = "0.14.5"
 val circeGenericsExtrasVersion = "0.14.3"
-val sttpVersion = "3.8.13"
+val sttpVersion = "3.8.15"
 val prometheusVersion = "0.16.0"
 val scalafmtVersion = "3.7.3"
 val scalaLoggingVersion = "3.9.5"
 val logbackClassicVersion = "1.4.7"
 val scalaTestVersion = "3.2.15"
 val plokhotnyukJsoniterVersion = "2.23.0"
-val zioTestVersion = "2.0.5"
+val zioTestVersion = "2.0.13"
 
 val httpDependencies = Seq(
   "org.http4s" %% "http4s-ember-server" % http4sEmberServerVersion,
