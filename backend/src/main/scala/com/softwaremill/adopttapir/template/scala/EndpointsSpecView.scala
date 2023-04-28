@@ -52,7 +52,7 @@ object EndpointsSpecView:
         case ServerEffect.IOEffect =>
           Set(
             Import("cats.effect.IO"),
-            Import("sttp.tapir.integ.cats.CatsMonadError")
+            Import("sttp.tapir.integ.cats.effect.CatsMonadError")
           )
         case ServerEffect.ZIOEffect =>
           Set(
