@@ -39,8 +39,7 @@ object EndpointsSpecView:
 
       val body =
         s"""val backendStub = TapirStubInterpreter($stub)
-           |  .whenServerEndpoint($endpoint)
-           |  .thenRunLogic()
+           |  .whenServerEndpointRunLogic($endpoint)
            |  .backend()""".stripMargin
 
       val imports = serverEffect match {
