@@ -10,7 +10,7 @@ import scala.util.Try
 val scala2Version = "2.13.10"
 val scala3Version = "3.2.2"
 
-val tapirVersion = "1.2.9"
+val tapirVersion = "1.3.0"
 
 val http4sEmberServerVersion = "0.23.18"
 val http4sCirceVersion = "0.23.18"
@@ -257,6 +257,7 @@ lazy val templateDependencies: Project = project
       "com.softwaremill.sttp.client3" %% "zio-json" % sttpVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-netty-server" % tapirVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-cats" % tapirVersion % Provided,
+      "com.softwaremill.sttp.tapir" %% "tapir-cats-effect" % tapirVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-netty-server-cats" % tapirVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % tapirVersion % Provided,
       "org.http4s" %% "http4s-ember-server" % http4sEmberServerVersion % Provided,

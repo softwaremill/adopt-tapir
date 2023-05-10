@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory
 import sttp.tapir.server.interceptor.log.DefaultServerLog
 import sttp.tapir.server.ziohttp.{ZioHttpInterpreter, ZioHttpServerOptions}
 import zio.{Console, ExitCode, Scope, Task, ZIO, ZIOAppArgs, ZIOAppDefault}
-import zio.http.{Server, ServerConfig, HttpApp}
+import zio.http.{Server, HttpApp}
 
 object Main extends ZIOAppDefault {
   val log = LoggerFactory.getLogger(ZioHttpInterpreter.getClass.getName)
@@ -33,8 +33,7 @@ object Main extends ZIOAppDefault {
        _ <- Console.readLine
      } yield ()
    ).provide(
-      ServerConfig.live(ServerConfig.default.port(port)),
-      Server.live
+      Server.defaultWithPort(port)
    ).exitCode
   }
 }

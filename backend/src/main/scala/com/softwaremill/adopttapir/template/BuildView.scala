@@ -113,6 +113,7 @@ abstract class BuildView:
     def ioNetty(): List[ScalaDependency] =
       List(
         ScalaDependency("com.softwaremill.sttp.tapir", "tapir-cats", getTapirVersion()),
+        ScalaDependency("com.softwaremill.sttp.tapir", "tapir-cats-effect", getTapirVersion()),
         ScalaDependency("com.softwaremill.sttp.tapir", "tapir-netty-server-cats", getTapirVersion())
       )
 
@@ -134,7 +135,8 @@ abstract class BuildView:
 
     def ioVerteX(): List[ScalaDependency] = List(
       ScalaDependency("com.softwaremill.sttp.tapir", "tapir-vertx-server-cats", getTapirVersion()),
-      ScalaDependency("com.softwaremill.sttp.tapir", "tapir-cats", getTapirVersion())
+      ScalaDependency("com.softwaremill.sttp.tapir", "tapir-cats", getTapirVersion()),
+      ScalaDependency("com.softwaremill.sttp.tapir", "tapir-cats-effect", getTapirVersion())
     )
 
     def ZIOVerteX(): List[ScalaDependency] = List(
