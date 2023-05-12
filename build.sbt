@@ -63,7 +63,7 @@ val fileDependencies = Seq(
 )
 
 val configDependencies = Seq(
-  "com.github.pureconfig" %% "pureconfig-core" % "0.17.3"
+  "com.github.pureconfig" %% "pureconfig-core" % "0.17.4"
 )
 
 val baseDependencies = Seq(
