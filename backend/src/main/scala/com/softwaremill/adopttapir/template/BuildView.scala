@@ -6,6 +6,7 @@ import com.softwaremill.adopttapir.starter.{JsonImplementation, ServerEffect, St
 import Dependency.{JavaDependency, ScalaDependency, ScalaTestDependency, constantTapirVersion}
 import com.softwaremill.adopttapir.version.TemplateDependencyInfo
 import com.softwaremill.adopttapir.starter.ServerEffectAndImplementation
+import com.softwaremill.adopttapir.starter.ServerImplementation
 
 abstract class BuildView:
   def getAllDependencies(starterDetails: StarterDetails): List[Dependency] =
@@ -14,6 +15,7 @@ abstract class BuildView:
   def getMainDependencies(starterDetails: StarterDetails): List[Dependency] =
     val httpDependencies = getHttpDependencies(starterDetails)
     val monitoringDependencies = Nil
+    val loggingDependencies = getLoggingDependency(starterDetails)
     val jsonDependencies = getJsonDependencies(starterDetails)
     val docsDependencies = getDocsDependencies(starterDetails)
     val metricsDependencies = getMetricsDependencies(starterDetails)
@@ -21,7 +23,7 @@ abstract class BuildView:
       JavaDependency("ch.qos.logback", "logback-classic", TemplateDependencyInfo.logbackClassicVersion)
     )
 
-    httpDependencies ++ metricsDependencies ++ docsDependencies ++ monitoringDependencies ++ jsonDependencies ++ baseDependencies
+    httpDependencies ++ metricsDependencies ++ docsDependencies ++ monitoringDependencies ++ jsonDependencies ++ baseDependencies ++ loggingDependencies
 
   def getAllTestDependencies(starterDetails: StarterDetails): List[Dependency] =
     ScalaTestDependency("com.softwaremill.sttp.tapir", "tapir-sttp-stub-server", getTapirVersion()) ::
@@ -37,6 +39,10 @@ abstract class BuildView:
         ScalaTestDependency("dev.zio", "zio-test", TemplateDependencyInfo.zioTestVersion),
         ScalaTestDependency("dev.zio", "zio-test-sbt", TemplateDependencyInfo.zioTestVersion)
       )
+
+  private def getLoggingDependency(starterDetails: StarterDetails): List[ScalaDependency] =
+    if starterDetails.serverImplementation != ServerImplementation.ZIOHttp then Nil
+    else List(ScalaDependency("dev.zio", "zio-logging", "2.1.12"))
 
   private def getDocsDependencies(starterDetails: StarterDetails): List[ScalaDependency] =
     if starterDetails.addDocumentation then
