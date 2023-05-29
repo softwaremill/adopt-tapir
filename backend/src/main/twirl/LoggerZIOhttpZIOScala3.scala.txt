@@ -21,6 +21,6 @@ object Logger:
 
       val formatter = DateTimeFormatter.ofPattern("HH:mm:ss.SSS")
       val time = LocalDateTime.now().format(formatter)
-      val logName = ZioHttpInterpreter.getClass.getName
+      val logName = ZioHttpInterpreter().getClass.getName
 
       println(s"$time [${Thread.currentThread.getName}] ${logLevel.label} $logName - ${message()}")
