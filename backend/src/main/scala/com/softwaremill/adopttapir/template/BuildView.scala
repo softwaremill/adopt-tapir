@@ -15,15 +15,12 @@ abstract class BuildView:
   def getMainDependencies(starterDetails: StarterDetails): List[Dependency] =
     val httpDependencies = getHttpDependencies(starterDetails)
     val monitoringDependencies = Nil
-    val loggingDependencies = getLoggingDependency(starterDetails)
     val jsonDependencies = getJsonDependencies(starterDetails)
     val docsDependencies = getDocsDependencies(starterDetails)
     val metricsDependencies = getMetricsDependencies(starterDetails)
-    val baseDependencies = List(
-      JavaDependency("ch.qos.logback", "logback-classic", TemplateDependencyInfo.logbackClassicVersion)
-    )
+    val loggerDependencies = getLoggerDependency(starterDetails)
 
-    httpDependencies ++ metricsDependencies ++ docsDependencies ++ monitoringDependencies ++ jsonDependencies ++ baseDependencies ++ loggingDependencies
+    httpDependencies ++ metricsDependencies ++ docsDependencies ++ monitoringDependencies ++ jsonDependencies ++ loggerDependencies
 
   def getAllTestDependencies(starterDetails: StarterDetails): List[Dependency] =
     ScalaTestDependency("com.softwaremill.sttp.tapir", "tapir-sttp-stub-server", getTapirVersion()) ::
@@ -40,10 +37,6 @@ abstract class BuildView:
         ScalaTestDependency("dev.zio", "zio-test-sbt", TemplateDependencyInfo.zioTestVersion)
       )
 
-  private def getLoggingDependency(starterDetails: StarterDetails): List[ScalaDependency] =
-    if starterDetails.serverImplementation != ServerImplementation.ZIOHttp then Nil
-    else List(ScalaDependency("dev.zio", "zio-logging", "2.1.12"))
-
   private def getDocsDependencies(starterDetails: StarterDetails): List[ScalaDependency] =
     if starterDetails.addDocumentation then
       List(ScalaDependency("com.softwaremill.sttp.tapir", "tapir-swagger-ui-bundle", getTapirVersion()))
@@ -52,6 +45,15 @@ abstract class BuildView:
   private def getMetricsDependencies(starterDetails: StarterDetails): List[ScalaDependency] =
     if starterDetails.addMetrics then List(ScalaDependency("com.softwaremill.sttp.tapir", "tapir-prometheus-metrics", getTapirVersion()))
     else Nil
+
+  private def getLoggerDependency(starterDetails: StarterDetails): List[Dependency] =
+    val extraLogger =
+      if starterDetails.serverImplementation != ServerImplementation.ZIOHttp then Nil
+      else List(ScalaDependency("dev.zio", "zio-logging", "2.1.12"))
+
+    List(
+      JavaDependency("ch.qos.logback", "logback-classic", TemplateDependencyInfo.logbackClassicVersion)
+    ) ++ extraLogger
 
   private def getJsonDependencies(starterDetails: StarterDetails): List[ScalaDependency] =
     starterDetails.jsonImplementation match {

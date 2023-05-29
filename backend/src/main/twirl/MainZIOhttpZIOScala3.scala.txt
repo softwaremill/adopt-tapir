@@ -2,16 +2,13 @@
 package @groupId
 
 import sttp.tapir.server.ziohttp.{ZioHttpInterpreter, ZioHttpServerOptions}
-import zio.{Console, ExitCode, Scope, Runtime, ZLayer, ZIO, ZIOAppArgs, ZIOAppDefault}
-import zio.http.{Server, HttpApp}
-import zio.LogLevel
-import zio.logging.{consoleLogger, ConsoleLoggerConfig, LogFilter, LogFormat}
+import zio.{Console, ExitCode, Runtime, Scope, ZIO, ZIOAppArgs, ZIOAppDefault, ZLayer}
+import zio.http.{HttpApp, Server}
 
 object Main extends ZIOAppDefault:
 
   override val bootstrap: ZLayer[ZIOAppArgs, Any, Any] =
-    val consoleConfig = ConsoleLoggerConfig(LogFormat.default, LogFilter.logLevel(LogLevel.Debug))
-    Runtime.removeDefaultLoggers >>> consoleLogger(consoleConfig)
+    Runtime.removeDefaultLoggers >>> Runtime.addLogger(Logger.zLogger)
 
   override def run: ZIO[Any with ZIOAppArgs with Scope, Any, Any] =
     val serverOptions: ZioHttpServerOptions[Any] =
