@@ -18,7 +18,7 @@ abstract class BuildView:
     val jsonDependencies = getJsonDependencies(starterDetails)
     val docsDependencies = getDocsDependencies(starterDetails)
     val metricsDependencies = getMetricsDependencies(starterDetails)
-    val loggerDependencies = getLoggerDependency(starterDetails)
+    val loggerDependencies = getLoggerDependencies(starterDetails)
 
     httpDependencies ++ metricsDependencies ++ docsDependencies ++ monitoringDependencies ++ jsonDependencies ++ loggerDependencies
 
@@ -46,7 +46,7 @@ abstract class BuildView:
     if starterDetails.addMetrics then List(ScalaDependency("com.softwaremill.sttp.tapir", "tapir-prometheus-metrics", getTapirVersion()))
     else Nil
 
-  private def getLoggerDependency(starterDetails: StarterDetails): List[Dependency] =
+  private def getLoggerDependencies(starterDetails: StarterDetails): List[Dependency] =
     val extraLogger =
       if starterDetails.serverImplementation != ServerImplementation.ZIOHttp then Nil
       else List(ScalaDependency("dev.zio", "zio-logging", "2.1.12"))
