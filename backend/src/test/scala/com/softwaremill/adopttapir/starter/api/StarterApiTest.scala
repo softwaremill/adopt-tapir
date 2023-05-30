@@ -42,8 +42,7 @@ class StarterApiTest extends BaseTest with TestDependencies {
         "Main.scala",
         "sbtx",
         "README.md",
-        ".gitignore",
-        "Logger.scala"
+        ".gitignore"
       )
     }
   }
@@ -81,8 +80,7 @@ class StarterApiTest extends BaseTest with TestDependencies {
         "Endpoints.scala",
         "Main.scala",
         "README.md",
-        ".gitignore",
-        "Logger.scala"
+        ".gitignore"
       )
     }
   }
@@ -110,7 +108,6 @@ class StarterApiTest extends BaseTest with TestDependencies {
         paths.map(_.toString) should contain theSameElementsAs List(
           s"$root/README.md",
           s"$root/$mainPath/$groupIdRelativePath/Main.scala",
-          s"$root/src/main/scala/$groupIdRelativePath/Logger.scala",
           s"$root/src/main/scala/$groupIdRelativePath/Endpoints.scala",
           s"$root/src/test/scala/$groupIdRelativePath/EndpointsSpec.scala"
         )
