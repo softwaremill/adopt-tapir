@@ -31,7 +31,7 @@ abstract class ProjectTemplate:
       getEndpoints(starterDetails),
       getEndpointsSpec(starterDetails),
       scalafmtConf(starterDetails.scalaVersion)
-    )
+    ) ++ getLogback(starterDetails)
   }
 
   private def getMain(starterDetails: StarterDetails): GeneratedFile = {
@@ -109,6 +109,16 @@ abstract class ProjectTemplate:
       pathUnderPackage("src/test/scala", groupId, "EndpointsSpec.scala"),
       fileContent.toString
     )
+  }
+
+  private def getLogback(starterDetails: StarterDetails): List[GeneratedFile] = {
+    import com.softwaremill.adopttapir.starter.ServerImplementation
+
+    if starterDetails.serverImplementation != ServerImplementation.ZIOHttp then Nil
+    else
+      List(
+        GeneratedFile("src/main/resources/logback.xml", txt.logback().toString)
+      )
   }
 
   import CommonObjectTemplate.scalafmtConfigPath
