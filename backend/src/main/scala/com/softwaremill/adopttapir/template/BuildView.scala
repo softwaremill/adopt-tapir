@@ -6,6 +6,7 @@ import com.softwaremill.adopttapir.starter.{JsonImplementation, ServerEffect, St
 import Dependency.{JavaDependency, ScalaDependency, ScalaTestDependency, constantTapirVersion}
 import com.softwaremill.adopttapir.version.TemplateDependencyInfo
 import com.softwaremill.adopttapir.starter.ServerEffectAndImplementation
+import com.softwaremill.adopttapir.starter.ServerImplementation
 
 abstract class BuildView:
   def getAllDependencies(starterDetails: StarterDetails): List[Dependency] =
@@ -17,11 +18,9 @@ abstract class BuildView:
     val jsonDependencies = getJsonDependencies(starterDetails)
     val docsDependencies = getDocsDependencies(starterDetails)
     val metricsDependencies = getMetricsDependencies(starterDetails)
-    val baseDependencies = List(
-      JavaDependency("ch.qos.logback", "logback-classic", TemplateDependencyInfo.logbackClassicVersion)
-    )
+    val loggerDependencies = getLoggerDependency(starterDetails)
 
-    httpDependencies ++ metricsDependencies ++ docsDependencies ++ monitoringDependencies ++ jsonDependencies ++ baseDependencies
+    httpDependencies ++ metricsDependencies ++ docsDependencies ++ monitoringDependencies ++ jsonDependencies ++ loggerDependencies
 
   def getAllTestDependencies(starterDetails: StarterDetails): List[Dependency] =
     ScalaTestDependency("com.softwaremill.sttp.tapir", "tapir-sttp-stub-server", getTapirVersion()) ::
@@ -46,6 +45,17 @@ abstract class BuildView:
   private def getMetricsDependencies(starterDetails: StarterDetails): List[ScalaDependency] =
     if starterDetails.addMetrics then List(ScalaDependency("com.softwaremill.sttp.tapir", "tapir-prometheus-metrics", getTapirVersion()))
     else Nil
+
+  private def getLoggerDependency(starterDetails: StarterDetails): List[Dependency] =
+    val loggingDependencies =
+      if starterDetails.serverImplementation != ServerImplementation.ZIOHttp then Nil
+      else
+        List(
+          ScalaDependency("dev.zio", "zio-logging", "2.1.12"),
+          ScalaDependency("dev.zio", "zio-logging-slf4j", "2.0.0")
+        )
+
+    List(JavaDependency("ch.qos.logback", "logback-classic", TemplateDependencyInfo.logbackClassicVersion)) ++ loggingDependencies
 
   private def getJsonDependencies(starterDetails: StarterDetails): List[ScalaDependency] =
     starterDetails.jsonImplementation match {
