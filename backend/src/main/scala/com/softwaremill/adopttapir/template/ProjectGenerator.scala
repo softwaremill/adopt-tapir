@@ -3,7 +3,7 @@ package com.softwaremill.adopttapir.template
 import better.files.Resource
 import com.softwaremill.adopttapir.starter.ServerEffect.ZIOEffect
 import com.softwaremill.adopttapir.starter.{Builder, ScalaVersion, StarterDetails}
-import com.softwaremill.adopttapir.template.scala.{EndpointsSpecView, EndpointsView, Import, MainView, LoggerView}
+import com.softwaremill.adopttapir.template.scala.{EndpointsSpecView, EndpointsView, Import, MainView}
 import com.softwaremill.adopttapir.version.TemplateDependencyInfo
 
 final case class GeneratedFile(
@@ -30,9 +30,8 @@ abstract class ProjectTemplate:
       getMain(starterDetails),
       getEndpoints(starterDetails),
       getEndpointsSpec(starterDetails),
-      getLogger(starterDetails),
       scalafmtConf(starterDetails.scalaVersion)
-    ) ++ getLogback(starterDetails)
+    )
   }
 
   private def getMain(starterDetails: StarterDetails): GeneratedFile = {
@@ -110,25 +109,6 @@ abstract class ProjectTemplate:
       pathUnderPackage("src/test/scala", groupId, "EndpointsSpec.scala"),
       fileContent.toString
     )
-  }
-
-  private def getLogger(starterDetails: StarterDetails): GeneratedFile = {
-    val groupId = starterDetails.legalizedGroupId
-
-    GeneratedFile(
-      pathUnderPackage("src/main/scala", groupId, "Logger.scala"),
-      LoggerView.getProperLoggerContent(starterDetails)
-    )
-  }
-
-  private def getLogback(starterDetails: StarterDetails): List[GeneratedFile] = {
-    import com.softwaremill.adopttapir.starter.ServerImplementation
-
-    if starterDetails.serverImplementation != ServerImplementation.ZIOHttp then Nil
-    else
-      List(
-        GeneratedFile("src/main/resources/logback.xml", txt.logback().toString)
-      )
   }
 
   import CommonObjectTemplate.scalafmtConfigPath

@@ -46,10 +46,16 @@ abstract class BuildView:
     if starterDetails.addMetrics then List(ScalaDependency("com.softwaremill.sttp.tapir", "tapir-prometheus-metrics", getTapirVersion()))
     else Nil
 
-  private def getLoggerDependency(starterDetails: StarterDetails): List[JavaDependency] =
-    List(
-      JavaDependency("ch.qos.logback", "logback-classic", TemplateDependencyInfo.logbackClassicVersion)
-    )
+  private def getLoggerDependency(starterDetails: StarterDetails): List[Dependency] =
+    val loggingDependencies =
+      if starterDetails.serverImplementation != ServerImplementation.ZIOHttp then Nil
+      else
+        List(
+          ScalaDependency("dev.zio", "zio-logging", "2.1.12"),
+          ScalaDependency("dev.zio", "zio-logging-slf4j", "2.0.0")
+        )
+
+    List(JavaDependency("ch.qos.logback", "logback-classic", TemplateDependencyInfo.logbackClassicVersion)) ++ loggingDependencies
 
   private def getJsonDependencies(starterDetails: StarterDetails): List[ScalaDependency] =
     starterDetails.jsonImplementation match {
