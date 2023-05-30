@@ -28,19 +28,17 @@ object Main extends ZIOAppDefault {
       .flatMap(Port.fromInt)
       .getOrElse(port"8080")
 
-    ZIO.executor.flatMap{ _ =>
-      EmberServerBuilder
-        .default[Task]
-        .withHost(Host.fromString("localhost").get)
-        .withPort(port)
-        .withHttpApp(Router("/" -> routes).orNotFound)
-        .build
-        .use { server =>
-          for {
-            _ <- Console.printLine(s"@if(addDocumentation){Go to http://localhost:${server.address.getPort}/docs to open SwaggerUI. }else{Server started at http://localhost:${server.address.getPort}. }Press ENTER key to exit.")
-            _ <- Console.readLine
-          } yield ()
-        }
-    }
+    EmberServerBuilder
+      .default[Task]
+      .withHost(Host.fromString("localhost").get)
+      .withPort(port)
+      .withHttpApp(Router("/" -> routes).orNotFound)
+      .build
+      .use { server =>
+        for {
+          _ <- Console.printLine(s"@if(addDocumentation){Go to http://localhost:${server.address.getPort}/docs to open SwaggerUI. }else{Server started at http://localhost:${server.address.getPort}. }Press ENTER key to exit.")
+          _ <- Console.readLine
+        } yield ()
+      }
   }
 }
