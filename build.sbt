@@ -47,7 +47,7 @@ val jsonDependencies = Seq(
   "io.circe" %% "circe-parser" % circeVersion,
   "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % tapirVersion,
   "com.softwaremill.sttp.client3" %% "circe" % sttpVersion,
-  "org.latestbit" %% "circe-tagged-adt-codec" % "0.10.1"
+  "org.latestbit" %% "circe-tagged-adt-codec" % "0.11.0"
 )
 
 val loggingDependencies = Seq(
