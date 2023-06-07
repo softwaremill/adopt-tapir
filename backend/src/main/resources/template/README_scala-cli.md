@@ -10,6 +10,16 @@ scala-cli --power run . # run the application (Main)
 scala-cli --power fmt --check . # run scalaformat check on all scala files and print summary, removing '--check' fixes badly formatted files
 ```
 
+If you use Scala CLI experimental version, you can use command `scala` instead of `scala-cli`.
+More information about Scala CLI as `scala` you can find on this [Scala CLI command: scala](https://scala-cli.virtuslab.org/docs/reference/scala-command/#testing-scala-cli-as-scala) page.
+
+```shell
+scala --power compile --test . # build the project ('--test' means that tests will be also compiled)
+scala --power test . # run the tests
+scala --power run . # run the application (Main)
+scala --power fmt --check . # run scalaformat check on all scala files and print summary, removing '--check' fixes badly formatted files
+```
+
 To open project in the IDE (Metals / IntelliJ) run any of the `compile` or `test` command above and open the project.
 IDE should detect a BSP project and import it.
 
