@@ -47,15 +47,19 @@ abstract class BuildView:
     else Nil
 
   private def getLoggerDependency(starterDetails: StarterDetails): List[Dependency] =
-    val loggingDependencies =
-      if starterDetails.serverImplementation != ServerImplementation.ZIOHttp then Nil
-      else
-        List(
-          ScalaDependency("dev.zio", "zio-logging", "2.1.12"),
-          ScalaDependency("dev.zio", "zio-logging-slf4j", "2.0.0")
-        )
+    val zioLoggingDependencies =
+      List(
+        ScalaDependency("dev.zio", "zio-logging", "2.1.12"),
+        ScalaDependency("dev.zio", "zio-logging-slf4j", "2.0.0")
+      )
 
-    List(JavaDependency("ch.qos.logback", "logback-classic", TemplateDependencyInfo.logbackClassicVersion)) ++ loggingDependencies
+    val logbackClassic = List(JavaDependency("ch.qos.logback", "logback-classic", TemplateDependencyInfo.logbackClassicVersion))
+
+    starterDetails.serverImplementation match
+      case ServerImplementation.Netty   => Nil
+      case ServerImplementation.ZIOHttp => logbackClassic ++ zioLoggingDependencies
+      case ServerImplementation.Http4s  => logbackClassic
+      case ServerImplementation.VertX   => logbackClassic
 
   private def getJsonDependencies(starterDetails: StarterDetails): List[ScalaDependency] =
     starterDetails.jsonImplementation match {

@@ -2,7 +2,7 @@ package com.softwaremill.adopttapir.template
 
 import better.files.Resource
 import com.softwaremill.adopttapir.starter.ServerEffect.ZIOEffect
-import com.softwaremill.adopttapir.starter.{Builder, ScalaVersion, StarterDetails}
+import com.softwaremill.adopttapir.starter.{Builder, ScalaVersion, StarterDetails, ServerImplementation}
 import com.softwaremill.adopttapir.template.scala.{EndpointsSpecView, EndpointsView, Import, MainView}
 import com.softwaremill.adopttapir.version.TemplateDependencyInfo
 
@@ -111,15 +111,10 @@ abstract class ProjectTemplate:
     )
   }
 
-  private def getLogback(starterDetails: StarterDetails): List[GeneratedFile] = {
-    import com.softwaremill.adopttapir.starter.ServerImplementation
-
-    if starterDetails.serverImplementation != ServerImplementation.ZIOHttp then Nil
-    else
-      List(
-        GeneratedFile("src/main/resources/logback.xml", txt.logback().toString)
-      )
-  }
+  private def getLogback(starterDetails: StarterDetails): List[GeneratedFile] =
+    List(
+      GeneratedFile("src/main/resources/logback.xml", txt.logback().toString)
+    )
 
   import CommonObjectTemplate.scalafmtConfigPath
 
