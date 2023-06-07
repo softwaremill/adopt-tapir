@@ -42,7 +42,8 @@ class StarterApiTest extends BaseTest with TestDependencies {
         "Main.scala",
         "sbtx",
         "README.md",
-        ".gitignore"
+        ".gitignore",
+        "logback.xml"
       )
     }
   }
@@ -80,7 +81,8 @@ class StarterApiTest extends BaseTest with TestDependencies {
         "Endpoints.scala",
         "Main.scala",
         "README.md",
-        ".gitignore"
+        ".gitignore",
+        "logback.xml"
       )
     }
   }

@@ -47,7 +47,7 @@ abstract class BuildView:
     else Nil
 
   private def getLoggerDependency(starterDetails: StarterDetails): List[Dependency] =
-    val loggingDependencies =
+    val zioLoggingDependencies =
       List(
         ScalaDependency("dev.zio", "zio-logging", "2.1.12"),
         ScalaDependency("dev.zio", "zio-logging-slf4j", "2.0.0")
@@ -57,7 +57,7 @@ abstract class BuildView:
 
     starterDetails.serverImplementation match
       case ServerImplementation.Netty   => Nil
-      case ServerImplementation.ZIOHttp => logbackClassic ++ loggingDependencies
+      case ServerImplementation.ZIOHttp => logbackClassic ++ zioLoggingDependencies
       case ServerImplementation.Http4s  => logbackClassic
       case ServerImplementation.VertX   => logbackClassic
 

@@ -111,13 +111,10 @@ abstract class ProjectTemplate:
     )
   }
 
-  private def getLogback(starterDetails: StarterDetails): List[GeneratedFile] = {
-    if starterDetails.serverImplementation == ServerImplementation.Netty then Nil
-    else
-      List(
-        GeneratedFile("src/main/resources/logback.xml", txt.logback().toString)
-      )
-  }
+  private def getLogback(starterDetails: StarterDetails): List[GeneratedFile] =
+    List(
+      GeneratedFile("src/main/resources/logback.xml", txt.logback().toString)
+    )
 
   import CommonObjectTemplate.scalafmtConfigPath
 
