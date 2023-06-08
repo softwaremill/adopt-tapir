@@ -206,14 +206,14 @@ private object ScalaCliProjectTemplate extends ProjectTemplate:
         starterDetails.projectName,
         starterDetails.groupId,
         starterDetails.scalaVersion.value,
-        (BuildScalaCliView.getMainDependencies _).andThen(BuildScalaCliView.format)(starterDetails)
+        (BuildScalaCliView.getMainDependencies _).andThen(deps => BuildScalaCliView.format(deps, false))(starterDetails)
       )
       .toString()
     GeneratedFile("build.scala", content)
   }
 
   private def getTestScalaCli(starterDetails: StarterDetails): GeneratedFile = {
-    val content = (BuildScalaCliView.getAllTestDependencies _).andThen(BuildScalaCliView.format)(starterDetails)
+    val content = (BuildScalaCliView.getAllTestDependencies _).andThen(deps => BuildScalaCliView.format(deps, true))(starterDetails)
     GeneratedFile("src/test/scala/build.test.scala", content)
   }
 

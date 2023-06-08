@@ -15,7 +15,7 @@ trait DefaultFormat:
   self: Dependency =>
   override def asSbtDependency: String = s"\"$groupId\" % \"$artifactId\" % \"$version\""
 
-  override def asScalaCliDependency: String = s"\"$groupId:$artifactId:$version\""
+  override def asScalaCliDependency: String = s"$groupId:$artifactId:$version"
 
 trait ScalaFormat:
   self: Dependency =>
@@ -25,7 +25,7 @@ trait ScalaFormat:
     s"\"$groupId\" %% \"$artifactId\" % $versionString"
   }
 
-  override def asScalaCliDependency: String = s"\"$groupId::$artifactId:$version\""
+  override def asScalaCliDependency: String = s"$groupId::$artifactId:$version"
 
 trait TestFormat extends ScalaFormat:
   self: Dependency =>
