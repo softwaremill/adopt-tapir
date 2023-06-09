@@ -172,8 +172,8 @@ object BuildSbtView extends BuildView:
   override protected def getTapirVersion(): String = constantTapirVersion
 
 object BuildScalaCliView extends BuildView:
-  def format(dependencies: List[Dependency]): String =
-    val importPrefix = "//> using lib "
+  def format(dependencies: List[Dependency], test: Boolean): String =
+    val importPrefix = if test then "//> using test.dep " else "//> using dep "
     dependencies
       .map(_.asScalaCliDependency)
       .mkString(importPrefix, System.lineSeparator() + importPrefix, System.lineSeparator())
