@@ -9,7 +9,7 @@ import scala.concurrent.duration._
 object Main extends IOApp:
 
   override def runtimeConfig: IORuntimeConfig =
-    super.runtimeConfig.copy(cpuStarvationCheckInterval = 500.millisecond)
+    super.runtimeConfig.copy(cpuStarvationCheckInterval = 5.second)
 
   override def run(args: List[String]): IO[ExitCode] =
     val server = for
