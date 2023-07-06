@@ -12,13 +12,13 @@ val scala3Version = "3.3.0"
 
 val tapirVersion = "1.5.5"
 
-val http4sEmberServerVersion = "0.23.21"
-val http4sCirceVersion = "0.23.21"
+val http4sEmberServerVersion = "0.23.22"
+val http4sCirceVersion = "0.23.22"
 val circeVersion = "0.14.5"
 val circeGenericsExtrasVersion = "0.14.3"
 val sttpVersion = "3.8.15"
 val prometheusVersion = "0.16.0"
-val scalafmtVersion = "3.7.4"
+val scalafmtVersion = "3.7.6"
 val scalaLoggingVersion = "3.9.5"
 val logbackClassicVersion = "1.4.8"
 val scalaTestVersion = "3.2.16"
@@ -53,7 +53,7 @@ val jsonDependencies = Seq(
 val loggingDependencies = Seq(
   "com.typesafe.scala-logging" %% "scala-logging" % scalaLoggingVersion,
   "ch.qos.logback" % "logback-classic" % logbackClassicVersion,
-  "org.codehaus.janino" % "janino" % "3.1.9" % Runtime,
+  "org.codehaus.janino" % "janino" % "3.1.10" % Runtime,
   "net.logstash.logback" % "logstash-logback-encoder" % "7.3" % Runtime
 )
 
@@ -67,7 +67,7 @@ val configDependencies = Seq(
 )
 
 val baseDependencies = Seq(
-  "org.typelevel" %% "cats-effect" % "3.5.0",
+  "org.typelevel" %% "cats-effect" % "3.5.1",
   "com.softwaremill.common" %% "tagging" % "2.3.4",
   "com.softwaremill.quicklens" %% "quicklens" % "1.9.4"
 )
