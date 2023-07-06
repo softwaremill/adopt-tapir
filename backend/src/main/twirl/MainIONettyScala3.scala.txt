@@ -5,14 +5,12 @@ package @groupId
 import cats.effect.{ExitCode, IO, IOApp}
 import sttp.tapir.server.netty.cats.@if(addMetrics){{NettyCatsServer, NettyCatsServerOptions}}else{NettyCatsServer}
 
-@if(addMetrics){import java.net.InetSocketAddress}
-
 object Main extends IOApp:
   val port = sys.env.get("HTTP_PORT").flatMap(_.toIntOption).getOrElse(8080)
 
   override def run(args: List[String]): IO[ExitCode] =
     @if(addMetrics){
-      Dispatcher[IO].map( d => { NettyCatsServer.apply[IO, InetSocketAddress]({
+      Dispatcher[IO].map( d => { NettyCatsServer.apply[IO]({
         NettyCatsServerOptions.customiseInterceptors(d)
           .metricsInterceptor(Endpoints.prometheusMetrics.metricsInterceptor())
           .options
