@@ -198,23 +198,21 @@ end CommonObjectTemplate
 
 private object ScalaCliProjectTemplate extends ProjectTemplate:
   override def generate(starterDetails: StarterDetails): List[GeneratedFile] =
-    super.generate(starterDetails) ::: List(getBuildScalaCli(starterDetails), getTestScalaCli(starterDetails), readme, gitignore)
+    super.generate(starterDetails) ::: List(getProjectScalaCli(starterDetails), readme, gitignore)
 
-  private def getBuildScalaCli(starterDetails: StarterDetails): GeneratedFile = {
+  private def getProjectScalaCli(starterDetails: StarterDetails): GeneratedFile = {
+    val dependencies = (BuildScalaCliView.getMainDependencies _).andThen(deps => BuildScalaCliView.format(deps, false))(starterDetails) +
+      (BuildScalaCliView.getAllTestDependencies _).andThen(deps => BuildScalaCliView.format(deps, true))(starterDetails)
+
     val content = txt
       .scalaCliBuild(
         starterDetails.projectName,
         starterDetails.groupId,
         starterDetails.scalaVersion.value,
-        (BuildScalaCliView.getMainDependencies _).andThen(deps => BuildScalaCliView.format(deps, false))(starterDetails)
+        dependencies
       )
       .toString()
-    GeneratedFile("build.scala", content)
-  }
-
-  private def getTestScalaCli(starterDetails: StarterDetails): GeneratedFile = {
-    val content = (BuildScalaCliView.getAllTestDependencies _).andThen(deps => BuildScalaCliView.format(deps, true))(starterDetails)
-    GeneratedFile("src/test/scala/build.test.scala", content)
+    GeneratedFile("project.scala", content)
   }
 
   private lazy val readme: GeneratedFile =
