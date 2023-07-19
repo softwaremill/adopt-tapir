@@ -4,7 +4,6 @@ package @groupId
 import zio.{Console, Scope, ZIO, ZIOAppArgs, ZIOAppDefault}
 import sttp.tapir.server.netty.zio.NettyZioServer
 import sttp.tapir.server.netty.zio.NettyZioServerOptions
-import sttp.tapir.server.netty.NettyOptions
 import zio.ExitCode
 
 object Main extends ZIOAppDefault:
@@ -19,13 +18,10 @@ object Main extends ZIOAppDefault:
     .customiseInterceptors[Any]
     .metricsInterceptor(Endpoints.prometheusMetrics.metricsInterceptor())
     .options
-    .nettyOptions(NettyOptions.default.port(port))
     } else {
-    val options = NettyZioServerOptions
-    .default[Any]
-    .nettyOptions(NettyOptions.default.port(port))
+    val options = NettyZioServerOptions.default[Any]
     }
-    val server = NettyZioServer.apply(options)
+    val server = NettyZioServer.apply(options).port(port)
 
     for {
       bind <- server.addEndpoints(Endpoints.all).start()
