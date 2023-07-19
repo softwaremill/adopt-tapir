@@ -74,8 +74,7 @@ class StarterApiTest extends BaseTest with TestDependencies {
     response.code.code shouldBe 200
     checkStreamZipContent(response.body) { unpackedDir =>
       unpackedDir.listRecursively.toList.filter(_.isRegularFile).map(_.path.getFileName.toString) should contain theSameElementsAs List(
-        "build.scala",
-        "build.test.scala",
+        "project.scala",
         ".scalafmt.conf",
         "EndpointsSpec.scala",
         "Endpoints.scala",
@@ -102,8 +101,7 @@ class StarterApiTest extends BaseTest with TestDependencies {
           .collect {
             case f: File
                 if f.path.toString.endsWith("README.md") ||
-                  f.path.toString.endsWith(".scala") && !f.path
-                    .endsWith("build.scala") && !f.path.endsWith("build.test.scala") && f.isRegularFile =>
+                  f.path.toString.endsWith(".scala") && !f.path.endsWith("project.scala") && f.isRegularFile =>
               unpackedDir.relativize(f)
           }
         val root = req.projectName
