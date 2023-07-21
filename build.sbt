@@ -10,10 +10,10 @@ import scala.util.Try
 val scala2Version = "2.13.10"
 val scala3Version = "3.3.0"
 
-val tapirVersion = "1.6.1"
+val tapirVersion = "1.6.2"
 
-val http4sEmberServerVersion = "0.23.22"
-val http4sCirceVersion = "0.23.22"
+val http4sEmberServerVersion = "0.23.23"
+val http4sCirceVersion = "0.23.23"
 val circeVersion = "0.14.5"
 val circeGenericsExtrasVersion = "0.14.3"
 val sttpVersion = "3.8.16"
@@ -69,7 +69,7 @@ val configDependencies = Seq(
 val baseDependencies = Seq(
   "org.typelevel" %% "cats-effect" % "3.5.1",
   "com.softwaremill.common" %% "tagging" % "2.3.4",
-  "com.softwaremill.quicklens" %% "quicklens" % "1.9.5"
+  "com.softwaremill.quicklens" %% "quicklens" % "1.9.6"
 )
 
 val apiDocsDependencies = Seq(
