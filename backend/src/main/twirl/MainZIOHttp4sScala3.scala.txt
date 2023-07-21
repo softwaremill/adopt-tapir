@@ -7,6 +7,7 @@ import org.http4s.server.Router@if(addMetrics){
 import sttp.tapir.server.http4s.Http4sServerOptions}
 import sttp.tapir.server.http4s.ztapir.ZHttp4sServerInterpreter
 import zio.interop.catz.*
+import zio.stream.interop.fs2z.io.networkInstance
 import zio.{Scope, Task, ZIO, ZIOAppArgs, ZIOAppDefault, Console}
 
 object Main extends ZIOAppDefault:
