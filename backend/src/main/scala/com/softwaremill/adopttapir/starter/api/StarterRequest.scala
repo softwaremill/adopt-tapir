@@ -1,8 +1,8 @@
 package com.softwaremill.adopttapir.starter.api
 
-import com.softwaremill.adopttapir.starter.{Builder, JsonImplementation, ScalaVersion, ServerEffect, ServerImplementation}
-import io.circe.{Decoder, Encoder}
+import com.softwaremill.adopttapir.starter.*
 import io.circe.generic.semiauto.*
+import io.circe.{Decoder, Encoder}
 import org.latestbit.circe.adt.codec.*
 import sttp.tapir.Schema
 
@@ -34,7 +34,8 @@ enum EffectRequest(val toModel: ServerEffect, val legalServerImplementations: Se
         ServerEffect.FutureEffect,
         legalServerImplementations = Set(
           ServerImplementation.Netty,
-          ServerImplementation.VertX
+          ServerImplementation.VertX,
+          ServerImplementation.Pekko
         )
       )
   case IOEffect
@@ -62,6 +63,7 @@ enum ServerImplementationRequest(val toModel: ServerImplementation) derives Json
   case Http4s extends ServerImplementationRequest(ServerImplementation.Http4s)
   case ZIOHttp extends ServerImplementationRequest(ServerImplementation.ZIOHttp)
   case VertX extends ServerImplementationRequest(ServerImplementation.VertX)
+  case Pekko extends ServerImplementationRequest(ServerImplementation.Pekko)
 
 enum JsonImplementationRequest(val toModel: JsonImplementation) derives JsonTaggedAdt.PureEncoder, JsonTaggedAdt.PureDecoder, Schema:
   case No extends JsonImplementationRequest(JsonImplementation.WithoutJson)

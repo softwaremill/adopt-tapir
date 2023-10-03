@@ -14,6 +14,8 @@ object MainView:
             txt.MainFutureNetty(groupId, addDocumentation, addMetrics).toString()
           case StarterDetails(_, groupId, FutureEffect, VertX, addDocumentation, addMetrics, _, _, _) =>
             txt.MainFutureVertx(groupId, addDocumentation, addMetrics).toString()
+          case StarterDetails(_, groupId, FutureEffect, Pekko, addDocumentation, addMetrics, _, _, _) =>
+            txt.MainFuturePekko(groupId, addDocumentation, addMetrics).toString()
           case StarterDetails(_, groupId, IOEffect, Http4s, addDocumentation, addMetrics, _, _, _) =>
             txt.MainIOHttp4s(groupId, addDocumentation, addMetrics).toString()
           case StarterDetails(_, groupId, IOEffect, Netty, addDocumentation, addMetrics, _, _, _) =>
@@ -36,6 +38,8 @@ object MainView:
             txt.MainFutureNettyScala3(groupId, addDocumentation, addMetrics).toString()
           case StarterDetails(_, groupId, FutureEffect, VertX, addDocumentation, addMetrics, _, _, _) =>
             txt.MainFutureVertxScala3(groupId, addDocumentation, addMetrics).toString()
+          case StarterDetails(_, groupId, FutureEffect, Pekko, addDocumentation, addMetrics, _, _, _) =>
+            txt.MainFuturePekkoScala3(groupId, addDocumentation, addMetrics).toString()
           case StarterDetails(_, groupId, IOEffect, Http4s, addDocumentation, addMetrics, _, _, _) =>
             txt.MainIOHttp4sScala3(groupId, addDocumentation, addMetrics).toString()
           case StarterDetails(_, groupId, IOEffect, Netty, addDocumentation, addMetrics, _, _, _) =>

@@ -1,12 +1,10 @@
 package com.softwaremill.adopttapir.template
 
+import com.softwaremill.adopttapir.starter.*
 import com.softwaremill.adopttapir.starter.ServerEffect.{FutureEffect, IOEffect, ZIOEffect}
-import com.softwaremill.adopttapir.starter.ServerImplementation.{Http4s, Netty, ZIOHttp, VertX}
-import com.softwaremill.adopttapir.starter.{JsonImplementation, ServerEffect, StarterDetails}
-import Dependency.{JavaDependency, ScalaDependency, ScalaTestDependency, constantTapirVersion}
+import com.softwaremill.adopttapir.starter.ServerImplementation.{Http4s, Netty, Pekko, VertX, ZIOHttp}
+import com.softwaremill.adopttapir.template.Dependency.{JavaDependency, ScalaDependency, ScalaTestDependency, constantTapirVersion}
 import com.softwaremill.adopttapir.version.TemplateDependencyInfo
-import com.softwaremill.adopttapir.starter.ServerEffectAndImplementation
-import com.softwaremill.adopttapir.starter.ServerImplementation
 
 abstract class BuildView:
   def getAllDependencies(starterDetails: StarterDetails): List[Dependency] =
@@ -60,6 +58,7 @@ abstract class BuildView:
       case ServerImplementation.ZIOHttp => logbackClassic ++ zioLoggingDependencies
       case ServerImplementation.Http4s  => logbackClassic
       case ServerImplementation.VertX   => logbackClassic
+      case ServerImplementation.Pekko   => logbackClassic
 
   private def getJsonDependencies(starterDetails: StarterDetails): List[ScalaDependency] =
     starterDetails.jsonImplementation match {
@@ -109,6 +108,7 @@ abstract class BuildView:
     starterDetails match {
       case ServerEffectAndImplementation(FutureEffect, Netty) => HttpDependencies.netty()
       case ServerEffectAndImplementation(FutureEffect, VertX) => HttpDependencies.vertX()
+      case ServerEffectAndImplementation(FutureEffect, Pekko) => HttpDependencies.pekko()
       case ServerEffectAndImplementation(IOEffect, Http4s)    => HttpDependencies.http4s()
       case ServerEffectAndImplementation(IOEffect, Netty)     => HttpDependencies.ioNetty()
       case ServerEffectAndImplementation(IOEffect, VertX)     => HttpDependencies.ioVerteX()
@@ -157,6 +157,10 @@ abstract class BuildView:
 
     def ZIONetty(): List[ScalaDependency] = List(
       ScalaDependency("com.softwaremill.sttp.tapir", "tapir-netty-server-zio", getTapirVersion())
+    )
+
+    def pekko(): List[ScalaDependency] = List(
+      ScalaDependency("com.softwaremill.sttp.tapir", "tapir-pekko-http-server", getTapirVersion())
     )
 
 end BuildView

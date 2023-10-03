@@ -31,6 +31,7 @@ enum ServerImplementation(val name: String):
   case Http4s extends ServerImplementation("Http4s")
   case ZIOHttp extends ServerImplementation("ZIO Http")
   case VertX extends ServerImplementation("Vert.X")
+  case Pekko extends ServerImplementation("Pekko")
 
 enum ServerEffect(val name: String):
   case FutureEffect extends ServerEffect("Future")

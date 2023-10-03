@@ -1,14 +1,13 @@
 package com.softwaremill.adopttapir.starter.api
 
-import cats.data.ValidatedNec
+import cats.data.{Validated, ValidatedNec}
 import cats.syntax.all.*
 import com.softwaremill.adopttapir.Fail.*
 import com.softwaremill.adopttapir.starter.StarterDetails
-import com.softwaremill.adopttapir.starter.api.EffectRequest.{FutureEffect, IOEffect, ZIOEffect}
+import com.softwaremill.adopttapir.starter.api.EffectRequest.ZIOEffect
 import com.softwaremill.adopttapir.starter.api.JsonImplementationRequest.ZIOJson
 import com.softwaremill.adopttapir.starter.api.RequestValidation.{GroupIdShouldFollowJavaPackageConvention, ProjectNameShouldMatchRegex}
-import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Http4s, Netty, ZIOHttp, VertX}
-import cats.data.Validated
+import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Http4s, Netty, Pekko, VertX, ZIOHttp}
 
 sealed trait RequestValidation:
   def errMessage: String
@@ -88,7 +87,7 @@ sealed trait FormValidator:
       addMetrics: Boolean
   ): ValidatedNec[RequestValidation, Boolean] =
     (effect, serverImplementation, addMetrics) match {
-      case t @ (_, Http4s | ZIOHttp | Netty | VertX, _) => t._3.validNec
+      case t @ (_, Http4s | ZIOHttp | Netty | VertX | Pekko, _) => t._3.validNec
     }
 
   private def validateEffectWithJson(
