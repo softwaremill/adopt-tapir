@@ -137,6 +137,7 @@ describe('configuration consts', () => {
         [EffectType.Future, ScalaVersion.Scala2, EffectImplementation.Netty, true],
         [EffectType.Future, ScalaVersion.Scala2, EffectImplementation.Http4s, false],
         [EffectType.Future, ScalaVersion.Scala2, EffectImplementation.ZIOHttp, false],
+        [EffectType.Future, ScalaVersion.Scala2, EffectImplementation.Pekko, true],
 
         [EffectType.IO, ScalaVersion.Scala2, EffectImplementation.Netty, true],
         [EffectType.IO, ScalaVersion.Scala2, EffectImplementation.Http4s, true],
@@ -150,6 +151,7 @@ describe('configuration consts', () => {
         [EffectType.Future, ScalaVersion.Scala3, EffectImplementation.Netty, true],
         [EffectType.Future, ScalaVersion.Scala3, EffectImplementation.Http4s, false],
         [EffectType.Future, ScalaVersion.Scala3, EffectImplementation.ZIOHttp, false],
+        [EffectType.Future, ScalaVersion.Scala3, EffectImplementation.Pekko, true],
 
         [EffectType.IO, ScalaVersion.Scala3, EffectImplementation.Netty, true],
         [EffectType.IO, ScalaVersion.Scala3, EffectImplementation.Http4s, true],

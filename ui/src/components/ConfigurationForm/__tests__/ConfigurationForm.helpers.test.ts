@@ -1,4 +1,4 @@
-import { EffectType, EffectImplementation, ScalaVersion, JSONImplementation } from 'api/starter';
+import { EffectImplementation, EffectType, JSONImplementation, ScalaVersion } from 'api/starter';
 import {
   getAvailableEffectImplementations,
   getEffectImplementationOptions,
@@ -10,7 +10,11 @@ import type { FormRadioOption } from '../../FormRadioGroup';
 describe('configuration form helpers', () => {
   describe('.getAvailableEffectImplementations()', () => {
     const cases: [EffectType, ScalaVersion, EffectImplementation[]][] = [
-      [EffectType.Future, ScalaVersion.Scala2, [EffectImplementation.Netty, EffectImplementation.VertX]],
+      [
+        EffectType.Future,
+        ScalaVersion.Scala2,
+        [EffectImplementation.Netty, EffectImplementation.VertX, EffectImplementation.Pekko],
+      ],
       [
         EffectType.IO,
         ScalaVersion.Scala2,
@@ -27,7 +31,11 @@ describe('configuration form helpers', () => {
         ],
       ],
 
-      [EffectType.Future, ScalaVersion.Scala3, [EffectImplementation.Netty, EffectImplementation.VertX]],
+      [
+        EffectType.Future,
+        ScalaVersion.Scala3,
+        [EffectImplementation.Netty, EffectImplementation.VertX, EffectImplementation.Pekko],
+      ],
       [
         EffectType.IO,
         ScalaVersion.Scala3,
@@ -66,6 +74,10 @@ describe('configuration form helpers', () => {
           {
             label: 'Vert.X',
             value: EffectImplementation.VertX,
+          },
+          {
+            label: 'Pekko HTTP',
+            value: EffectImplementation.Pekko,
           },
         ],
       ],
@@ -121,6 +133,10 @@ describe('configuration form helpers', () => {
           {
             label: 'Vert.X',
             value: EffectImplementation.VertX,
+          },
+          {
+            label: 'Pekko HTTP',
+            value: EffectImplementation.Pekko,
           },
         ],
       ],
