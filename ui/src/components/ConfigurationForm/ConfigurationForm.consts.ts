@@ -58,6 +58,10 @@ export const EFFECT_IMPLEMENTATIONS_OPTIONS: FormSelectOption<EffectImplementati
     label: 'Vert.X',
     value: EffectImplementation.VertX,
   },
+  {
+    label: 'Pekko HTTP',
+    value: EffectImplementation.Pekko,
+  },
 ];
 
 export const ENDPOINTS_OPTIONS: FormRadioOption<boolean>[] = [

@@ -12,6 +12,7 @@ export enum EffectImplementation {
   Http4s = 'Http4s',
   ZIOHttp = 'ZIOHttp',
   VertX = 'VertX',
+  Pekko = 'Pekko',
 }
 
 export enum JSONImplementation {
