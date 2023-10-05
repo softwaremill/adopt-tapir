@@ -21,5 +21,5 @@ final case class ContentService(generatedFilesFormatter: GeneratedFilesFormatter
         DirectoryMerger(projectName, paths, content)
       }))
       projectAsTree <- IO(projectAsDirTrees.reduce(DirectoryMerger.apply))
-      _ <- IO(Metrics.increasePreviewOperationMetricCounter(starterDetails))
+      _ <- Metrics.increasePreviewOperationMetricCounter(starterDetails)
     yield projectAsTree
