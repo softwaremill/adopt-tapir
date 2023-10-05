@@ -1,16 +1,17 @@
 package com.softwaremill.adopttapir.starter.files
 
-import cats.syntax.all.*
+import better.files.File as BFile
 import better.files.File.newTemporaryDirectory
-import better.files.{File => BFile}
 import cats.effect.IO
 import cats.syntax.all.*
+import com.softwaremill.adopttapir.infrastructure.CorrelationId
+import com.softwaremill.adopttapir.logging.FLogging
 import com.softwaremill.adopttapir.template.GeneratedFile
 import com.softwaremill.adopttapir.util.ZipArchiver
 
 import java.io.File
 
-class FilesManager(config: StorageConfig):
+class FilesManager(config: StorageConfig) extends FLogging:
 
   def createTempDir(): IO[File] =
     IO.blocking(newTemporaryDirectory(prefix = config.tempPrefix).toJava)
@@ -33,12 +34,10 @@ class FilesManager(config: StorageConfig):
       destination.toJava
     }
 
-  def deleteFilesAsStatedInConfig(destinationDir: IO[File]): IO[Unit] =
-    IO.blocking {
-      if config.deleteTempFolder then
-        for
-          dir <- destinationDir
-          _ <- dir.delete().pure[IO]
-        yield ()
-      else ().pure[IO]
-    }
+  def deleteFilesAsStatedInConfig(destinationDir: IO[File])(using cid: CorrelationId): IO[Unit] = {
+    for
+      dir <- destinationDir
+      deleted <- IO.blocking(dir.delete())
+      _ <- logger.info(s"The $dir deletion ${if (deleted) "succeeded" else "failed"}")
+    yield ()
+  }.whenA(config.deleteTempFolder)
