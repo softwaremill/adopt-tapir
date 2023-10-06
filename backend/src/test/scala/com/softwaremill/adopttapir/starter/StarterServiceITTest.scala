@@ -197,5 +197,5 @@ object ZipGenerator:
     yield service
 
 case class RunLogger(log: mutable.StringBuilder = new mutable.StringBuilder()):
-  def log(l: String): IO[Unit] = IO(log.append(System.lineSeparator()).append(l))
+  def log(l: String): IO[Unit] = IO(log.append(System.lineSeparator()).append(l)).void
   override def toString: String = log.toString()
