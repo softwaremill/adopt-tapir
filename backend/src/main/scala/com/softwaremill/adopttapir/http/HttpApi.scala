@@ -9,12 +9,12 @@ import org.http4s.HttpRoutes
 import org.http4s.ember.server.EmberServerBuilder
 import sttp.capabilities.fs2.Fs2Streams
 import sttp.tapir.*
+import sttp.tapir.files.{FilesOptions, staticResourcesGetServerEndpoint}
 import sttp.tapir.server.ServerEndpoint
 import sttp.tapir.server.http4s.{Http4sServerInterpreter, Http4sServerOptions}
 import sttp.tapir.server.interceptor.cors.CORSInterceptor
 import sttp.tapir.server.metrics.prometheus.PrometheusMetrics
 import sttp.tapir.server.model.ValuedEndpointOutput
-import sttp.tapir.static.ResourcesOptions
 import sttp.tapir.swagger.SwaggerUIOptions
 import sttp.tapir.swagger.bundle.SwaggerInterpreter
 
@@ -74,10 +74,10 @@ class HttpApi(
     // directory on the classpath; otherwise, returning index.html; this is needed to support paths in the frontend
     // apps (e.g. /login) the frontend app will handle displaying appropriate error messages
     val webappEndpoints = List(
-      resourcesGetServerEndpoint[IO](emptyInput: EndpointInput[Unit])(
+      staticResourcesGetServerEndpoint[IO](emptyInput: EndpointInput[Unit])(
         classOf[HttpApi].getClassLoader,
         "webapp",
-        ResourcesOptions.default.defaultResource(List("index.html"))
+        FilesOptions.default.defaultFile(List("index.html"))
       )
     )
     apiEndpoints.toList ++ webappEndpoints
