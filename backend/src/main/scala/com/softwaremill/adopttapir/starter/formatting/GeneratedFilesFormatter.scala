@@ -1,11 +1,10 @@
 package com.softwaremill.adopttapir.starter.formatting
 
-import cats.effect.{IO, Resource}
 import cats.effect.std.Dispatcher
+import cats.effect.{IO, Resource}
 import com.softwaremill.adopttapir.infrastructure.CorrelationId
 import com.softwaremill.adopttapir.logging.FLogging
 import com.softwaremill.adopttapir.starter.files.FilesManager
-import com.softwaremill.adopttapir.starter.files.StorageConfig
 import com.softwaremill.adopttapir.template.{CommonObjectTemplate, GeneratedFile}
 import org.scalafmt.interfaces.{Scalafmt, ScalafmtReporter}
 

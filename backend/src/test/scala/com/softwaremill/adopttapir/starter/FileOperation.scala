@@ -6,7 +6,6 @@ import com.softwaremill.adopttapir.infrastructure.CorrelationId
 import com.softwaremill.adopttapir.metrics.Metrics
 import com.softwaremill.adopttapir.starter.files.FilesManager
 import com.softwaremill.adopttapir.starter.formatting.GeneratedFilesFormatter
-import com.softwaremill.adopttapir.template.ProjectGenerator
 
 @deprecated("Only for development purpose")
 object FileOperation extends IOApp:

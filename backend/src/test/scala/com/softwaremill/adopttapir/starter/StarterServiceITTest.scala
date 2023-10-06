@@ -11,7 +11,6 @@ import com.softwaremill.adopttapir.metrics.Metrics
 import com.softwaremill.adopttapir.starter.api.*
 import com.softwaremill.adopttapir.starter.files.{FilesManager, StorageConfig}
 import com.softwaremill.adopttapir.starter.formatting.GeneratedFilesFormatter
-import com.softwaremill.adopttapir.template.ProjectGenerator
 import com.softwaremill.adopttapir.test.ServiceTimeouts.waitForPortTimeout
 import com.softwaremill.adopttapir.test.ShowHelpers.*
 import com.softwaremill.adopttapir.test.{BaseTest, GeneratedService, ServiceFactory}
@@ -21,7 +20,6 @@ import sttp.client3.{HttpURLConnectionBackend, Identity, SttpBackend, UriContext
 import scala.collection.mutable
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 import scala.util.Properties
-import scala.reflect.ClassTag
 
 object Setup:
   type TestFunction = Integer => IO[Unit]
@@ -199,5 +197,5 @@ object ZipGenerator:
     yield service
 
 case class RunLogger(log: mutable.StringBuilder = new mutable.StringBuilder()):
-  def log(l: String): IO[Unit] = IO(log.append(System.lineSeparator()).append(l))
+  def log(l: String): IO[Unit] = IO(log.append(System.lineSeparator()).append(l)).void
   override def toString: String = log.toString()

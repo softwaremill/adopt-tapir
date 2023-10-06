@@ -4,10 +4,9 @@ import cats.effect.IO
 import com.softwaremill.adopttapir.http.Http
 import com.softwaremill.adopttapir.infrastructure.Json.*
 import com.softwaremill.adopttapir.version.BuildInfo
-import sttp.tapir.server.ServerEndpoint
-import io.circe.{Encoder, Decoder}
-import io.circe.generic.semiauto.*
+import io.circe.{Decoder, Encoder}
 import sttp.tapir.Schema
+import sttp.tapir.server.ServerEndpoint
 
 /** Defines an endpoint which exposes the current application version information.
   */

@@ -1,6 +1,5 @@
 package com.softwaremill.adopttapir.infrastructure
 
-import com.softwaremill.adopttapir.util.Constants
 import com.softwaremill.tagging.@@
 import io.circe.{Decoder, Encoder, Printer}
 

@@ -3,11 +3,9 @@ package com.softwaremill.adopttapir.test
 import cats.effect.IO
 import com.softwaremill.adopttapir.starter.api.StarterRequest
 import com.softwaremill.adopttapir.test.RichIO.unwrap
-import com.softwaremill.adopttapir.infrastructure.Json.*
 import io.circe.syntax.EncoderOps
 import sttp.capabilities.fs2.Fs2Streams
 import sttp.client3.{Response, SttpBackend, UriContext, asStreamUnsafe, basicRequest}
-import org.latestbit.circe.adt.codec.*
 
 class Requests(backend: SttpBackend[IO, Any with Fs2Streams[IO]]):
 
