@@ -1,6 +1,6 @@
 package com.softwaremill.adopttapir.starter.api
 
-import better.files.File
+import better.files.{DisposeableExtensions, File}
 import cats.effect.{IO, Resource}
 import com.softwaremill.adopttapir.http.Error_OUT
 import com.softwaremill.adopttapir.infrastructure.Json.*
@@ -13,12 +13,10 @@ import com.softwaremill.adopttapir.test.RichIO.unwrap
 import com.softwaremill.adopttapir.test.{BaseTest, TestDependencies}
 import fs2.io.file.Files
 import io.circe.jawn
-import org.scalatest.Assertion
-import better.files.{DisposeableExtensions, File}
-import sttp.client3.{HttpError, Response, SttpClientException}
-import java.nio.file.attribute.PosixFilePermissions
-import org.apache.commons.compress.utils.SeekableInMemoryByteChannel
 import org.apache.commons.compress.archivers.zip.ZipFile
+import org.apache.commons.compress.utils.SeekableInMemoryByteChannel
+import org.scalatest.Assertion
+import sttp.client3.{HttpError, Response, SttpClientException}
 
 class StarterApiTest extends BaseTest with TestDependencies {
 

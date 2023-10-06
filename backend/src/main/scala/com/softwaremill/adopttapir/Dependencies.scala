@@ -4,13 +4,13 @@ import cats.data.{NonEmptyList, Reader, ReaderT}
 import cats.effect.{IO, Resource}
 import cats.syntax.all.*
 import com.softwaremill.adopttapir.config.Config
-import com.softwaremill.adopttapir.http.{Http, HttpApi, HttpConfig}
+import com.softwaremill.adopttapir.http.{Http, HttpApi}
 import com.softwaremill.adopttapir.infrastructure.CorrelationId
 import com.softwaremill.adopttapir.metrics.{Metrics, VersionApi}
 import com.softwaremill.adopttapir.starter.StarterService
-import com.softwaremill.adopttapir.starter.files.FilesManager
 import com.softwaremill.adopttapir.starter.api.StarterApi
 import com.softwaremill.adopttapir.starter.content.ContentService
+import com.softwaremill.adopttapir.starter.files.FilesManager
 import com.softwaremill.adopttapir.starter.formatting.GeneratedFilesFormatter
 import sttp.tapir.server.metrics.prometheus.PrometheusMetrics
 

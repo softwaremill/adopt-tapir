@@ -7,14 +7,11 @@ import com.softwaremill.adopttapir.infrastructure.CorrelationId
 import com.softwaremill.adopttapir.infrastructure.Json.*
 import com.softwaremill.adopttapir.logging.FLogging
 import com.softwaremill.adopttapir.util.Constants
-import com.softwaremill.tagging.*
 import io.circe.{Decoder, Encoder, Printer}
 import sttp.model.StatusCode
-import sttp.tapir.Codec.PlainCodec
-import sttp.tapir.json.circe.TapirJsonCirce
-import sttp.tapir.{Codec, Endpoint, EndpointOutput, PublicEndpoint, Schema, SchemaType, Tapir}
 import sttp.tapir.generic.Configuration as TapirConfiguration
-import io.circe.generic.semiauto.*
+import sttp.tapir.json.circe.TapirJsonCirce
+import sttp.tapir.{EndpointOutput, PublicEndpoint, Schema, SchemaType, Tapir}
 
 /** Helper class for defining HTTP endpoints. Import the members of this class when defining an HTTP API using tapir. */
 class Http(using CorrelationId) extends Tapir, TapirJsonCirce, FLogging:

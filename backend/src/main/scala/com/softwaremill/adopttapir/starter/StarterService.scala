@@ -1,13 +1,12 @@
 package com.softwaremill.adopttapir.starter
 
 import cats.effect.IO
+import com.softwaremill.adopttapir.infrastructure.CorrelationId
 import com.softwaremill.adopttapir.logging.FLogging
 import com.softwaremill.adopttapir.metrics.Metrics
 import com.softwaremill.adopttapir.starter.files.FilesManager
 import com.softwaremill.adopttapir.starter.formatting.GeneratedFilesFormatter
 import com.softwaremill.adopttapir.template.ProjectGenerator
-import cats.syntax.all.*
-import com.softwaremill.adopttapir.infrastructure.CorrelationId
 
 import java.io.File
 

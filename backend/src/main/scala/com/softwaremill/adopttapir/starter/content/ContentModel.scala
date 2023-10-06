@@ -1,13 +1,9 @@
 package com.softwaremill.adopttapir.starter.content
 
 import cats.syntax.all.*
-import io.circe.{Encoder, Decoder}
 import io.circe.*
-import io.circe.parser.*
 import io.circe.syntax.*
-import io.circe.generic.semiauto.*
 import sttp.tapir.Schema
-import io.circe.*
 
 sealed trait Node:
   def name: String

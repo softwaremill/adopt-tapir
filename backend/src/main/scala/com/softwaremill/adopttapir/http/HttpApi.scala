@@ -18,8 +18,6 @@ import sttp.tapir.static.ResourcesOptions
 import sttp.tapir.swagger.SwaggerUIOptions
 import sttp.tapir.swagger.bundle.SwaggerInterpreter
 
-import scala.util.chaining.*
-
 /** Interprets the endpoint descriptions (defined using tapir) as http4s routes, adding CORS, metrics, api docs support.
   *
   * The following endpoints are exposed on `config.port`
