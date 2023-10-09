@@ -45,7 +45,10 @@ jobs:
       fail-fast: false
       matrix:
         scala: [ "Scala2", "Scala3" ]
-        json: [ "No", "Circe", "UPickle", "Jsoniter", "ZIOJson" ]
+        json: [ "No", "Circe", "UPickle", "Jsoniter", "ZIOJson", "Pickler" ]
+        exclude:
+          - scala: "Scala2"
+            json: "Pickler"
 
     steps:
       - name: Check-out repository
