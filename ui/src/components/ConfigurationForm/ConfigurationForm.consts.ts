@@ -13,6 +13,7 @@ import {
   getAvailableEffectImplementations,
   getEffectImplementationOptions,
   mapEffectTypeToJSONImplementation,
+  mapScalaVersionToJSONImplementation,
 } from './ConfigurationForm.helpers';
 
 export const SCALA_VERSION_OPTIONS: FormSelectOption<string>[] = [
@@ -87,6 +88,10 @@ export const JSON_OUTPUT_OPTIONS: FormRadioOption<JSONImplementation>[] = [
   {
     label: 'µPickle',
     value: JSONImplementation.UPickle,
+  },
+  {
+    label: 'pickler',
+    value: JSONImplementation.Pickler,
   },
   {
     label: 'jsoniter',
@@ -178,6 +183,11 @@ export const starterValidationSchema = yup
         // NOTE: any effect type besides ZIO will work here as an argument
         then: schema => schema.oneOf(mapEffectTypeToJSONImplementation(EffectType.Future)),
         otherwise: schema => schema.oneOf(mapEffectTypeToJSONImplementation(EffectType.ZIO)),
+      })
+      .when('scalaVersion', {
+        is: (scalaVersion: ScalaVersion) => scalaVersion !== ScalaVersion.Scala3,
+        then: schema => schema.oneOf(mapScalaVersionToJSONImplementation(ScalaVersion.Scala2)),
+        otherwise: schema => schema.oneOf(mapScalaVersionToJSONImplementation(ScalaVersion.Scala3)),
       })
       .required(REQUIRED_FIELD_MESSAGE),
     addMetrics: yup.boolean().required(REQUIRED_FIELD_MESSAGE),

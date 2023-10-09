@@ -1,4 +1,4 @@
-import { EffectImplementation, EffectType, JSONImplementation } from 'api/starter';
+import { EffectImplementation, EffectType, JSONImplementation, ScalaVersion } from 'api/starter';
 import { EFFECT_IMPLEMENTATIONS_OPTIONS, JSON_OUTPUT_OPTIONS } from './ConfigurationForm.consts';
 import type { FormSelectOption } from '../FormSelect';
 import type { FormRadioOption } from '../FormRadioGroup';
@@ -50,16 +50,29 @@ const effectTypeJsonImplementationMap: Record<EffectType, JSONImplementation[]> 
   [EffectType.ZIO]: commonJSONImplementations.concat(JSONImplementation.ZIOJson),
 };
 
+const versionTypeJsonImlpementationMap: Record<ScalaVersion, JSONImplementation[]> = {
+  [ScalaVersion.Scala2]: commonJSONImplementations,
+  [ScalaVersion.Scala3]: commonJSONImplementations.concat(JSONImplementation.Pickler),
+};
+
 export const mapEffectTypeToJSONImplementation = (effectType: EffectType): JSONImplementation[] => {
   return effectTypeJsonImplementationMap[effectType];
 };
 
-export const getJSONImplementationOptions = (effectType?: EffectType): FormRadioOption[] => {
-  if (effectType) {
-    const availableJSONImplementations = mapEffectTypeToJSONImplementation(effectType);
+export const mapScalaVersionToJSONImplementation = (scalaVersion: ScalaVersion): JSONImplementation[] => {
+  return versionTypeJsonImlpementationMap[scalaVersion];
+};
 
-    return JSON_OUTPUT_OPTIONS.filter(({ value }) => availableJSONImplementations.includes(value));
-  } else {
-    return JSON_OUTPUT_OPTIONS.filter(({ value }) => value !== JSONImplementation.ZIOJson);
-  }
+const getJSONImplementations = (scalaVersion?: ScalaVersion, effectType?: EffectType): JSONImplementation[] => {
+  const implementationsForVersion = scalaVersion ? mapScalaVersionToJSONImplementation(scalaVersion) : [];
+  const implementationsForEffect = effectType ? mapEffectTypeToJSONImplementation(effectType) : [];
+
+  // Merge and deduplicate
+  return [...new Set([...implementationsForVersion, ...implementationsForEffect])]
+};
+
+export const getJSONImplementationOptions = (scalaVersion?: ScalaVersion, effectType?: EffectType): FormRadioOption[] => {
+  const availableJSONImplementations = getJSONImplementations(scalaVersion, effectType) || commonJSONImplementations;
+
+  return JSON_OUTPUT_OPTIONS.filter(({ value }) => availableJSONImplementations.includes(value));
 };
