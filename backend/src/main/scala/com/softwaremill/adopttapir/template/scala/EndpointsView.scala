@@ -80,7 +80,7 @@ object EndpointsView:
            |
            |""".stripMargin
         case JsonImplementation.Pickler =>
-              s"""
+          s"""
                |  given Pickler[Author] = Pickler.derived
                |  given Pickler[Book] = Pickler.derived
                |
@@ -138,7 +138,7 @@ object EndpointsView:
             prepareBookListing,
             Set(
               Import("sttp.tapir.json.pickler.*"),
-              Import("upickle.default.Reader"),
+              Import("upickle.default.Reader")
             )
           )
         case JsonImplementation.Jsoniter =>
