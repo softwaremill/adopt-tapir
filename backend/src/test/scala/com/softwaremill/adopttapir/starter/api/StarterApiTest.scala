@@ -5,7 +5,7 @@ import cats.effect.{IO, Resource}
 import com.softwaremill.adopttapir.http.Error_OUT
 import com.softwaremill.adopttapir.infrastructure.Json.*
 import com.softwaremill.adopttapir.starter.api.EffectRequest.FutureEffect
-import com.softwaremill.adopttapir.starter.api.JsonImplementationRequest.Jsoniter
+import com.softwaremill.adopttapir.starter.api.JsonImplementationRequest.{Jsoniter, ZIOJson, Pickler}
 import com.softwaremill.adopttapir.starter.api.ScalaVersionRequest.Scala2
 import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Netty, ZIOHttp}
 import com.softwaremill.adopttapir.starter.api.StarterApiTest.{mainPath, validSbtRequest, validScalaCliRequest}
@@ -125,6 +125,36 @@ class StarterApiTest extends BaseTest with TestDependencies {
     ex.statusCode.code shouldBe 400
     jawn.decode[Error_OUT](ex.body).value.error should include(
       "Picked FutureEffect with ZIOHttp - Future effect will work only with: Netty, Vert.X"
+    )
+  }
+
+  it should "return request error with information about picking wrong effect for a json" in {
+    // given
+    val request = StarterRequestGenerators.randomStarterRequest().copy(effect = FutureEffect, json = ZIOJson)
+
+    // when
+    val rootEx = intercept[SttpClientException](requests.requestZip(request))
+    val ex = rootEx.cause.asInstanceOf[HttpError[String]]
+
+    // then
+    ex.statusCode.code shouldBe 400
+    jawn.decode[Error_OUT](ex.body).value.error should include(
+      "ZIOJson will work only with ZIO effect"
+    )
+  }
+
+  it should "return request error with information about picking wrong scala version for a json" in {
+    // given
+    val request = StarterRequestGenerators.randomStarterRequest().copy(scalaVersion = Scala2, json = Pickler)
+
+    // when
+    val rootEx = intercept[SttpClientException](requests.requestZip(request))
+    val ex = rootEx.cause.asInstanceOf[HttpError[String]]
+
+    // then
+    ex.statusCode.code shouldBe 400
+    jawn.decode[Error_OUT](ex.body).value.error should include(
+      "Pickler will work only with Scala 3"
     )
   }
 

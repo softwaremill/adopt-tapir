@@ -39,7 +39,7 @@ enum ServerEffect(val name: String):
   case ZIOEffect extends ServerEffect("ZIO")
 
 enum JsonImplementation:
-  case WithoutJson, Circe, UPickle, Jsoniter, ZIOJson
+  case WithoutJson, Circe, UPickle, Jsoniter, ZIOJson, Pickler
 
 enum ScalaVersion(val value: String):
   case Scala2 extends ScalaVersion(TemplateDependencyInfo.scala2Version)
