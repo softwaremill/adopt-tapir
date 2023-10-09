@@ -68,10 +68,13 @@ const getJSONImplementations = (scalaVersion?: ScalaVersion, effectType?: Effect
   const implementationsForEffect = effectType ? mapEffectTypeToJSONImplementation(effectType) : [];
 
   // Merge and deduplicate
-  return [...new Set([...implementationsForVersion, ...implementationsForEffect])]
+  return [...new Set([...implementationsForVersion, ...implementationsForEffect])];
 };
 
-export const getJSONImplementationOptions = (scalaVersion?: ScalaVersion, effectType?: EffectType): FormRadioOption[] => {
+export const getJSONImplementationOptions = (
+  scalaVersion?: ScalaVersion,
+  effectType?: EffectType
+): FormRadioOption[] => {
   const availableJSONImplementations = getJSONImplementations(scalaVersion, effectType) || commonJSONImplementations;
 
   return JSON_OUTPUT_OPTIONS.filter(({ value }) => availableJSONImplementations.includes(value));

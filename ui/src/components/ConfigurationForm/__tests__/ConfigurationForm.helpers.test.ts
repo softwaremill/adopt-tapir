@@ -317,7 +317,7 @@ describe('configuration form helpers', () => {
           {
             label: 'jsoniter',
             value: JSONImplementation.Jsoniter,
-          }
+          },
         ],
       ],
       [
