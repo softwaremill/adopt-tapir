@@ -129,7 +129,7 @@ object EndpointsView:
             prepareBookListing,
             Set(Import("sttp.tapir.generic.auto._"), Import("upickle.default._"), Import("sttp.tapir.json.upickle._"))
           )
-        case JsonImplementation.Pickler => Code(prepareBookListing, Set(Import("sttp.tapir.json.pickler.*")))
+        case JsonImplementation.Pickler => Code(prepareBookListing, Set(Import("sttp.tapir.json.pickler._")))
         case JsonImplementation.Jsoniter =>
           val codecs = s"$givenPrefix codecBooks: JsonValueCodec[List[Book]] = JsonCodecMaker.make"
 

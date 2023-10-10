@@ -90,7 +90,8 @@ abstract class ProjectTemplate:
             toSortedList(helloServerStub.imports ++ booksServerStub.imports),
             helloServerStub.body,
             booksServerStub.body,
-            starterDetails.scalaVersion
+            starterDetails.scalaVersion,
+            starterDetails.jsonImplementation
           )
       } else {
         val unwrapper = EndpointsSpecView.Unwrapper.prepareUnwrapper(starterDetails.serverEffect, starterDetails.scalaVersion)
