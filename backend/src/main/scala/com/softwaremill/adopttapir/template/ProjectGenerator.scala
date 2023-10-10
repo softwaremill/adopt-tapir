@@ -101,7 +101,8 @@ abstract class ProjectTemplate:
             helloServerStub.body,
             unwrapper.body,
             booksServerStub.body,
-            starterDetails.scalaVersion
+            starterDetails.scalaVersion,
+            starterDetails.jsonImplementation
           )
       }
 

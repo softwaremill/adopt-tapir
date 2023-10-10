@@ -84,10 +84,6 @@ object EndpointsView:
                |  given Pickler[Author] = Pickler.derived
                |  given Pickler[Book] = Pickler.derived
                |
-               |  // Adding Reader to support upickle during tests
-               |  given Reader[Author] = summon[Pickler[Author]].innerUpickle.reader.asInstanceOf[Reader[Author]]
-               |  given Reader[Book] = summon[Pickler[Book]].innerUpickle.reader.asInstanceOf[Reader[Book]]
-               |
                |""".stripMargin
         case _ => ""
       }
@@ -133,14 +129,7 @@ object EndpointsView:
             prepareBookListing,
             Set(Import("sttp.tapir.generic.auto._"), Import("upickle.default._"), Import("sttp.tapir.json.upickle._"))
           )
-        case JsonImplementation.Pickler =>
-          Code(
-            prepareBookListing,
-            Set(
-              Import("sttp.tapir.json.pickler.*"),
-              Import("upickle.default.Reader")
-            )
-          )
+        case JsonImplementation.Pickler => Code(prepareBookListing, Set(Import("sttp.tapir.json.pickler.*")))
         case JsonImplementation.Jsoniter =>
           val codecs = s"$givenPrefix codecBooks: JsonValueCodec[List[Book]] = JsonCodecMaker.make"
 

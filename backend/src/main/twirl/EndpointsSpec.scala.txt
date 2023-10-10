@@ -5,6 +5,7 @@ helloStub: String,
 unwrapper: String,
 booksStub: String,
 scalaVersion: com.softwaremill.adopttapir.starter.ScalaVersion,
+jsonImplementation: com.softwaremill.adopttapir.starter.JsonImplementation,
 leftBracket: Char = '{',
 rightBracket: Char = '}'
 )
@@ -21,6 +22,10 @@ import sttp.tapir.server.stub.TapirStubInterpreter
 @{additionalImport.asScalaImport(scalaVersion)}}
 
 class EndpointsSpec extends AnyFlatSpec with Matchers with EitherValues@if(scalaVersion == com.softwaremill.adopttapir.starter.ScalaVersion.Scala2){ @leftBracket}else{:}
+@if(jsonImplementation == com.softwaremill.adopttapir.starter.JsonImplementation.Pickler){
+  given Reader[Author] = upickle.default.macroR
+  given Reader[Book] = upickle.default.macroR
+}
 
   it should "return hello message" in {
     // given
