@@ -50,6 +50,17 @@ class FormValidatorTest extends BaseTest:
 
   }
 
+  it should "raise a problem with picking Pickler for other version than Scala 3" in {
+    // given
+    val request = randomStarterRequest().copy(json = JsonImplementationRequest.Pickler, scalaVersion = ScalaVersionRequest.Scala2)
+
+    // when
+    val result = FormValidator.validate(request)
+
+    // then
+    result.left.value.msg should include(s"Pickler will work only with Scala 3")
+  }
+
   it should "raise a problem when effect will not match implementation" in {
     FormValidator.validate(randomStarterRequest(FutureEffect, ZIOHttp)).left.value.msg should
       include("Picked FutureEffect with ZIOHttp - Future effect will work only with: Netty, Vert.X, Pekko")

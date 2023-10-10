@@ -56,7 +56,7 @@ describe('configuration form helpers', () => {
     test.each(cases)(
       'should return set of effect implementations based on EffectType - (%s) and ScalaVersion - (%s)',
       (effectType, scalaVersion, effectImplementations) => {
-        expect(getAvailableEffectImplementations(effectType, scalaVersion)).toEqual(effectImplementations);
+        expect(getAvailableEffectImplementations(effectType)).toEqual(effectImplementations);
       }
     );
   });
@@ -185,7 +185,7 @@ describe('configuration form helpers', () => {
     test.each(cases)(
       'should return set of form select options based on EffectType - (%s) and ScalaVersion - (%s)',
       (effectType, scalaVersion, formSelectOptions) => {
-        const effectImplementationOptions = getEffectImplementationOptions(effectType, scalaVersion);
+        const effectImplementationOptions = getEffectImplementationOptions(effectType);
 
         expect(effectImplementationOptions).toHaveLength(formSelectOptions.length);
         expect(effectImplementationOptions).toEqual(expect.arrayContaining(formSelectOptions));
@@ -194,8 +194,10 @@ describe('configuration form helpers', () => {
   });
 
   describe('.getJSONImplementationOptions()', () => {
-    const cases: [EffectType, FormRadioOption[]][] = [
+    const cases: [ScalaVersion, EffectType, FormRadioOption[]][] = [
+      // Scala 2 variants
       [
+        ScalaVersion.Scala2,
         EffectType.Future,
         [
           {
@@ -217,6 +219,7 @@ describe('configuration form helpers', () => {
         ],
       ],
       [
+        ScalaVersion.Scala2,
         EffectType.IO,
         [
           {
@@ -238,6 +241,7 @@ describe('configuration form helpers', () => {
         ],
       ],
       [
+        ScalaVersion.Scala2,
         EffectType.ZIO,
         [
           {
@@ -262,12 +266,96 @@ describe('configuration form helpers', () => {
           },
         ],
       ],
+
+      // Scala 3 variants
+      [
+        ScalaVersion.Scala3,
+        EffectType.Future,
+        [
+          {
+            label: "don't add",
+            value: JSONImplementation.No,
+          },
+          {
+            label: 'circe',
+            value: JSONImplementation.Circe,
+          },
+          {
+            label: 'µPickle',
+            value: JSONImplementation.UPickle,
+          },
+          {
+            label: 'pickler',
+            value: JSONImplementation.Pickler,
+          },
+          {
+            label: 'jsoniter',
+            value: JSONImplementation.Jsoniter,
+          },
+        ],
+      ],
+      [
+        ScalaVersion.Scala3,
+        EffectType.IO,
+        [
+          {
+            label: "don't add",
+            value: JSONImplementation.No,
+          },
+          {
+            label: 'circe',
+            value: JSONImplementation.Circe,
+          },
+          {
+            label: 'µPickle',
+            value: JSONImplementation.UPickle,
+          },
+          {
+            label: 'pickler',
+            value: JSONImplementation.Pickler,
+          },
+          {
+            label: 'jsoniter',
+            value: JSONImplementation.Jsoniter,
+          },
+        ],
+      ],
+      [
+        ScalaVersion.Scala3,
+        EffectType.ZIO,
+        [
+          {
+            label: "don't add",
+            value: JSONImplementation.No,
+          },
+          {
+            label: 'circe',
+            value: JSONImplementation.Circe,
+          },
+          {
+            label: 'µPickle',
+            value: JSONImplementation.UPickle,
+          },
+          {
+            label: 'pickler',
+            value: JSONImplementation.Pickler,
+          },
+          {
+            label: 'jsoniter',
+            value: JSONImplementation.Jsoniter,
+          },
+          {
+            label: 'zio-json',
+            value: JSONImplementation.ZIOJson,
+          },
+        ],
+      ],
     ];
 
     test.each(cases)(
       'should return set of form radio options based on EffectType - (%s)',
-      (effectType, formRadioOptions) => {
-        const jsonImplementationOptions = getJSONImplementationOptions(effectType);
+      (scalaVersion, effectType, formRadioOptions) => {
+        const jsonImplementationOptions = getJSONImplementationOptions(scalaVersion, effectType);
 
         expect(jsonImplementationOptions).toHaveLength(formRadioOptions.length);
         expect(jsonImplementationOptions).toEqual(expect.arrayContaining(formRadioOptions));

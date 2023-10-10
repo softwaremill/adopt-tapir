@@ -32,6 +32,7 @@ import {
   getEffectImplementationOptions,
   getJSONImplementationOptions,
   mapEffectTypeToJSONImplementation,
+  mapScalaVersionToJSONImplementation,
 } from './ConfigurationForm.helpers';
 import { useNavigate } from 'react-router-dom';
 import { ApiCallAddons } from '../ApiCallAddons';
@@ -128,15 +129,17 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
   }, [form, effectType, effectImplementation, scalaVersion]);
 
   useEffect(() => {
-    // NOTE: reset json field value upon effect type change
+    // NOTE: reset json field value upon effect type and scala version change
     if (
       effectType &&
+      scalaVersion &&
       jsonImplementation &&
-      !mapEffectTypeToJSONImplementation(effectType).includes(jsonImplementation)
+      !mapEffectTypeToJSONImplementation(effectType).includes(jsonImplementation) &&
+      !mapScalaVersionToJSONImplementation(scalaVersion).includes(jsonImplementation)
     ) {
       form.resetField('json');
     }
-  }, [form, effectType, jsonImplementation]);
+  }, [form, effectType, scalaVersion, jsonImplementation]);
 
   const handleFormSubmit = (formData: StarterRequest): void => {
     call(() => doRequestStarter(formData));
@@ -264,7 +267,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
             <FormRadioGroup
               name="json"
               label="Add JSON endpoint using"
-              options={getJSONImplementationOptions(effectType)}
+              options={getJSONImplementationOptions(scalaVersion, effectType)}
             />
             <FormRadioGroup
               name="addDocumentation"

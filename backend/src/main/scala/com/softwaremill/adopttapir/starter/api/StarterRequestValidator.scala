@@ -5,7 +5,8 @@ import cats.syntax.all.*
 import com.softwaremill.adopttapir.Fail.*
 import com.softwaremill.adopttapir.starter.StarterDetails
 import com.softwaremill.adopttapir.starter.api.EffectRequest.ZIOEffect
-import com.softwaremill.adopttapir.starter.api.JsonImplementationRequest.ZIOJson
+import com.softwaremill.adopttapir.starter.api.JsonImplementationRequest.{ZIOJson, Pickler}
+import com.softwaremill.adopttapir.starter.api.ScalaVersionRequest.Scala3
 import com.softwaremill.adopttapir.starter.api.RequestValidation.{GroupIdShouldFollowJavaPackageConvention, ProjectNameShouldMatchRegex}
 import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Http4s, Netty, Pekko, VertX, ZIOHttp}
 
@@ -34,6 +35,9 @@ object RequestValidation:
   case object ZIOJsonWillWorkOnlyWithZIOEffect extends RequestValidation:
     override val errMessage: String = s"ZIOJson will work only with ZIO effect"
 
+  case object PicklerWillWorkOnlyWithScala3 extends RequestValidation:
+    override val errMessage: String = s"Pickler will work only with Scala 3"
+
 end RequestValidation
 
 sealed trait FormValidator:
@@ -45,7 +49,7 @@ sealed trait FormValidator:
       validateGroupId(r.groupId),
       validateEffectWithImplementation(r.effect, r.implementation),
       validateMetrics(r.effect, r.implementation, r.addMetrics),
-      validateEffectWithJson(r.effect, r.json)
+      validateJson(r.effect, r.scalaVersion, r.json)
     ).mapN { case (projectName, groupId, (effect, serverImplementation), addMetrics, json) =>
       StarterDetails(
         projectName,
@@ -90,6 +94,13 @@ sealed trait FormValidator:
       case t @ (_, Http4s | ZIOHttp | Netty | VertX | Pekko, _) => t._3.validNec
     }
 
+  private def validateJson(
+      effectRequest: EffectRequest,
+      versionRequest: ScalaVersionRequest,
+      json: JsonImplementationRequest
+  ): ValidatedNec[RequestValidation, JsonImplementationRequest] =
+    validateEffectWithJson(effectRequest, json).andThen(validateVersionWithJson(versionRequest, _))
+
   private def validateEffectWithJson(
       effectRequest: EffectRequest,
       json: JsonImplementationRequest
@@ -98,6 +109,16 @@ sealed trait FormValidator:
       case t @ (ZIOEffect, ZIOJson) => t._2.validNec
       case (_, ZIOJson)             => RequestValidation.ZIOJsonWillWorkOnlyWithZIOEffect.invalidNec
       case t                        => t._2.validNec
+    }
+
+  private def validateVersionWithJson(
+      versionRequest: ScalaVersionRequest,
+      json: JsonImplementationRequest
+  ): ValidatedNec[RequestValidation, JsonImplementationRequest] =
+    (versionRequest, json) match {
+      case t @ (Scala3, Pickler) => t._2.validNec
+      case (_, Pickler)          => RequestValidation.PicklerWillWorkOnlyWithScala3.invalidNec
+      case t                     => t._2.validNec
     }
 
 end FormValidator

@@ -18,6 +18,7 @@ export enum EffectImplementation {
 export enum JSONImplementation {
   Circe = 'Circe',
   UPickle = 'UPickle',
+  Pickler = 'Pickler',
   Jsoniter = 'Jsoniter',
   ZIOJson = 'ZIOJson',
   No = 'No',

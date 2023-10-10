@@ -61,11 +61,11 @@ describe('ConfigurationForm component', () => {
       body: JSON.stringify({
         builder: 'ScalaCli',
         addMetrics: true,
+        scalaVersion: 'Scala2',
         effect: 'FutureEffect',
         json: 'Circe',
         addDocumentation: true,
         implementation: 'Netty',
-        scalaVersion: 'Scala2',
         groupId: 'com.softwaremill',
         projectName: 'test-project',
       }),
@@ -222,6 +222,37 @@ describe('ConfigurationForm component', () => {
       // default values below
       scalaVersion: 'Scala3',
       implementation: '',
+      groupId: 'com.softwaremill',
+      addDocumentation: 'false',
+      addMetrics: 'false',
+    });
+  });
+
+  test('json field reset flow based on scala version change', async () => {
+    // given
+    const user = userEvent.setup();
+    render(
+      <BrowserRouter>
+        <ConfigurationForm />
+      </BrowserRouter>
+    );
+
+    // when
+    await user.click(screen.getByRole('radiogroup', { name: /Scala version/i }));
+    await user.click(screen.getByText('3'));
+
+    await user.click(within(screen.getByRole('radiogroup', { name: /Add JSON endpoint using/i })).getByText('pickler'));
+
+    await user.click(screen.getByRole('radiogroup', { name: /Scala version/i }));
+    await user.click(screen.getByText('2'));
+
+    // then
+    expect(screen.getByTestId('configuration-form')).toHaveFormValues({
+      effect: 'IOEffect',
+      json: 'No',
+      // default values below
+      scalaVersion: 'Scala2',
+      implementation: 'Http4s',
       groupId: 'com.softwaremill',
       addDocumentation: 'false',
       addMetrics: 'false',

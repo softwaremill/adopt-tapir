@@ -4,6 +4,7 @@ additionalImports: List[com.softwaremill.adopttapir.template.scala.Import],
 helloStub: String,
 booksStub: String,
 scalaVersion: com.softwaremill.adopttapir.starter.ScalaVersion,
+jsonImplementation: com.softwaremill.adopttapir.starter.JsonImplementation,
 leftBracket: Char = '{',
 rightBracket: Char = '}'
 )
@@ -19,6 +20,11 @@ import zio.test.{ZIOSpecDefault, assertZIO}
 @{additionalImport.asScalaImport(scalaVersion)}}
 
 object EndpointsSpec extends ZIOSpecDefault@if(scalaVersion == com.softwaremill.adopttapir.starter.ScalaVersion.Scala2){ @leftBracket}else{:}
+@if(jsonImplementation == com.softwaremill.adopttapir.starter.JsonImplementation.Pickler){
+  given Reader[Author] = upickle.default.macroR
+  given Reader[Book] = upickle.default.macroR
+}
+
   def spec = suite("Endpoints spec")(
     test("return hello message") {
     //given
