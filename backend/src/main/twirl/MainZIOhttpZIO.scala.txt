@@ -17,18 +17,19 @@ object Main extends ZIOAppDefault {
         @if(addMetrics){.metricsInterceptor(Endpoints.prometheusMetrics.metricsInterceptor())}
         .options
 
-    val app: HttpApp[Any, Throwable] = ZioHttpInterpreter(serverOptions).toHttp(Endpoints.all)
+    val app: HttpApp[Any] = ZioHttpInterpreter(serverOptions).toHttp(Endpoints.all)
 
     val port = sys.env.get("HTTP_PORT").flatMap(_.toIntOption).getOrElse(8080)
 
    (
      for {
-       actualPort <- Server.install(app.withDefaultErrorResponse)
+       actualPort <- Server.serve(app)
        _ <- Console.printLine(s"@if(addDocumentation){Go to http://localhost:${actualPort}/docs to open SwaggerUI. }else{Server started at http://localhost:${actualPort}. }Press ENTER key to exit.")
        _ <- Console.readLine
      } yield ()
-   ).provide(
-      Server.defaultWithPort(port)
-   ).exitCode
+     ).provide(
+       ZLayer.succeed(Server.Config.default.port(port)),
+       Server.live
+     ).exitCode
   }
 }
