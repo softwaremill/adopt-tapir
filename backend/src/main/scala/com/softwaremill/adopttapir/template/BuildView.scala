@@ -47,8 +47,8 @@ abstract class BuildView:
   private def getLoggerDependency(starterDetails: StarterDetails): List[Dependency] =
     val zioLoggingDependencies =
       List(
-        ScalaDependency("dev.zio", "zio-logging", "2.1.12"),
-        ScalaDependency("dev.zio", "zio-logging-slf4j", "2.0.0")
+        ScalaDependency("dev.zio", "zio-logging", "2.1.15"),
+        ScalaDependency("dev.zio", "zio-logging-slf4j", "2.1.15")
       )
 
     val logbackClassic = List(JavaDependency("ch.qos.logback", "logback-classic", TemplateDependencyInfo.logbackClassicVersion))
