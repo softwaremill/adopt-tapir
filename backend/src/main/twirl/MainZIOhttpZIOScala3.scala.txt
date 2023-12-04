@@ -22,7 +22,7 @@ object Main extends ZIOAppDefault:
     val port = sys.env.get("HTTP_PORT").flatMap(_.toIntOption).getOrElse(8080)
 
     (for {
-      actualPort <- Server.install(app)
+      actualPort <- Server.install(app) // or .serve if you don't need the port and want to keep it running without manual readLine
       _ <- Console.printLine(s"@if(addDocumentation){Go to http://localhost:${actualPort}/docs to open SwaggerUI. }else{Server started at http://localhost:${actualPort}. }Press ENTER key to exit.")
       _ <- Console.readLine
     } yield ()
