@@ -3,9 +3,7 @@ package com.softwaremill.adopttapir.starter
 import better.files.{FileExtensions, File as BFile}
 import cats.effect.unsafe.implicits.global
 import cats.effect.{IO, Resource}
-import cats.instances.list.*
-import cats.syntax.parallel.*
-import cats.syntax.show.*
+import cats.syntax.all.*
 import com.softwaremill.adopttapir.infrastructure.CorrelationId
 import com.softwaremill.adopttapir.metrics.Metrics
 import com.softwaremill.adopttapir.starter.api.*
@@ -20,6 +18,7 @@ import sttp.client3.{HttpURLConnectionBackend, Identity, SttpBackend, UriContext
 import scala.collection.mutable
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 import scala.util.Properties
+import scala.util.control.NonFatal
 
 object Setup:
   type TestFunction = Integer => IO[Unit]
@@ -112,18 +111,25 @@ class StarterServiceITTest extends BaseTest with ParallelTestExecution:
       )
 
       val metricsEndpointTest: Option[TestFunction] = Option.when(details.addMetrics)(port =>
-        IO.blocking {
-          val result: String =
-            basicRequest.response(asStringAlways).get(uri"http://localhost:$port/metrics").send(backend).body
+        def runWithRetries(retriesAllowed: Int): IO[Unit] =
+          IO.blocking {
+            val result: String =
+              basicRequest.response(asStringAlways).get(uri"http://localhost:$port/metrics").send(backend).body
 
-          result should (include("# HELP tapir_request_duration_seconds Duration of HTTP requests")
-            and include("# TYPE tapir_request_duration_seconds histogram")
-            and include("# HELP tapir_request_total Total HTTP requests")
-            and include("# TYPE tapir_request_total counter")
-            and include("# HELP tapir_request_active Active HTTP requests")
-            and include("# TYPE tapir_request_active gauge"))
-          info(subTest("metrics"))
-        }
+            result should (include("# HELP tapir_request_duration_seconds Duration of HTTP requests")
+              and include("# TYPE tapir_request_duration_seconds histogram")
+              and include("# HELP tapir_request_total Total HTTP requests")
+              and include("# TYPE tapir_request_total counter")
+              and include("# HELP tapir_request_active Active HTTP requests")
+              and include("# TYPE tapir_request_active gauge"))
+            info(subTest("metrics"))
+          }.handleErrorWith {
+            // Sometimes the registry is empty right after the server starts
+            case NonFatal(_) if retriesAllowed > 0 => IO.sleep(500.millis) >> runWithRetries(retriesAllowed - 1)
+            case NonFatal(e)                       => IO.raiseError(e)
+          }
+
+        runWithRetries(3)
       )
 
       // get implementation for a given configuration, compile it, unit & integration test it
