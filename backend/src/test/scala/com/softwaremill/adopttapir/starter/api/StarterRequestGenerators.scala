@@ -17,7 +17,9 @@ object StarterRequestGenerators:
         str.length <= 256 && str.nonEmpty
       )
       scalaVersion <- Gen.oneOf(ScalaVersionRequest.values.toIndexedSeq)
-      jsonValuesForScalaVersion = JsonImplementationRequest.values.toSet -- (if (scalaVersion.toModel == ScalaVersion.Scala2) Set(JsonImplementationRequest.Pickler) else Set.empty)
+      jsonValuesForScalaVersion = JsonImplementationRequest.values.toSet -- (if (scalaVersion.toModel == ScalaVersion.Scala2)
+                                                                               Set(JsonImplementationRequest.Pickler)
+                                                                             else Set.empty)
       json <- Gen.oneOf(jsonValuesForScalaVersion.toIndexedSeq)
       effect <-
         if (json == JsonImplementationRequest.ZIOJson)
