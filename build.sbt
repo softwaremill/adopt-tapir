@@ -10,19 +10,19 @@ import scala.util.Try
 val scala2Version = "2.13.10"
 val scala3Version = "3.3.1"
 
-val tapirVersion = "1.8.1"
+val tapirVersion = "1.9.2"
 
-val http4sEmberServerVersion = "0.23.23"
-val http4sCirceVersion = "0.23.23"
+val http4sEmberServerVersion = "0.23.24"
+val http4sCirceVersion = "0.23.24"
 val circeVersion = "0.14.6"
 val circeGenericsExtrasVersion = "0.14.3"
-val sttpVersion = "3.9.0"
+val sttpVersion = "3.9.1"
 val prometheusVersion = "0.16.0"
-val scalafmtVersion = "3.7.14"
+val scalafmtVersion = "3.7.17"
 val scalaLoggingVersion = "3.9.5"
-val logbackClassicVersion = "1.4.11"
+val logbackClassicVersion = "1.4.14"
 val scalaTestVersion = "3.2.17"
-val plokhotnyukJsoniterVersion = "2.24.1"
+val plokhotnyukJsoniterVersion = "2.24.4"
 val zioTestVersion = "2.0.13"
 
 val httpDependencies = Seq(
@@ -59,7 +59,7 @@ val loggingDependencies = Seq(
 
 val fileDependencies = Seq(
   "com.github.pathikrit" %% "better-files" % "3.9.2" cross CrossVersion.for3Use2_13,
-  "org.apache.commons" % "commons-compress" % "1.24.0"
+  "org.apache.commons" % "commons-compress" % "1.25.0"
 )
 
 val configDependencies = Seq(
@@ -83,7 +83,7 @@ val scalafmtStandaloneDependencies = Seq(
 val unitTestingStack = Seq(
   "org.scalatest" %% "scalatest" % scalaTestVersion % Test,
   "org.scalacheck" %% "scalacheck" % "1.17.0" % Test,
-  "com.lihaoyi" %% "os-lib" % "0.9.1" % Test
+  "com.lihaoyi" %% "os-lib" % "0.9.2" % Test
 )
 
 val commonDependencies =
