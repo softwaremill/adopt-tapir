@@ -2,7 +2,7 @@ addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.11.0")
 
 addSbtPlugin("io.spray" % "sbt-revolver" % "0.10.0")
 
-addSbtPlugin("com.softwaremill.sbt-softwaremill" % "sbt-softwaremill-common" % "2.0.18")
+addSbtPlugin("com.softwaremill.sbt-softwaremill" % "sbt-softwaremill-common" % "2.0.19")
 
 addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "2.1.5")
 
