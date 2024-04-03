@@ -8,21 +8,21 @@ import scala.sys.process.Process
 import scala.util.Try
 
 val scala2Version = "2.13.10"
-val scala3Version = "3.3.3"
+val scala3Version = "3.4.1"
 
-val tapirVersion = "1.9.10"
+val tapirVersion = "1.10.0"
 
 val http4sEmberServerVersion = "0.23.26"
 val http4sCirceVersion = "0.23.26"
 val circeVersion = "0.14.6"
 val circeGenericsExtrasVersion = "0.14.3"
-val sttpVersion = "3.9.3"
+val sttpVersion = "3.9.5"
 val prometheusVersion = "0.16.0"
-val scalafmtVersion = "3.8.0"
+val scalafmtVersion = "3.8.1"
 val scalaLoggingVersion = "3.9.5"
 val logbackClassicVersion = "1.5.3"
 val scalaTestVersion = "3.2.18"
-val plokhotnyukJsoniterVersion = "2.28.3"
+val plokhotnyukJsoniterVersion = "2.28.4"
 val zioTestVersion = "2.0.13"
 
 val httpDependencies = Seq(
@@ -59,7 +59,7 @@ val loggingDependencies = Seq(
 
 val fileDependencies = Seq(
   "com.github.pathikrit" %% "better-files" % "3.9.2" cross CrossVersion.for3Use2_13,
-  "org.apache.commons" % "commons-compress" % "1.26.0"
+  "org.apache.commons" % "commons-compress" % "1.26.1"
 )
 
 val configDependencies = Seq(
@@ -67,7 +67,7 @@ val configDependencies = Seq(
 )
 
 val baseDependencies = Seq(
-  "org.typelevel" %% "cats-effect" % "3.5.3",
+  "org.typelevel" %% "cats-effect" % "3.5.4",
   "com.softwaremill.common" %% "tagging" % "2.3.4",
   "com.softwaremill.quicklens" %% "quicklens" % "1.9.7"
 )

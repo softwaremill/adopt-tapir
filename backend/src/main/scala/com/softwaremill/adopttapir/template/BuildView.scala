@@ -54,7 +54,7 @@ abstract class BuildView:
     val logbackClassic = List(JavaDependency("ch.qos.logback", "logback-classic", TemplateDependencyInfo.logbackClassicVersion))
 
     starterDetails.serverImplementation match
-      case ServerImplementation.Netty   => Nil
+      case ServerImplementation.Netty   => logbackClassic
       case ServerImplementation.ZIOHttp => logbackClassic ++ zioLoggingDependencies
       case ServerImplementation.Http4s  => logbackClassic
       case ServerImplementation.VertX   => logbackClassic
