@@ -57,6 +57,13 @@ enum EffectRequest(val toModel: ServerEffect, val legalServerImplementations: Se
           ServerImplementation.ZIOHttp
         )
       )
+  case Sync
+      extends EffectRequest(
+        ServerEffect.Sync,
+        legalServerImplementations = Set(
+          ServerImplementation.Netty
+        )
+      )
 
 enum ServerImplementationRequest(val toModel: ServerImplementation) derives JsonTaggedAdt.PureEncoder, JsonTaggedAdt.PureDecoder, Schema:
   case Netty extends ServerImplementationRequest(ServerImplementation.Netty)

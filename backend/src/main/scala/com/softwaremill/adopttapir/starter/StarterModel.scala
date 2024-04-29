@@ -37,6 +37,7 @@ enum ServerEffect(val name: String):
   case FutureEffect extends ServerEffect("Future")
   case IOEffect extends ServerEffect("IO")
   case ZIOEffect extends ServerEffect("ZIO")
+  case Sync extends ServerEffect("Sync")
 
 enum JsonImplementation:
   case WithoutJson, Circe, UPickle, Jsoniter, ZIOJson, Pickler

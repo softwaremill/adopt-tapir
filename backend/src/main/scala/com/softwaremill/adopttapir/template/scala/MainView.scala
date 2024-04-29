@@ -1,6 +1,6 @@
 package com.softwaremill.adopttapir.template.scala
 
-import com.softwaremill.adopttapir.starter.ServerEffect.{FutureEffect, IOEffect, ZIOEffect}
+import com.softwaremill.adopttapir.starter.ServerEffect.{FutureEffect, IOEffect, Sync, ZIOEffect}
 import com.softwaremill.adopttapir.starter.ServerImplementation.*
 import com.softwaremill.adopttapir.starter.{ScalaVersion, StarterDetails}
 
@@ -44,6 +44,8 @@ object MainView:
             txt.MainIOHttp4sScala3(groupId, addDocumentation, addMetrics).toString()
           case StarterDetails(_, groupId, IOEffect, Netty, addDocumentation, addMetrics, _, _, _) =>
             txt.MainIONettyScala3(groupId, addDocumentation, addMetrics).toString()
+          case StarterDetails(_, groupId, Sync, Netty, addDocumentation, addMetrics, _, _, _) =>
+            txt.MainSyncNettyScala3(groupId, addDocumentation, addMetrics).toString()
           case StarterDetails(_, groupId, IOEffect, VertX, addDocumentation, addMetrics, _, _, _) =>
             txt.MainIOVertxScala3(groupId, addDocumentation, addMetrics).toString()
           case StarterDetails(_, groupId, ZIOEffect, Http4s, addDocumentation, addMetrics, _, _, _) =>

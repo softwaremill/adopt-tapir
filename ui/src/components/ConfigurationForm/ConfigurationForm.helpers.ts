@@ -10,6 +10,7 @@ import type { FormRadioOption } from '../FormRadioGroup';
 const effectTypeImplementationMap: Record<EffectType, EffectImplementation[]> = {
   [EffectType.Future]: [EffectImplementation.Netty, EffectImplementation.VertX, EffectImplementation.Pekko],
   [EffectType.IO]: [EffectImplementation.Http4s, EffectImplementation.Netty, EffectImplementation.VertX],
+  [EffectType.Sync]: [EffectImplementation.Netty],
   [EffectType.ZIO]: [
     EffectImplementation.Netty,
     EffectImplementation.Http4s,
@@ -47,6 +48,7 @@ const commonJSONImplementations: JSONImplementation[] = [
 const effectTypeJsonImplementationMap: Record<EffectType, JSONImplementation[]> = {
   [EffectType.Future]: commonJSONImplementations,
   [EffectType.IO]: commonJSONImplementations,
+  [EffectType.Sync]: commonJSONImplementations,
   [EffectType.ZIO]: commonJSONImplementations.concat(JSONImplementation.ZIOJson),
 };
 
