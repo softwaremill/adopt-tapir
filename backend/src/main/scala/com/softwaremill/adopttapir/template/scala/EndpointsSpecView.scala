@@ -2,6 +2,7 @@ package com.softwaremill.adopttapir.template.scala
 
 import com.softwaremill.adopttapir.starter.{JsonImplementation, ScalaVersion, ServerEffect, StarterDetails}
 import com.softwaremill.adopttapir.template.scala.EndpointsView.Constants.{booksListingServerEndpoint, helloServerEndpoint}
+import org.http4s.headers.Server
 
 object EndpointsSpecView:
 
@@ -64,7 +65,8 @@ object EndpointsSpecView:
           Set(
             Import("sttp.tapir.ztapir.RIOMonadError")
           )
-
+        case ServerEffect.Sync =>
+          Set.empty
       }
 
       Code(body, imports)
@@ -101,4 +103,6 @@ object EndpointsSpecView:
           Code(prepareBody("IO[T]", "t.unsafeRunSync()"), Set(Import("cats.effect.unsafe.implicits.global")))
         case ServerEffect.ZIOEffect =>
           Code(prepareBody("ZIO[Any, Throwable, T]", "zio.Runtime.default.unsafeRun(t)"), Set(Import("zio.ZIO")))
+        case ServerEffect.Sync =>
+          throw new UnsupportedOperationException("Should not unwrap Sync effect")
       }

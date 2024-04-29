@@ -1,7 +1,7 @@
 package com.softwaremill.adopttapir.template
 
 import better.files.Resource
-import com.softwaremill.adopttapir.starter.ServerEffect.ZIOEffect
+import com.softwaremill.adopttapir.starter.ServerEffect.{Sync, ZIOEffect}
 import com.softwaremill.adopttapir.starter.{Builder, ScalaVersion, StarterDetails}
 import com.softwaremill.adopttapir.template.scala.{EndpointsSpecView, EndpointsView, Import, MainView}
 import com.softwaremill.adopttapir.version.TemplateDependencyInfo
@@ -86,6 +86,16 @@ abstract class ProjectTemplate:
       if starterDetails.serverEffect == ZIOEffect then {
         txt
           .EndpointsSpecZIO(
+            starterDetails,
+            toSortedList(helloServerStub.imports ++ booksServerStub.imports),
+            helloServerStub.body,
+            booksServerStub.body,
+            starterDetails.scalaVersion,
+            starterDetails.jsonImplementation
+          )
+      } else if starterDetails.serverEffect == Sync then {
+        txt
+          .EndpointsSpecSync(
             starterDetails,
             toSortedList(helloServerStub.imports ++ booksServerStub.imports),
             helloServerStub.body,

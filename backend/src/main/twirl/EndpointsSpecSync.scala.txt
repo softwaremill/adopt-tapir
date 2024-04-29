@@ -1,0 +1,56 @@
+@(
+starterDetails: com.softwaremill.adopttapir.starter.StarterDetails,
+additionalImports: List[com.softwaremill.adopttapir.template.scala.Import],
+helloStub: String,
+booksStub: String,
+scalaVersion: com.softwaremill.adopttapir.starter.ScalaVersion,
+jsonImplementation: com.softwaremill.adopttapir.starter.JsonImplementation,
+leftBracket: Char = '{',
+rightBracket: Char = '}'
+)
+package @{starterDetails.groupId}
+
+import @{starterDetails.groupId}.Endpoints.@leftBracket*,given@rightBracket
+import org.scalatest.EitherValues
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
+import sttp.client3.*
+import sttp.client3.testing.SttpBackendStub
+import sttp.tapir.server.stub.TapirStubInterpreter
+@for(additionalImport <- additionalImports) {
+@{additionalImport.asScalaImport(scalaVersion)}}
+
+class EndpointsSpec extends AnyFlatSpec with Matchers with EitherValues:
+@if(jsonImplementation == com.softwaremill.adopttapir.starter.JsonImplementation.Pickler){
+  given Reader[Author] = upickle.default.macroR
+  given Reader[Book] = upickle.default.macroR
+}
+
+  it should "return hello message" in {
+    // given
+    @helloStub
+
+    // when
+    val response = basicRequest
+      .get(uri"http://test.com/hello?name=adam")
+      .send(backendStub)
+
+    // then
+    response.body.value shouldBe "Hello adam"
+  }
+
+@if(booksStub.nonEmpty){
+  it should "list available books" in {
+    // given
+    @booksStub
+
+    // when
+    val response = basicRequest
+      .get(uri"http://test.com/books/list/all")
+      .response(asJson[List[Book]])
+      .send(backendStub)
+
+    // then
+    response.body.value shouldBe books
+  }
+}
