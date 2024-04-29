@@ -7,7 +7,7 @@ import sbtbuildinfo.{BuildInfoKey, BuildInfoOption}
 import scala.sys.process.Process
 import scala.util.Try
 
-val scala2Version = "2.13.10"
+val scala2Version = "2.13.13"
 val scala3Version = "3.3.3"
 
 val tapirVersion = "1.10.6"

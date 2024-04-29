@@ -2,7 +2,7 @@
 package @groupId
 
 import ox.*
-import sttp.tapir.server.netty.@if(addMetrics){{NettySyncServer, NettySyncServerOptions}}else{NettySyncServer}
+import sttp.tapir.server.netty.sync.@if(addMetrics){{NettySyncServer, NettySyncServerOptions}}else{NettySyncServer}
 
 import scala.io.StdIn
 
