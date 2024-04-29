@@ -37,6 +37,10 @@ export const EFFECT_TYPE_OPTIONS: FormSelectOption<EffectType>[] = [
     value: EffectType.IO,
   },
   {
+    label: 'Sync (direct-style)',
+    value: EffectType.Sync,
+  },
+  {
     label: 'ZIO',
     value: EffectType.ZIO,
   },

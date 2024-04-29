@@ -166,8 +166,8 @@ describe('configuration form helpers', () => {
           {
             label: 'Netty',
             value: EffectImplementation.Netty,
-          }
-        ]
+          },
+        ],
       ],
       [
         EffectType.ZIO,
