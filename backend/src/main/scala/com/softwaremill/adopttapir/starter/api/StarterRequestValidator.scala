@@ -76,24 +76,24 @@ sealed trait FormValidator:
     else GroupIdShouldFollowJavaPackageConvention(groupId).invalidNec
 
   private def validateStackWithImplementation(
-      effect: StackRequest,
+      stackRequest: StackRequest,
       serverImplementation: ServerImplementationRequest,
       scalaVersionRequest: ScalaVersionRequest
   ): ValidatedNec[RequestValidation, (StackRequest, ServerImplementationRequest)] =
     Validated.condNec(
-      effect.legalServerImplementations.contains(
+      stackRequest.legalServerImplementations.contains(
         serverImplementation.toModel
-      ) && !(effect == StackRequest.OxStack && scalaVersionRequest == ScalaVersionRequest.Scala2),
-      (effect, serverImplementation),
-      RequestValidation.StackWithIllegalServerImplementation(effect, serverImplementation)
+      ) && !(stackRequest == StackRequest.OxStack && scalaVersionRequest == ScalaVersionRequest.Scala2),
+      (stackRequest, serverImplementation),
+      RequestValidation.StackWithIllegalServerImplementation(stackRequest, serverImplementation)
     )
 
   private def validateMetrics(
-      effect: StackRequest,
+      stackRequest: StackRequest,
       serverImplementation: ServerImplementationRequest,
       addMetrics: Boolean
   ): ValidatedNec[RequestValidation, Boolean] =
-    (effect, serverImplementation, addMetrics) match {
+    (stackRequest, serverImplementation, addMetrics) match {
       case t @ (_, Http4s | ZIOHttp | Netty | VertX | Pekko, _) => t._3.validNec
     }
 

@@ -26,8 +26,8 @@ abstract class BuildView:
 
   protected def getTapirVersion(): String
 
-  private def getTestDependencies(effect: ServerStack): List[ScalaTestDependency] =
-    if effect != ServerStack.ZIOStack then List(ScalaTestDependency("org.scalatest", "scalatest", TemplateDependencyInfo.scalaTestVersion))
+  private def getTestDependencies(stack: ServerStack): List[ScalaTestDependency] =
+    if stack != ServerStack.ZIOStack then List(ScalaTestDependency("org.scalatest", "scalatest", TemplateDependencyInfo.scalaTestVersion))
     else
       List(
         ScalaTestDependency("dev.zio", "zio-test", TemplateDependencyInfo.zioTestVersion),

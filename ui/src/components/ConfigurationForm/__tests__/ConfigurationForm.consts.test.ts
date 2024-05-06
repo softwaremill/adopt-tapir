@@ -12,7 +12,7 @@ import { starterValidationSchema } from '../ConfigurationForm.consts';
 const TEST_FORM_VALUES: StarterRequest = {
   projectName: 'test-project',
   groupId: 'softwaremill.com',
-  effect: StackType.Future,
+  stack: StackType.Future,
   scalaVersion: ScalaVersion.Scala3,
   implementation: EffectImplementation.Netty,
   addDocumentation: false,
@@ -30,7 +30,7 @@ describe('configuration consts', () => {
     it('should return false, if any form value does not conforms the validation schema', () => {
       const formValues = {
         ...TEST_FORM_VALUES,
-        effect: 'test effect',
+        stack: 'test stack',
       };
 
       expect(starterValidationSchema.isValidSync(formValues)).toBe(false);
@@ -87,7 +87,7 @@ describe('configuration consts', () => {
       });
     });
 
-    describe('effect field', () => {
+    describe('stack field', () => {
       const stackSchema = yup.reach(starterValidationSchema, 'stack');
       const cases: { stackType: StackType | undefined; expected: boolean }[] = [
         { stackType: StackType.Future, expected: true },
@@ -127,7 +127,7 @@ describe('configuration consts', () => {
 
     describe('implementation field', () => {
       const effectImplementationSchema = yup.object({
-        effect: yup.reach(starterValidationSchema, 'effect'),
+        stack: yup.reach(starterValidationSchema, 'stack'),
         scalaVersion: yup.reach(starterValidationSchema, 'scalaVersion'),
         implementation: yup.reach(starterValidationSchema, 'implementation'),
       });
@@ -180,7 +180,7 @@ describe('configuration consts', () => {
         ({ stackType, scalaVersion, effectImplementation, expected }) => {
           expect(
             effectImplementationSchema.isValidSync({
-              effect: stackType,
+              stack: stackType,
               scalaVersion,
               implementation: effectImplementation,
             })
@@ -207,7 +207,7 @@ describe('configuration consts', () => {
 
     describe('json field', () => {
       const jsonSchema = yup.object({
-        effect: yup.reach(starterValidationSchema, 'effect'),
+        stack: yup.reach(starterValidationSchema, 'stack'),
         json: yup.reach(starterValidationSchema, 'json'),
       });
 
@@ -272,9 +272,9 @@ describe('configuration consts', () => {
       }));
 
       test.each(cases)(
-        'should return $expected based on effect type [$stackType] and json implementation [$jsonImplementation] combination validity',
+        'should return $expected based on stack type [$stackType] and json implementation [$jsonImplementation] combination validity',
         ({ scalaVersion, stackType, jsonImplementation, expected }) => {
-          expect(jsonSchema.isValidSync({ scalaVersion, effect: stackType, json: jsonImplementation })).toBe(expected);
+          expect(jsonSchema.isValidSync({ scalaVersion, stack: stackType, json: jsonImplementation })).toBe(expected);
         }
       );
     });

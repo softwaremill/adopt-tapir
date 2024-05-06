@@ -163,7 +163,7 @@ describe('ConfigurationForm component', () => {
     });
   });
 
-  test('effect implementation field reset flow based on effect type change', async () => {
+  test('effect implementation field reset flow based on stack type change', async () => {
     // given
     const user = userEvent.setup();
     render(
@@ -174,7 +174,7 @@ describe('ConfigurationForm component', () => {
 
     // when
     await user.click(screen.getByRole('button', { name: /Stack/i }));
-    await user.click(screen.getByText('ZIO'));
+    await user.click(screen.getByText('Functional (ZIO)'));
 
     await user.click(screen.getByRole('button', { name: /Server implementation/i }));
     await user.click(screen.getByText('ZIO Http'));
@@ -195,7 +195,7 @@ describe('ConfigurationForm component', () => {
     });
   });
 
-  test('json field reset flow based on effect type change', async () => {
+  test('json field reset flow based on stack type change', async () => {
     // given
     const user = userEvent.setup();
     render(
@@ -206,7 +206,7 @@ describe('ConfigurationForm component', () => {
 
     // when
     await user.click(screen.getByRole('button', { name: /Stack/i }));
-    await user.click(screen.getByText('ZIO'));
+    await user.click(screen.getByText('Functional (ZIO)'));
 
     await user.click(
       within(screen.getByRole('radiogroup', { name: /Add JSON endpoint using/i })).getByText('zio-json')
