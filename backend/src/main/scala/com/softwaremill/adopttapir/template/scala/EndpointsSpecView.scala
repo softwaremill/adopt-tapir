@@ -100,7 +100,7 @@ object EndpointsSpecView:
             )
           )
         case ServerStack.IOStack =>
-          Code(prepareBody("IO[T]", "t.unsafeRunOxStack()"), Set(Import("cats.effect.unsafe.implicits.global")))
+          Code(prepareBody("IO[T]", "t.unsafeRunSync()"), Set(Import("cats.effect.unsafe.implicits.global")))
         case ServerStack.ZIOStack =>
           Code(prepareBody("ZIO[Any, Throwable, T]", "zio.Runtime.default.unsafeRun(t)"), Set(Import("zio.ZIO")))
         case ServerStack.OxStack =>
