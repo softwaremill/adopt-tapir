@@ -24,11 +24,11 @@ jobs:
         id: repo-checkout
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17 with sbt cache
+      - name: Set up JDK 21 with sbt cache
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: 17
+          java-version: 21
           cache: 'sbt'
 
       - name: Check formatting
@@ -61,7 +61,7 @@ jobs:
       - name: Set up scala-cli
         uses: VirtusLab/scala-cli-setup@v1
         with:
-          jvm: temurin:17
+          jvm: temurin:21
 
       - name: Cache SBT
         id: cache-sbt
@@ -88,11 +88,11 @@ jobs:
         id: repo-checkout
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17 with sbt cache
+      - name: Set up JDK 21 with sbt cache
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: 17
+          java-version: 21
           cache: 'sbt'
 
       - name: Build docker image locally
@@ -109,12 +109,12 @@ jobs:
         id: repo-checkout
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         id: jdk-setup
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: 17
+          java-version: 21
           cache: 'sbt'
 
       - name: Cache SBT

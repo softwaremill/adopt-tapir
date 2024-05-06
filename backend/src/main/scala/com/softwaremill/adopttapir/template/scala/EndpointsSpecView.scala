@@ -43,6 +43,7 @@ object EndpointsSpecView:
         case ServerEffect.FutureEffect => "SttpBackendStub.asynchronousFuture"
         case ServerEffect.IOEffect     => "SttpBackendStub(new CatsMonadError[IO]())"
         case ServerEffect.ZIOEffect    => "SttpBackendStub(new RIOMonadError[Any])"
+        case ServerEffect.Sync         => "SttpBackendStub.synchronous"
       }
 
       val body =

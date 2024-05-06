@@ -8,10 +8,12 @@ import org.scalatest.Assertions
 import os.SubProcess
 
 import java.time.LocalDateTime
+import java.util.concurrent.atomic.AtomicInteger
 import scala.annotation.tailrec
 import scala.collection.mutable
 import scala.concurrent.TimeoutException
-import scala.concurrent.duration.{DurationInt, FiniteDuration}
+import scala.concurrent.duration.DurationInt
+import scala.concurrent.duration.FiniteDuration
 import scala.util.matching.Regex
 
 object ServiceTimeouts:
@@ -66,6 +68,10 @@ abstract class GeneratedService:
 
     override def toString: String = s"[$timestamp]"
 
+object ServiceFactory:
+  val port: AtomicInteger = new AtomicInteger(8080)
+  private def nextPortStr(): String = port.getAndIncrement().toString
+
 class ServiceFactory:
   import ServiceTimeouts.waitForScalaCliCompileAndUnitTest
 
@@ -87,7 +93,7 @@ class ServiceFactory:
         // forward std input to forked process - https://www.scala-sbt.org/1.x/docs/Forking.html#Configuring+Input
         "set run / connectInput := true",
         ";compile ;test ;run"
-      ).spawn(cwd = os.Path(tempDir.toJava), env = Map("HTTP_PORT" -> "0"), mergeErrIntoOut = true)
+      ).spawn(cwd = os.Path(tempDir.toJava), env = Map("HTTP_PORT" -> ServiceFactory.nextPortStr()), mergeErrIntoOut = true)
     }
 
   private case class ScalaCliService(tempDir: better.files.File) extends GeneratedService:
@@ -104,4 +110,4 @@ class ServiceFactory:
       )
 
       os.proc("scala-cli", "--power", "run", ".")
-        .spawn(cwd = os.Path(tempDir.toJava), env = Map("HTTP_PORT" -> "0"), mergeErrIntoOut = true)
+        .spawn(cwd = os.Path(tempDir.toJava), env = Map("HTTP_PORT" -> ServiceFactory.nextPortStr()), mergeErrIntoOut = true)

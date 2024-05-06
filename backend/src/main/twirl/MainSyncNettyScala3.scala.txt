@@ -14,7 +14,7 @@ import scala.io.StdIn
   }
   val port = sys.env.get("HTTP_PORT").flatMap(_.toIntOption).getOrElse(8080)
   supervised {
-    val binding = useInScope(NettySyncServer(@if(addMetrics){serverOptions}).addEndpoints(Endpoints.all).start())(_.stop())
+    val binding = useInScope(NettySyncServer(@if(addMetrics){serverOptions}).port(port).addEndpoints(Endpoints.all).start())(_.stop())
     println(s"@if(addDocumentation){Go to http://localhost:${binding.port}/docs to open SwaggerUI. }else{Server started at http://localhost:${binding.port}. }")
     // For demonstration puprposes, using ox.never is preferred to keep server running. See also NettySyncServer.startAndWait() for simpler approach:
     // (https://github.com/softwaremill/tapir/blob/master/examples/src/main/scala/sttp/tapir/examples/HelloWorldNettySyncServer.scala)
