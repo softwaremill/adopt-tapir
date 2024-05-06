@@ -35,7 +35,7 @@ object Setup:
       .getOrElse(elseAll)
 
   lazy val validConfigurations: Seq[StarterDetails] = for
-    effect <- EffectRequest.values.toIndexedSeq
+    effect <- effectImplementations
     server <- ServerImplementationRequest.values.toIndexedSeq
     docs <- List(true, false)
     metrics <- List(true, false)
@@ -61,6 +61,9 @@ object Setup:
 
   private lazy val scalaVersions: List[ScalaVersionRequest] =
     fromEnvOrElseAll("SCALA", ScalaVersionRequest.valueOf)(ScalaVersionRequest.values.toList)
+
+  private lazy val effectImplementations: List[EffectRequest] =
+    fromEnvOrElseAll("EFFECT", EffectRequest.valueOf)(EffectRequest.values.toList)
 
 object TestTimeouts:
   // wait for tests has to be longer than waiting for port otherwise it will break waiting for port with bogus errors
