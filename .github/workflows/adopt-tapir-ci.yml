@@ -46,12 +46,12 @@ jobs:
       matrix:
         scala: [ "Scala2", "Scala3" ]
         json: [ "No", "Circe", "UPickle", "Jsoniter", "ZIOJson", "Pickler" ]
-        effect: [ "Sync", "FutureEffect", "IOEffect", "ZIOEffect" ]
+        stack: [ "OxStack", "FutureStack", "IOStack", "ZIOStack" ]
         exclude:
           - scala: "Scala2"
             json: "Pickler"
           - scala: "Scala2"
-            effect: "Sync"
+            stack: "OxStack"
     steps:
       - name: Check-out repository
         id: repo-checkout
@@ -75,8 +75,8 @@ jobs:
             ~/.coursier
           key: ${{ runner.os }}-sbt-${{ hashFiles('**/build.sbt') }}
 
-      - name: Run integration tests for ${{ matrix.effect }}, ${{ matrix.scala }} with ${{ matrix.json }} JSON support
-        run: SCALA=${{ matrix.scala }} JSON=${{ matrix.json }} EFFECT=${{ matrix.effect }} IT_TESTS_THREADS_NO=1 sbt 'ItTest / test'
+      - name: Run integration tests for ${{ matrix.stack }}, ${{ matrix.scala }} with ${{ matrix.json }} JSON support
+        run: SCALA=${{ matrix.scala }} JSON=${{ matrix.json }} STACK=${{ matrix.stack }} IT_TESTS_THREADS_NO=1 sbt 'ItTest / test'
 
   verify_docker_image_build:
     if: github.event_name == 'pull_request' && github.ref != 'refs/heads/main'
