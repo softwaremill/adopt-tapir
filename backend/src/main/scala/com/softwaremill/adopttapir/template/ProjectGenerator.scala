@@ -1,7 +1,7 @@
 package com.softwaremill.adopttapir.template
 
 import better.files.Resource
-import com.softwaremill.adopttapir.starter.ServerEffect.{Sync, ZIOEffect}
+import com.softwaremill.adopttapir.starter.ServerStack.{OxStack, ZIOStack}
 import com.softwaremill.adopttapir.starter.{Builder, ScalaVersion, StarterDetails}
 import com.softwaremill.adopttapir.template.scala.{EndpointsSpecView, EndpointsView, Import, MainView}
 import com.softwaremill.adopttapir.version.TemplateDependencyInfo
@@ -83,7 +83,7 @@ abstract class ProjectTemplate:
     val booksServerStub = EndpointsSpecView.getBookServerStub(starterDetails)
 
     val fileContent =
-      if starterDetails.serverEffect == ZIOEffect then {
+      if starterDetails.serverStack == ZIOStack then {
         txt
           .EndpointsSpecZIO(
             starterDetails,
@@ -93,7 +93,7 @@ abstract class ProjectTemplate:
             starterDetails.scalaVersion,
             starterDetails.jsonImplementation
           )
-      } else if starterDetails.serverEffect == Sync then {
+      } else if starterDetails.serverStack == OxStack then {
         txt
           .EndpointsSpecSync(
             starterDetails,
@@ -104,7 +104,7 @@ abstract class ProjectTemplate:
             starterDetails.jsonImplementation
           )
       } else {
-        val unwrapper = EndpointsSpecView.Unwrapper.prepareUnwrapper(starterDetails.serverEffect, starterDetails.scalaVersion)
+        val unwrapper = EndpointsSpecView.Unwrapper.prepareUnwrapper(starterDetails.serverStack, starterDetails.scalaVersion)
         txt
           .EndpointsSpec(
             starterDetails,
@@ -154,7 +154,7 @@ object SbtProjectTemplate extends ProjectTemplate:
         starterDetails.scalaVersion.value,
         TemplateDependencyInfo.tapirVersion,
         (BuildSbtView.getAllDependencies _).andThen(BuildSbtView.format)(starterDetails),
-        starterDetails.serverEffect == ZIOEffect
+        starterDetails.serverStack == ZIOStack
       )
       .toString()
 

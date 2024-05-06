@@ -22,7 +22,7 @@ object FileOperation extends IOApp:
     val details = StarterDetails(
       "amadeusz",
       "com.mjoyit.experience",
-      ServerEffect.ZIOEffect,
+      ServerStack.ZIOStack,
       ServerImplementation.ZIOHttp,
       addDocumentation = false,
       addMetrics = false,

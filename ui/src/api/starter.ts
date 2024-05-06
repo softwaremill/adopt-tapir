@@ -1,11 +1,11 @@
 import { saveAs } from 'file-saver';
 import { Tree } from 'components/FileTreeView/FileTreeView.types';
 
-export enum EffectType {
-  Future = 'FutureEffect',
-  IO = 'IOEffect',
-  ZIO = 'ZIOEffect',
-  Sync = 'Sync',
+export enum StackType {
+  Future = 'FutureStack',
+  IO = 'IOStack',
+  ZIO = 'ZIOStack',
+  Ox = 'OxStack',
 }
 
 export enum EffectImplementation {
@@ -38,7 +38,7 @@ export enum Builder {
 export type StarterRequest = {
   projectName: string;
   groupId: string;
-  effect: EffectType;
+  stack: StackType;
   implementation: EffectImplementation;
   addDocumentation: boolean;
   addMetrics: boolean;

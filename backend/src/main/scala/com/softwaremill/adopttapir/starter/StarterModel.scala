@@ -9,7 +9,7 @@ import com.softwaremill.adopttapir.version.TemplateDependencyInfo
 final case class StarterDetails(
     projectName: String,
     groupId: String,
-    serverEffect: ServerEffect,
+    serverStack: ServerStack,
     serverImplementation: ServerImplementation,
     addDocumentation: Boolean,
     addMetrics: Boolean,
@@ -18,11 +18,11 @@ final case class StarterDetails(
     builder: Builder
 )
 
-object ServerEffectAndImplementation {
-  def unapply(starterDetails: StarterDetails): (ServerEffect, ServerImplementation) =
+object ServerStackAndImplementation {
+  def unapply(starterDetails: StarterDetails): (ServerStack, ServerImplementation) =
     starterDetails match {
-      case StarterDetails(_, _, serverEffect, serverImplementation, _, _, _, _, _) =>
-        (serverEffect, serverImplementation)
+      case StarterDetails(_, _, serverStack, serverImplementation, _, _, _, _, _) =>
+        (serverStack, serverImplementation)
     }
 }
 
@@ -33,11 +33,11 @@ enum ServerImplementation(val name: String):
   case VertX extends ServerImplementation("Vert.X")
   case Pekko extends ServerImplementation("Pekko")
 
-enum ServerEffect(val name: String):
-  case FutureEffect extends ServerEffect("Future")
-  case IOEffect extends ServerEffect("IO")
-  case ZIOEffect extends ServerEffect("ZIO")
-  case Sync extends ServerEffect("Sync")
+enum ServerStack(val name: String):
+  case FutureStack extends ServerStack("Future")
+  case IOStack extends ServerStack("IO")
+  case ZIOStack extends ServerStack("ZIO")
+  case OxStack extends ServerStack("Ox")
 
 enum JsonImplementation:
   case WithoutJson, Circe, UPickle, Jsoniter, ZIOJson, Pickler
