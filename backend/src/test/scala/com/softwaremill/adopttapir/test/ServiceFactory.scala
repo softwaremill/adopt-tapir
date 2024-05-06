@@ -8,7 +8,6 @@ import org.scalatest.Assertions
 import os.SubProcess
 
 import java.time.LocalDateTime
-import java.util.concurrent.atomic.AtomicInteger
 import scala.annotation.tailrec
 import scala.collection.mutable
 import scala.concurrent.TimeoutException
@@ -67,10 +66,6 @@ abstract class GeneratedService:
     private val timestamp = LocalDateTime.now()
 
     override def toString: String = s"[$timestamp]"
-
-object ServiceFactory:
-  val port: AtomicInteger = new AtomicInteger(8080)
-  private def nextPortStr(): String = port.getAndIncrement().toString
 
 class ServiceFactory:
   import ServiceTimeouts.waitForScalaCliCompileAndUnitTest
