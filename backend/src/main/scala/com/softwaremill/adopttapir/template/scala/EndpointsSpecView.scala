@@ -1,18 +1,17 @@
 package com.softwaremill.adopttapir.template.scala
 
-import com.softwaremill.adopttapir.starter.{JsonImplementation, ScalaVersion, ServerEffect, StarterDetails}
+import com.softwaremill.adopttapir.starter.{JsonImplementation, ScalaVersion, ServerStack, StarterDetails}
 import com.softwaremill.adopttapir.template.scala.EndpointsView.Constants.{booksListingServerEndpoint, helloServerEndpoint}
-import org.http4s.headers.Server
 
 object EndpointsSpecView:
 
   def getHelloServerStub(starterDetails: StarterDetails): Code =
-    Stub.prepareBackendStub(helloServerEndpoint, starterDetails.serverEffect)
+    Stub.prepareBackendStub(helloServerEndpoint, starterDetails.serverStack)
 
   def getBookServerStub(starterDetails: StarterDetails): Code =
 
     val stubBooks = Stub
-      .prepareBackendStub(booksListingServerEndpoint, starterDetails.serverEffect)
+      .prepareBackendStub(booksListingServerEndpoint, starterDetails.serverStack)
 
     starterDetails.jsonImplementation match {
       case JsonImplementation.WithoutJson => Code.empty
@@ -38,12 +37,12 @@ object EndpointsSpecView:
     }
 
   object Stub:
-    def prepareBackendStub(endpoint: String, serverEffect: ServerEffect): Code =
-      val stub = serverEffect match {
-        case ServerEffect.FutureEffect => "SttpBackendStub.asynchronousFuture"
-        case ServerEffect.IOEffect     => "SttpBackendStub(new CatsMonadError[IO]())"
-        case ServerEffect.ZIOEffect    => "SttpBackendStub(new RIOMonadError[Any])"
-        case ServerEffect.Sync         => "SttpBackendStub.synchronous"
+    def prepareBackendStub(endpoint: String, serverStack: ServerStack): Code =
+      val stub = serverStack match {
+        case ServerStack.FutureStack => "SttpBackendStub.asynchronousFuture"
+        case ServerStack.IOStack     => "SttpBackendStub(new CatsMonadError[IO]())"
+        case ServerStack.ZIOStack    => "SttpBackendStub(new RIOMonadError[Any])"
+        case ServerStack.OxStack     => "SttpBackendStub.synchronous"
       }
 
       val body =
@@ -51,29 +50,29 @@ object EndpointsSpecView:
            |  .whenServerEndpointRunLogic($endpoint)
            |  .backend()""".stripMargin
 
-      val imports = serverEffect match {
-        case ServerEffect.FutureEffect =>
+      val imports = serverStack match {
+        case ServerStack.FutureStack =>
           Set(
             Import("scala.concurrent.Future"),
             Import("scala.concurrent.ExecutionContext.Implicits.global")
           )
-        case ServerEffect.IOEffect =>
+        case ServerStack.IOStack =>
           Set(
             Import("cats.effect.IO"),
             Import("sttp.tapir.integ.cats.effect.CatsMonadError")
           )
-        case ServerEffect.ZIOEffect =>
+        case ServerStack.ZIOStack =>
           Set(
             Import("sttp.tapir.ztapir.RIOMonadError")
           )
-        case ServerEffect.Sync =>
+        case ServerStack.OxStack =>
           Set.empty
       }
 
       Code(body, imports)
 
   object Unwrapper:
-    def prepareUnwrapper(effect: ServerEffect, scalaVersion: ScalaVersion): Code =
+    def prepareUnwrapper(stack: ServerStack, scalaVersion: ScalaVersion): Code =
       def prepareBody(kind: String, unwrapFn: String): String = {
         case class ExtensionMethodVersion(prefix: String, codeBlockStart: String, codeBlockEnd: String)
         val scala2Extension = ExtensionMethodVersion("implicit class Unwrapper", " {", "}")
@@ -90,8 +89,8 @@ object EndpointsSpecView:
 
       }
 
-      effect match {
-        case ServerEffect.FutureEffect =>
+      stack match {
+        case ServerStack.FutureStack =>
           Code(
             prepareBody("Future[T]", "Await.result(t, Duration.Inf)"),
             Set(
@@ -100,10 +99,10 @@ object EndpointsSpecView:
               Import("scala.concurrent.duration.Duration")
             )
           )
-        case ServerEffect.IOEffect =>
+        case ServerStack.IOStack =>
           Code(prepareBody("IO[T]", "t.unsafeRunSync()"), Set(Import("cats.effect.unsafe.implicits.global")))
-        case ServerEffect.ZIOEffect =>
+        case ServerStack.ZIOStack =>
           Code(prepareBody("ZIO[Any, Throwable, T]", "zio.Runtime.default.unsafeRun(t)"), Set(Import("zio.ZIO")))
-        case ServerEffect.Sync =>
-          throw new UnsupportedOperationException("Should not unwrap Sync effect")
+        case ServerStack.OxStack =>
+          throw new UnsupportedOperationException("Should not unwrap OxStack effect")
       }

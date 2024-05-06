@@ -24,7 +24,7 @@ describe('ConfigurationForm component', () => {
     await user.type(screen.getByRole('textbox', { name: /Project name/i }), 'test-project');
     await user.type(screen.getByRole('textbox', { name: /Group ID/i }), 'com.softwaremill');
 
-    await user.click(screen.getByRole('button', { name: /Effect type/i }));
+    await user.click(screen.getByRole('button', { name: /Stack/i }));
     await user.click(screen.getByText('Future'));
 
     await user.click(within(screen.getByRole('radiogroup', { name: /Scala version/i })).getByText('2'));
@@ -62,7 +62,7 @@ describe('ConfigurationForm component', () => {
         builder: 'ScalaCli',
         addMetrics: true,
         scalaVersion: 'Scala2',
-        effect: 'FutureEffect',
+        stack: 'FutureStack',
         json: 'Circe',
         addDocumentation: true,
         implementation: 'Netty',
@@ -89,7 +89,7 @@ describe('ConfigurationForm component', () => {
     await user.type(screen.getByRole('textbox', { name: /Project name/i }), 'test-project');
     await user.type(screen.getByRole('textbox', { name: /Group ID/i }), 'com.softwaremill');
 
-    await user.click(screen.getByRole('button', { name: /Effect type/i }));
+    await user.click(screen.getByRole('button', { name: /Stack/i }));
     await user.click(screen.getByText('Future'));
 
     await user.click(within(screen.getByRole('radiogroup', { name: /Scala version/i })).getByText('3'));
@@ -127,7 +127,7 @@ describe('ConfigurationForm component', () => {
     await user.type(screen.getByRole('textbox', { name: /Project name/i }), 'test-project');
     await user.type(screen.getByRole('textbox', { name: /Group ID/i }), 'com.softwaremill');
 
-    await user.click(screen.getByRole('button', { name: /Effect type/i }));
+    await user.click(screen.getByRole('button', { name: /Stack/i }));
     await user.click(screen.getByText('Future'));
 
     await user.click(within(screen.getByRole('radiogroup', { name: /Scala version/i })).getByText('2'));
@@ -153,7 +153,7 @@ describe('ConfigurationForm component', () => {
     expect(screen.getByTestId('configuration-form')).toHaveFormValues({
       projectName: '',
       groupId: '',
-      effect: '',
+      stack: '',
       scalaVersion: 'Scala3',
       implementation: '',
       builder: 'Sbt',
@@ -163,7 +163,7 @@ describe('ConfigurationForm component', () => {
     });
   });
 
-  test('effect implementation field reset flow based on effect type change', async () => {
+  test('effect implementation field reset flow based on stack type change', async () => {
     // given
     const user = userEvent.setup();
     render(
@@ -173,18 +173,18 @@ describe('ConfigurationForm component', () => {
     );
 
     // when
-    await user.click(screen.getByRole('button', { name: /Effect type/i }));
-    await user.click(screen.getByText('ZIO'));
+    await user.click(screen.getByRole('button', { name: /Stack/i }));
+    await user.click(screen.getByText('Functional (ZIO)'));
 
     await user.click(screen.getByRole('button', { name: /Server implementation/i }));
     await user.click(screen.getByText('ZIO Http'));
 
-    await user.click(screen.getByRole('button', { name: /Effect type/i }));
+    await user.click(screen.getByRole('button', { name: /Stack/i }));
     await user.click(screen.getByText('Future'));
 
     // then
     expect(screen.getByTestId('configuration-form')).toHaveFormValues({
-      effect: 'FutureEffect',
+      stack: 'FutureStack',
       scalaVersion: 'Scala3',
       implementation: '',
       // default values below
@@ -195,7 +195,7 @@ describe('ConfigurationForm component', () => {
     });
   });
 
-  test('json field reset flow based on effect type change', async () => {
+  test('json field reset flow based on stack type change', async () => {
     // given
     const user = userEvent.setup();
     render(
@@ -205,19 +205,19 @@ describe('ConfigurationForm component', () => {
     );
 
     // when
-    await user.click(screen.getByRole('button', { name: /Effect type/i }));
-    await user.click(screen.getByText('ZIO'));
+    await user.click(screen.getByRole('button', { name: /Stack/i }));
+    await user.click(screen.getByText('Functional (ZIO)'));
 
     await user.click(
       within(screen.getByRole('radiogroup', { name: /Add JSON endpoint using/i })).getByText('zio-json')
     );
 
-    await user.click(screen.getByRole('button', { name: /Effect type/i }));
+    await user.click(screen.getByRole('button', { name: /Stack/i }));
     await user.click(screen.getByText('Future'));
 
     // then
     expect(screen.getByTestId('configuration-form')).toHaveFormValues({
-      effect: 'FutureEffect',
+      stack: 'FutureStack',
       json: 'No',
       // default values below
       scalaVersion: 'Scala3',
@@ -248,7 +248,7 @@ describe('ConfigurationForm component', () => {
 
     // then
     expect(screen.getByTestId('configuration-form')).toHaveFormValues({
-      effect: 'IOEffect',
+      stack: 'IOStack',
       json: 'No',
       // default values below
       scalaVersion: 'Scala2',

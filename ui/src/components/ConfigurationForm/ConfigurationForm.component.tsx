@@ -29,10 +29,10 @@ import {
 import {
   getAvailableEffectImplementations,
   getEffectImplementationOptions,
-  getEffectTypeOptions,
+  getStackTypeOptions,
   getJSONImplementationOptions,
-  mapEffectTypeToJSONImplementation,
-  mapScalaVersionToEffectType,
+  mapStackTypeToJSONImplementation,
+  mapScalaVersionToStackType,
   mapScalaVersionToJSONImplementation,
 } from './ConfigurationForm.helpers';
 import { useNavigate } from 'react-router-dom';
@@ -114,40 +114,40 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
   }, [ready, initialized, sharedRequest, formData, initialData, snackbarConfig, form, preview, handleShowPreview]);
 
   // TODO: improve type definitions in watch, as if they do not have default value they should be undefined
-  const [effectType, effectImplementation, jsonImplementation, scalaVersion] = form.watch([
-    'effect',
+  const [stackType, effectImplementation, jsonImplementation, scalaVersion] = form.watch([
+    'stack',
     'implementation',
     'json',
     'scalaVersion',
   ]);
-  const isEffectImplementationSelectable = Boolean(effectType) && Boolean(scalaVersion);
+  const isEffectImplementationSelectable = Boolean(stackType) && Boolean(scalaVersion);
 
   useEffect(() => {
-    // NOTE: reset effect type field value upon scala version change
-    if (effectType && scalaVersion && !mapScalaVersionToEffectType(scalaVersion).includes(effectType)) {
-      form.resetField('effect');
+    // NOTE: reset stack type field value upon scala version change
+    if (stackType && scalaVersion && !mapScalaVersionToStackType(scalaVersion).includes(stackType)) {
+      form.resetField('stack');
     }
-  }, [form, effectType, effectImplementation, scalaVersion]);
+  }, [form, stackType, effectImplementation, scalaVersion]);
 
   useEffect(() => {
     // NOTE: reset effect implementation field value upon effect type or scala version change
-    if (effectType && !getAvailableEffectImplementations(effectType).includes(effectImplementation)) {
+    if (stackType && !getAvailableEffectImplementations(stackType).includes(effectImplementation)) {
       form.resetField('implementation');
     }
-  }, [form, effectType, effectImplementation, scalaVersion]);
+  }, [form, stackType, effectImplementation, scalaVersion]);
 
   useEffect(() => {
     // NOTE: reset json field value upon effect type and scala version change
     if (
-      effectType &&
+      stackType &&
       scalaVersion &&
       jsonImplementation &&
-      !mapEffectTypeToJSONImplementation(effectType).includes(jsonImplementation) &&
+      !mapStackTypeToJSONImplementation(stackType).includes(jsonImplementation) &&
       !mapScalaVersionToJSONImplementation(scalaVersion).includes(jsonImplementation)
     ) {
       form.resetField('json');
     }
-  }, [form, effectType, scalaVersion, jsonImplementation]);
+  }, [form, stackType, scalaVersion, jsonImplementation]);
 
   const handleFormSubmit = (formData: StarterRequest): void => {
     call(() => doRequestStarter(formData));
@@ -244,16 +244,16 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
 
           <fieldset className={classes.groupedInputs}>
             <legend className={classes.groupLegend}>Server</legend>
-            <FormSelect name="effect" label="Effect type" options={getEffectTypeOptions(scalaVersion)} />
+            <FormSelect name="stack" label="Stack" options={getStackTypeOptions(scalaVersion)} />
             <div className={classes.inputWithAddon}>
               <FormSelect
                 name="implementation"
                 label="Server implementation"
                 disabled={!isEffectImplementationSelectable}
-                options={isEffectImplementationSelectable ? getEffectImplementationOptions(effectType) : []}
+                options={isEffectImplementationSelectable ? getEffectImplementationOptions(stackType) : []}
               />
               <Tooltip
-                title="Available options depend on the values of the 'Effect type' and 'Scala version' inputs."
+                title="Available options depend on the values of the 'Stack' and 'Scala version' inputs."
                 className={classes.serverTooltip}
                 enterDelay={50}
               >
@@ -275,7 +275,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
             <FormRadioGroup
               name="json"
               label="Add JSON endpoint using"
-              options={getJSONImplementationOptions(scalaVersion, effectType)}
+              options={getJSONImplementationOptions(scalaVersion, stackType)}
             />
             <FormRadioGroup
               name="addDocumentation"

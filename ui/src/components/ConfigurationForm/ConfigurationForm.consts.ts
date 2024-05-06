@@ -2,7 +2,7 @@ import * as yup from 'yup';
 import {
   Builder,
   EffectImplementation,
-  EffectType,
+  StackType,
   JSONImplementation,
   ScalaVersion,
   StarterRequest,
@@ -12,7 +12,7 @@ import type { FormRadioOption } from '../FormRadioGroup';
 import {
   getAvailableEffectImplementations,
   getEffectImplementationOptions,
-  mapEffectTypeToJSONImplementation,
+  mapStackTypeToJSONImplementation,
   mapScalaVersionToJSONImplementation,
 } from './ConfigurationForm.helpers';
 
@@ -27,22 +27,22 @@ export const SCALA_VERSION_OPTIONS: FormSelectOption<string>[] = [
   },
 ];
 
-export const EFFECT_TYPE_OPTIONS: FormSelectOption<EffectType>[] = [
+export const STACK_TYPE_OPTIONS: FormSelectOption<StackType>[] = [
   {
     label: 'Future',
-    value: EffectType.Future,
+    value: StackType.Future,
   },
   {
-    label: 'IO (cats-effect)',
-    value: EffectType.IO,
+    label: 'Functional (IO, cats-effect)',
+    value: StackType.IO,
   },
   {
-    label: 'Sync (direct-style)',
-    value: EffectType.Sync,
+    label: 'Direct-style (Ox)',
+    value: StackType.Ox,
   },
   {
-    label: 'ZIO',
-    value: EffectType.ZIO,
+    label: 'Functional (ZIO)',
+    value: StackType.ZIO,
   },
 ];
 
@@ -126,8 +126,8 @@ const valueGetter = (
   option: FormSelectOption | FormRadioOption
 ): FormSelectOption['value'] | FormRadioOption['value'] => option.value;
 
-const getEffectImplementationFieldMessage = (effectType: EffectType): string =>
-  `Server implementation must be one of the following values: ${getEffectImplementationOptions(effectType)
+const getEffectImplementationFieldMessage = (stackType: StackType): string =>
+  `Server implementation must be one of the following values: ${getEffectImplementationOptions(stackType)
     .map(labelGetter)
     .join(', ')}`;
 
@@ -159,34 +159,34 @@ export const starterValidationSchema = yup
         `Scala version must be one of the following values: ${SCALA_VERSION_OPTIONS.map(labelGetter).join(', ')}`
       )
       .required(REQUIRED_FIELD_MESSAGE),
-    effect: yup
+    stack: yup
       .mixed()
       .oneOf(
-        EFFECT_TYPE_OPTIONS.map(valueGetter),
-        `Effect type must be one of the following values: ${EFFECT_TYPE_OPTIONS.map(labelGetter).join(', ')}`
+        STACK_TYPE_OPTIONS.map(valueGetter),
+        `Stack type must be one of the following values: ${STACK_TYPE_OPTIONS.map(labelGetter).join(', ')}`
       )
       .required(REQUIRED_FIELD_MESSAGE),
     implementation: yup
       .mixed()
       .test('effect implementation validation', (value: EffectImplementation, context) => {
-        const { effect } = context.parent as StarterRequest;
+        const { stack } = context.parent as StarterRequest;
 
-        const effectImplementations = getAvailableEffectImplementations(effect);
+        const effectImplementations = getAvailableEffectImplementations(stack);
 
         return (
           effectImplementations.includes(value) ||
-          context.createError({ message: getEffectImplementationFieldMessage(effect) })
+          context.createError({ message: getEffectImplementationFieldMessage(stack) })
         );
       })
       .required(REQUIRED_FIELD_MESSAGE),
     addDocumentation: yup.boolean().required(REQUIRED_FIELD_MESSAGE),
     json: yup
       .mixed()
-      .when('effect', {
-        is: (effect: EffectType) => effect !== EffectType.ZIO,
-        // NOTE: any effect type besides ZIO will work here as an argument
-        then: schema => schema.oneOf(mapEffectTypeToJSONImplementation(EffectType.Future)),
-        otherwise: schema => schema.oneOf(mapEffectTypeToJSONImplementation(EffectType.ZIO)),
+      .when('stack', {
+        is: (stack: StackType) => stack !== StackType.ZIO,
+        // NOTE: any stack type besides ZIO will work here as an argument
+        then: schema => schema.oneOf(mapStackTypeToJSONImplementation(StackType.Future)),
+        otherwise: schema => schema.oneOf(mapStackTypeToJSONImplementation(StackType.ZIO)),
       })
       .when('scalaVersion', {
         is: (scalaVersion: ScalaVersion) => scalaVersion !== ScalaVersion.Scala3,

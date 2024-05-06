@@ -1,4 +1,4 @@
-import { EffectImplementation, EffectType, JSONImplementation, ScalaVersion } from 'api/starter';
+import { EffectImplementation, StackType, JSONImplementation, ScalaVersion } from 'api/starter';
 import {
   getAvailableEffectImplementations,
   getEffectImplementationOptions,
@@ -9,19 +9,19 @@ import type { FormRadioOption } from '../../FormRadioGroup';
 
 describe('configuration form helpers', () => {
   describe('.getAvailableEffectImplementations()', () => {
-    const cases: [EffectType, ScalaVersion, EffectImplementation[]][] = [
+    const cases: [StackType, ScalaVersion, EffectImplementation[]][] = [
       [
-        EffectType.Future,
+        StackType.Future,
         ScalaVersion.Scala2,
         [EffectImplementation.Netty, EffectImplementation.VertX, EffectImplementation.Pekko],
       ],
       [
-        EffectType.IO,
+        StackType.IO,
         ScalaVersion.Scala2,
         [EffectImplementation.Http4s, EffectImplementation.Netty, EffectImplementation.VertX],
       ],
       [
-        EffectType.ZIO,
+        StackType.ZIO,
         ScalaVersion.Scala2,
         [
           EffectImplementation.Netty,
@@ -32,18 +32,18 @@ describe('configuration form helpers', () => {
       ],
 
       [
-        EffectType.Future,
+        StackType.Future,
         ScalaVersion.Scala3,
         [EffectImplementation.Netty, EffectImplementation.VertX, EffectImplementation.Pekko],
       ],
       [
-        EffectType.IO,
+        StackType.IO,
         ScalaVersion.Scala3,
         [EffectImplementation.Http4s, EffectImplementation.Netty, EffectImplementation.VertX],
       ],
-      [EffectType.Sync, ScalaVersion.Scala3, [EffectImplementation.Netty]],
+      [StackType.Ox, ScalaVersion.Scala3, [EffectImplementation.Netty]],
       [
-        EffectType.ZIO,
+        StackType.ZIO,
         ScalaVersion.Scala3,
         [
           EffectImplementation.Netty,
@@ -55,17 +55,17 @@ describe('configuration form helpers', () => {
     ];
 
     test.each(cases)(
-      'should return set of effect implementations based on EffectType - (%s) and ScalaVersion - (%s)',
-      (effectType, scalaVersion, effectImplementations) => {
-        expect(getAvailableEffectImplementations(effectType)).toEqual(effectImplementations);
+      'should return set of effect implementations based on StackType - (%s) and ScalaVersion - (%s)',
+      (stackType, scalaVersion, effectImplementations) => {
+        expect(getAvailableEffectImplementations(stackType)).toEqual(effectImplementations);
       }
     );
   });
 
   describe('.getEffectImplementationOptions()', () => {
-    const cases: [EffectType, ScalaVersion, FormSelectOption[]][] = [
+    const cases: [StackType, ScalaVersion, FormSelectOption[]][] = [
       [
-        EffectType.Future,
+        StackType.Future,
         ScalaVersion.Scala2,
         [
           {
@@ -83,7 +83,7 @@ describe('configuration form helpers', () => {
         ],
       ],
       [
-        EffectType.IO,
+        StackType.IO,
         ScalaVersion.Scala2,
         [
           {
@@ -101,7 +101,7 @@ describe('configuration form helpers', () => {
         ],
       ],
       [
-        EffectType.ZIO,
+        StackType.ZIO,
         ScalaVersion.Scala2,
         [
           {
@@ -124,7 +124,7 @@ describe('configuration form helpers', () => {
       ],
 
       [
-        EffectType.Future,
+        StackType.Future,
         ScalaVersion.Scala3,
         [
           {
@@ -142,7 +142,7 @@ describe('configuration form helpers', () => {
         ],
       ],
       [
-        EffectType.IO,
+        StackType.IO,
         ScalaVersion.Scala3,
         [
           {
@@ -160,7 +160,7 @@ describe('configuration form helpers', () => {
         ],
       ],
       [
-        EffectType.Sync,
+        StackType.Ox,
         ScalaVersion.Scala3,
         [
           {
@@ -170,7 +170,7 @@ describe('configuration form helpers', () => {
         ],
       ],
       [
-        EffectType.ZIO,
+        StackType.ZIO,
         ScalaVersion.Scala3,
         [
           {
@@ -194,9 +194,9 @@ describe('configuration form helpers', () => {
     ];
 
     test.each(cases)(
-      'should return set of form select options based on EffectType - (%s) and ScalaVersion - (%s)',
-      (effectType, scalaVersion, formSelectOptions) => {
-        const effectImplementationOptions = getEffectImplementationOptions(effectType);
+      'should return set of form select options based on StackType - (%s) and ScalaVersion - (%s)',
+      (stackType, scalaVersion, formSelectOptions) => {
+        const effectImplementationOptions = getEffectImplementationOptions(stackType);
 
         expect(effectImplementationOptions).toHaveLength(formSelectOptions.length);
         expect(effectImplementationOptions).toEqual(expect.arrayContaining(formSelectOptions));
@@ -205,11 +205,11 @@ describe('configuration form helpers', () => {
   });
 
   describe('.getJSONImplementationOptions()', () => {
-    const cases: [ScalaVersion, EffectType, FormRadioOption[]][] = [
+    const cases: [ScalaVersion, StackType, FormRadioOption[]][] = [
       // Scala 2 variants
       [
         ScalaVersion.Scala2,
-        EffectType.Future,
+        StackType.Future,
         [
           {
             label: "don't add",
@@ -231,7 +231,7 @@ describe('configuration form helpers', () => {
       ],
       [
         ScalaVersion.Scala2,
-        EffectType.IO,
+        StackType.IO,
         [
           {
             label: "don't add",
@@ -253,7 +253,7 @@ describe('configuration form helpers', () => {
       ],
       [
         ScalaVersion.Scala2,
-        EffectType.ZIO,
+        StackType.ZIO,
         [
           {
             label: "don't add",
@@ -281,7 +281,7 @@ describe('configuration form helpers', () => {
       // Scala 3 variants
       [
         ScalaVersion.Scala3,
-        EffectType.Future,
+        StackType.Future,
         [
           {
             label: "don't add",
@@ -307,7 +307,7 @@ describe('configuration form helpers', () => {
       ],
       [
         ScalaVersion.Scala3,
-        EffectType.IO,
+        StackType.IO,
         [
           {
             label: "don't add",
@@ -333,7 +333,7 @@ describe('configuration form helpers', () => {
       ],
       [
         ScalaVersion.Scala3,
-        EffectType.Sync,
+        StackType.Ox,
         [
           {
             label: "don't add",
@@ -359,7 +359,7 @@ describe('configuration form helpers', () => {
       ],
       [
         ScalaVersion.Scala3,
-        EffectType.ZIO,
+        StackType.ZIO,
         [
           {
             label: "don't add",
@@ -390,9 +390,9 @@ describe('configuration form helpers', () => {
     ];
 
     test.each(cases)(
-      'should return set of form radio options based on EffectType - (%s)',
-      (scalaVersion, effectType, formRadioOptions) => {
-        const jsonImplementationOptions = getJSONImplementationOptions(scalaVersion, effectType);
+      'should return set of form radio options based on StackType - (%s)',
+      (scalaVersion, stackType, formRadioOptions) => {
+        const jsonImplementationOptions = getJSONImplementationOptions(scalaVersion, stackType);
 
         expect(jsonImplementationOptions).toHaveLength(formRadioOptions.length);
         expect(jsonImplementationOptions).toEqual(expect.arrayContaining(formRadioOptions));

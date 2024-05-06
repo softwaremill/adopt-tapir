@@ -51,7 +51,7 @@ object Metrics:
       StarterDetails(
         "",
         "",
-        ServerEffect.IOEffect,
+        ServerStack.IOStack,
         ServerImplementation.Netty,
         true,
         false,

@@ -8,7 +8,7 @@ import scala.util.Using
 
 object ShowHelpers:
   implicit lazy val detailsShow: Show[StarterDetails] = Show.show[StarterDetails](details =>
-    s"${details.serverEffect}/${details.serverImplementation}/docs=${details.addDocumentation}/metrics=${details.addMetrics}" +
+    s"${details.serverStack}/${details.serverImplementation}/docs=${details.addDocumentation}/metrics=${details.addMetrics}" +
       s"/json=${details.jsonImplementation}/scalaVersion=${details.scalaVersion}/builder=${details.builder}"
   )
 

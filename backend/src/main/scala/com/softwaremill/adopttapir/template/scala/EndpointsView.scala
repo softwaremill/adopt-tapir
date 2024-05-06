@@ -1,17 +1,17 @@
 package com.softwaremill.adopttapir.template.scala
 
 import com.softwaremill.adopttapir.starter.ScalaVersion.Scala2
-import com.softwaremill.adopttapir.starter.{JsonImplementation, ScalaVersion, ServerEffect, StarterDetails}
+import com.softwaremill.adopttapir.starter.{JsonImplementation, ScalaVersion, ServerStack, StarterDetails}
 import com.softwaremill.adopttapir.template.scala.EndpointsView.Constants.*
 
 object EndpointsView:
 
   def getHelloServerEndpoint(starterDetails: StarterDetails): Code =
-    val helloServerCode = starterDetails.serverEffect match {
-      case ServerEffect.FutureEffect => HelloServerEndpoint.future
-      case ServerEffect.IOEffect     => HelloServerEndpoint.io
-      case ServerEffect.ZIOEffect    => HelloServerEndpoint.zio
-      case ServerEffect.Sync         => HelloServerEndpoint.sync
+    val helloServerCode = starterDetails.serverStack match {
+      case ServerStack.FutureStack => HelloServerEndpoint.future
+      case ServerStack.IOStack     => HelloServerEndpoint.io
+      case ServerStack.ZIOStack    => HelloServerEndpoint.zio
+      case ServerStack.OxStack     => HelloServerEndpoint.sync
     }
 
     helloServerCode.prependBody(INDENT)
@@ -173,11 +173,11 @@ object EndpointsView:
       }
 
     private def prepareBookListingServerLogic(starterDetails: StarterDetails): Code =
-      val (serverKind, pureEffectFn) = starterDetails.serverEffect match {
-        case ServerEffect.FutureEffect => ("ServerEndpoint[Any, Future]", "Future.successful")
-        case ServerEffect.Sync         => ("ServerEndpoint[Any, Id]", "")
-        case ServerEffect.IOEffect     => ("ServerEndpoint[Any, IO]", "IO.pure")
-        case ServerEffect.ZIOEffect    => ("ZServerEndpoint[Any, Any]", "ZIO.succeed")
+      val (serverKind, pureEffectFn) = starterDetails.serverStack match {
+        case ServerStack.FutureStack => ("ServerEndpoint[Any, Future]", "Future.successful")
+        case ServerStack.OxStack     => ("ServerEndpoint[Any, Id]", "")
+        case ServerStack.IOStack     => ("ServerEndpoint[Any, IO]", "IO.pure")
+        case ServerStack.ZIOStack    => ("ZServerEndpoint[Any, Any]", "ZIO.succeed")
       }
 
       // Imports silently taken from helloServerEndpoint
@@ -188,11 +188,11 @@ object EndpointsView:
     else JsonModelObject.prepareLibraryModel(starterDetails)
 
   def getApiEndpoints(starterDetails: StarterDetails): Code =
-    val serverKind = starterDetails.serverEffect match {
-      case ServerEffect.FutureEffect => "List[ServerEndpoint[Any, Future]]"
-      case ServerEffect.Sync         => "List[ServerEndpoint[Any, Id]]"
-      case ServerEffect.IOEffect     => "List[ServerEndpoint[Any, IO]]"
-      case ServerEffect.ZIOEffect    => "List[ZServerEndpoint[Any, Any]]"
+    val serverKind = starterDetails.serverStack match {
+      case ServerStack.FutureStack => "List[ServerEndpoint[Any, Future]]"
+      case ServerStack.OxStack     => "List[ServerEndpoint[Any, Id]]"
+      case ServerStack.IOStack     => "List[ServerEndpoint[Any, IO]]"
+      case ServerStack.ZIOStack    => "List[ZServerEndpoint[Any, Any]]"
     }
 
     val jsonEndpoint = if starterDetails.jsonImplementation == JsonImplementation.WithoutJson then Nil else List(booksListingServerEndpoint)
@@ -205,7 +205,7 @@ object EndpointsView:
     if starterDetails.addDocumentation then {
       DocumentationEndpoint.prepareDocEndpoints(
         starterDetails.projectName,
-        starterDetails.serverEffect
+        starterDetails.serverStack
       )
     } else Code.empty
 
@@ -213,54 +213,54 @@ object EndpointsView:
 
     def prepareDocEndpoints(
         projectName: String,
-        serverEffect: ServerEffect
+        serverStack: ServerStack
     ): Code =
-      Code(prepareCode(projectName, serverEffect), prepareImports(serverEffect)).prependBody(INDENT)
+      Code(prepareCode(projectName, serverStack), prepareImports(serverStack)).prependBody(INDENT)
 
-    private def prepareCode(projectName: String, serverEffect: ServerEffect): String =
-      val (effect, endpoint) = serverEffectToEffectAndEndpoint(serverEffect)
+    private def prepareCode(projectName: String, serverStack: ServerStack): String =
+      val (effect, endpoint) = serverStackToEffectAndEndpoint(serverStack)
       s"""val $docEndpoints: List[$endpoint] = SwaggerInterpreter()
           .fromServerEndpoints[$effect]($apiEndpoints, "$projectName", "1.0.0")""".stripMargin
 
-    def prepareImports(serverEffect: ServerEffect): Set[Import] =
-      serverEffectImports(serverEffect) + Import("sttp.tapir.swagger.bundle.SwaggerInterpreter")
+    def prepareImports(serverStack: ServerStack): Set[Import] =
+      serverStackImports(serverStack) + Import("sttp.tapir.swagger.bundle.SwaggerInterpreter")
 
   def getMetricsEndpoint(starterDetails: StarterDetails): Code =
     if starterDetails.addMetrics then {
-      MetricsEndpoint.prepareMetricsEndpoint(starterDetails.serverEffect)
+      MetricsEndpoint.prepareMetricsEndpoint(starterDetails.serverStack)
     } else {
       Code.empty
     }
 
   private object MetricsEndpoint:
-    def prepareMetricsEndpoint(serverEffect: ServerEffect): Code =
-      val (effect, endpoint) = serverEffectToEffectAndEndpoint(serverEffect)
+    def prepareMetricsEndpoint(serverStack: ServerStack): Code =
+      val (effect, endpoint) = serverStackToEffectAndEndpoint(serverStack)
       Code(
         s"${INDENT}val prometheusMetrics: PrometheusMetrics[$effect] = PrometheusMetrics.default[$effect]()" + NEW_LINE_WITH_INDENT +
           s"val metricsEndpoint: $endpoint = prometheusMetrics.metricsEndpoint",
-        serverEffectImports(serverEffect) + Import("sttp.tapir.server.metrics.prometheus.PrometheusMetrics")
+        serverStackImports(serverStack) + Import("sttp.tapir.server.metrics.prometheus.PrometheusMetrics")
       )
 
-  private def serverEffectToEffectAndEndpoint(serverEffect: ServerEffect): (String, String) =
-    serverEffect match {
-      case ServerEffect.FutureEffect => ("Future", "ServerEndpoint[Any, Future]")
-      case ServerEffect.Sync         => ("Id", "ServerEndpoint[Any, Id]")
-      case ServerEffect.IOEffect     => ("IO", "ServerEndpoint[Any, IO]")
-      case ServerEffect.ZIOEffect    => ("Task", "ZServerEndpoint[Any, Any]")
+  private def serverStackToEffectAndEndpoint(serverStack: ServerStack): (String, String) =
+    serverStack match {
+      case ServerStack.FutureStack => ("Future", "ServerEndpoint[Any, Future]")
+      case ServerStack.OxStack     => ("Id", "ServerEndpoint[Any, Id]")
+      case ServerStack.IOStack     => ("IO", "ServerEndpoint[Any, IO]")
+      case ServerStack.ZIOStack    => ("Task", "ZServerEndpoint[Any, Any]")
     }
 
-  private def serverEffectImports(serverEffect: ServerEffect): Set[Import] =
-    serverEffect match {
-      case ServerEffect.ZIOEffect => Set(Import("zio.Task"))
-      case _                      => Set.empty[Import]
+  private def serverStackImports(serverStack: ServerStack): Set[Import] =
+    serverStack match {
+      case ServerStack.ZIOStack => Set(Import("zio.Task"))
+      case _                    => Set.empty[Import]
     }
 
   def getAllEndpoints(starterDetails: StarterDetails): Code =
-    val serverKind = starterDetails.serverEffect match {
-      case ServerEffect.FutureEffect => "List[ServerEndpoint[Any, Future]]"
-      case ServerEffect.Sync         => "List[ServerEndpoint[Any, Id]]"
-      case ServerEffect.IOEffect     => "List[ServerEndpoint[Any, IO]]"
-      case ServerEffect.ZIOEffect    => "List[ZServerEndpoint[Any, Any]]"
+    val serverKind = starterDetails.serverStack match {
+      case ServerStack.FutureStack => "List[ServerEndpoint[Any, Future]]"
+      case ServerStack.OxStack     => "List[ServerEndpoint[Any, Id]]"
+      case ServerStack.IOStack     => "List[ServerEndpoint[Any, IO]]"
+      case ServerStack.ZIOStack    => "List[ZServerEndpoint[Any, Any]]"
     }
 
     def bodyTemplate(serverKind: String, addMetrics: Boolean, hasDocumentation: Boolean): String = {

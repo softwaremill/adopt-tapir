@@ -35,7 +35,7 @@ object Setup:
       .getOrElse(elseAll)
 
   lazy val validConfigurations: Seq[StarterDetails] = for
-    effect <- effectImplementations
+    stack <- stackImplementations
     server <- ServerImplementationRequest.values.toIndexedSeq
     docs <- List(true, false)
     metrics <- List(true, false)
@@ -45,7 +45,7 @@ object Setup:
     starterRequest = StarterRequest(
       "myproject",
       "com.softwaremill",
-      effect,
+      stack,
       server,
       addDocumentation = docs,
       addMetrics = metrics,
@@ -62,8 +62,8 @@ object Setup:
   private lazy val scalaVersions: List[ScalaVersionRequest] =
     fromEnvOrElseAll("SCALA", ScalaVersionRequest.valueOf)(ScalaVersionRequest.values.toList)
 
-  private lazy val effectImplementations: List[EffectRequest] =
-    fromEnvOrElseAll("EFFECT", EffectRequest.valueOf)(EffectRequest.values.toList)
+  private lazy val stackImplementations: List[StackRequest] =
+    fromEnvOrElseAll("STACK", StackRequest.valueOf)(StackRequest.values.toList)
 
 object TestTimeouts:
   // wait for tests has to be longer than waiting for port otherwise it will break waiting for port with bogus errors
@@ -72,22 +72,6 @@ object TestTimeouts:
 class StarterServiceITTest extends BaseTest with ParallelTestExecution:
   import Setup.*
 
-//  val singleTest = FormValidator
-//    .validate(
-//      StarterRequest(
-//        "myproject",
-//        "com.softwaremill",
-//        EffectRequest.ZIOEffect,
-//        ServerImplementationRequest.ZIOHttp,
-//        false,
-//        false,
-//        JsonImplementationRequest.ZIOJson,
-//        ScalaVersionRequest.Scala2,
-//        BuilderRequest.ScalaCli
-//      )
-//    )
-//    .toSeq
-//  for details <- singleTest do {
   for details <- Setup.validConfigurations do {
     it should s"work using the configuration: ${details.show}" in {
       val backend: SttpBackend[Identity, Any] = HttpURLConnectionBackend()

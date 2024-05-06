@@ -7,8 +7,8 @@ object StarterRequestGenerators:
 
   def randomStarterRequest(): StarterRequest = randomStarterRequestGen().sample.getOrElse(randomStarterRequest())
 
-  def randomStarterRequest(effect: EffectRequest, implementation: ServerImplementationRequest): StarterRequest =
-    randomStarterRequest().copy(effect = effect, implementation = implementation, json = JsonImplementationRequest.Circe)
+  def randomStarterRequest(stack: StackRequest, implementation: ServerImplementationRequest): StarterRequest =
+    randomStarterRequest().copy(stack = stack, implementation = implementation, json = JsonImplementationRequest.Circe)
 
   private def randomStarterRequestGen(): Gen[StarterRequest] =
     for
@@ -23,9 +23,9 @@ object StarterRequestGenerators:
       json <- Gen.oneOf(jsonValuesForScalaVersion.toIndexedSeq)
       effect <-
         if (json == JsonImplementationRequest.ZIOJson)
-          Gen.const(EffectRequest.ZIOEffect)
+          Gen.const(StackRequest.ZIOStack)
         else
-          Gen.oneOf(EffectRequest.values.toIndexedSeq)
+          Gen.oneOf(StackRequest.values.toIndexedSeq)
       serverImplementation <- Gen.oneOf(ServerImplementationRequest.values.toIndexedSeq)
       documentationAdded <- Gen.oneOf(true, false)
       metricsAdded <- Gen.oneOf(true, false)

@@ -2,11 +2,11 @@ package com.softwaremill.adopttapir.starter.api
 
 import com.softwaremill.adopttapir.starter.JsonImplementation.WithoutJson
 import com.softwaremill.adopttapir.starter.ScalaVersion.Scala2
-import com.softwaremill.adopttapir.starter.api.EffectRequest.{FutureEffect, IOEffect, ZIOEffect}
+import com.softwaremill.adopttapir.starter.api.StackRequest.{FutureStack, IOStack, ZIOStack}
 import com.softwaremill.adopttapir.starter.api.JsonImplementationRequest.No
 import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Http4s, Netty, ZIOHttp}
 import com.softwaremill.adopttapir.starter.api.StarterRequestGenerators.randomStarterRequest
-import com.softwaremill.adopttapir.starter.{Builder, ServerEffect, ServerImplementation, StarterDetails}
+import com.softwaremill.adopttapir.starter.{Builder, ServerStack, ServerImplementation, StarterDetails}
 import com.softwaremill.adopttapir.test.BaseTest
 
 class FormValidatorTest extends BaseTest:
@@ -37,16 +37,16 @@ class FormValidatorTest extends BaseTest:
 
   it should "raise a problem with picking ZIOJson for other effect than ZIO" in {
     // given
-    val requestWithFutureEffect = randomStarterRequest().copy(json = JsonImplementationRequest.ZIOJson, effect = EffectRequest.FutureEffect)
-    val requestWithIOEffect = randomStarterRequest().copy(json = JsonImplementationRequest.ZIOJson, effect = EffectRequest.FutureEffect)
+    val requestWithFutureStack = randomStarterRequest().copy(json = JsonImplementationRequest.ZIOJson, stack = StackRequest.FutureStack)
+    val requestWithIOStack = randomStarterRequest().copy(json = JsonImplementationRequest.ZIOJson, stack = StackRequest.FutureStack)
 
     // when
-    val resultFuture = FormValidator.validate(requestWithFutureEffect)
-    val resultIO = FormValidator.validate(requestWithIOEffect)
+    val resultFuture = FormValidator.validate(requestWithFutureStack)
+    val resultIO = FormValidator.validate(requestWithIOStack)
 
     // then
-    resultFuture.left.value.msg should include(s"ZIOJson will work only with ZIO effect")
-    resultIO.left.value.msg should include(s"ZIOJson will work only with ZIO effect")
+    resultFuture.left.value.msg should include(s"ZIOJson will work only with ZIO stack")
+    resultIO.left.value.msg should include(s"ZIOJson will work only with ZIO stack")
 
   }
 
@@ -61,26 +61,26 @@ class FormValidatorTest extends BaseTest:
     result.left.value.msg should include(s"Pickler will work only with Scala 3")
   }
 
-  it should "raise a problem when effect will not match implementation" in {
-    FormValidator.validate(randomStarterRequest(FutureEffect, ZIOHttp)).left.value.msg should
-      include("Picked FutureEffect with ZIOHttp - Future effect will work only with: Netty, Vert.X, Pekko")
-    FormValidator.validate(randomStarterRequest(FutureEffect, Http4s)).left.value.msg should
-      include("Picked FutureEffect with Http4s - Future effect will work only with: Netty, Vert.X, Pekko")
-    FormValidator.validate(randomStarterRequest(IOEffect, ZIOHttp)).left.value.msg should
-      be("Picked IOEffect with ZIOHttp - IO effect will work only with: Netty, Vert.X, Http4s")
+  it should "raise a problem when stack will not match implementation" in {
+    FormValidator.validate(randomStarterRequest(FutureStack, ZIOHttp)).left.value.msg should
+      include("Picked FutureStack with ZIOHttp - Future stack will work only with: Netty, Vert.X, Pekko")
+    FormValidator.validate(randomStarterRequest(FutureStack, Http4s)).left.value.msg should
+      include("Picked FutureStack with Http4s - Future stack will work only with: Netty, Vert.X, Pekko")
+    FormValidator.validate(randomStarterRequest(IOStack, ZIOHttp)).left.value.msg should
+      be("Picked IOStack with ZIOHttp - IO stack will work only with: Netty, Vert.X, Http4s")
   }
 
   it should "not raise a problem with Effect and Implementation" in {
     val request = defaultRequest()
-    val request2 = request.copy(effect = IOEffect, implementation = Netty)
-    val request3 = request.copy(effect = IOEffect, implementation = Http4s)
-    val request4 = request.copy(effect = ZIOEffect, implementation = Http4s)
-    val request5 = request.copy(effect = ZIOEffect, implementation = ZIOHttp)
+    val request2 = request.copy(stack = IOStack, implementation = Netty)
+    val request3 = request.copy(stack = IOStack, implementation = Http4s)
+    val request4 = request.copy(stack = ZIOStack, implementation = Http4s)
+    val request5 = request.copy(stack = ZIOStack, implementation = ZIOHttp)
 
     FormValidator.validate(request).value shouldBe StarterDetails(
       request.projectName,
       request.groupId,
-      ServerEffect.FutureEffect,
+      ServerStack.FutureStack,
       ServerImplementation.Netty,
       addDocumentation = true,
       addMetrics = false,
@@ -91,7 +91,7 @@ class FormValidatorTest extends BaseTest:
     FormValidator.validate(request2).value shouldBe StarterDetails(
       request2.projectName,
       request2.groupId,
-      ServerEffect.IOEffect,
+      ServerStack.IOStack,
       ServerImplementation.Netty,
       addDocumentation = true,
       addMetrics = false,
@@ -102,7 +102,7 @@ class FormValidatorTest extends BaseTest:
     FormValidator.validate(request3).value shouldBe StarterDetails(
       request3.projectName,
       request3.groupId,
-      ServerEffect.IOEffect,
+      ServerStack.IOStack,
       ServerImplementation.Http4s,
       addDocumentation = true,
       addMetrics = false,
@@ -113,7 +113,7 @@ class FormValidatorTest extends BaseTest:
     FormValidator.validate(request4).value shouldBe StarterDetails(
       request4.projectName,
       request4.groupId,
-      ServerEffect.ZIOEffect,
+      ServerStack.ZIOStack,
       ServerImplementation.Http4s,
       addDocumentation = true,
       addMetrics = false,
@@ -124,7 +124,7 @@ class FormValidatorTest extends BaseTest:
     FormValidator.validate(request5).value shouldBe StarterDetails(
       request5.projectName,
       request5.groupId,
-      ServerEffect.ZIOEffect,
+      ServerStack.ZIOStack,
       ServerImplementation.ZIOHttp,
       addDocumentation = true,
       addMetrics = false,
@@ -138,7 +138,7 @@ class FormValidatorTest extends BaseTest:
     StarterRequest(
       "project",
       "com.softwaremill",
-      FutureEffect,
+      FutureStack,
       Netty,
       addDocumentation = true,
       addMetrics = false,

@@ -1,17 +1,17 @@
-import { EffectImplementation, EffectType, JSONImplementation, ScalaVersion } from 'api/starter';
-import { EFFECT_IMPLEMENTATIONS_OPTIONS, EFFECT_TYPE_OPTIONS, JSON_OUTPUT_OPTIONS } from './ConfigurationForm.consts';
+import { EffectImplementation, StackType, JSONImplementation, ScalaVersion } from 'api/starter';
+import { EFFECT_IMPLEMENTATIONS_OPTIONS, STACK_TYPE_OPTIONS, JSON_OUTPUT_OPTIONS } from './ConfigurationForm.consts';
 import type { FormSelectOption } from '../FormSelect';
 import type { FormRadioOption } from '../FormRadioGroup';
 
 /**
- * Effect type to effect implementation mapping
+ * Stack type to effect implementation mapping
  */
 
-const effectTypeImplementationMap: Record<EffectType, EffectImplementation[]> = {
-  [EffectType.Future]: [EffectImplementation.Netty, EffectImplementation.VertX, EffectImplementation.Pekko],
-  [EffectType.IO]: [EffectImplementation.Http4s, EffectImplementation.Netty, EffectImplementation.VertX],
-  [EffectType.Sync]: [EffectImplementation.Netty],
-  [EffectType.ZIO]: [
+const stackTypeImplementationMap: Record<StackType, EffectImplementation[]> = {
+  [StackType.Future]: [EffectImplementation.Netty, EffectImplementation.VertX, EffectImplementation.Pekko],
+  [StackType.IO]: [EffectImplementation.Http4s, EffectImplementation.Netty, EffectImplementation.VertX],
+  [StackType.Ox]: [EffectImplementation.Netty],
+  [StackType.ZIO]: [
     EffectImplementation.Netty,
     EffectImplementation.Http4s,
     EffectImplementation.ZIOHttp,
@@ -19,41 +19,41 @@ const effectTypeImplementationMap: Record<EffectType, EffectImplementation[]> = 
   ],
 };
 
-const versionTypeEffectImplementationMap: Record<ScalaVersion, EffectType[]> = {
-  [ScalaVersion.Scala2]: [EffectType.Future, EffectType.IO, EffectType.ZIO],
-  [ScalaVersion.Scala3]: [EffectType.Future, EffectType.IO, EffectType.Sync, EffectType.ZIO],
+const versionTypeEffectImplementationMap: Record<ScalaVersion, StackType[]> = {
+  [ScalaVersion.Scala2]: [StackType.Future, StackType.IO, StackType.ZIO],
+  [ScalaVersion.Scala3]: [StackType.Future, StackType.IO, StackType.Ox, StackType.ZIO],
 };
 
-const mapEffectTypeToEffectImplementation = (effectType: EffectType): EffectImplementation[] => {
-  return effectTypeImplementationMap[effectType];
+const mapStackTypeToEffectImplementation = (stackType: StackType): EffectImplementation[] => {
+  return stackTypeImplementationMap[stackType];
 };
 
-export const getAvailableEffectImplementations = (effectType: EffectType): EffectImplementation[] => {
-  const availableEffectImplementations = mapEffectTypeToEffectImplementation(effectType);
+export const getAvailableEffectImplementations = (stackType: StackType): EffectImplementation[] => {
+  const availableEffectImplementations = mapStackTypeToEffectImplementation(stackType);
   return availableEffectImplementations === undefined ? [] : availableEffectImplementations;
 };
 
-export const mapScalaVersionToEffectType = (scalaVersion: ScalaVersion): EffectType[] => {
+export const mapScalaVersionToStackType = (scalaVersion: ScalaVersion): StackType[] => {
   return versionTypeEffectImplementationMap[scalaVersion];
 };
 
-const getEffectTypes = (scalaVersion?: ScalaVersion): EffectType[] => {
-  return scalaVersion ? mapScalaVersionToEffectType(scalaVersion) : Object.values(EffectType);
+const getStackTypes = (scalaVersion?: ScalaVersion): StackType[] => {
+  return scalaVersion ? mapScalaVersionToStackType(scalaVersion) : Object.values(StackType);
 };
 
-export const getEffectTypeOptions = (scalaVersion?: ScalaVersion): FormSelectOption[] => {
-  const effectTypes = getEffectTypes(scalaVersion);
-  return EFFECT_TYPE_OPTIONS.filter(({ value }) => effectTypes.includes(value));
+export const getStackTypeOptions = (scalaVersion?: ScalaVersion): FormSelectOption[] => {
+  const stackTypes = getStackTypes(scalaVersion);
+  return STACK_TYPE_OPTIONS.filter(({ value }) => stackTypes.includes(value));
 };
 
-export const getEffectImplementationOptions = (effectType: EffectType): FormSelectOption[] => {
-  const effectImplementations = getAvailableEffectImplementations(effectType);
+export const getEffectImplementationOptions = (stackType: StackType): FormSelectOption[] => {
+  const effectImplementations = getAvailableEffectImplementations(stackType);
 
   return EFFECT_IMPLEMENTATIONS_OPTIONS.filter(({ value }) => effectImplementations.includes(value));
 };
 
 /**
- * Effect type to json implementation mapping
+ * Stack type to json implementation mapping
  */
 
 const commonJSONImplementations: JSONImplementation[] = [
@@ -63,11 +63,11 @@ const commonJSONImplementations: JSONImplementation[] = [
   JSONImplementation.Jsoniter,
 ];
 
-const effectTypeJsonImplementationMap: Record<EffectType, JSONImplementation[]> = {
-  [EffectType.Future]: commonJSONImplementations,
-  [EffectType.IO]: commonJSONImplementations,
-  [EffectType.Sync]: commonJSONImplementations,
-  [EffectType.ZIO]: commonJSONImplementations.concat(JSONImplementation.ZIOJson),
+const stackTypeJsonImplementationMap: Record<StackType, JSONImplementation[]> = {
+  [StackType.Future]: commonJSONImplementations,
+  [StackType.IO]: commonJSONImplementations,
+  [StackType.Ox]: commonJSONImplementations,
+  [StackType.ZIO]: commonJSONImplementations.concat(JSONImplementation.ZIOJson),
 };
 
 const versionTypeJsonImlpementationMap: Record<ScalaVersion, JSONImplementation[]> = {
@@ -75,27 +75,24 @@ const versionTypeJsonImlpementationMap: Record<ScalaVersion, JSONImplementation[
   [ScalaVersion.Scala3]: commonJSONImplementations.concat(JSONImplementation.Pickler),
 };
 
-export const mapEffectTypeToJSONImplementation = (effectType: EffectType): JSONImplementation[] => {
-  return effectTypeJsonImplementationMap[effectType];
+export const mapStackTypeToJSONImplementation = (stackType: StackType): JSONImplementation[] => {
+  return stackTypeJsonImplementationMap[stackType];
 };
 
 export const mapScalaVersionToJSONImplementation = (scalaVersion: ScalaVersion): JSONImplementation[] => {
   return versionTypeJsonImlpementationMap[scalaVersion];
 };
 
-const getJSONImplementations = (scalaVersion?: ScalaVersion, effectType?: EffectType): JSONImplementation[] => {
+const getJSONImplementations = (scalaVersion?: ScalaVersion, stackType?: StackType): JSONImplementation[] => {
   const implementationsForVersion = scalaVersion ? mapScalaVersionToJSONImplementation(scalaVersion) : [];
-  const implementationsForEffect = effectType ? mapEffectTypeToJSONImplementation(effectType) : [];
+  const implementationsForEffect = stackType ? mapStackTypeToJSONImplementation(stackType) : [];
 
   // Merge and deduplicate
   return [...new Set([...implementationsForVersion, ...implementationsForEffect])];
 };
 
-export const getJSONImplementationOptions = (
-  scalaVersion?: ScalaVersion,
-  effectType?: EffectType
-): FormRadioOption[] => {
-  const availableJSONImplementations = getJSONImplementations(scalaVersion, effectType) || commonJSONImplementations;
+export const getJSONImplementationOptions = (scalaVersion?: ScalaVersion, stackType?: StackType): FormRadioOption[] => {
+  const availableJSONImplementations = getJSONImplementations(scalaVersion, stackType) || commonJSONImplementations;
 
   return JSON_OUTPUT_OPTIONS.filter(({ value }) => availableJSONImplementations.includes(value));
 };

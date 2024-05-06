@@ -5,7 +5,7 @@ Content-Type: application/json
 {
   "projectName": "projectname",
   "groupId": "com.softwaremill",
-  "effect": "FutureEffect",
+  "stack": "FutureStack",
   "implementation": "Netty",
   "addDocumentation": true,
   "addMetrics": true,

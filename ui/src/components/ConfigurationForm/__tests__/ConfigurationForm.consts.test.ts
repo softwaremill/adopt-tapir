@@ -2,7 +2,7 @@ import * as yup from 'yup';
 import {
   Builder,
   EffectImplementation,
-  EffectType,
+  StackType,
   JSONImplementation,
   ScalaVersion,
   StarterRequest,
@@ -12,7 +12,7 @@ import { starterValidationSchema } from '../ConfigurationForm.consts';
 const TEST_FORM_VALUES: StarterRequest = {
   projectName: 'test-project',
   groupId: 'softwaremill.com',
-  effect: EffectType.Future,
+  stack: StackType.Future,
   scalaVersion: ScalaVersion.Scala3,
   implementation: EffectImplementation.Netty,
   addDocumentation: false,
@@ -30,7 +30,7 @@ describe('configuration consts', () => {
     it('should return false, if any form value does not conforms the validation schema', () => {
       const formValues = {
         ...TEST_FORM_VALUES,
-        effect: 'test effect',
+        stack: 'test stack',
       };
 
       expect(starterValidationSchema.isValidSync(formValues)).toBe(false);
@@ -87,22 +87,22 @@ describe('configuration consts', () => {
       });
     });
 
-    describe('effect field', () => {
-      const effectSchema = yup.reach(starterValidationSchema, 'effect');
-      const cases: { effectType: EffectType | undefined; expected: boolean }[] = [
-        { effectType: EffectType.Future, expected: true },
-        { effectType: EffectType.IO, expected: true },
-        { effectType: EffectType.ZIO, expected: true },
-        { effectType: EffectType.Sync, expected: true },
-        { effectType: 'notValidEffect' as EffectType, expected: false },
-        { effectType: '' as EffectType, expected: false },
-        { effectType: undefined, expected: false },
+    describe('stack field', () => {
+      const stackSchema = yup.reach(starterValidationSchema, 'stack');
+      const cases: { stackType: StackType | undefined; expected: boolean }[] = [
+        { stackType: StackType.Future, expected: true },
+        { stackType: StackType.IO, expected: true },
+        { stackType: StackType.ZIO, expected: true },
+        { stackType: StackType.Ox, expected: true },
+        { stackType: 'notValidEffect' as StackType, expected: false },
+        { stackType: '' as StackType, expected: false },
+        { stackType: undefined, expected: false },
       ];
 
       test.each(cases)(
-        'should return $expected based on effect type [$effectType] validity',
-        ({ effectType, expected }) => {
-          expect(effectSchema.isValidSync(effectType)).toBe(expected);
+        'should return $expected based on effect type [$stackType] validity',
+        ({ stackType, expected }) => {
+          expect(stackSchema.isValidSync(stackType)).toBe(expected);
         }
       );
     });
@@ -127,60 +127,60 @@ describe('configuration consts', () => {
 
     describe('implementation field', () => {
       const effectImplementationSchema = yup.object({
-        effect: yup.reach(starterValidationSchema, 'effect'),
+        stack: yup.reach(starterValidationSchema, 'stack'),
         scalaVersion: yup.reach(starterValidationSchema, 'scalaVersion'),
         implementation: yup.reach(starterValidationSchema, 'implementation'),
       });
 
       // NOTE: it's easier to comprehend cases definitions this way, step with casesDetails is purerly due formatting issues
-      const casesDetails: [EffectType, ScalaVersion, EffectImplementation, boolean][] = [
+      const casesDetails: [StackType, ScalaVersion, EffectImplementation, boolean][] = [
         // Scala 2 variants
-        [EffectType.Future, ScalaVersion.Scala2, EffectImplementation.Netty, true],
-        [EffectType.Future, ScalaVersion.Scala2, EffectImplementation.Http4s, false],
-        [EffectType.Future, ScalaVersion.Scala2, EffectImplementation.ZIOHttp, false],
-        [EffectType.Future, ScalaVersion.Scala2, EffectImplementation.Pekko, true],
+        [StackType.Future, ScalaVersion.Scala2, EffectImplementation.Netty, true],
+        [StackType.Future, ScalaVersion.Scala2, EffectImplementation.Http4s, false],
+        [StackType.Future, ScalaVersion.Scala2, EffectImplementation.ZIOHttp, false],
+        [StackType.Future, ScalaVersion.Scala2, EffectImplementation.Pekko, true],
 
-        [EffectType.IO, ScalaVersion.Scala2, EffectImplementation.Netty, true],
-        [EffectType.IO, ScalaVersion.Scala2, EffectImplementation.Http4s, true],
-        [EffectType.IO, ScalaVersion.Scala2, EffectImplementation.ZIOHttp, false],
+        [StackType.IO, ScalaVersion.Scala2, EffectImplementation.Netty, true],
+        [StackType.IO, ScalaVersion.Scala2, EffectImplementation.Http4s, true],
+        [StackType.IO, ScalaVersion.Scala2, EffectImplementation.ZIOHttp, false],
 
-        [EffectType.ZIO, ScalaVersion.Scala2, EffectImplementation.Netty, true],
-        [EffectType.ZIO, ScalaVersion.Scala2, EffectImplementation.Http4s, true],
-        [EffectType.ZIO, ScalaVersion.Scala2, EffectImplementation.ZIOHttp, true],
+        [StackType.ZIO, ScalaVersion.Scala2, EffectImplementation.Netty, true],
+        [StackType.ZIO, ScalaVersion.Scala2, EffectImplementation.Http4s, true],
+        [StackType.ZIO, ScalaVersion.Scala2, EffectImplementation.ZIOHttp, true],
 
         // Scala 3 variants
-        [EffectType.Future, ScalaVersion.Scala3, EffectImplementation.Netty, true],
-        [EffectType.Future, ScalaVersion.Scala3, EffectImplementation.Http4s, false],
-        [EffectType.Future, ScalaVersion.Scala3, EffectImplementation.ZIOHttp, false],
-        [EffectType.Future, ScalaVersion.Scala3, EffectImplementation.Pekko, true],
+        [StackType.Future, ScalaVersion.Scala3, EffectImplementation.Netty, true],
+        [StackType.Future, ScalaVersion.Scala3, EffectImplementation.Http4s, false],
+        [StackType.Future, ScalaVersion.Scala3, EffectImplementation.ZIOHttp, false],
+        [StackType.Future, ScalaVersion.Scala3, EffectImplementation.Pekko, true],
 
-        [EffectType.IO, ScalaVersion.Scala3, EffectImplementation.Netty, true],
-        [EffectType.IO, ScalaVersion.Scala3, EffectImplementation.Http4s, true],
-        [EffectType.IO, ScalaVersion.Scala3, EffectImplementation.ZIOHttp, false],
+        [StackType.IO, ScalaVersion.Scala3, EffectImplementation.Netty, true],
+        [StackType.IO, ScalaVersion.Scala3, EffectImplementation.Http4s, true],
+        [StackType.IO, ScalaVersion.Scala3, EffectImplementation.ZIOHttp, false],
 
-        [EffectType.Sync, ScalaVersion.Scala3, EffectImplementation.Netty, true],
-        [EffectType.Sync, ScalaVersion.Scala3, EffectImplementation.Http4s, false],
-        [EffectType.Sync, ScalaVersion.Scala3, EffectImplementation.ZIOHttp, false],
-        [EffectType.Sync, ScalaVersion.Scala3, EffectImplementation.Pekko, false],
+        [StackType.Ox, ScalaVersion.Scala3, EffectImplementation.Netty, true],
+        [StackType.Ox, ScalaVersion.Scala3, EffectImplementation.Http4s, false],
+        [StackType.Ox, ScalaVersion.Scala3, EffectImplementation.ZIOHttp, false],
+        [StackType.Ox, ScalaVersion.Scala3, EffectImplementation.Pekko, false],
 
-        [EffectType.ZIO, ScalaVersion.Scala3, EffectImplementation.Netty, true],
-        [EffectType.ZIO, ScalaVersion.Scala3, EffectImplementation.Http4s, true],
-        [EffectType.ZIO, ScalaVersion.Scala3, EffectImplementation.ZIOHttp, true],
+        [StackType.ZIO, ScalaVersion.Scala3, EffectImplementation.Netty, true],
+        [StackType.ZIO, ScalaVersion.Scala3, EffectImplementation.Http4s, true],
+        [StackType.ZIO, ScalaVersion.Scala3, EffectImplementation.ZIOHttp, true],
       ];
 
-      const cases = casesDetails.map(([effectType, scalaVersion, effectImplementation, expected]) => ({
-        effectType,
+      const cases = casesDetails.map(([stackType, scalaVersion, effectImplementation, expected]) => ({
+        stackType,
         scalaVersion,
         effectImplementation,
         expected,
       }));
 
       test.each(cases)(
-        'should return $expected based on effect type [$effectType], scala version [$scalaVersion] and effect implementation [$effectImplementation] combination validity',
-        ({ effectType, scalaVersion, effectImplementation, expected }) => {
+        'should return $expected based on effect type [$stackType], scala version [$scalaVersion] and effect implementation [$effectImplementation] combination validity',
+        ({ stackType, scalaVersion, effectImplementation, expected }) => {
           expect(
             effectImplementationSchema.isValidSync({
-              effect: effectType,
+              stack: stackType,
               scalaVersion,
               implementation: effectImplementation,
             })
@@ -207,74 +207,74 @@ describe('configuration consts', () => {
 
     describe('json field', () => {
       const jsonSchema = yup.object({
-        effect: yup.reach(starterValidationSchema, 'effect'),
+        stack: yup.reach(starterValidationSchema, 'stack'),
         json: yup.reach(starterValidationSchema, 'json'),
       });
 
-      const casesDetails: [ScalaVersion, EffectType, JSONImplementation, boolean][] = [
+      const casesDetails: [ScalaVersion, StackType, JSONImplementation, boolean][] = [
         // Scala 2 variants
-        [ScalaVersion.Scala2, EffectType.Future, JSONImplementation.No, true],
-        [ScalaVersion.Scala2, EffectType.Future, JSONImplementation.Circe, true],
-        [ScalaVersion.Scala2, EffectType.Future, JSONImplementation.UPickle, true],
-        [ScalaVersion.Scala2, EffectType.Future, JSONImplementation.Jsoniter, true],
-        [ScalaVersion.Scala2, EffectType.Future, JSONImplementation.ZIOJson, false],
-        [ScalaVersion.Scala2, EffectType.Future, JSONImplementation.Pickler, false],
+        [ScalaVersion.Scala2, StackType.Future, JSONImplementation.No, true],
+        [ScalaVersion.Scala2, StackType.Future, JSONImplementation.Circe, true],
+        [ScalaVersion.Scala2, StackType.Future, JSONImplementation.UPickle, true],
+        [ScalaVersion.Scala2, StackType.Future, JSONImplementation.Jsoniter, true],
+        [ScalaVersion.Scala2, StackType.Future, JSONImplementation.ZIOJson, false],
+        [ScalaVersion.Scala2, StackType.Future, JSONImplementation.Pickler, false],
 
-        [ScalaVersion.Scala2, EffectType.IO, JSONImplementation.No, true],
-        [ScalaVersion.Scala2, EffectType.IO, JSONImplementation.Circe, true],
-        [ScalaVersion.Scala2, EffectType.IO, JSONImplementation.UPickle, true],
-        [ScalaVersion.Scala2, EffectType.IO, JSONImplementation.Jsoniter, true],
-        [ScalaVersion.Scala2, EffectType.IO, JSONImplementation.ZIOJson, false],
-        [ScalaVersion.Scala2, EffectType.IO, JSONImplementation.Pickler, false],
+        [ScalaVersion.Scala2, StackType.IO, JSONImplementation.No, true],
+        [ScalaVersion.Scala2, StackType.IO, JSONImplementation.Circe, true],
+        [ScalaVersion.Scala2, StackType.IO, JSONImplementation.UPickle, true],
+        [ScalaVersion.Scala2, StackType.IO, JSONImplementation.Jsoniter, true],
+        [ScalaVersion.Scala2, StackType.IO, JSONImplementation.ZIOJson, false],
+        [ScalaVersion.Scala2, StackType.IO, JSONImplementation.Pickler, false],
 
-        [ScalaVersion.Scala2, EffectType.ZIO, JSONImplementation.No, true],
-        [ScalaVersion.Scala2, EffectType.ZIO, JSONImplementation.Circe, true],
-        [ScalaVersion.Scala2, EffectType.ZIO, JSONImplementation.UPickle, true],
-        [ScalaVersion.Scala2, EffectType.ZIO, JSONImplementation.Jsoniter, true],
-        [ScalaVersion.Scala2, EffectType.ZIO, JSONImplementation.ZIOJson, true],
-        [ScalaVersion.Scala2, EffectType.ZIO, JSONImplementation.Pickler, false],
+        [ScalaVersion.Scala2, StackType.ZIO, JSONImplementation.No, true],
+        [ScalaVersion.Scala2, StackType.ZIO, JSONImplementation.Circe, true],
+        [ScalaVersion.Scala2, StackType.ZIO, JSONImplementation.UPickle, true],
+        [ScalaVersion.Scala2, StackType.ZIO, JSONImplementation.Jsoniter, true],
+        [ScalaVersion.Scala2, StackType.ZIO, JSONImplementation.ZIOJson, true],
+        [ScalaVersion.Scala2, StackType.ZIO, JSONImplementation.Pickler, false],
 
         // Scala 3 variants
-        [ScalaVersion.Scala3, EffectType.Future, JSONImplementation.No, true],
-        [ScalaVersion.Scala3, EffectType.Future, JSONImplementation.Circe, true],
-        [ScalaVersion.Scala3, EffectType.Future, JSONImplementation.UPickle, true],
-        [ScalaVersion.Scala3, EffectType.Future, JSONImplementation.Jsoniter, true],
-        [ScalaVersion.Scala3, EffectType.Future, JSONImplementation.ZIOJson, false],
-        [ScalaVersion.Scala3, EffectType.Future, JSONImplementation.Pickler, true],
+        [ScalaVersion.Scala3, StackType.Future, JSONImplementation.No, true],
+        [ScalaVersion.Scala3, StackType.Future, JSONImplementation.Circe, true],
+        [ScalaVersion.Scala3, StackType.Future, JSONImplementation.UPickle, true],
+        [ScalaVersion.Scala3, StackType.Future, JSONImplementation.Jsoniter, true],
+        [ScalaVersion.Scala3, StackType.Future, JSONImplementation.ZIOJson, false],
+        [ScalaVersion.Scala3, StackType.Future, JSONImplementation.Pickler, true],
 
-        [ScalaVersion.Scala3, EffectType.IO, JSONImplementation.No, true],
-        [ScalaVersion.Scala3, EffectType.IO, JSONImplementation.Circe, true],
-        [ScalaVersion.Scala3, EffectType.IO, JSONImplementation.UPickle, true],
-        [ScalaVersion.Scala3, EffectType.IO, JSONImplementation.Jsoniter, true],
-        [ScalaVersion.Scala3, EffectType.IO, JSONImplementation.ZIOJson, false],
-        [ScalaVersion.Scala3, EffectType.IO, JSONImplementation.Pickler, true],
+        [ScalaVersion.Scala3, StackType.IO, JSONImplementation.No, true],
+        [ScalaVersion.Scala3, StackType.IO, JSONImplementation.Circe, true],
+        [ScalaVersion.Scala3, StackType.IO, JSONImplementation.UPickle, true],
+        [ScalaVersion.Scala3, StackType.IO, JSONImplementation.Jsoniter, true],
+        [ScalaVersion.Scala3, StackType.IO, JSONImplementation.ZIOJson, false],
+        [ScalaVersion.Scala3, StackType.IO, JSONImplementation.Pickler, true],
 
-        [ScalaVersion.Scala3, EffectType.Sync, JSONImplementation.No, true],
-        [ScalaVersion.Scala3, EffectType.Sync, JSONImplementation.Circe, true],
-        [ScalaVersion.Scala3, EffectType.Sync, JSONImplementation.UPickle, true],
-        [ScalaVersion.Scala3, EffectType.Sync, JSONImplementation.Jsoniter, true],
-        [ScalaVersion.Scala3, EffectType.Sync, JSONImplementation.ZIOJson, false],
-        [ScalaVersion.Scala3, EffectType.Sync, JSONImplementation.Pickler, true],
+        [ScalaVersion.Scala3, StackType.Ox, JSONImplementation.No, true],
+        [ScalaVersion.Scala3, StackType.Ox, JSONImplementation.Circe, true],
+        [ScalaVersion.Scala3, StackType.Ox, JSONImplementation.UPickle, true],
+        [ScalaVersion.Scala3, StackType.Ox, JSONImplementation.Jsoniter, true],
+        [ScalaVersion.Scala3, StackType.Ox, JSONImplementation.ZIOJson, false],
+        [ScalaVersion.Scala3, StackType.Ox, JSONImplementation.Pickler, true],
 
-        [ScalaVersion.Scala3, EffectType.ZIO, JSONImplementation.No, true],
-        [ScalaVersion.Scala3, EffectType.ZIO, JSONImplementation.Circe, true],
-        [ScalaVersion.Scala3, EffectType.ZIO, JSONImplementation.UPickle, true],
-        [ScalaVersion.Scala3, EffectType.ZIO, JSONImplementation.Jsoniter, true],
-        [ScalaVersion.Scala3, EffectType.ZIO, JSONImplementation.ZIOJson, true],
-        [ScalaVersion.Scala3, EffectType.ZIO, JSONImplementation.Pickler, true],
+        [ScalaVersion.Scala3, StackType.ZIO, JSONImplementation.No, true],
+        [ScalaVersion.Scala3, StackType.ZIO, JSONImplementation.Circe, true],
+        [ScalaVersion.Scala3, StackType.ZIO, JSONImplementation.UPickle, true],
+        [ScalaVersion.Scala3, StackType.ZIO, JSONImplementation.Jsoniter, true],
+        [ScalaVersion.Scala3, StackType.ZIO, JSONImplementation.ZIOJson, true],
+        [ScalaVersion.Scala3, StackType.ZIO, JSONImplementation.Pickler, true],
       ];
 
-      const cases = casesDetails.map(([scalaVersion, effectType, jsonImplementation, expected]) => ({
-        effectType,
+      const cases = casesDetails.map(([scalaVersion, stackType, jsonImplementation, expected]) => ({
+        stackType,
         scalaVersion,
         jsonImplementation,
         expected,
       }));
 
       test.each(cases)(
-        'should return $expected based on effect type [$effectType] and json implementation [$jsonImplementation] combination validity',
-        ({ scalaVersion, effectType, jsonImplementation, expected }) => {
-          expect(jsonSchema.isValidSync({ scalaVersion, effect: effectType, json: jsonImplementation })).toBe(expected);
+        'should return $expected based on stack type [$stackType] and json implementation [$jsonImplementation] combination validity',
+        ({ scalaVersion, stackType, jsonImplementation, expected }) => {
+          expect(jsonSchema.isValidSync({ scalaVersion, stack: stackType, json: jsonImplementation })).toBe(expected);
         }
       );
     });

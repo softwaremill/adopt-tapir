@@ -4,7 +4,7 @@ import better.files.{DisposeableExtensions, File}
 import cats.effect.{IO, Resource}
 import com.softwaremill.adopttapir.http.Error_OUT
 import com.softwaremill.adopttapir.infrastructure.Json.*
-import com.softwaremill.adopttapir.starter.api.EffectRequest.FutureEffect
+import com.softwaremill.adopttapir.starter.api.StackRequest.FutureStack
 import com.softwaremill.adopttapir.starter.api.JsonImplementationRequest.{Jsoniter, ZIOJson, Pickler}
 import com.softwaremill.adopttapir.starter.api.ScalaVersionRequest.Scala2
 import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Netty, ZIOHttp}
@@ -113,9 +113,9 @@ class StarterApiTest extends BaseTest with TestDependencies {
     }
   }
 
-  it should "return request error with information about picking wrong implementation for an effect" in {
+  it should "return request error with information about picking wrong implementation for a stack" in {
     // given
-    val request = StarterRequestGenerators.randomStarterRequest().copy(effect = FutureEffect, implementation = ZIOHttp)
+    val request = StarterRequestGenerators.randomStarterRequest().copy(stack = FutureStack, implementation = ZIOHttp)
 
     // when
     val rootEx = intercept[SttpClientException](requests.requestZip(request))
@@ -124,13 +124,13 @@ class StarterApiTest extends BaseTest with TestDependencies {
     // then
     ex.statusCode.code shouldBe 400
     jawn.decode[Error_OUT](ex.body).value.error should include(
-      "Picked FutureEffect with ZIOHttp - Future effect will work only with: Netty, Vert.X"
+      "Picked FutureStack with ZIOHttp - Future stack will work only with: Netty, Vert.X"
     )
   }
 
-  it should "return request error with information about picking wrong effect for a json" in {
+  it should "return request error with information about picking wrong stack for a json" in {
     // given
-    val request = StarterRequestGenerators.randomStarterRequest().copy(effect = FutureEffect, json = ZIOJson)
+    val request = StarterRequestGenerators.randomStarterRequest().copy(stack = FutureStack, json = ZIOJson)
 
     // when
     val rootEx = intercept[SttpClientException](requests.requestZip(request))
@@ -139,7 +139,7 @@ class StarterApiTest extends BaseTest with TestDependencies {
     // then
     ex.statusCode.code shouldBe 400
     jawn.decode[Error_OUT](ex.body).value.error should include(
-      "ZIOJson will work only with ZIO effect"
+      "ZIOJson will work only with ZIO stack"
     )
   }
 
@@ -161,7 +161,7 @@ class StarterApiTest extends BaseTest with TestDependencies {
   it should "return request error with information about wrong projectName " in {
     // given
     val request =
-      StarterRequestGenerators.randomStarterRequest().copy(projectName = "Uppercase", effect = FutureEffect, implementation = Netty)
+      StarterRequestGenerators.randomStarterRequest().copy(projectName = "Uppercase", stack = FutureStack, implementation = Netty)
 
     // when
     val rootEx = intercept[SttpClientException](requests.requestZip(request))
@@ -223,7 +223,7 @@ object StarterApiTest {
   val validSbtRequest: StarterRequest = StarterRequest(
     projectName = "projectname",
     groupId = "com.softwaremill",
-    effect = FutureEffect,
+    stack = FutureStack,
     implementation = ServerImplementationRequest.Netty,
     addDocumentation = true,
     addMetrics = false,

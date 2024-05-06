@@ -3,7 +3,7 @@ import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generato
 import {
   Builder,
   EffectImplementation,
-  EffectType,
+  StackType,
   JSONImplementation,
   ScalaVersion,
   StarterRequest,
@@ -21,7 +21,7 @@ export const useInitialData: () => StarterRequest = () => {
   return {
     projectName: name,
     groupId: 'com.softwaremill',
-    effect: EffectType.IO,
+    stack: StackType.IO,
     implementation: EffectImplementation.Http4s,
     addDocumentation: false,
     addMetrics: false,

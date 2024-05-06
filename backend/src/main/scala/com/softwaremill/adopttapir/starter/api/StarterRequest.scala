@@ -9,7 +9,7 @@ import sttp.tapir.Schema
 case class StarterRequest(
     projectName: String,
     groupId: String,
-    effect: EffectRequest,
+    stack: StackRequest,
     implementation: ServerImplementationRequest,
     addDocumentation: Boolean,
     addMetrics: Boolean,
@@ -25,31 +25,31 @@ case class StarterRequest(
   * JsonTaggedAdt one liners. But if this improves with higher versions of circe, it would be advisable to fall back to circe in order to
   * reduce dependencies.
   */
-enum EffectRequest(val toModel: ServerEffect, val legalServerImplementations: Set[ServerImplementation])
+enum StackRequest(val toModel: ServerStack, val legalServerImplementations: Set[ServerImplementation])
     derives JsonTaggedAdt.PureEncoder,
       JsonTaggedAdt.PureDecoder,
       Schema:
-  case FutureEffect
-      extends EffectRequest(
-        ServerEffect.FutureEffect,
+  case FutureStack
+      extends StackRequest(
+        ServerStack.FutureStack,
         legalServerImplementations = Set(
           ServerImplementation.Netty,
           ServerImplementation.VertX,
           ServerImplementation.Pekko
         )
       )
-  case IOEffect
-      extends EffectRequest(
-        ServerEffect.IOEffect,
+  case IOStack
+      extends StackRequest(
+        ServerStack.IOStack,
         legalServerImplementations = Set(
           ServerImplementation.Netty,
           ServerImplementation.VertX,
           ServerImplementation.Http4s
         )
       )
-  case ZIOEffect
-      extends EffectRequest(
-        ServerEffect.ZIOEffect,
+  case ZIOStack
+      extends StackRequest(
+        ServerStack.ZIOStack,
         legalServerImplementations = Set(
           ServerImplementation.Netty,
           ServerImplementation.VertX,
@@ -57,9 +57,9 @@ enum EffectRequest(val toModel: ServerEffect, val legalServerImplementations: Se
           ServerImplementation.ZIOHttp
         )
       )
-  case Sync
-      extends EffectRequest(
-        ServerEffect.Sync,
+  case OxStack
+      extends StackRequest(
+        ServerStack.OxStack,
         legalServerImplementations = Set(
           ServerImplementation.Netty
         )

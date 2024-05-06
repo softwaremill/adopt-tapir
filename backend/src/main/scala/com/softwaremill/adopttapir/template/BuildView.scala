@@ -1,7 +1,7 @@
 package com.softwaremill.adopttapir.template
 
 import com.softwaremill.adopttapir.starter.*
-import com.softwaremill.adopttapir.starter.ServerEffect.{FutureEffect, IOEffect, Sync, ZIOEffect}
+import com.softwaremill.adopttapir.starter.ServerStack.{FutureStack, IOStack, OxStack, ZIOStack}
 import com.softwaremill.adopttapir.starter.ServerImplementation.{Http4s, Netty, Pekko, VertX, ZIOHttp}
 import com.softwaremill.adopttapir.template.Dependency.{JavaDependency, ScalaDependency, ScalaTestDependency, constantTapirVersion}
 import com.softwaremill.adopttapir.version.TemplateDependencyInfo
@@ -22,13 +22,12 @@ abstract class BuildView:
 
   def getAllTestDependencies(starterDetails: StarterDetails): List[Dependency] =
     ScalaTestDependency("com.softwaremill.sttp.tapir", "tapir-sttp-stub-server", getTapirVersion()) ::
-      getTestDependencies(starterDetails.serverEffect) ++ getJsonTestDependencies(starterDetails)
+      getTestDependencies(starterDetails.serverStack) ++ getJsonTestDependencies(starterDetails)
 
   protected def getTapirVersion(): String
 
-  private def getTestDependencies(effect: ServerEffect): List[ScalaTestDependency] =
-    if effect != ServerEffect.ZIOEffect then
-      List(ScalaTestDependency("org.scalatest", "scalatest", TemplateDependencyInfo.scalaTestVersion))
+  private def getTestDependencies(stack: ServerStack): List[ScalaTestDependency] =
+    if stack != ServerStack.ZIOStack then List(ScalaTestDependency("org.scalatest", "scalatest", TemplateDependencyInfo.scalaTestVersion))
     else
       List(
         ScalaTestDependency("dev.zio", "zio-test", TemplateDependencyInfo.zioTestVersion),
@@ -110,17 +109,17 @@ abstract class BuildView:
 
   private def getHttpDependencies(starterDetails: StarterDetails): List[Dependency] =
     starterDetails match {
-      case ServerEffectAndImplementation(FutureEffect, Netty) => HttpDependencies.netty()
-      case ServerEffectAndImplementation(FutureEffect, VertX) => HttpDependencies.vertX()
-      case ServerEffectAndImplementation(FutureEffect, Pekko) => HttpDependencies.pekko()
-      case ServerEffectAndImplementation(IOEffect, Http4s)    => HttpDependencies.http4s()
-      case ServerEffectAndImplementation(IOEffect, Netty)     => HttpDependencies.ioNetty()
-      case ServerEffectAndImplementation(Sync, Netty)         => HttpDependencies.syncNetty()
-      case ServerEffectAndImplementation(IOEffect, VertX)     => HttpDependencies.ioVerteX()
-      case ServerEffectAndImplementation(ZIOEffect, Http4s)   => HttpDependencies.http4sZIO()
-      case ServerEffectAndImplementation(ZIOEffect, ZIOHttp)  => HttpDependencies.ZIOHttp()
-      case ServerEffectAndImplementation(ZIOEffect, VertX)    => HttpDependencies.ZIOVerteX()
-      case ServerEffectAndImplementation(ZIOEffect, Netty)    => HttpDependencies.ZIONetty()
+      case ServerStackAndImplementation(FutureStack, Netty) => HttpDependencies.netty()
+      case ServerStackAndImplementation(FutureStack, VertX) => HttpDependencies.vertX()
+      case ServerStackAndImplementation(FutureStack, Pekko) => HttpDependencies.pekko()
+      case ServerStackAndImplementation(IOStack, Http4s)    => HttpDependencies.http4s()
+      case ServerStackAndImplementation(IOStack, Netty)     => HttpDependencies.ioNetty()
+      case ServerStackAndImplementation(OxStack, Netty)     => HttpDependencies.syncNetty()
+      case ServerStackAndImplementation(IOStack, VertX)     => HttpDependencies.ioVerteX()
+      case ServerStackAndImplementation(ZIOStack, Http4s)   => HttpDependencies.http4sZIO()
+      case ServerStackAndImplementation(ZIOStack, ZIOHttp)  => HttpDependencies.ZIOHttp()
+      case ServerStackAndImplementation(ZIOStack, VertX)    => HttpDependencies.ZIOVerteX()
+      case ServerStackAndImplementation(ZIOStack, Netty)    => HttpDependencies.ZIONetty()
       case other: StarterDetails => throw new UnsupportedOperationException(s"Cannot pick dependencies for $other")
     }
 
