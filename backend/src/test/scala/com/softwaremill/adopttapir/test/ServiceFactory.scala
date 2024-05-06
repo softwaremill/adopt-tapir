@@ -11,7 +11,8 @@ import java.time.LocalDateTime
 import scala.annotation.tailrec
 import scala.collection.mutable
 import scala.concurrent.TimeoutException
-import scala.concurrent.duration.{DurationInt, FiniteDuration}
+import scala.concurrent.duration.DurationInt
+import scala.concurrent.duration.FiniteDuration
 import scala.util.matching.Regex
 
 object ServiceTimeouts:

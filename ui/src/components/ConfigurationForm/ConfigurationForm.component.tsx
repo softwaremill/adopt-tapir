@@ -22,7 +22,6 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 import {
   BUILDER_OPTIONS,
-  EFFECT_TYPE_OPTIONS,
   ENDPOINTS_OPTIONS,
   SCALA_VERSION_OPTIONS,
   starterValidationSchema,
@@ -30,8 +29,10 @@ import {
 import {
   getAvailableEffectImplementations,
   getEffectImplementationOptions,
+  getEffectTypeOptions,
   getJSONImplementationOptions,
   mapEffectTypeToJSONImplementation,
+  mapScalaVersionToEffectType,
   mapScalaVersionToJSONImplementation,
 } from './ConfigurationForm.helpers';
 import { useNavigate } from 'react-router-dom';
@@ -120,6 +121,13 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
     'scalaVersion',
   ]);
   const isEffectImplementationSelectable = Boolean(effectType) && Boolean(scalaVersion);
+
+  useEffect(() => {
+    // NOTE: reset effect type field value upon scala version change
+    if (effectType && scalaVersion && !mapScalaVersionToEffectType(scalaVersion).includes(effectType)) {
+      form.resetField('effect');
+    }
+  }, [form, effectType, effectImplementation, scalaVersion]);
 
   useEffect(() => {
     // NOTE: reset effect implementation field value upon effect type or scala version change
@@ -236,7 +244,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
 
           <fieldset className={classes.groupedInputs}>
             <legend className={classes.groupLegend}>Server</legend>
-            <FormSelect name="effect" label="Effect type" options={EFFECT_TYPE_OPTIONS} />
+            <FormSelect name="effect" label="Effect type" options={getEffectTypeOptions(scalaVersion)} />
             <div className={classes.inputWithAddon}>
               <FormSelect
                 name="implementation"

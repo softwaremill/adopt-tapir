@@ -93,6 +93,7 @@ describe('configuration consts', () => {
         { effectType: EffectType.Future, expected: true },
         { effectType: EffectType.IO, expected: true },
         { effectType: EffectType.ZIO, expected: true },
+        { effectType: EffectType.Sync, expected: true },
         { effectType: 'notValidEffect' as EffectType, expected: false },
         { effectType: '' as EffectType, expected: false },
         { effectType: undefined, expected: false },
@@ -156,6 +157,11 @@ describe('configuration consts', () => {
         [EffectType.IO, ScalaVersion.Scala3, EffectImplementation.Netty, true],
         [EffectType.IO, ScalaVersion.Scala3, EffectImplementation.Http4s, true],
         [EffectType.IO, ScalaVersion.Scala3, EffectImplementation.ZIOHttp, false],
+
+        [EffectType.Sync, ScalaVersion.Scala3, EffectImplementation.Netty, true],
+        [EffectType.Sync, ScalaVersion.Scala3, EffectImplementation.Http4s, false],
+        [EffectType.Sync, ScalaVersion.Scala3, EffectImplementation.ZIOHttp, false],
+        [EffectType.Sync, ScalaVersion.Scala3, EffectImplementation.Pekko, false],
 
         [EffectType.ZIO, ScalaVersion.Scala3, EffectImplementation.Netty, true],
         [EffectType.ZIO, ScalaVersion.Scala3, EffectImplementation.Http4s, true],
@@ -242,6 +248,13 @@ describe('configuration consts', () => {
         [ScalaVersion.Scala3, EffectType.IO, JSONImplementation.Jsoniter, true],
         [ScalaVersion.Scala3, EffectType.IO, JSONImplementation.ZIOJson, false],
         [ScalaVersion.Scala3, EffectType.IO, JSONImplementation.Pickler, true],
+
+        [ScalaVersion.Scala3, EffectType.Sync, JSONImplementation.No, true],
+        [ScalaVersion.Scala3, EffectType.Sync, JSONImplementation.Circe, true],
+        [ScalaVersion.Scala3, EffectType.Sync, JSONImplementation.UPickle, true],
+        [ScalaVersion.Scala3, EffectType.Sync, JSONImplementation.Jsoniter, true],
+        [ScalaVersion.Scala3, EffectType.Sync, JSONImplementation.ZIOJson, false],
+        [ScalaVersion.Scala3, EffectType.Sync, JSONImplementation.Pickler, true],
 
         [ScalaVersion.Scala3, EffectType.ZIO, JSONImplementation.No, true],
         [ScalaVersion.Scala3, EffectType.ZIO, JSONImplementation.Circe, true],

@@ -1,5 +1,5 @@
 import { EffectImplementation, EffectType, JSONImplementation, ScalaVersion } from 'api/starter';
-import { EFFECT_IMPLEMENTATIONS_OPTIONS, JSON_OUTPUT_OPTIONS } from './ConfigurationForm.consts';
+import { EFFECT_IMPLEMENTATIONS_OPTIONS, EFFECT_TYPE_OPTIONS, JSON_OUTPUT_OPTIONS } from './ConfigurationForm.consts';
 import type { FormSelectOption } from '../FormSelect';
 import type { FormRadioOption } from '../FormRadioGroup';
 
@@ -10,12 +10,18 @@ import type { FormRadioOption } from '../FormRadioGroup';
 const effectTypeImplementationMap: Record<EffectType, EffectImplementation[]> = {
   [EffectType.Future]: [EffectImplementation.Netty, EffectImplementation.VertX, EffectImplementation.Pekko],
   [EffectType.IO]: [EffectImplementation.Http4s, EffectImplementation.Netty, EffectImplementation.VertX],
+  [EffectType.Sync]: [EffectImplementation.Netty],
   [EffectType.ZIO]: [
     EffectImplementation.Netty,
     EffectImplementation.Http4s,
     EffectImplementation.ZIOHttp,
     EffectImplementation.VertX,
   ],
+};
+
+const versionTypeEffectImplementationMap: Record<ScalaVersion, EffectType[]> = {
+  [ScalaVersion.Scala2]: [EffectType.Future, EffectType.IO, EffectType.ZIO],
+  [ScalaVersion.Scala3]: [EffectType.Future, EffectType.IO, EffectType.Sync, EffectType.ZIO],
 };
 
 const mapEffectTypeToEffectImplementation = (effectType: EffectType): EffectImplementation[] => {
@@ -25,6 +31,19 @@ const mapEffectTypeToEffectImplementation = (effectType: EffectType): EffectImpl
 export const getAvailableEffectImplementations = (effectType: EffectType): EffectImplementation[] => {
   const availableEffectImplementations = mapEffectTypeToEffectImplementation(effectType);
   return availableEffectImplementations === undefined ? [] : availableEffectImplementations;
+};
+
+export const mapScalaVersionToEffectType = (scalaVersion: ScalaVersion): EffectType[] => {
+  return versionTypeEffectImplementationMap[scalaVersion];
+};
+
+const getEffectTypes = (scalaVersion?: ScalaVersion): EffectType[] => {
+  return scalaVersion ? mapScalaVersionToEffectType(scalaVersion) : Object.values(EffectType);
+};
+
+export const getEffectTypeOptions = (scalaVersion?: ScalaVersion): FormSelectOption[] => {
+  const effectTypes = getEffectTypes(scalaVersion);
+  return EFFECT_TYPE_OPTIONS.filter(({ value }) => effectTypes.includes(value));
 };
 
 export const getEffectImplementationOptions = (effectType: EffectType): FormSelectOption[] => {
@@ -47,6 +66,7 @@ const commonJSONImplementations: JSONImplementation[] = [
 const effectTypeJsonImplementationMap: Record<EffectType, JSONImplementation[]> = {
   [EffectType.Future]: commonJSONImplementations,
   [EffectType.IO]: commonJSONImplementations,
+  [EffectType.Sync]: commonJSONImplementations,
   [EffectType.ZIO]: commonJSONImplementations.concat(JSONImplementation.ZIOJson),
 };
 

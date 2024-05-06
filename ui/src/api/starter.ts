@@ -5,6 +5,7 @@ export enum EffectType {
   Future = 'FutureEffect',
   IO = 'IOEffect',
   ZIO = 'ZIOEffect',
+  Sync = 'Sync',
 }
 
 export enum EffectImplementation {

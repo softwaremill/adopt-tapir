@@ -7,7 +7,7 @@ import sbtbuildinfo.{BuildInfoKey, BuildInfoOption}
 import scala.sys.process.Process
 import scala.util.Try
 
-val scala2Version = "2.13.10"
+val scala2Version = "2.13.14"
 val scala3Version = "3.3.3"
 
 val tapirVersion = "1.10.6"
@@ -258,6 +258,7 @@ lazy val templateDependencies: Project = project
       "com.softwaremill.sttp.tapir" %% "tapir-netty-server" % tapirVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-cats" % tapirVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-netty-server-cats" % tapirVersion % Provided,
+      "com.softwaremill.sttp.tapir" %% "tapir-netty-server-sync" % tapirVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % tapirVersion % Provided,
       "org.http4s" %% "http4s-ember-server" % http4sEmberServerVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-http4s-server-zio" % tapirVersion % Provided,

@@ -47,7 +47,7 @@ sealed trait FormValidator:
     (
       validateProjectName(r.projectName),
       validateGroupId(r.groupId),
-      validateEffectWithImplementation(r.effect, r.implementation),
+      validateEffectWithImplementation(r.effect, r.implementation, r.scalaVersion),
       validateMetrics(r.effect, r.implementation, r.addMetrics),
       validateJson(r.effect, r.scalaVersion, r.json)
     ).mapN { case (projectName, groupId, (effect, serverImplementation), addMetrics, json) =>
@@ -77,10 +77,13 @@ sealed trait FormValidator:
 
   private def validateEffectWithImplementation(
       effect: EffectRequest,
-      serverImplementation: ServerImplementationRequest
+      serverImplementation: ServerImplementationRequest,
+      scalaVersionRequest: ScalaVersionRequest
   ): ValidatedNec[RequestValidation, (EffectRequest, ServerImplementationRequest)] =
     Validated.condNec(
-      effect.legalServerImplementations.contains(serverImplementation.toModel),
+      effect.legalServerImplementations.contains(
+        serverImplementation.toModel
+      ) && !(effect == EffectRequest.Sync && scalaVersionRequest == ScalaVersionRequest.Scala2),
       (effect, serverImplementation),
       RequestValidation.EffectWithIllegalServerImplementation(effect, serverImplementation)
     )

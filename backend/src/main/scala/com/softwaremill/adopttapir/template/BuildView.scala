@@ -1,7 +1,7 @@
 package com.softwaremill.adopttapir.template
 
 import com.softwaremill.adopttapir.starter.*
-import com.softwaremill.adopttapir.starter.ServerEffect.{FutureEffect, IOEffect, ZIOEffect}
+import com.softwaremill.adopttapir.starter.ServerEffect.{FutureEffect, IOEffect, Sync, ZIOEffect}
 import com.softwaremill.adopttapir.starter.ServerImplementation.{Http4s, Netty, Pekko, VertX, ZIOHttp}
 import com.softwaremill.adopttapir.template.Dependency.{JavaDependency, ScalaDependency, ScalaTestDependency, constantTapirVersion}
 import com.softwaremill.adopttapir.version.TemplateDependencyInfo
@@ -115,6 +115,7 @@ abstract class BuildView:
       case ServerEffectAndImplementation(FutureEffect, Pekko) => HttpDependencies.pekko()
       case ServerEffectAndImplementation(IOEffect, Http4s)    => HttpDependencies.http4s()
       case ServerEffectAndImplementation(IOEffect, Netty)     => HttpDependencies.ioNetty()
+      case ServerEffectAndImplementation(Sync, Netty)         => HttpDependencies.syncNetty()
       case ServerEffectAndImplementation(IOEffect, VertX)     => HttpDependencies.ioVerteX()
       case ServerEffectAndImplementation(ZIOEffect, Http4s)   => HttpDependencies.http4sZIO()
       case ServerEffectAndImplementation(ZIOEffect, ZIOHttp)  => HttpDependencies.ZIOHttp()
@@ -132,6 +133,11 @@ abstract class BuildView:
       List(
         ScalaDependency("com.softwaremill.sttp.tapir", "tapir-cats-effect", getTapirVersion()),
         ScalaDependency("com.softwaremill.sttp.tapir", "tapir-netty-server-cats", getTapirVersion())
+      )
+
+    def syncNetty(): List[ScalaDependency] =
+      List(
+        ScalaDependency("com.softwaremill.sttp.tapir", "tapir-netty-server-sync", getTapirVersion())
       )
 
     def http4s(): List[ScalaDependency] = List(

@@ -11,6 +11,7 @@ object EndpointsView:
       case ServerEffect.FutureEffect => HelloServerEndpoint.future
       case ServerEffect.IOEffect     => HelloServerEndpoint.io
       case ServerEffect.ZIOEffect    => HelloServerEndpoint.zio
+      case ServerEffect.Sync         => HelloServerEndpoint.sync
     }
 
     helloServerCode.prependBody(INDENT)
@@ -26,6 +27,16 @@ object EndpointsView:
       Set(
         Import("scala.concurrent.Future"),
         Import("sttp.tapir.server.ServerEndpoint")
+      )
+    )
+
+    val sync: Code = Code(
+      s"""${INDENT}val $helloServerEndpoint: ServerEndpoint[Any, Id] = $helloEndpoint.serverLogicSuccess(user =>
+         |  s"Hello $${user.name}"
+         |)""".stripMargin,
+      Set(
+        Import("sttp.tapir.server.ServerEndpoint"),
+        Import("sttp.tapir.server.netty.sync.Id")
       )
     )
 
@@ -164,6 +175,7 @@ object EndpointsView:
     private def prepareBookListingServerLogic(starterDetails: StarterDetails): Code =
       val (serverKind, pureEffectFn) = starterDetails.serverEffect match {
         case ServerEffect.FutureEffect => ("ServerEndpoint[Any, Future]", "Future.successful")
+        case ServerEffect.Sync         => ("ServerEndpoint[Any, Id]", "")
         case ServerEffect.IOEffect     => ("ServerEndpoint[Any, IO]", "IO.pure")
         case ServerEffect.ZIOEffect    => ("ZServerEndpoint[Any, Any]", "ZIO.succeed")
       }
@@ -178,6 +190,7 @@ object EndpointsView:
   def getApiEndpoints(starterDetails: StarterDetails): Code =
     val serverKind = starterDetails.serverEffect match {
       case ServerEffect.FutureEffect => "List[ServerEndpoint[Any, Future]]"
+      case ServerEffect.Sync         => "List[ServerEndpoint[Any, Id]]"
       case ServerEffect.IOEffect     => "List[ServerEndpoint[Any, IO]]"
       case ServerEffect.ZIOEffect    => "List[ZServerEndpoint[Any, Any]]"
     }
@@ -231,6 +244,7 @@ object EndpointsView:
   private def serverEffectToEffectAndEndpoint(serverEffect: ServerEffect): (String, String) =
     serverEffect match {
       case ServerEffect.FutureEffect => ("Future", "ServerEndpoint[Any, Future]")
+      case ServerEffect.Sync         => ("Id", "ServerEndpoint[Any, Id]")
       case ServerEffect.IOEffect     => ("IO", "ServerEndpoint[Any, IO]")
       case ServerEffect.ZIOEffect    => ("Task", "ZServerEndpoint[Any, Any]")
     }
@@ -244,6 +258,7 @@ object EndpointsView:
   def getAllEndpoints(starterDetails: StarterDetails): Code =
     val serverKind = starterDetails.serverEffect match {
       case ServerEffect.FutureEffect => "List[ServerEndpoint[Any, Future]]"
+      case ServerEffect.Sync         => "List[ServerEndpoint[Any, Id]]"
       case ServerEffect.IOEffect     => "List[ServerEndpoint[Any, IO]]"
       case ServerEffect.ZIOEffect    => "List[ZServerEndpoint[Any, Any]]"
     }

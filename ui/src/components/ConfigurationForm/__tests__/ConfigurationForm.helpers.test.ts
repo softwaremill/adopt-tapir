@@ -41,6 +41,7 @@ describe('configuration form helpers', () => {
         ScalaVersion.Scala3,
         [EffectImplementation.Http4s, EffectImplementation.Netty, EffectImplementation.VertX],
       ],
+      [EffectType.Sync, ScalaVersion.Scala3, [EffectImplementation.Netty]],
       [
         EffectType.ZIO,
         ScalaVersion.Scala3,
@@ -155,6 +156,16 @@ describe('configuration form helpers', () => {
           {
             label: 'Vert.X',
             value: EffectImplementation.VertX,
+          },
+        ],
+      ],
+      [
+        EffectType.Sync,
+        ScalaVersion.Scala3,
+        [
+          {
+            label: 'Netty',
+            value: EffectImplementation.Netty,
           },
         ],
       ],
@@ -297,6 +308,32 @@ describe('configuration form helpers', () => {
       [
         ScalaVersion.Scala3,
         EffectType.IO,
+        [
+          {
+            label: "don't add",
+            value: JSONImplementation.No,
+          },
+          {
+            label: 'circe',
+            value: JSONImplementation.Circe,
+          },
+          {
+            label: 'µPickle',
+            value: JSONImplementation.UPickle,
+          },
+          {
+            label: 'pickler',
+            value: JSONImplementation.Pickler,
+          },
+          {
+            label: 'jsoniter',
+            value: JSONImplementation.Jsoniter,
+          },
+        ],
+      ],
+      [
+        ScalaVersion.Scala3,
+        EffectType.Sync,
         [
           {
             label: "don't add",

@@ -46,10 +46,12 @@ jobs:
       matrix:
         scala: [ "Scala2", "Scala3" ]
         json: [ "No", "Circe", "UPickle", "Jsoniter", "ZIOJson", "Pickler" ]
+        effect: [ "Sync", "FutureEffect", "IOEffect", "ZIOEffect" ]
         exclude:
           - scala: "Scala2"
             json: "Pickler"
-
+          - scala: "Scala2"
+            effect: "Sync"
     steps:
       - name: Check-out repository
         id: repo-checkout
@@ -61,7 +63,7 @@ jobs:
       - name: Set up scala-cli
         uses: VirtusLab/scala-cli-setup@v1
         with:
-          jvm: temurin:17
+          jvm: ${{ matrix.effect == 'Sync' && 'temurin:21' || 'temurin:17' }}
 
       - name: Cache SBT
         id: cache-sbt
@@ -73,8 +75,8 @@ jobs:
             ~/.coursier
           key: ${{ runner.os }}-sbt-${{ hashFiles('**/build.sbt') }}
 
-      - name: Run integration tests for ${{ matrix.scala }} with ${{ matrix.json }} JSON support
-        run: SCALA=${{ matrix.scala }} JSON=${{ matrix.json }} IT_TESTS_THREADS_NO=1 sbt 'ItTest / test'
+      - name: Run integration tests for ${{ matrix.effect }}, ${{ matrix.scala }} with ${{ matrix.json }} JSON support
+        run: SCALA=${{ matrix.scala }} JSON=${{ matrix.json }} EFFECT=${{ matrix.effect }} IT_TESTS_THREADS_NO=1 sbt 'ItTest / test'
 
   verify_docker_image_build:
     if: github.event_name == 'pull_request' && github.ref != 'refs/heads/main'
@@ -88,11 +90,11 @@ jobs:
         id: repo-checkout
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17 with sbt cache
+      - name: Set up JDK 21 with sbt cache
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: 17
+          java-version: 21
           cache: 'sbt'
 
       - name: Build docker image locally
@@ -109,12 +111,12 @@ jobs:
         id: repo-checkout
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         id: jdk-setup
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: 17
+          java-version: 21
           cache: 'sbt'
 
       - name: Cache SBT
