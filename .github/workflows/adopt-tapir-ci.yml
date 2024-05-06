@@ -63,7 +63,7 @@ jobs:
       - name: Set up scala-cli
         uses: VirtusLab/scala-cli-setup@v1
         with:
-          jvm: ${{ matrix.effect == 'Sync' && 'temurin:21' || 'temurin:17' }}
+          jvm: ${{ matrix.stack == 'OxStack' && 'temurin:21' || 'temurin:17' }}
 
       - name: Cache SBT
         id: cache-sbt
