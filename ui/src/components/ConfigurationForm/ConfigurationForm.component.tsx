@@ -244,10 +244,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
 
           <fieldset className={classes.groupedInputs}>
             <legend className={classes.groupLegend}>Server</legend>
-            <FormSelect
-              name="effect"
-              label="Effect type"
-              options={ getEffectTypeOptions(scalaVersion) } />
+            <FormSelect name="effect" label="Effect type" options={getEffectTypeOptions(scalaVersion)} />
             <div className={classes.inputWithAddon}>
               <FormSelect
                 name="implementation"
