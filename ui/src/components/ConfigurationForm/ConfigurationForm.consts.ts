@@ -38,7 +38,7 @@ export const STACK_TYPE_OPTIONS: FormSelectOption<StackType>[] = [
   },
   {
     label: 'Direct-style (Ox)',
-    value: StackType.Sync,
+    value: StackType.Ox,
   },
   {
     label: 'Functional (ZIO)',
@@ -169,13 +169,13 @@ export const starterValidationSchema = yup
     implementation: yup
       .mixed()
       .test('effect implementation validation', (value: EffectImplementation, context) => {
-        const { effect } = context.parent as StarterRequest;
+        const { stack } = context.parent as StarterRequest;
 
-        const effectImplementations = getAvailableEffectImplementations(effect);
+        const effectImplementations = getAvailableEffectImplementations(stack);
 
         return (
           effectImplementations.includes(value) ||
-          context.createError({ message: getEffectImplementationFieldMessage(effect) })
+          context.createError({ message: getEffectImplementationFieldMessage(stack) })
         );
       })
       .required(REQUIRED_FIELD_MESSAGE),
