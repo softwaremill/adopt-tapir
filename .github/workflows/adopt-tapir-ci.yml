@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up JDK 17 with sbt cache
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: 17
@@ -67,7 +67,7 @@ jobs:
 
       - name: Cache SBT
         id: cache-sbt
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.sbt
@@ -91,7 +91,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up JDK 21 with sbt cache
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: 21
@@ -113,7 +113,7 @@ jobs:
 
       - name: Set up JDK 21
         id: jdk-setup
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: 21
@@ -121,7 +121,7 @@ jobs:
 
       - name: Cache SBT
         id: cache-sbt
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.sbt
