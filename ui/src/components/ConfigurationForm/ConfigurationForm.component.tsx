@@ -132,7 +132,12 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
   useEffect(() => {
     // NOTE: reset effect implementation field value upon effect type or scala version change
     if (stackType && !getAvailableEffectImplementations(stackType).includes(effectImplementation)) {
-      form.resetField('implementation');
+      let availableEffectImplementations = getAvailableEffectImplementations(stackType);
+      if (availableEffectImplementations.length > 0) {
+        form.setValue('implementation', availableEffectImplementations[0]);
+      } else {
+        form.resetField('implementation');
+      }
     }
   }, [form, stackType, effectImplementation, scalaVersion]);
 

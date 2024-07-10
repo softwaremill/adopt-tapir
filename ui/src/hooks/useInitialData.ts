@@ -21,12 +21,12 @@ export const useInitialData: () => StarterRequest = () => {
   return {
     projectName: name,
     groupId: 'com.softwaremill',
-    stack: StackType.IO,
-    implementation: EffectImplementation.Http4s,
+    stack: StackType.Ox,
+    implementation: EffectImplementation.Netty,
     addDocumentation: false,
     addMetrics: false,
     json: JSONImplementation.No,
     scalaVersion: ScalaVersion.Scala3,
-    builder: Builder.Sbt,
+    builder: Builder.ScalaCli,
   };
 };
