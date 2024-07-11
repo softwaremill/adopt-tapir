@@ -244,7 +244,7 @@ object EndpointsView:
   private def serverStackToEffectAndEndpoint(serverStack: ServerStack): (String, String) =
     serverStack match {
       case ServerStack.FutureStack => ("Future", "ServerEndpoint[Any, Future]")
-      case ServerStack.OxStack     => ("Id", "ServerEndpoint[Any, Identity]")
+      case ServerStack.OxStack     => ("Identity", "ServerEndpoint[Any, Identity]")
       case ServerStack.IOStack     => ("IO", "ServerEndpoint[Any, IO]")
       case ServerStack.ZIOStack    => ("Task", "ZServerEndpoint[Any, Any]")
     }
