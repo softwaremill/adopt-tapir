@@ -31,12 +31,12 @@ object EndpointsView:
     )
 
     val sync: Code = Code(
-      s"""${INDENT}val $helloServerEndpoint: ServerEndpoint[Any, Id] = $helloEndpoint.serverLogicSuccess(user =>
+      s"""${INDENT}val $helloServerEndpoint: ServerEndpoint[Any, Identity] = $helloEndpoint.serverLogicSuccess(user =>
          |  s"Hello $${user.name}"
          |)""".stripMargin,
       Set(
         Import("sttp.tapir.server.ServerEndpoint"),
-        Import("sttp.tapir.server.netty.sync.Id")
+        Import("sttp.shared.Identity")
       )
     )
 
@@ -175,7 +175,7 @@ object EndpointsView:
     private def prepareBookListingServerLogic(starterDetails: StarterDetails): Code =
       val (serverKind, pureEffectFn) = starterDetails.serverStack match {
         case ServerStack.FutureStack => ("ServerEndpoint[Any, Future]", "Future.successful")
-        case ServerStack.OxStack     => ("ServerEndpoint[Any, Id]", "")
+        case ServerStack.OxStack     => ("ServerEndpoint[Any, Identity]", "")
         case ServerStack.IOStack     => ("ServerEndpoint[Any, IO]", "IO.pure")
         case ServerStack.ZIOStack    => ("ZServerEndpoint[Any, Any]", "ZIO.succeed")
       }
@@ -190,7 +190,7 @@ object EndpointsView:
   def getApiEndpoints(starterDetails: StarterDetails): Code =
     val serverKind = starterDetails.serverStack match {
       case ServerStack.FutureStack => "List[ServerEndpoint[Any, Future]]"
-      case ServerStack.OxStack     => "List[ServerEndpoint[Any, Id]]"
+      case ServerStack.OxStack     => "List[ServerEndpoint[Any, Identity]]"
       case ServerStack.IOStack     => "List[ServerEndpoint[Any, IO]]"
       case ServerStack.ZIOStack    => "List[ZServerEndpoint[Any, Any]]"
     }
@@ -244,7 +244,7 @@ object EndpointsView:
   private def serverStackToEffectAndEndpoint(serverStack: ServerStack): (String, String) =
     serverStack match {
       case ServerStack.FutureStack => ("Future", "ServerEndpoint[Any, Future]")
-      case ServerStack.OxStack     => ("Id", "ServerEndpoint[Any, Id]")
+      case ServerStack.OxStack     => ("Identity", "ServerEndpoint[Any, Identity]")
       case ServerStack.IOStack     => ("IO", "ServerEndpoint[Any, IO]")
       case ServerStack.ZIOStack    => ("Task", "ZServerEndpoint[Any, Any]")
     }
@@ -258,7 +258,7 @@ object EndpointsView:
   def getAllEndpoints(starterDetails: StarterDetails): Code =
     val serverKind = starterDetails.serverStack match {
       case ServerStack.FutureStack => "List[ServerEndpoint[Any, Future]]"
-      case ServerStack.OxStack     => "List[ServerEndpoint[Any, Id]]"
+      case ServerStack.OxStack     => "List[ServerEndpoint[Any, Identity]]"
       case ServerStack.IOStack     => "List[ServerEndpoint[Any, IO]]"
       case ServerStack.ZIOStack    => "List[ZServerEndpoint[Any, Any]]"
     }
