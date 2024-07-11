@@ -14,7 +14,7 @@ val tapirVersion = "1.10.6"
 
 val http4sEmberServerVersion = "0.23.27"
 val http4sCirceVersion = "0.23.27"
-val circeVersion = "0.14.7"
+val circeVersion = "0.14.9"
 val circeGenericsExtrasVersion = "0.14.3"
 val sttpVersion = "3.9.6"
 val prometheusVersion = "0.16.0"
@@ -23,6 +23,8 @@ val scalaLoggingVersion = "3.9.5"
 val logbackClassicVersion = "1.5.6"
 val scalaTestVersion = "3.2.19"
 val plokhotnyukJsoniterVersion = "2.28.5"
+val scalaTestVersion = "3.2.19"
+val plokhotnyukJsoniterVersion = "2.30.5"
 val zioTestVersion = "2.0.13"
 
 val httpDependencies = Seq(
