@@ -31,7 +31,7 @@ object EndpointsView:
     )
 
     val sync: Code = Code(
-      s"""${INDENT}val $helloServerEndpoint: ServerEndpoint[Any, Identity] = $helloEndpoint.serverLogicSuccess(user =>
+      s"""${INDENT}val $helloServerEndpoint: ServerEndpoint[Any, Identity] = $helloEndpoint.handleSuccess(user =>
          |  s"Hello $${user.name}"
          |)""".stripMargin,
       Set(
@@ -174,14 +174,18 @@ object EndpointsView:
 
     private def prepareBookListingServerLogic(starterDetails: StarterDetails): Code =
       val (serverKind, pureEffectFn) = starterDetails.serverStack match {
-        case ServerStack.FutureStack => ("ServerEndpoint[Any, Future]", "Future.successful")
-        case ServerStack.OxStack     => ("ServerEndpoint[Any, Identity]", "")
-        case ServerStack.IOStack     => ("ServerEndpoint[Any, IO]", "IO.pure")
-        case ServerStack.ZIOStack    => ("ZServerEndpoint[Any, Any]", "ZIO.succeed")
+        case ServerStack.FutureStack => ("ServerEndpoint[Any, Future]", Some("Future.successful"))
+        case ServerStack.OxStack     => ("ServerEndpoint[Any, Identity]", None)
+        case ServerStack.IOStack     => ("ServerEndpoint[Any, IO]", Some("IO.pure"))
+        case ServerStack.ZIOStack    => ("ZServerEndpoint[Any, Any]", Some("ZIO.succeed"))
       }
 
       // Imports silently taken from helloServerEndpoint
-      Code(s"val $booksListingServerEndpoint: $serverKind = $bookListing.serverLogicSuccess(_ => $pureEffectFn(Library.books))")
+      val handler = pureEffectFn match
+        case Some(fn) => s"serverLogicSuccess(_ => $pureEffectFn(Library.books))"
+        case None     => "handleSuccess(_ => Library.books)"
+
+      Code(s"val $booksListingServerEndpoint: $serverKind = $bookListing.$handler")
 
   def getJsonLibrary(starterDetails: StarterDetails): Code =
     if starterDetails.jsonImplementation == JsonImplementation.WithoutJson then Code.empty
