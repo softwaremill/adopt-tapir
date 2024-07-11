@@ -182,7 +182,7 @@ object EndpointsView:
 
       // Imports silently taken from helloServerEndpoint
       val handler = pureEffectFn match
-        case Some(fn) => s"serverLogicSuccess(_ => $pureEffectFn(Library.books))"
+        case Some(fn) => s"serverLogicSuccess(_ => $fn(Library.books))"
         case None     => "handleSuccess(_ => Library.books)"
 
       Code(s"val $booksListingServerEndpoint: $serverKind = $bookListing.$handler")
