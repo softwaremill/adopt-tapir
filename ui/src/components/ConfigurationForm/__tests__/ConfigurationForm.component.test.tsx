@@ -30,7 +30,7 @@ describe('ConfigurationForm component', () => {
     await user.click(within(screen.getByRole('radiogroup', { name: /Scala version/i })).getByText('2'));
 
     await user.click(screen.getByRole('button', { name: /Server implementation/i }));
-    await user.click(screen.getByText('Netty'));
+    await user.click(screen.getByText('Vert.X'));
 
     await user.click(within(screen.getByRole('radiogroup', { name: /Build tool/i })).getByText('Scala CLI'));
 
@@ -65,7 +65,7 @@ describe('ConfigurationForm component', () => {
         stack: 'FutureStack',
         json: 'Circe',
         addDocumentation: true,
-        implementation: 'Netty',
+        implementation: 'VertX',
         groupId: 'com.softwaremill',
         projectName: 'test-project',
       }),
@@ -89,10 +89,7 @@ describe('ConfigurationForm component', () => {
     await user.type(screen.getByRole('textbox', { name: /Project name/i }), 'test-project');
     await user.type(screen.getByRole('textbox', { name: /Group ID/i }), 'com.softwaremill');
 
-    await user.click(screen.getByRole('button', { name: /Stack/i }));
-    await user.click(screen.getByText('Future'));
-
-    await user.click(within(screen.getByRole('radiogroup', { name: /Scala version/i })).getByText('3'));
+    await user.click(within(screen.getByRole('radiogroup', { name: /Scala version/i })).getByText('2'));
 
     await user.click(
       within(
@@ -133,7 +130,7 @@ describe('ConfigurationForm component', () => {
     await user.click(within(screen.getByRole('radiogroup', { name: /Scala version/i })).getByText('2'));
 
     await user.click(screen.getByRole('button', { name: /Server implementation/i }));
-    await user.click(screen.getByText('Netty'));
+    await user.click(screen.getByText('Vert.X'));
 
     await user.click(within(screen.getByRole('radiogroup', { name: /Build tool/i })).getByText('Scala CLI'));
 
@@ -186,8 +183,8 @@ describe('ConfigurationForm component', () => {
     expect(screen.getByTestId('configuration-form')).toHaveFormValues({
       stack: 'FutureStack',
       scalaVersion: 'Scala3',
-      implementation: '',
       // default values below
+      implementation: 'Netty',
       groupId: 'com.softwaremill',
       addDocumentation: 'false',
       json: 'No',
@@ -221,7 +218,7 @@ describe('ConfigurationForm component', () => {
       json: 'No',
       // default values below
       scalaVersion: 'Scala3',
-      implementation: '',
+      implementation: 'Netty',
       groupId: 'com.softwaremill',
       addDocumentation: 'false',
       addMetrics: 'false',
@@ -238,6 +235,9 @@ describe('ConfigurationForm component', () => {
     );
 
     // when
+    await user.click(screen.getByRole('button', { name: /Stack/i }));
+    await user.click(screen.getByText('Functional (IO, cats-effect)'));
+
     await user.click(screen.getByRole('radiogroup', { name: /Scala version/i }));
     await user.click(screen.getByText('3'));
 
@@ -252,7 +252,7 @@ describe('ConfigurationForm component', () => {
       json: 'No',
       // default values below
       scalaVersion: 'Scala2',
-      implementation: 'Http4s',
+      implementation: 'Netty',
       groupId: 'com.softwaremill',
       addDocumentation: 'false',
       addMetrics: 'false',

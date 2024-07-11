@@ -37,7 +37,7 @@ export const STACK_TYPE_OPTIONS: FormSelectOption<StackType>[] = [
     value: StackType.IO,
   },
   {
-    label: 'Direct-style (Ox)',
+    label: 'Direct-style (Ox, JDK 21+)',
     value: StackType.Ox,
   },
   {
