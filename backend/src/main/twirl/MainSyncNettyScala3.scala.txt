@@ -4,15 +4,15 @@ package @groupId
 import ox.*
 import sttp.tapir.server.netty.sync.@if(addMetrics){{NettySyncServer, NettySyncServerOptions}}else{NettySyncServer}
 
-@@main def run(): Unit =
-  @if(addMetrics) {
-  val serverOptions = NettySyncServerOptions.customiseInterceptors
-    .metricsInterceptor(Endpoints.prometheusMetrics.metricsInterceptor())
-    .options
-  }
-  val port = sys.env.get("HTTP_PORT").flatMap(_.toIntOption).getOrElse(8080)
-  supervised {
+object Main extends OxApp.Simple:
+
+  def run(using Ox): Unit =
+    @if(addMetrics) {
+    val serverOptions = NettySyncServerOptions.customiseInterceptors
+      .metricsInterceptor(Endpoints.prometheusMetrics.metricsInterceptor())
+      .options
+    }
+    val port = sys.env.get("HTTP_PORT").flatMap(_.toIntOption).getOrElse(8080)
     val binding = useInScope(NettySyncServer(@if(addMetrics){serverOptions}).port(port).addEndpoints(Endpoints.all).start())(_.stop())
     println(s"@if(addDocumentation){Go to http://localhost:${binding.port}/docs to open SwaggerUI. }else{Server started at http://localhost:${binding.port}. }")
     never
-  }
