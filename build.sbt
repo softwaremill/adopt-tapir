@@ -13,7 +13,7 @@ val scala3Version = "3.4.3"
 val tapirVersion = "1.11.2"
 
 val http4sEmberServerVersion = "0.23.27"
-val http4sCirceVersion = "0.23.27"
+val http4sCirceVersion = "0.23.28"
 val circeVersion = "0.14.10"
 val circeGenericsExtrasVersion = "0.14.3"
 val sttpVersion = "3.9.8"
