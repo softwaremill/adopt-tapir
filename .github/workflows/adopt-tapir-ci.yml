@@ -10,8 +10,6 @@ on:
   release:
     types:
       - released
-    paths-ignore:
-      - "helm/**"
 
 jobs:
   verify_unit_tests_lint:
@@ -65,16 +63,6 @@ jobs:
         with:
           jvm: ${{ matrix.stack == 'OxStack' && 'temurin:21' || 'temurin:17' }}
 
-      - name: Cache SBT
-        id: cache-sbt
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.sbt
-            ~/.ivy2/cache
-            ~/.coursier
-          key: ${{ runner.os }}-sbt-${{ hashFiles('**/build.sbt') }}
-
       - name: Run integration tests for ${{ matrix.stack }}, ${{ matrix.scala }} with ${{ matrix.json }} JSON support
         run: SCALA=${{ matrix.scala }} JSON=${{ matrix.json }} STACK=${{ matrix.stack }} IT_TESTS_THREADS_NO=1 sbt 'ItTest / test'
 
@@ -118,16 +106,6 @@ jobs:
           distribution: 'temurin'
           java-version: 21
           cache: 'sbt'
-
-      - name: Cache SBT
-        id: cache-sbt
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.sbt
-            ~/.ivy2/cache
-            ~/.coursier
-          key: ${{ runner.os }}-sbt-${{ hashFiles('**/build.sbt') }}
 
       - name: Login to DockerHub
         uses: docker/login-action@v3
