@@ -10,19 +10,19 @@ import scala.util.Try
 val scala2Version = "2.13.14"
 val scala3Version = "3.5.0"
 
-val tapirVersion = "1.10.15"
+val tapirVersion = "1.11.4"
 
-val http4sEmberServerVersion = "0.23.27"
-val http4sCirceVersion = "0.23.27"
-val circeVersion = "0.14.9"
+val http4sEmberServerVersion = "0.23.28"
+val http4sCirceVersion = "0.23.28"
+val circeVersion = "0.14.10"
 val circeGenericsExtrasVersion = "0.14.3"
 val sttpVersion = "3.9.8"
 val prometheusVersion = "0.16.0"
 val scalafmtVersion = "3.8.3"
 val scalaLoggingVersion = "3.9.5"
-val logbackClassicVersion = "1.5.7"
+val logbackClassicVersion = "1.5.8"
 val scalaTestVersion = "3.2.19"
-val plokhotnyukJsoniterVersion = "2.30.7"
+val plokhotnyukJsoniterVersion = "2.30.11"
 val zioTestVersion = "2.0.13"
 
 val httpDependencies = Seq(
@@ -69,7 +69,7 @@ val configDependencies = Seq(
 val baseDependencies = Seq(
   "org.typelevel" %% "cats-effect" % "3.5.4",
   "com.softwaremill.common" %% "tagging" % "2.3.5",
-  "com.softwaremill.quicklens" %% "quicklens" % "1.9.7"
+  "com.softwaremill.quicklens" %% "quicklens" % "1.9.9"
 )
 
 val apiDocsDependencies = Seq(
@@ -82,8 +82,8 @@ val scalafmtStandaloneDependencies = Seq(
 
 val unitTestingStack = Seq(
   "org.scalatest" %% "scalatest" % scalaTestVersion % Test,
-  "org.scalacheck" %% "scalacheck" % "1.18.0" % Test,
-  "com.lihaoyi" %% "os-lib" % "0.10.4" % Test
+  "org.scalacheck" %% "scalacheck" % "1.18.1" % Test,
+  "com.lihaoyi" %% "os-lib" % "0.10.7" % Test
 )
 
 val commonDependencies =
