@@ -8,7 +8,7 @@ import scala.sys.process.Process
 import scala.util.Try
 
 val scala2Version = "2.13.14"
-val scala3Version = "3.5.0"
+val scala3Version = "3.5.1"
 
 val tapirVersion = "1.11.4"
 
