@@ -8,21 +8,21 @@ import scala.sys.process.Process
 import scala.util.Try
 
 val scala2Version = "2.13.14"
-val scala3Version = "3.4.2"
+val scala3Version = "3.5.0"
 
-val tapirVersion = "1.10.13"
+val tapirVersion = "1.11.4"
 
-val http4sEmberServerVersion = "0.23.27"
-val http4sCirceVersion = "0.23.27"
-val circeVersion = "0.14.9"
+val http4sEmberServerVersion = "0.23.28"
+val http4sCirceVersion = "0.23.28"
+val circeVersion = "0.14.10"
 val circeGenericsExtrasVersion = "0.14.3"
-val sttpVersion = "3.9.7"
+val sttpVersion = "3.9.8"
 val prometheusVersion = "0.16.0"
-val scalafmtVersion = "3.8.1"
+val scalafmtVersion = "3.8.3"
 val scalaLoggingVersion = "3.9.5"
-val logbackClassicVersion = "1.5.6"
+val logbackClassicVersion = "1.5.8"
 val scalaTestVersion = "3.2.19"
-val plokhotnyukJsoniterVersion = "2.30.6"
+val plokhotnyukJsoniterVersion = "2.30.11"
 val zioTestVersion = "2.0.13"
 
 val httpDependencies = Seq(
@@ -54,12 +54,12 @@ val loggingDependencies = Seq(
   "com.typesafe.scala-logging" %% "scala-logging" % scalaLoggingVersion,
   "ch.qos.logback" % "logback-classic" % logbackClassicVersion,
   "org.codehaus.janino" % "janino" % "3.1.12" % Runtime,
-  "net.logstash.logback" % "logstash-logback-encoder" % "7.4" % Runtime
+  "net.logstash.logback" % "logstash-logback-encoder" % "8.0" % Runtime
 )
 
 val fileDependencies = Seq(
   "com.github.pathikrit" %% "better-files" % "3.9.2" cross CrossVersion.for3Use2_13,
-  "org.apache.commons" % "commons-compress" % "1.26.2"
+  "org.apache.commons" % "commons-compress" % "1.27.1"
 )
 
 val configDependencies = Seq(
@@ -69,7 +69,7 @@ val configDependencies = Seq(
 val baseDependencies = Seq(
   "org.typelevel" %% "cats-effect" % "3.5.4",
   "com.softwaremill.common" %% "tagging" % "2.3.5",
-  "com.softwaremill.quicklens" %% "quicklens" % "1.9.7"
+  "com.softwaremill.quicklens" %% "quicklens" % "1.9.9"
 )
 
 val apiDocsDependencies = Seq(
@@ -82,8 +82,8 @@ val scalafmtStandaloneDependencies = Seq(
 
 val unitTestingStack = Seq(
   "org.scalatest" %% "scalatest" % scalaTestVersion % Test,
-  "org.scalacheck" %% "scalacheck" % "1.18.0" % Test,
-  "com.lihaoyi" %% "os-lib" % "0.10.2" % Test
+  "org.scalacheck" %% "scalacheck" % "1.18.1" % Test,
+  "com.lihaoyi" %% "os-lib" % "0.10.7" % Test
 )
 
 val commonDependencies =
