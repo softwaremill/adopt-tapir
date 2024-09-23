@@ -27,10 +27,9 @@ import scala.io.StdIn
   val bindingFuture = Http()
     .newServerAt("localhost", port)
     .bindFlow(route)
-    .map { binding =>
+    .map: binding =>
        println(s"@if(addDocumentation){Go to http://localhost:${binding.localAddress.getPort}/docs to open SwaggerUI.}else{Server started at http://localhost:${binding.localAddress.getPort}.} Press ENTER key to exit.")
        binding
-    }
 
   StdIn.readLine()
 

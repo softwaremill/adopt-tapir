@@ -18,7 +18,7 @@ object Main extends ZIOAppDefault:
     val server = vertx.createHttpServer()
     val router = Router.router(vertx)
 
-    (for {
+    (for
       serverStart <- ZIO
         .attempt {
           @if(addMetrics) {
@@ -28,14 +28,13 @@ object Main extends ZIOAppDefault:
             .options
           }
           Endpoints.all
-            .foreach(endpoint => {
+            .foreach: endpoint => 
               VertxZioServerInterpreter(@if(addMetrics) {serverOptions})
                 .route(endpoint)
                 .apply(router)
-            })
           server.requestHandler(router).listen(port)
         }.flatMap(_.asRIO)
       _ <- Console.printLine(s"@if(addDocumentation){Go to http://localhost:${serverStart.actualPort()}/docs to open SwaggerUI. }else{Server started at http://localhost:${serverStart.actualPort()}. }Press ENTER key to exit.")
       _ <- Console.readLine
-    } yield serverStart)
+    yield serverStart)
       .exitCode

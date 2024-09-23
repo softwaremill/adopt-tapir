@@ -19,7 +19,7 @@ object Main extends IOApp:
       NettyCatsServer
         .io()
     }
-      .use { server =>
+      .use: server =>
         for
           bind <- server
             .port(port)
@@ -30,5 +30,4 @@ object Main extends IOApp:
           _ <- IO.readLine
           _ <- bind.stop()
         yield bind
-      }
       .as(ExitCode.Success)
