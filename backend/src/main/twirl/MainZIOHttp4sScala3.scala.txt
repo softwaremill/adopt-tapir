@@ -35,9 +35,8 @@ object Main extends ZIOAppDefault:
       .withPort(port)
       .withHttpApp(Router("/" -> routes).orNotFound)
       .build
-      .use { server =>
-        for {
+      .use: server =>
+        for
           _ <- Console.printLine(s"@if(addDocumentation){Go to http://localhost:${server.address.getPort}/docs to open SwaggerUI. }else{Server started at http://localhost:${server.address.getPort}. }Press ENTER key to exit.")
           _ <- Console.readLine
-        } yield ()
-      }
+        yield ()

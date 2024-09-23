@@ -19,27 +19,24 @@ object Main extends IOApp:
 
     Dispatcher[IO]
       @if(addMetrics) {
-      .map(d => {
+      .map: d => 
         VertxCatsServerOptions
           .customiseInterceptors(d)
           .metricsInterceptor(Endpoints.prometheusMetrics.metricsInterceptor())
           .options
-      })
       }
-      .use { @if(addMetrics) {serverOptions} else {dispatcher} =>
-        for {
+      .use: @if(addMetrics) {serverOptions} else {dispatcher} =>
+        for
           bind <- IO.delay {
             Endpoints.all
-              .foreach(endpoint => {
+              .foreach: endpoint =>
                 VertxCatsServerInterpreter[IO](@if(addMetrics) {serverOptions} else {dispatcher})
                   .route(endpoint)
                   .apply(router)
-              })
             server.requestHandler(router).listen(port)
           }.flatMap(_.asF[IO])
           _ <- IO.println(s"@if(addDocumentation){Go to http://localhost:${bind.actualPort()}/docs to open SwaggerUI. }else{Server started at http://localhost:${bind.actualPort()}. }Press ENTER key to exit.")
           _ <- IO.readLine
           _ <- IO.delay(server.close).flatMap(_.asF[IO].void)
-        } yield bind
-      }
+        yield bind
       .as(ExitCode.Success)
