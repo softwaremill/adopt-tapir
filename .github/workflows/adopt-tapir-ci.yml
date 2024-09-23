@@ -90,7 +90,7 @@ jobs:
         run: sbt -Dsbt.task.timings=true docker:publishLocal
 
   deploy:
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && (github.event_name != 'pull_request'  || github.event.pull_request.merged == true)
     needs: [ verify_unit_tests_lint, verify_integration ]
     runs-on: ubuntu-22.04
 
