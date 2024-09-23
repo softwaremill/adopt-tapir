@@ -23,9 +23,9 @@ object Main extends ZIOAppDefault:
     }
     val server = NettyZioServer.apply(options).port(port)
 
-    for {
+    for
       bind <- server.addEndpoints(Endpoints.all).start()
       _ <- Console.printLine(s"@if(addDocumentation){Go to http://localhost:${bind.port}/docs to open SwaggerUI. }else{Server started at http://localhost:${bind.port}. }Press ENTER key to exit.")
       _ <- Console.readLine
       _ <- bind.stop()
-    } yield ExitCode.success
+    yield ExitCode.success
