@@ -136,8 +136,7 @@ abstract class BuildView:
 
     def syncNetty(): List[ScalaDependency] =
       List(
-        ScalaDependency("com.softwaremill.sttp.tapir", "tapir-netty-server-sync", getTapirVersion()),
-        ScalaDependency("com.softwaremill.ox", "core", "0.3.1") // TODO remove when Tapir catches up transitively
+        ScalaDependency("com.softwaremill.sttp.tapir", "tapir-netty-server-sync", getTapirVersion())
       )
 
     def http4s(): List[ScalaDependency] = List(
