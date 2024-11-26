@@ -90,7 +90,7 @@ jobs:
         run: sbt -Dsbt.task.timings=true docker:publishLocal
 
   deploy:
-    if: github.ref == 'refs/heads/main' && (github.event_name != 'pull_request'  || github.event.pull_request.merged == true)
+    if: github.ref == 'refs/heads/main' && github.repository == 'softwaremill/adopt-tapir'
     needs: [ verify_unit_tests_lint, verify_integration ]
     runs-on: ubuntu-22.04
 
