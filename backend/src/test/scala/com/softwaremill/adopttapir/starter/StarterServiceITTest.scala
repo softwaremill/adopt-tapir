@@ -138,9 +138,8 @@ case class GeneratedServiceUnderTest(serviceFactory: ServiceFactory, details: St
       tempDir <- createTempDirectory()
     yield (zipFile, tempDir))
       .use { case (zipFile, tempDir) =>
-        unzipFile(zipFile, tempDir, logger) >> spawnService(tempDir, details.projectName).use(service =>
-          getPortFromService(service, logger).flatMap(port => runTests(port, tests, logger))
-        )
+        unzipFile(zipFile, tempDir, logger) >> spawnService(tempDir, details.projectName)
+          .use(service => getPortFromService(service, logger).flatMap(port => runTests(port, tests, logger)))
       }
       .unsafeRunSync()
 
