@@ -28,4 +28,4 @@ For more details check the [Scala CLI commands](https://scala-cli.virtuslab.org/
 * [tapir documentation](https://tapir.softwaremill.com/en/latest/)
 * [tapir github](https://github.com/softwaremill/tapir)
 * [bootzooka: template microservice using tapir](https://softwaremill.github.io/bootzooka/)
-* [Scala CLI](ttps://scala-cli.virtuslab.org)
+* [Scala CLI](https://scala-cli.virtuslab.org)
