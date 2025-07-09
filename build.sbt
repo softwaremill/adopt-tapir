@@ -8,19 +8,19 @@ import scala.sys.process.Process
 import scala.util.Try
 
 val scala2Version = "2.13.14"
-val scala3Version = "3.6.4"
+val scala3Version = "3.7.1"
 
-val tapirVersion = "1.11.17"
+val tapirVersion = "1.11.35"
 
 val http4sEmberServerVersion = "0.23.30"
 val http4sCirceVersion = "0.23.30"
-val circeVersion = "0.14.10"
+val circeVersion = "0.14.14"
 val circeGenericsExtrasVersion = "0.14.3"
 val sttpVersion = "3.10.2"
 val prometheusVersion = "0.16.0"
-val scalafmtVersion = "3.9.4"
+val scalafmtVersion = "3.9.8"
 val scalaLoggingVersion = "3.9.5"
-val logbackClassicVersion = "1.5.17"
+val logbackClassicVersion = "1.5.18"
 val scalaTestVersion = "3.2.19"
 val plokhotnyukJsoniterVersion = "2.30.14"
 val zioTestVersion = "2.0.13"
@@ -54,7 +54,7 @@ val loggingDependencies = Seq(
   "com.typesafe.scala-logging" %% "scala-logging" % scalaLoggingVersion,
   "ch.qos.logback" % "logback-classic" % logbackClassicVersion,
   "org.codehaus.janino" % "janino" % "3.1.12" % Runtime,
-  "net.logstash.logback" % "logstash-logback-encoder" % "8.0" % Runtime
+  "net.logstash.logback" % "logstash-logback-encoder" % "8.1" % Runtime
 )
 
 val fileDependencies = Seq(
@@ -67,7 +67,7 @@ val configDependencies = Seq(
 )
 
 val baseDependencies = Seq(
-  "org.typelevel" %% "cats-effect" % "3.5.7",
+  "org.typelevel" %% "cats-effect" % "3.6.2",
   "com.softwaremill.common" %% "tagging" % "2.3.5",
   "com.softwaremill.quicklens" %% "quicklens" % "1.9.12"
 )
