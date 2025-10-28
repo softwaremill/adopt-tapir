@@ -142,7 +142,7 @@ lazy val fatJarSettings = Seq(
     case PathList(ps @ _*) if ps.last endsWith "io.netty.versions.properties"       => MergeStrategy.first
     case PathList(ps @ _*) if ps.last endsWith "pom.properties"                     => MergeStrategy.first
     case PathList(ps @ _*) if ps.last endsWith "scala-collection-compat.properties" => MergeStrategy.first
-    case x =>
+    case x                                                                          =>
       val oldStrategy = (assembly / assemblyMergeStrategy).value
       oldStrategy(x)
   }
