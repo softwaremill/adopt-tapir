@@ -121,12 +121,12 @@ jobs:
         run: sbt -Dsbt.task.timings=true backend/docker:publish
 
   label:
-    # only for PRs by github-actions[bot]
-    if: github.event.pull_request.user.login == 'github-actions[bot]'
+    # only for PRs by softwaremill-ci
+    if: github.event.pull_request.user.login == 'softwaremill-ci'
     uses: softwaremill/github-actions-workflows/.github/workflows/label.yml@main
 
   auto-merge:
-    # only for PRs by github-actions[bot]
-    if: github.event.pull_request.user.login == 'github-actions[bot]'
+    # only for PRs by softwaremill-ci
+    if: github.event.pull_request.user.login == 'softwaremill-ci'
     needs: [ verify_unit_tests_lint, verify_integration, verify_docker_image_build, label ]
     uses: softwaremill/github-actions-workflows/.github/workflows/auto-merge.yml@main
