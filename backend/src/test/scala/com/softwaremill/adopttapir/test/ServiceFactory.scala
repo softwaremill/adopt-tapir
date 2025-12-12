@@ -43,7 +43,13 @@ abstract class GeneratedService:
 
   @tailrec
   private def waitForPort(stdOut: mutable.StringBuilder): Integer =
-    if process.stdout.available() > 0 || process.isAlive() then {
+    val stdoutAvailable = process.stdout.available()
+    val processAlive = process.isAlive()
+    if !processAlive then {
+      -1
+    } else if stdoutAvailable > 0 then {
+      // Data is available - readLine() may block briefly waiting for a complete line, but that's acceptable
+      // The key is we never call readLine() when available() == 0, which would block indefinitely
       val line = process.stdout.readLine()
       if line == null then {
         -1
@@ -55,7 +61,11 @@ abstract class GeneratedService:
         }
       }
     } else {
-      -1
+      // Process is alive but no data available yet
+      // Wait briefly and retry - this prevents blocking on readLine() when scala-cli
+      // is checking dependencies or output is buffered (common in CI environments)
+      Thread.sleep(100)
+      waitForPort(stdOut)
     }
 
   def close(): IO[Unit] = IO.blocking {
