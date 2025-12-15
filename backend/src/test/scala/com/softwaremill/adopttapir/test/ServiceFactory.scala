@@ -37,10 +37,6 @@ abstract class GeneratedService:
       port
     }.timeoutAndForget(waitForPortTimeout)
       .onError(e =>
-        val errorTime = System.currentTimeMillis()
-        println(s"[DEBUG port] Error occurred at $errorTime: ${e.getClass.getSimpleName}, isTimeout=${e.isInstanceOf[TimeoutException]}")
-      )
-      .onError(e =>
         Assertions.fail(
           s"Detecting port of the running server failed ${
               if e.isInstanceOf[TimeoutException] then s"due to timeout [${waitForPortTimeout}s]"
