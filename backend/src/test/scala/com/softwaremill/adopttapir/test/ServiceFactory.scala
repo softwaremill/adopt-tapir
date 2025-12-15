@@ -18,7 +18,7 @@ import ExecutionContext.Implicits.global
 object ServiceTimeouts:
   val waitForScalaCliCompileAndUnitTest: FiniteDuration = 45.seconds
   val waitForPortTimeout: FiniteDuration = 90.seconds
-  val readLineTimeout: FiniteDuration = 2.seconds
+  val readLineTimeout: FiniteDuration = 10.seconds
 
 abstract class GeneratedService:
   import ServiceTimeouts.waitForPortTimeout
@@ -55,7 +55,12 @@ abstract class GeneratedService:
     println(s"[DEBUG waitForPort] iteration=$iteration, available=$stdoutAvailable, alive=$processAlive, time=$timestamp")
 
     if !processAlive then {
-      println(s"[DEBUG waitForPort] Process not alive, returning -1")
+      val exitCode = try {
+        Some(process.exitCode())
+      } catch {
+        case _: Exception => None
+      }
+      println(s"[DEBUG waitForPort] Process not alive, exitCode=$exitCode, returning -1")
       -1
     } else if process.stdout.available() > 0 || process.isAlive() then {
       println(s"[DEBUG waitForPort] Calling readLine() at iteration $iteration (available=$stdoutAvailable)")
@@ -67,9 +72,10 @@ abstract class GeneratedService:
       } catch {
         case _: TimeoutException =>
           val readDuration = System.currentTimeMillis() - readStartTime
-          println(s"[DEBUG waitForPort] readLine() timed out after ${readDuration}ms, processAlive=$processAlive")
-          // readLine() blocked - if process is still alive, retry after a short delay
-          if process.isAlive() then {
+          val stillAlive = process.isAlive()
+          val exitCode = if stillAlive then None else try { Some(process.exitCode()) } catch { case _: Exception => None }
+          println(s"[DEBUG waitForPort] readLine() timed out after ${readDuration}ms, processAlive=$stillAlive, exitCode=$exitCode")
+          if stillAlive then {
             Thread.sleep(100)
             return waitForPort(stdOut, iteration + 1)
           } else {
