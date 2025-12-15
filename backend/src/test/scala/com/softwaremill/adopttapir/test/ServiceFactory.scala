@@ -47,23 +47,17 @@ abstract class GeneratedService:
 
   @tailrec
   private def waitForPort(stdOut: mutable.StringBuilder, iteration: Int = 0): Integer =
-    val stdoutAvailable = process.stdout.available()
-    val processAlive = process.isAlive()
-    val timestamp = System.currentTimeMillis()
 
     if process.stdout.available() > 0 || process.isAlive() then {
-      val readStartTime = System.currentTimeMillis()
       val line = process.stdout.readLine()
-      val readDuration = System.currentTimeMillis() - readStartTime
 
       if line == null then {
         -1
       } else {
         stdOut.append("### process log <").append(new Timestamper).append(line).append(">").append(System.lineSeparator())
-        val patternMatch = portPattern.findFirstMatchIn(line)
-        patternMatch match {
+        portPattern.findFirstMatchIn(line) match {
           case Some(port) => port.group(1).toInt
-          case None       => waitForPort(stdOut, iteration + 1)
+          case None       => Thread.sleep(10); waitForPort(stdOut, iteration + 1)
         }
       }
     } else {
