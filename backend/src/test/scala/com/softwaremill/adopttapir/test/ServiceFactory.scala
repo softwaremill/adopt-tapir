@@ -50,23 +50,27 @@ abstract class GeneratedService:
     val stdoutAvailable = process.stdout.available()
     val processAlive = process.isAlive()
     val timestamp = System.currentTimeMillis()
-    
+
     println(s"[DEBUG waitForPort] iteration=$iteration, available=$stdoutAvailable, alive=$processAlive, time=$timestamp")
-    
+
     if process.stdout.available() > 0 || process.isAlive() then {
       println(s"[DEBUG waitForPort] Calling readLine() at iteration $iteration")
       val readStartTime = System.currentTimeMillis()
       val line = process.stdout.readLine()
       val readDuration = System.currentTimeMillis() - readStartTime
-      println(s"[DEBUG waitForPort] readLine() returned after ${readDuration}ms, line=${if line == null then "null" else s"length=${line.length}, preview=${line.take(100)}"}")
-      
+      println(s"[DEBUG waitForPort] readLine() returned after ${readDuration}ms, line=${
+          if line == null then "null" else s"length=${line.length}, preview=${line.take(100)}"
+        }")
+
       if line == null then {
         println(s"[DEBUG waitForPort] readLine() returned null, processAlive=$processAlive")
         -1
       } else {
         stdOut.append("### process log <").append(new Timestamper).append(line).append(">").append(System.lineSeparator())
         val patternMatch = portPattern.findFirstMatchIn(line)
-        println(s"[DEBUG waitForPort] Pattern match result: ${if patternMatch.isDefined then s"MATCH port=${patternMatch.get.group(1)}" else "NO MATCH"}")
+        println(s"[DEBUG waitForPort] Pattern match result: ${
+            if patternMatch.isDefined then s"MATCH port=${patternMatch.get.group(1)}" else "NO MATCH"
+          }")
         patternMatch match {
           case Some(port) => port.group(1).toInt
           case None       => waitForPort(stdOut, iteration + 1)
