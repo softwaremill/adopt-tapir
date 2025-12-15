@@ -29,19 +29,19 @@ abstract class GeneratedService:
     val stdOut = new mutable.StringBuilder()
     println(s"[DEBUG port] Starting port detection, timeout=${waitForPortTimeout}")
     IO.blocking {
-        val startTime = System.currentTimeMillis()
-        val port = waitForPort(stdOut, 0)
-        val duration = System.currentTimeMillis() - startTime
-        println(s"[DEBUG port] waitForPort returned port=$port after ${duration}ms")
-        assert(port > -1)
-        port
-      }.timeoutAndForget(waitForPortTimeout)
+      val startTime = System.currentTimeMillis()
+      val port = waitForPort(stdOut, 0)
+      val duration = System.currentTimeMillis() - startTime
+      println(s"[DEBUG port] waitForPort returned port=$port after ${duration}ms")
+      assert(port > -1)
+      port
+    }.timeoutAndForget(waitForPortTimeout)
       .onError(e =>
         Assertions.fail(
           s"Detecting port of the running server failed ${
-            if e.isInstanceOf[TimeoutException] then s"due to timeout [${waitForPortTimeout}s]"
-            else s"Exception:${System.lineSeparator()}${e.show}"
-          } with process std output:${System.lineSeparator()}$stdOut"
+              if e.isInstanceOf[TimeoutException] then s"due to timeout [${waitForPortTimeout}s]"
+              else s"Exception:${System.lineSeparator()}${e.show}"
+            } with process std output:${System.lineSeparator()}$stdOut"
         )
       )
 
@@ -124,7 +124,7 @@ class ServiceFactory:
       assert(
         compileAndTest.exitCode == 0,
         s"Compilation and unit tests exited with [${compileAndTest.exitCode}] and output:${System
-          .lineSeparator()}${compileAndTest.out.lines().mkString(System.lineSeparator())}"
+            .lineSeparator()}${compileAndTest.out.lines().mkString(System.lineSeparator())}"
       )
 
       os.proc("scala-cli", "--power", "run", ".")
