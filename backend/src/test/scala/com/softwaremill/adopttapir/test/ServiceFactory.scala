@@ -10,15 +10,14 @@ import os.SubProcess
 import java.time.LocalDateTime
 import scala.annotation.tailrec
 import scala.collection.mutable
-import scala.concurrent.{Await, ExecutionContext, Future, TimeoutException}
-import scala.concurrent.duration.{DurationInt, FiniteDuration}
+import scala.concurrent.TimeoutException
+import scala.concurrent.duration.DurationInt
+import scala.concurrent.duration.FiniteDuration
 import scala.util.matching.Regex
-import ExecutionContext.Implicits.global
 
 object ServiceTimeouts:
   val waitForScalaCliCompileAndUnitTest: FiniteDuration = 45.seconds
   val waitForPortTimeout: FiniteDuration = 90.seconds
-  val readLineTimeout: FiniteDuration = 10.seconds
 
 abstract class GeneratedService:
   import ServiceTimeouts.waitForPortTimeout
@@ -30,19 +29,19 @@ abstract class GeneratedService:
     val stdOut = new mutable.StringBuilder()
     println(s"[DEBUG port] Starting port detection, timeout=${waitForPortTimeout}")
     IO.blocking {
-      val startTime = System.currentTimeMillis()
-      val port = waitForPort(stdOut, 0)
-      val duration = System.currentTimeMillis() - startTime
-      println(s"[DEBUG port] waitForPort returned port=$port after ${duration}ms")
-      assert(port > -1)
-      port
-    }.timeoutAndForget(waitForPortTimeout)
+        val startTime = System.currentTimeMillis()
+        val port = waitForPort(stdOut, 0)
+        val duration = System.currentTimeMillis() - startTime
+        println(s"[DEBUG port] waitForPort returned port=$port after ${duration}ms")
+        assert(port > -1)
+        port
+      }.timeoutAndForget(waitForPortTimeout)
       .onError(e =>
         Assertions.fail(
           s"Detecting port of the running server failed ${
-              if e.isInstanceOf[TimeoutException] then s"due to timeout [${waitForPortTimeout}s]"
-              else s"Exception:${System.lineSeparator()}${e.show}"
-            } with process std output:${System.lineSeparator()}$stdOut"
+            if e.isInstanceOf[TimeoutException] then s"due to timeout [${waitForPortTimeout}s]"
+            else s"Exception:${System.lineSeparator()}${e.show}"
+          } with process std output:${System.lineSeparator()}$stdOut"
         )
       )
 
@@ -52,54 +51,33 @@ abstract class GeneratedService:
     val processAlive = process.isAlive()
     val timestamp = System.currentTimeMillis()
 
-    println(s"[DEBUG waitForPort] iteration=$iteration, available=$stdoutAvailable, alive=$processAlive, time=$timestamp")
+//    println(s"[DEBUG waitForPort] iteration=$iteration, available=$stdoutAvailable, alive=$processAlive, time=$timestamp")
 
-    if !processAlive then {
-      val exitCode = try {
-        Some(process.exitCode())
-      } catch {
-        case _: Exception => None
-      }
-      println(s"[DEBUG waitForPort] Process not alive, exitCode=$exitCode, returning -1")
-      -1
-    } else if process.stdout.available() > 0 || process.isAlive() then {
-      println(s"[DEBUG waitForPort] Calling readLine() at iteration $iteration (available=$stdoutAvailable)")
+    if process.stdout.available() > 0 || process.isAlive() then {
+//      println(s"[DEBUG waitForPort] Calling readLine() at iteration $iteration")
       val readStartTime = System.currentTimeMillis()
-
-      val line = try {
-        val lineFuture = Future(process.stdout.readLine())
-        Await.result(lineFuture, ServiceTimeouts.readLineTimeout)
-      } catch {
-        case _: TimeoutException =>
-          val readDuration = System.currentTimeMillis() - readStartTime
-          val stillAlive = process.isAlive()
-          val exitCode = if stillAlive then None else try { Some(process.exitCode()) } catch { case _: Exception => None }
-          println(s"[DEBUG waitForPort] readLine() timed out after ${readDuration}ms, processAlive=$stillAlive, exitCode=$exitCode")
-          if stillAlive then {
-            Thread.sleep(100)
-            return waitForPort(stdOut, iteration + 1)
-          } else {
-            return -1
-          }
-      }
-
+      val line = process.stdout.readLine()
       val readDuration = System.currentTimeMillis() - readStartTime
-      println(s"[DEBUG waitForPort] readLine() returned after ${readDuration}ms, line=${if line == null then "null" else s"length=${line.length}, preview=${line.take(100)}"}")
+//      println(s"[DEBUG waitForPort] readLine() returned after ${readDuration}ms, line=${
+//        if line == null then "null" else s"length=${line.length}, preview=${line.take(100)}"
+//      }")
 
       if line == null then {
-        println(s"[DEBUG waitForPort] readLine() returned null, processAlive=$processAlive")
+//        println(s"[DEBUG waitForPort] readLine() returned null, processAlive=$processAlive")
         -1
       } else {
         stdOut.append("### process log <").append(new Timestamper).append(line).append(">").append(System.lineSeparator())
         val patternMatch = portPattern.findFirstMatchIn(line)
-        println(s"[DEBUG waitForPort] Pattern match result: ${if patternMatch.isDefined then s"MATCH port=${patternMatch.get.group(1)}" else "NO MATCH"}")
+//        println(s"[DEBUG waitForPort] Pattern match result: ${
+//          if patternMatch.isDefined then s"MATCH port=${patternMatch.get.group(1)}" else "NO MATCH"
+//        }")
         patternMatch match {
           case Some(port) => port.group(1).toInt
           case None       => waitForPort(stdOut, iteration + 1)
         }
       }
     } else {
-      println(s"[DEBUG waitForPort] Process not alive and no data available, returning -1")
+//      println(s"[DEBUG waitForPort] Process not alive and no data available, returning -1")
       -1
     }
 
@@ -146,7 +124,7 @@ class ServiceFactory:
       assert(
         compileAndTest.exitCode == 0,
         s"Compilation and unit tests exited with [${compileAndTest.exitCode}] and output:${System
-            .lineSeparator()}${compileAndTest.out.lines().mkString(System.lineSeparator())}"
+          .lineSeparator()}${compileAndTest.out.lines().mkString(System.lineSeparator())}"
       )
 
       os.proc("scala-cli", "--power", "run", ".")
