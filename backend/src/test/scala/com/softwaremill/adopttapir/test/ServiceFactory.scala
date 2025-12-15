@@ -27,12 +27,8 @@ abstract class GeneratedService:
 
   val port: IO[Integer] =
     val stdOut = new mutable.StringBuilder()
-    println(s"[DEBUG port] Starting port detection, timeout=${waitForPortTimeout}")
     IO.blocking {
-      val startTime = System.currentTimeMillis()
-      val port = waitForPort(stdOut, 0)
-      val duration = System.currentTimeMillis() - startTime
-      println(s"[DEBUG port] waitForPort returned port=$port after ${duration}ms")
+      val port = waitForPort(stdOut)
       assert(port > -1)
       port
     }.timeoutAndForget(waitForPortTimeout)
@@ -46,18 +42,16 @@ abstract class GeneratedService:
       )
 
   @tailrec
-  private def waitForPort(stdOut: mutable.StringBuilder, iteration: Int = 0): Integer =
-
+  private def waitForPort(stdOut: mutable.StringBuilder): Integer =
     if process.stdout.available() > 0 || process.isAlive() then {
       val line = process.stdout.readLine()
-
       if line == null then {
         -1
       } else {
         stdOut.append("### process log <").append(new Timestamper).append(line).append(">").append(System.lineSeparator())
         portPattern.findFirstMatchIn(line) match {
           case Some(port) => port.group(1).toInt
-          case None       => Thread.sleep(100); waitForPort(stdOut, iteration + 1)
+          case None       => Thread.sleep(10); waitForPort(stdOut)
         }
       }
     } else {
