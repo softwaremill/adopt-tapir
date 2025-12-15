@@ -57,7 +57,7 @@ abstract class GeneratedService:
         stdOut.append("### process log <").append(new Timestamper).append(line).append(">").append(System.lineSeparator())
         portPattern.findFirstMatchIn(line) match {
           case Some(port) => port.group(1).toInt
-          case None       => Thread.sleep(10); waitForPort(stdOut, iteration + 1)
+          case None       => Thread.sleep(100); waitForPort(stdOut, iteration + 1)
         }
       }
     } else {
