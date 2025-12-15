@@ -10,14 +10,15 @@ import os.SubProcess
 import java.time.LocalDateTime
 import scala.annotation.tailrec
 import scala.collection.mutable
-import scala.concurrent.TimeoutException
-import scala.concurrent.duration.DurationInt
-import scala.concurrent.duration.FiniteDuration
+import scala.concurrent.{Await, ExecutionContext, Future, TimeoutException}
+import scala.concurrent.duration.{DurationInt, FiniteDuration}
 import scala.util.matching.Regex
+import ExecutionContext.Implicits.global
 
 object ServiceTimeouts:
   val waitForScalaCliCompileAndUnitTest: FiniteDuration = 45.seconds
   val waitForPortTimeout: FiniteDuration = 90.seconds
+  val readLineTimeout: FiniteDuration = 2.seconds
 
 abstract class GeneratedService:
   import ServiceTimeouts.waitForPortTimeout
@@ -50,19 +51,35 @@ abstract class GeneratedService:
     val stdoutAvailable = process.stdout.available()
     val processAlive = process.isAlive()
     val timestamp = System.currentTimeMillis()
-    
+
     println(s"[DEBUG waitForPort] iteration=$iteration, available=$stdoutAvailable, alive=$processAlive, time=$timestamp")
-    
+
     if !processAlive then {
       println(s"[DEBUG waitForPort] Process not alive, returning -1")
       -1
-    } else if stdoutAvailable > 0 then {
-      println(s"[DEBUG waitForPort] Data available, calling readLine() at iteration $iteration")
+    } else if process.stdout.available() > 0 || process.isAlive() then {
+      println(s"[DEBUG waitForPort] Calling readLine() at iteration $iteration (available=$stdoutAvailable)")
       val readStartTime = System.currentTimeMillis()
-      val line = process.stdout.readLine()
+
+      val line = try {
+        val lineFuture = Future(process.stdout.readLine())
+        Await.result(lineFuture, ServiceTimeouts.readLineTimeout)
+      } catch {
+        case _: TimeoutException =>
+          val readDuration = System.currentTimeMillis() - readStartTime
+          println(s"[DEBUG waitForPort] readLine() timed out after ${readDuration}ms, processAlive=$processAlive")
+          // readLine() blocked - if process is still alive, retry after a short delay
+          if process.isAlive() then {
+            Thread.sleep(100)
+            return waitForPort(stdOut, iteration + 1)
+          } else {
+            return -1
+          }
+      }
+
       val readDuration = System.currentTimeMillis() - readStartTime
       println(s"[DEBUG waitForPort] readLine() returned after ${readDuration}ms, line=${if line == null then "null" else s"length=${line.length}, preview=${line.take(100)}"}")
-      
+
       if line == null then {
         println(s"[DEBUG waitForPort] readLine() returned null, processAlive=$processAlive")
         -1
@@ -76,9 +93,8 @@ abstract class GeneratedService:
         }
       }
     } else {
-      println(s"[DEBUG waitForPort] No data available, sleeping 50ms before retry at iteration $iteration")
-      Thread.sleep(50)
-      waitForPort(stdOut, iteration + 1)
+      println(s"[DEBUG waitForPort] Process not alive and no data available, returning -1")
+      -1
     }
 
   def close(): IO[Unit] = IO.blocking {
