@@ -27,12 +27,8 @@ abstract class GeneratedService:
 
   val port: IO[Integer] =
     val stdOut = new mutable.StringBuilder()
-    println(s"[DEBUG port] Starting port detection, timeout=${waitForPortTimeout}")
     IO.blocking {
-      val startTime = System.currentTimeMillis()
-      val port = waitForPort(stdOut, 0)
-      val duration = System.currentTimeMillis() - startTime
-      println(s"[DEBUG port] waitForPort returned port=$port after ${duration}ms")
+      val port = waitForPort(stdOut)
       assert(port > -1)
       port
     }.timeoutAndForget(waitForPortTimeout)
@@ -46,39 +42,31 @@ abstract class GeneratedService:
       )
 
   @tailrec
-  private def waitForPort(stdOut: mutable.StringBuilder, iteration: Int = 0): Integer =
+  private def waitForPort(stdOut: mutable.StringBuilder): Integer =
     val stdoutAvailable = process.stdout.available()
     val processAlive = process.isAlive()
-    val timestamp = System.currentTimeMillis()
-
-    println(s"[DEBUG waitForPort] iteration=$iteration, available=$stdoutAvailable, alive=$processAlive, time=$timestamp")
-
-    if process.stdout.available() > 0 || process.isAlive() then {
-      println(s"[DEBUG waitForPort] Calling readLine() at iteration $iteration")
-      val readStartTime = System.currentTimeMillis()
+    
+    if !processAlive then {
+      -1
+    } else if stdoutAvailable > 0 then {
+      // Data is available, safe to call readLine()
       val line = process.stdout.readLine()
-      val readDuration = System.currentTimeMillis() - readStartTime
-      println(s"[DEBUG waitForPort] readLine() returned after ${readDuration}ms, line=${
-          if line == null then "null" else s"length=${line.length}, preview=${line.take(100)}"
-        }")
-
       if line == null then {
-        println(s"[DEBUG waitForPort] readLine() returned null, processAlive=$processAlive")
         -1
       } else {
         stdOut.append("### process log <").append(new Timestamper).append(line).append(">").append(System.lineSeparator())
-        val patternMatch = portPattern.findFirstMatchIn(line)
-        println(s"[DEBUG waitForPort] Pattern match result: ${
-            if patternMatch.isDefined then s"MATCH port=${patternMatch.get.group(1)}" else "NO MATCH"
-          }")
-        patternMatch match {
+        portPattern.findFirstMatchIn(line) match {
           case Some(port) => port.group(1).toInt
-          case None       => waitForPort(stdOut, iteration + 1)
+          case None       => waitForPort(stdOut)
         }
       }
     } else {
-      println(s"[DEBUG waitForPort] Process not alive and no data available, returning -1")
-      -1
+      // Process is alive but no data available yet
+      // Add a small delay to avoid race condition where readLine() blocks indefinitely
+      // This gives the process time to produce output before we call readLine()
+      // The delay mimics the effect of debug logging which stabilized the tests
+      Thread.sleep(50)
+      waitForPort(stdOut)
     }
 
   def close(): IO[Unit] = IO.blocking {
