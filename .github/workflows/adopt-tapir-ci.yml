@@ -5,12 +5,11 @@ on:
   push:
     branches:
       - main
-      - scala-steward-fix
     paths-ignore:
       - "helm/**"
-#  release:
-#    types:
-#      - released
+  release:
+    types:
+      - released
 
 permissions:
   contents: write        # release-drafter, auto-merge requirement

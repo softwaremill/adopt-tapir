@@ -10,7 +10,7 @@ import scala.util.Try
 val scala2Version = "2.13.14"
 val scala3Version = "3.7.4"
 
-val tapirVersion = "1.13.2"
+val tapirVersion = "1.13.0"
 
 val http4sEmberServerVersion = "0.23.33"
 val http4sCirceVersion = "0.23.33"
