@@ -10,7 +10,7 @@ import scala.util.Try
 val scala2Version = "2.13.14"
 val scala3Version = "3.7.4"
 
-val tapirVersion = "1.12.4"
+val tapirVersion = "1.13.3"
 
 val http4sEmberServerVersion = "0.23.33"
 val http4sCirceVersion = "0.23.33"
@@ -20,7 +20,7 @@ val sttpVersion = "3.10.2"
 val prometheusVersion = "0.16.0"
 val scalafmtVersion = "3.9.9"
 val scalaLoggingVersion = "3.9.6"
-val logbackClassicVersion = "1.5.18"
+val logbackClassicVersion = "1.5.22"
 val scalaTestVersion = "3.2.19"
 val plokhotnyukJsoniterVersion = "2.30.14"
 val zioTestVersion = "2.0.13"
