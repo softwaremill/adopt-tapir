@@ -43,7 +43,7 @@ abstract class GeneratedService:
 
   @tailrec
   private def waitForPort(stdOut: mutable.StringBuilder): Integer =
-    if process.stdout.available() > 0 || process.isAlive() then {
+    if process.isAlive() then {
       val line = process.stdout.readLine()
       if line == null then {
         -1
