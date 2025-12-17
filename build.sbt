@@ -240,6 +240,7 @@ lazy val ui = (project in file(uiProjectName))
   .settings(cleanFiles += baseDirectory.value / "build")
 
 lazy val templateDependencies: Project = project
+  .settings(commonSettings)
   .settings(
     name := "templateDependencies",
     libraryDependencies --= scalafmtStandaloneDependencies,
@@ -287,4 +288,3 @@ lazy val templateDependencies: Project = project
     buildInfoObject := "TemplateDependencyInfo"
   )
   .enablePlugins(BuildInfoPlugin)
-  .settings(commonSettings)
