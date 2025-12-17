@@ -18,9 +18,9 @@ val circeVersion = "0.14.15"
 val circeGenericsExtrasVersion = "0.14.3"
 val sttpVersion = "3.10.2"
 val prometheusVersion = "0.16.0"
-val scalafmtVersion = "3.9.9"
+val scalafmtVersion = "3.9.10"
 val scalaLoggingVersion = "3.9.6"
-val logbackClassicVersion = "1.5.18"
+val logbackClassicVersion = "1.5.22"
 val scalaTestVersion = "3.2.19"
 val plokhotnyukJsoniterVersion = "2.30.14"
 val zioTestVersion = "2.0.13"
@@ -63,7 +63,7 @@ val fileDependencies = Seq(
 )
 
 val configDependencies = Seq(
-  "com.github.pureconfig" %% "pureconfig-core" % "0.17.8"
+  "com.github.pureconfig" %% "pureconfig-core" % "0.17.9"
 )
 
 val baseDependencies = Seq(
@@ -77,7 +77,8 @@ val apiDocsDependencies = Seq(
 )
 
 val scalafmtStandaloneDependencies = Seq(
-  "org.scalameta" %% "scalafmt-dynamic" % scalafmtVersion cross CrossVersion.for3Use2_13
+  ("org.scalameta" %% "scalafmt-dynamic" % scalafmtVersion cross CrossVersion.for3Use2_13)
+    .exclude("org.scala-lang.modules", "scala-xml_2.13")
 )
 
 val unitTestingStack = Seq(
@@ -239,9 +240,11 @@ lazy val ui = (project in file(uiProjectName))
   .settings(cleanFiles += baseDirectory.value / "build")
 
 lazy val templateDependencies: Project = project
+  .settings(commonSettings)
   .settings(
     name := "templateDependencies",
     scalaVersion := scala3Version,
+    libraryDependencies --= scalafmtStandaloneDependencies,
     libraryDependencies ++= List(
       "ch.qos.logback" % "logback-classic" % logbackClassicVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-sttp-stub-server" % tapirVersion % Provided,
@@ -286,4 +289,3 @@ lazy val templateDependencies: Project = project
     buildInfoObject := "TemplateDependencyInfo"
   )
   .enablePlugins(BuildInfoPlugin)
-  .settings(commonSettings)
