@@ -88,7 +88,7 @@ val unitTestingStack = Seq(
 )
 
 val commonDependencies =
-  baseDependencies ++ unitTestingStack ++ loggingDependencies ++ configDependencies ++ fileDependencies
+  baseDependencies ++ unitTestingStack ++ loggingDependencies ++ configDependencies ++ fileDependencies ++ scalafmtStandaloneDependencies
 
 lazy val uiProjectName = "ui"
 lazy val uiDirectory = settingKey[File]("Path to the ui project directory")
@@ -204,7 +204,6 @@ lazy val backend: Project = (project in file("backend"))
         ++ jsonDependencies
         ++ apiDocsDependencies
         ++ monitoringDependencies
-        ++ scalafmtStandaloneDependencies
   )
   .settings(
     inConfig(ItTest)(Defaults.testTasks),
@@ -241,12 +240,9 @@ lazy val ui = (project in file(uiProjectName))
   .settings(cleanFiles += baseDirectory.value / "build")
 
 lazy val templateDependencies: Project = project
-  .settings(commonSmlBuildSettings)
   .settings(
     name := "templateDependencies",
-    organization := "com.softwaremill.adopttapir",
-    scalaVersion := scala3Version,
-    libraryDependencies ++= baseDependencies ++ unitTestingStack ++ loggingDependencies ++ configDependencies ++ fileDependencies,
+    libraryDependencies --= scalafmtStandaloneDependencies,
     libraryDependencies ++= List(
       "ch.qos.logback" % "logback-classic" % logbackClassicVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-sttp-stub-server" % tapirVersion % Provided,
@@ -291,3 +287,4 @@ lazy val templateDependencies: Project = project
     buildInfoObject := "TemplateDependencyInfo"
   )
   .enablePlugins(BuildInfoPlugin)
+  .settings(commonSettings)
