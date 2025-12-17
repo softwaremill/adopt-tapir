@@ -62,7 +62,7 @@ abstract class BuildView:
   private def getJsonDependencies(starterDetails: StarterDetails): List[ScalaDependency] =
     starterDetails.jsonImplementation match {
       case JsonImplementation.WithoutJson => Nil
-      case JsonImplementation.Circe =>
+      case JsonImplementation.Circe       =>
         List(
           ScalaDependency("com.softwaremill.sttp.tapir", "tapir-json-circe", getTapirVersion())
         )
@@ -97,7 +97,7 @@ abstract class BuildView:
   private def getJsonTestDependencies(starterDetails: StarterDetails): List[ScalaTestDependency] =
     starterDetails.jsonImplementation match {
       case JsonImplementation.WithoutJson => Nil
-      case JsonImplementation.Circe =>
+      case JsonImplementation.Circe       =>
         List(ScalaTestDependency("com.softwaremill.sttp.client3", "circe", TemplateDependencyInfo.sttpVersion))
       case JsonImplementation.UPickle | JsonImplementation.Pickler =>
         List(ScalaTestDependency("com.softwaremill.sttp.client3", "upickle", TemplateDependencyInfo.sttpVersion))

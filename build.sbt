@@ -8,19 +8,19 @@ import scala.sys.process.Process
 import scala.util.Try
 
 val scala2Version = "2.13.14"
-val scala3Version = "3.6.4"
+val scala3Version = "3.7.4"
 
-val tapirVersion = "1.11.25"
+val tapirVersion = "1.13.3"
 
-val http4sEmberServerVersion = "0.23.30"
-val http4sCirceVersion = "0.23.30"
-val circeVersion = "0.14.13"
+val http4sEmberServerVersion = "0.23.33"
+val http4sCirceVersion = "0.23.33"
+val circeVersion = "0.14.15"
 val circeGenericsExtrasVersion = "0.14.3"
 val sttpVersion = "3.10.2"
 val prometheusVersion = "0.16.0"
-val scalafmtVersion = "3.9.4"
-val scalaLoggingVersion = "3.9.5"
-val logbackClassicVersion = "1.5.18"
+val scalafmtVersion = "3.9.9"
+val scalaLoggingVersion = "3.9.6"
+val logbackClassicVersion = "1.5.22"
 val scalaTestVersion = "3.2.19"
 val plokhotnyukJsoniterVersion = "2.30.14"
 val zioTestVersion = "2.0.13"
@@ -54,12 +54,12 @@ val loggingDependencies = Seq(
   "com.typesafe.scala-logging" %% "scala-logging" % scalaLoggingVersion,
   "ch.qos.logback" % "logback-classic" % logbackClassicVersion,
   "org.codehaus.janino" % "janino" % "3.1.12" % Runtime,
-  "net.logstash.logback" % "logstash-logback-encoder" % "8.1" % Runtime
+  "net.logstash.logback" % "logstash-logback-encoder" % "9.0" % Runtime
 )
 
 val fileDependencies = Seq(
   "com.github.pathikrit" %% "better-files" % "3.9.2" cross CrossVersion.for3Use2_13,
-  "org.apache.commons" % "commons-compress" % "1.27.1"
+  "org.apache.commons" % "commons-compress" % "1.28.0"
 )
 
 val configDependencies = Seq(
@@ -67,7 +67,7 @@ val configDependencies = Seq(
 )
 
 val baseDependencies = Seq(
-  "org.typelevel" %% "cats-effect" % "3.6.1",
+  "org.typelevel" %% "cats-effect" % "3.6.3",
   "com.softwaremill.common" %% "tagging" % "2.3.5",
   "com.softwaremill.quicklens" %% "quicklens" % "1.9.12"
 )
@@ -82,8 +82,8 @@ val scalafmtStandaloneDependencies = Seq(
 
 val unitTestingStack = Seq(
   "org.scalatest" %% "scalatest" % scalaTestVersion % Test,
-  "org.scalacheck" %% "scalacheck" % "1.18.1" % Test,
-  "com.lihaoyi" %% "os-lib" % "0.11.4" % Test
+  "org.scalacheck" %% "scalacheck" % "1.19.0" % Test,
+  "com.lihaoyi" %% "os-lib" % "0.11.6" % Test
 )
 
 val commonDependencies =
@@ -142,7 +142,7 @@ lazy val fatJarSettings = Seq(
     case PathList(ps @ _*) if ps.last endsWith "io.netty.versions.properties"       => MergeStrategy.first
     case PathList(ps @ _*) if ps.last endsWith "pom.properties"                     => MergeStrategy.first
     case PathList(ps @ _*) if ps.last endsWith "scala-collection-compat.properties" => MergeStrategy.first
-    case x =>
+    case x                                                                          =>
       val oldStrategy = (assembly / assemblyMergeStrategy).value
       oldStrategy(x)
   }
