@@ -243,6 +243,7 @@ lazy val templateDependencies: Project = project
   .settings(commonSettings)
   .settings(
     name := "templateDependencies",
+    scalaVersion := scala3Version,
     libraryDependencies --= scalafmtStandaloneDependencies,
     libraryDependencies ++= List(
       "ch.qos.logback" % "logback-classic" % logbackClassicVersion % Provided,
