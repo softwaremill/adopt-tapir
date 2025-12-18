@@ -22,7 +22,7 @@ val scalafmtVersion = "3.10.2"
 val scalaLoggingVersion = "3.9.6"
 val logbackClassicVersion = "1.5.22"
 val scalaTestVersion = "3.2.19"
-val plokhotnyukJsoniterVersion = "2.30.14"
+val plokhotnyukJsoniterVersion = "2.30.15"
 val zioTestVersion = "2.0.13"
 
 val httpDependencies = Seq(
