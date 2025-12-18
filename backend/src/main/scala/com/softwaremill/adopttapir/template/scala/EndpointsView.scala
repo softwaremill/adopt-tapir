@@ -64,7 +64,7 @@ object EndpointsView:
     def prepareJsonEndpoint(starterDetails: StarterDetails): Code =
       starterDetails.jsonImplementation match {
         case JsonImplementation.WithoutJson => Code.empty
-        case _ =>
+        case _                              =>
           List(prepareBookListing(starterDetails), prepareBookListingServerLogic(starterDetails))
             .reduce((a, b) => Code(a.body + NEW_LINE_WITH_INDENT + b.body, a.imports ++ b.imports))
             .prependBody(INDENT)
@@ -126,7 +126,7 @@ object EndpointsView:
 
       starterDetails.jsonImplementation match {
         case JsonImplementation.WithoutJson => Code.empty
-        case JsonImplementation.Circe =>
+        case JsonImplementation.Circe       =>
           Code(
             prepareBookListing,
             Set(
@@ -140,7 +140,7 @@ object EndpointsView:
             prepareBookListing,
             Set(Import("sttp.tapir.generic.auto._"), Import("upickle.default._"), Import("sttp.tapir.json.upickle._"))
           )
-        case JsonImplementation.Pickler => Code(prepareBookListing, Set(Import("sttp.tapir.json.pickler._")))
+        case JsonImplementation.Pickler  => Code(prepareBookListing, Set(Import("sttp.tapir.json.pickler._")))
         case JsonImplementation.Jsoniter =>
           val codecs = s"$givenPrefix codecBooks: JsonValueCodec[List[Book]] = JsonCodecMaker.make"
 

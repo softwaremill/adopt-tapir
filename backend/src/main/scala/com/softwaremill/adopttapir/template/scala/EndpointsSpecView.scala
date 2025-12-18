@@ -15,7 +15,7 @@ object EndpointsSpecView:
 
     starterDetails.jsonImplementation match {
       case JsonImplementation.WithoutJson => Code.empty
-      case JsonImplementation.Circe =>
+      case JsonImplementation.Circe       =>
         stubBooks.addImports(
           Set(
             Import("io.circe.generic.auto._"),
