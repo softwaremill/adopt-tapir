@@ -8,19 +8,19 @@ import scala.sys.process.Process
 import scala.util.Try
 
 val scala2Version = "2.13.14"
-val scala3Version = "3.5.1"
+val scala3Version = "3.7.4"
 
-val tapirVersion = "1.11.5"
+val tapirVersion = "1.13.3"
 
-val http4sEmberServerVersion = "0.23.28"
-val http4sCirceVersion = "0.23.28"
-val circeVersion = "0.14.10"
+val http4sEmberServerVersion = "0.23.33"
+val http4sCirceVersion = "0.23.33"
+val circeVersion = "0.14.15"
 val circeGenericsExtrasVersion = "0.14.3"
-val sttpVersion = "3.10.0"
+val sttpVersion = "3.10.3"
 val prometheusVersion = "0.16.0"
-val scalafmtVersion = "3.8.3"
-val scalaLoggingVersion = "3.9.5"
-val logbackClassicVersion = "1.5.8"
+val scalafmtVersion = "3.10.2"
+val scalaLoggingVersion = "3.9.6"
+val logbackClassicVersion = "1.5.22"
 val scalaTestVersion = "3.2.19"
 val plokhotnyukJsoniterVersion = "2.30.15"
 val zioTestVersion = "2.0.13"
@@ -54,22 +54,22 @@ val loggingDependencies = Seq(
   "com.typesafe.scala-logging" %% "scala-logging" % scalaLoggingVersion,
   "ch.qos.logback" % "logback-classic" % logbackClassicVersion,
   "org.codehaus.janino" % "janino" % "3.1.12" % Runtime,
-  "net.logstash.logback" % "logstash-logback-encoder" % "8.0" % Runtime
+  "net.logstash.logback" % "logstash-logback-encoder" % "9.0" % Runtime
 )
 
 val fileDependencies = Seq(
   "com.github.pathikrit" %% "better-files" % "3.9.2" cross CrossVersion.for3Use2_13,
-  "org.apache.commons" % "commons-compress" % "1.27.1"
+  "org.apache.commons" % "commons-compress" % "1.28.0"
 )
 
 val configDependencies = Seq(
-  "com.github.pureconfig" %% "pureconfig-core" % "0.17.7"
+  "com.github.pureconfig" %% "pureconfig-core" % "0.17.9"
 )
 
 val baseDependencies = Seq(
-  "org.typelevel" %% "cats-effect" % "3.5.4",
+  "org.typelevel" %% "cats-effect" % "3.6.3",
   "com.softwaremill.common" %% "tagging" % "2.3.5",
-  "com.softwaremill.quicklens" %% "quicklens" % "1.9.9"
+  "com.softwaremill.quicklens" %% "quicklens" % "1.9.12"
 )
 
 val apiDocsDependencies = Seq(
@@ -77,13 +77,14 @@ val apiDocsDependencies = Seq(
 )
 
 val scalafmtStandaloneDependencies = Seq(
-  "org.scalameta" %% "scalafmt-dynamic" % scalafmtVersion cross CrossVersion.for3Use2_13
+  ("org.scalameta" %% "scalafmt-dynamic" % scalafmtVersion cross CrossVersion.for3Use2_13)
+    .exclude("org.scala-lang.modules", "scala-xml_2.13")
 )
 
 val unitTestingStack = Seq(
   "org.scalatest" %% "scalatest" % scalaTestVersion % Test,
-  "org.scalacheck" %% "scalacheck" % "1.18.1" % Test,
-  "com.lihaoyi" %% "os-lib" % "0.10.7" % Test
+  "org.scalacheck" %% "scalacheck" % "1.19.0" % Test,
+  "com.lihaoyi" %% "os-lib" % "0.11.6" % Test
 )
 
 val commonDependencies =
@@ -142,7 +143,7 @@ lazy val fatJarSettings = Seq(
     case PathList(ps @ _*) if ps.last endsWith "io.netty.versions.properties"       => MergeStrategy.first
     case PathList(ps @ _*) if ps.last endsWith "pom.properties"                     => MergeStrategy.first
     case PathList(ps @ _*) if ps.last endsWith "scala-collection-compat.properties" => MergeStrategy.first
-    case x =>
+    case x                                                                          =>
       val oldStrategy = (assembly / assemblyMergeStrategy).value
       oldStrategy(x)
   }
@@ -239,9 +240,11 @@ lazy val ui = (project in file(uiProjectName))
   .settings(cleanFiles += baseDirectory.value / "build")
 
 lazy val templateDependencies: Project = project
+  .settings(commonSettings)
   .settings(
     name := "templateDependencies",
     scalaVersion := scala3Version,
+    libraryDependencies --= scalafmtStandaloneDependencies,
     libraryDependencies ++= List(
       "ch.qos.logback" % "logback-classic" % logbackClassicVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-sttp-stub-server" % tapirVersion % Provided,
@@ -286,4 +289,3 @@ lazy val templateDependencies: Project = project
     buildInfoObject := "TemplateDependencyInfo"
   )
   .enablePlugins(BuildInfoPlugin)
-  .settings(commonSettings)
