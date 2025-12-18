@@ -77,7 +77,7 @@ class ServiceFactory:
     }
 
   private case class SbtService(tempDir: better.files.File) extends GeneratedService:
-    override protected val portPattern = new Regex("^(?:\\[info\\] )(?:Go to |Server started at )http://localhost:(\\d+).*")
+    override protected val portPattern = new Regex("^(?:\\[info\\] )?(?:Go to |Server started at )http://localhost:(\\d+).*")
 
     override protected lazy val process: SubProcess = {
       os.proc(
