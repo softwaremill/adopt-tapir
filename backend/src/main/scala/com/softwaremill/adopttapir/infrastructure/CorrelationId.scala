@@ -2,9 +2,6 @@ package com.softwaremill.adopttapir.infrastructure
 
 import cats.effect.std.Random
 import cats.effect.{IO, IOLocal}
-import sttp.capabilities.Effect
-import sttp.client3.*
-import sttp.monad.MonadError
 import sttp.tapir.server.interceptor.{EndpointInterceptor, RequestHandler, RequestInterceptor, Responder}
 import cats.syntax.all.*
 
@@ -28,20 +25,23 @@ object CorrelationId:
   yield CorrelationId(local, random)
 
 //** An sttp backend wrapper, which sets the current correlation id on all outgoing requests. */
-class SetCorrelationIdBackend[P](delegate: SttpBackend[IO, P])(using correlationId: CorrelationId) extends SttpBackend[IO, P]:
-  import CorrelationIdInterceptor.*
-
-  override def send[T, R >: P with Effect[IO]](request: Request[T, R]): IO[Response[T]] =
-    correlationId.get
-      .map {
-        case Some(cid) => request.header(CorrelationIdInterceptor.HeaderName, cid)
-        case None      => request
-      }
-      .flatMap(delegate.send)
-
-  override def close(): IO[Unit] = delegate.close()
-
-  override def responseMonad: MonadError[IO] = delegate.responseMonad
+// Note: This is not currently used in the codebase. If needed, it should be updated to match sttp client4 API.
+// In client4, backend wrappers need to implement the correct backend trait (Backend, StreamBackend, etc.)
+// and handle GenericRequest types properly.
+// class SetCorrelationIdBackend(delegate: Backend[IO])(using correlationId: CorrelationId) extends Backend[IO]:
+//   import CorrelationIdInterceptor.*
+//
+//   override def send[T, P](request: GenericRequest[T, P]): IO[Response[T]] =
+//     correlationId.get
+//       .map {
+//         case Some(cid) => request.header(CorrelationIdInterceptor.HeaderName, cid)
+//         case None      => request
+//       }
+//       .flatMap(request => request.send(delegate))
+//
+//   override def close(): IO[Unit] = delegate.close()
+//
+//   override def monad: MonadError[IO] = delegate.monad
 
 /** A tapir interceptor, which reads the correlation id from the headers; if it's absent, generates a new one. */
 class CorrelationIdInterceptor private (using correlationId: CorrelationId) extends RequestInterceptor[IO]:
