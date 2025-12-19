@@ -42,7 +42,7 @@ object EndpointsSpecView:
         case ServerStack.FutureStack => ("BackendStub.asynchronousFuture", "TapirStubInterpreter")
         case ServerStack.IOStack     => ("BackendStub[IO]", "TapirStubInterpreter")
         case ServerStack.ZIOStack    => ("BackendStub[ZIO[Any, Throwable, *]]", "TapirStubInterpreter")
-        case ServerStack.OxStack     => ("SyncBackendStub.synchronous", "TapirSyncStubInterpreter")
+        case ServerStack.OxStack     => ("SyncBackendStub", "TapirSyncStubInterpreter")
       }
 
       val body =
