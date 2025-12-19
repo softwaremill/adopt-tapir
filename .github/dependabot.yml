@@ -2,7 +2,7 @@ version: 2
 updates:
   - package-ecosystem: "npm"
     directory: "/"
-    label: "automerge"
+    labels: "automerge"
 #    schedule:
 #      interval: "weekly"
 #      day: "tuesday"
