@@ -6,6 +6,7 @@ updates:
       - "automerge"
     schedule:
       interval: "daily"
+      
 #    groups:
 #      production-dependencies:
 #        dependency-type: "production"
