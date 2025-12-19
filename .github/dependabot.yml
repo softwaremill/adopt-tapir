@@ -5,17 +5,7 @@ updates:
     labels:
       - "automerge"
       - "javascript"
+      - "dependency"
     schedule:
       interval: "daily"
     open-pull-requests-limit: 0
-#    groups:
-#      production-dependencies:
-#        dependency-type: "production"
-#      nx-dependencies:
-#        patterns:
-#          - "@nx*"
-#      eslint-dependencies:
-#        patterns:
-#          - "*eslint*"
-#      development-dependencies:
-#        dependency-type: "development"
