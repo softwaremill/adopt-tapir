@@ -1,0 +1,19 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    label: "automerge"
+#    schedule:
+#      interval: "weekly"
+#      day: "tuesday"
+#    groups:
+#      production-dependencies:
+#        dependency-type: "production"
+#      nx-dependencies:
+#        patterns:
+#          - "@nx*"
+#      eslint-dependencies:
+#        patterns:
+#          - "*eslint*"
+#      development-dependencies:
+#        dependency-type: "development"
