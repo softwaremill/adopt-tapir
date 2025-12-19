@@ -4,6 +4,7 @@ updates:
     directory: "/ui"
     labels:
       - "automerge"
+      - "javascript"
     schedule:
       interval: "daily"
     open-pull-requests-limit: 0
