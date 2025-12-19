@@ -1,12 +1,11 @@
 version: 2
 updates:
   - package-ecosystem: "npm"
-    directory: "/ui"
+    directory: "/"
     labels:
       - "automerge"
-#    schedule:
-#      interval: "weekly"
-#      day: "tuesday"
+    schedule:
+      interval: "daily"
 #    groups:
 #      production-dependencies:
 #        dependency-type: "production"
