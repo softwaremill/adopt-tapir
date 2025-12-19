@@ -8,4 +8,4 @@ updates:
       - "dependency"
     schedule:
       interval: "daily"
-    open-pull-requests-limit: 0 // This enables only security related PRs
+    open-pull-requests-limit: 0 # This enables only security related PRs
