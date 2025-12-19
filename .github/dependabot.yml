@@ -6,7 +6,7 @@ updates:
       - "automerge"
     schedule:
       interval: "daily"
-      
+    open-pull-requests-limit: 0
 #    groups:
 #      production-dependencies:
 #        dependency-type: "production"
