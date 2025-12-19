@@ -21,7 +21,7 @@ abstract class BuildView:
     httpDependencies ++ metricsDependencies ++ docsDependencies ++ monitoringDependencies ++ jsonDependencies ++ loggerDependencies
 
   def getAllTestDependencies(starterDetails: StarterDetails): List[Dependency] =
-    ScalaTestDependency("com.softwaremill.sttp.tapir", "tapir-sttp-stub-server", getTapirVersion()) ::
+    ScalaTestDependency("com.softwaremill.sttp.tapir", "tapir-sttp-stub4-server", getTapirVersion()) ::
       getTestDependencies(starterDetails.serverStack) ++ getJsonTestDependencies(starterDetails)
 
   protected def getTapirVersion(): String
@@ -98,13 +98,13 @@ abstract class BuildView:
     starterDetails.jsonImplementation match {
       case JsonImplementation.WithoutJson => Nil
       case JsonImplementation.Circe       =>
-        List(ScalaTestDependency("com.softwaremill.sttp.client3", "circe", TemplateDependencyInfo.sttpVersion))
+        List(ScalaTestDependency("com.softwaremill.sttp.client4", "circe", TemplateDependencyInfo.sttpVersion))
       case JsonImplementation.UPickle | JsonImplementation.Pickler =>
-        List(ScalaTestDependency("com.softwaremill.sttp.client3", "upickle", TemplateDependencyInfo.sttpVersion))
+        List(ScalaTestDependency("com.softwaremill.sttp.client4", "upickle", TemplateDependencyInfo.sttpVersion))
       case JsonImplementation.Jsoniter =>
-        List(ScalaTestDependency("com.softwaremill.sttp.client3", "jsoniter", TemplateDependencyInfo.sttpVersion))
+        List(ScalaTestDependency("com.softwaremill.sttp.client4", "jsoniter", TemplateDependencyInfo.sttpVersion))
       case JsonImplementation.ZIOJson =>
-        List(ScalaTestDependency("com.softwaremill.sttp.client3", "zio-json", TemplateDependencyInfo.sttpVersion))
+        List(ScalaTestDependency("com.softwaremill.sttp.client4", "zio-json", TemplateDependencyInfo.sttpVersion))
     }
 
   private def getHttpDependencies(starterDetails: StarterDetails): List[Dependency] =

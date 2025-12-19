@@ -11,9 +11,9 @@ rightBracket: Char = '}'
 package @{starterDetails.groupId}
 
 import @{starterDetails.groupId}.Endpoints.@if(scalaVersion == com.softwaremill.adopttapir.starter.ScalaVersion.Scala2){_}else{@leftBracket*,given@rightBracket}
-import sttp.client3.testing.SttpBackendStub
-import sttp.client3.{UriContext, basicRequest}
-import sttp.tapir.server.stub.TapirStubInterpreter
+import sttp.client4.testing.BackendStub
+import sttp.client4.{UriContext, basicRequest}
+import sttp.tapir.server.stub4.TapirStubInterpreter
 import zio.test.Assertion.@if(scalaVersion == com.softwaremill.adopttapir.starter.ScalaVersion.Scala2){_}else{*}
 import zio.test.{ZIOSpecDefault, assertZIO}
 @for(additionalImport <- additionalImports) {

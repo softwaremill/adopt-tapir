@@ -19,34 +19,34 @@ object EndpointsSpecView:
         stubBooks.addImports(
           Set(
             Import("io.circe.generic.auto._"),
-            Import("sttp.client3.circe._"),
+            Import("sttp.client4.circe._"),
             Import("Library._")
           )
         )
-      case JsonImplementation.UPickle => stubBooks.addImports(Set(Import("sttp.client3.upicklejson._"), Import("Library._")))
+      case JsonImplementation.UPickle => stubBooks.addImports(Set(Import("sttp.client4.upicklejson._"), Import("Library._")))
       case JsonImplementation.Pickler =>
         stubBooks.addImports(
           Set(
             Import("upickle.default.Reader"),
-            Import("sttp.client3.upicklejson._"),
+            Import("sttp.client4.upicklejson._"),
             Import("Library._")
           )
         )
-      case JsonImplementation.Jsoniter => stubBooks.addImports(Set(Import("sttp.client3.jsoniter._"), Import("Library._")))
-      case JsonImplementation.ZIOJson  => stubBooks.addImports(Set(Import("sttp.client3.ziojson._"), Import("Library._")))
+      case JsonImplementation.Jsoniter => stubBooks.addImports(Set(Import("sttp.client4.jsoniter._"), Import("Library._")))
+      case JsonImplementation.ZIOJson  => stubBooks.addImports(Set(Import("sttp.client4.ziojson._"), Import("Library._")))
     }
 
   object Stub:
     def prepareBackendStub(endpoint: String, serverStack: ServerStack): Code =
-      val stub = serverStack match {
-        case ServerStack.FutureStack => "SttpBackendStub.asynchronousFuture"
-        case ServerStack.IOStack     => "SttpBackendStub(new CatsMonadError[IO]())"
-        case ServerStack.ZIOStack    => "SttpBackendStub(new RIOMonadError[Any])"
-        case ServerStack.OxStack     => "SttpBackendStub.synchronous"
+      val (stub, interpreter) = serverStack match {
+        case ServerStack.FutureStack => ("BackendStub.asynchronousFuture", "TapirStubInterpreter")
+        case ServerStack.IOStack     => ("BackendStub[IO]", "TapirStubInterpreter")
+        case ServerStack.ZIOStack    => ("BackendStub[ZIO[Any, Throwable, *]]", "TapirStubInterpreter")
+        case ServerStack.OxStack     => ("SyncBackendStub.synchronous", "TapirSyncStubInterpreter")
       }
 
       val body =
-        s"""val backendStub = TapirStubInterpreter($stub)
+        s"""val backendStub = $interpreter($stub)
            |  .whenServerEndpointRunLogic($endpoint)
            |  .backend()""".stripMargin
 
@@ -54,19 +54,27 @@ object EndpointsSpecView:
         case ServerStack.FutureStack =>
           Set(
             Import("scala.concurrent.Future"),
-            Import("scala.concurrent.ExecutionContext.Implicits.global")
+            Import("scala.concurrent.ExecutionContext.Implicits.global"),
+            Import("sttp.client4.testing.BackendStub"),
+            Import("sttp.tapir.server.stub4.TapirStubInterpreter")
           )
         case ServerStack.IOStack =>
           Set(
             Import("cats.effect.IO"),
-            Import("sttp.tapir.integ.cats.effect.CatsMonadError")
+            Import("sttp.client4.testing.BackendStub"),
+            Import("sttp.tapir.server.stub4.TapirStubInterpreter")
           )
         case ServerStack.ZIOStack =>
           Set(
-            Import("sttp.tapir.ztapir.RIOMonadError")
+            Import("zio.ZIO"),
+            Import("sttp.client4.testing.BackendStub"),
+            Import("sttp.tapir.server.stub4.TapirStubInterpreter")
           )
         case ServerStack.OxStack =>
-          Set.empty
+          Set(
+            Import("sttp.client4.testing.SyncBackendStub"),
+            Import("sttp.tapir.server.stub4.TapirSyncStubInterpreter")
+          )
       }
 
       Code(body, imports)

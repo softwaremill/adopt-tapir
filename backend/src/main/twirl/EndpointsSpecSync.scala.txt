@@ -14,9 +14,9 @@ import @{starterDetails.groupId}.Endpoints.@leftBracket*,given@rightBracket
 import org.scalatest.EitherValues
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import sttp.client3.*
-import sttp.client3.testing.SttpBackendStub
-import sttp.tapir.server.stub.TapirStubInterpreter
+import sttp.client4.*
+import sttp.client4.testing.SyncBackendStub
+import sttp.tapir.server.stub4.TapirSyncStubInterpreter
 @for(additionalImport <- additionalImports) {
 @{additionalImport.asScalaImport(scalaVersion)}}
 
