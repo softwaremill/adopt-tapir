@@ -10,7 +10,7 @@ rightBracket: Char = '}'
 )
 package @{starterDetails.groupId}
 
-import @{starterDetails.groupId}.Endpoints.@leftBracket*,given@rightBracket
+import @{starterDetails.groupId}.Endpoints.*
 import org.scalatest.EitherValues
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers

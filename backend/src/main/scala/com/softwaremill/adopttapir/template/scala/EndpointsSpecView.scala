@@ -23,12 +23,12 @@ object EndpointsSpecView:
             Import("Library._")
           )
         )
-      case JsonImplementation.UPickle => stubBooks.addImports(Set(Import("sttp.client4.upicklejson._"), Import("Library._")))
+      case JsonImplementation.UPickle => stubBooks.addImports(Set(Import("sttp.client4.upicklejson.default.asJson"), Import("Library._")))
       case JsonImplementation.Pickler =>
         stubBooks.addImports(
           Set(
             Import("upickle.default.Reader"),
-            Import("sttp.client4.upicklejson._"),
+            Import("sttp.client4.upicklejson.default.asJson"),
             Import("Library._")
           )
         )
@@ -40,7 +40,7 @@ object EndpointsSpecView:
     def prepareBackendStub(endpoint: String, serverStack: ServerStack): Code =
       val (stub, interpreter) = serverStack match {
         case ServerStack.FutureStack => ("BackendStub.asynchronousFuture", "TapirStubInterpreter")
-        case ServerStack.IOStack     => ("BackendStub[IO]", "TapirStubInterpreter")
+        case ServerStack.IOStack     => ("BackendStub[IO](new CatsMonadError[IO]())", "TapirStubInterpreter")
         case ServerStack.ZIOStack    => ("BackendStub[ZIO[Any, Throwable, *]]", "TapirStubInterpreter")
         case ServerStack.OxStack     => ("SyncBackendStub", "TapirSyncStubInterpreter")
       }
@@ -62,7 +62,8 @@ object EndpointsSpecView:
           Set(
             Import("cats.effect.IO"),
             Import("sttp.client4.testing.BackendStub"),
-            Import("sttp.tapir.server.stub4.TapirStubInterpreter")
+            Import("sttp.tapir.server.stub4.TapirStubInterpreter"),
+            Import("sttp.tapir.integ.cats.effect.CatsMonadError")
           )
         case ServerStack.ZIOStack =>
           Set(
