@@ -1,4 +1,4 @@
-import { EffectImplementation, StackType, JSONImplementation, ScalaVersion } from 'api/starter';
+import { EffectImplementation, StackType, JSONImplementation, ScalaVersion } from '@/api/starter';
 import {
   getAvailableEffectImplementations,
   getEffectImplementationOptions,

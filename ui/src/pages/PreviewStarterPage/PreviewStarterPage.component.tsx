@@ -1,9 +1,9 @@
 import { Box, Grid } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
-import { FileContentView } from 'components/FileContentView';
-import { FileTreeView } from 'components/FileTreeView/FileTreeView.component';
-import { Tree } from 'components/FileTreeView/FileTreeView.types';
-import { DEFAULT_NODE } from 'components/FileTreeView/FileTreeView.utils';
+import { FileContentView } from '@/components/FileContentView';
+import { FileTreeView } from '@/components/FileTreeView/FileTreeView.component';
+import { Tree } from '@/components/FileTreeView/FileTreeView.types';
+import { DEFAULT_NODE } from '@/components/FileTreeView/FileTreeView.utils';
 import { useNavigate } from 'react-router-dom';
 import { doRequestPreview } from '../../api/starter';
 import { useApiCall } from '../../hooks/useApiCall';

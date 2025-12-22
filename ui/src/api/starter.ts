@@ -1,5 +1,5 @@
 import { saveAs } from 'file-saver';
-import { Tree } from 'components/FileTreeView/FileTreeView.types';
+import { Tree } from '@/components/FileTreeView/FileTreeView.types';
 
 export enum StackType {
   Future = 'FutureStack',
@@ -47,7 +47,7 @@ export type StarterRequest = {
   builder: Builder;
 };
 
-export const serverAddress = process.env.REACT_APP_SERVER_ADDRESS ?? 'https://adopt-tapir.softwaremill.com';
+export const serverAddress = import.meta.env.VITE_SERVER_ADDRESS ?? 'https://adopt-tapir.softwaremill.com';
 
 export async function doRequestStarter(formData: StarterRequest) {
   const response = await fetch(`${serverAddress}/api/v1/starter.zip`, {
@@ -72,9 +72,7 @@ export async function doRequestStarter(formData: StarterRequest) {
 }
 
 export async function doRequestPreview(formData: StarterRequest, consumer: (resp: Tree) => void) {
-  const serverAddress = !process.env.REACT_APP_SERVER_ADDRESS
-    ? 'https://adopt-tapir.softwaremill.com'
-    : process.env.REACT_APP_SERVER_ADDRESS;
+  const serverAddress = import.meta.env.VITE_SERVER_ADDRESS ?? 'https://adopt-tapir.softwaremill.com';
   const response = await fetch(`${serverAddress}/api/v1/content`, {
     method: 'POST',
     headers: {

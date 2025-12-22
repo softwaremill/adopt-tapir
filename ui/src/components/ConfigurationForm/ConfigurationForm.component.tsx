@@ -11,9 +11,9 @@ import {
   ScalaVersion,
   serverAddress,
   StarterRequest,
-} from 'api/starter';
-import { useApiCall } from 'hooks/useApiCall';
-import { isDevelopment } from 'consts/env';
+} from '@/api/starter';
+import { useApiCall } from '@/hooks/useApiCall';
+import { isDevelopment } from '@/consts/env';
 import { FormTextField } from '../FormTextField';
 import { FormSelect } from '../FormSelect';
 import { FormRadioGroup } from '../FormRadioGroup';

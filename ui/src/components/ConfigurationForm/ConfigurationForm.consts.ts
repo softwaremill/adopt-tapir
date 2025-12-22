@@ -6,7 +6,7 @@ import {
   JSONImplementation,
   ScalaVersion,
   StarterRequest,
-} from 'api/starter';
+} from '@/api/starter';
 import type { FormSelectOption } from '../FormSelect';
 import type { FormRadioOption } from '../FormRadioGroup';
 import {

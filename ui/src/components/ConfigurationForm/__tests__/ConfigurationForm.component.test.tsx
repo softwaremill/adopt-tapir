@@ -1,14 +1,15 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
+import { vi } from 'vitest';
 import { ConfigurationForm } from '../ConfigurationForm.component';
 
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 describe('ConfigurationForm component', () => {
   test('successfully submitting the form after populating it with correct values', async () => {
     // given
-    (fetch as jest.Mock).mockImplementationOnce(
+    (fetch as ReturnType<typeof vi.fn>).mockImplementationOnce(
       // React 18 automatically batches setState in async code now, we need to delay resolve to the next tick
       () => new Promise(resolve => setTimeout(() => resolve({ ok: true }), 0))
     );
