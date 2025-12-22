@@ -4,14 +4,14 @@ type Props = {
   onClose: () => void;
   open: boolean;
   duration?: number;
-  message?: String;
+  message?: string;
   severity?: AlertColor;
 };
 
 export type SnackbarConfig = {
   open: boolean;
   severity?: AlertColor;
-  message?: String;
+  message?: string;
 };
 
 export function CommonSnackbar({ onClose, open, severity, message, duration }: Props) {

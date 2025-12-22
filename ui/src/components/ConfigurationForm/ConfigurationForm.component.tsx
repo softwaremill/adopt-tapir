@@ -106,7 +106,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
       setSnackbar(snackbarConfig);
     }
     // Share config button works after validation, so we trigger it.
-    form.trigger().then(_ => null);
+    form.trigger().then(() => null);
     setInitialized(true);
     if (preview) {
       handleShowPreview();
@@ -132,7 +132,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
   useEffect(() => {
     // NOTE: reset effect implementation field value upon effect type or scala version change
     if (stackType && !getAvailableEffectImplementations(stackType).includes(effectImplementation)) {
-      let availableEffectImplementations = getAvailableEffectImplementations(stackType);
+      const availableEffectImplementations = getAvailableEffectImplementations(stackType);
       if (availableEffectImplementations.length > 0) {
         form.setValue('implementation', availableEffectImplementations[0]);
       } else {
