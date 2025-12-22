@@ -5,10 +5,6 @@ labels:
     files:
       - "build.sbt"
       - "project/plugins.sbt"
-  - label: "automerge"
-    authors: ["dependabot"]
-    files:
-      - "ui/yarn.lock"
   - label: "dependency"
     authors: ["softwaremill-ci"]
     files:
