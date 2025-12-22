@@ -3,7 +3,7 @@ package com.softwaremill.adopttapir.template
 import com.softwaremill.adopttapir.starter.*
 import com.softwaremill.adopttapir.starter.ServerStack.{FutureStack, IOStack, OxStack, ZIOStack}
 import com.softwaremill.adopttapir.starter.ServerImplementation.{Http4s, Netty, Pekko, VertX, ZIOHttp}
-import com.softwaremill.adopttapir.template.Dependency.{JavaDependency, ScalaDependency, ScalaTestDependency, constantTapirVersion}
+import com.softwaremill.adopttapir.template.Dependency.{JavaDependency, ScalaDependency, ScalaTestDependency, asSbtDependency, asScalaCliDependency, constantTapirVersion}
 import com.softwaremill.adopttapir.version.TemplateDependencyInfo
 
 abstract class BuildView:
@@ -100,7 +100,16 @@ abstract class BuildView:
       case JsonImplementation.Circe       =>
         List(ScalaTestDependency("com.softwaremill.sttp.client4", "circe", TemplateDependencyInfo.sttpVersion))
       case JsonImplementation.UPickle | JsonImplementation.Pickler =>
-        List(ScalaTestDependency("com.softwaremill.sttp.client4", "upickle", TemplateDependencyInfo.sttpVersion))
+        List(
+          ScalaTestDependency(
+            "com.softwaremill.sttp.client4",
+            "upickle",
+            TemplateDependencyInfo.sttpVersion,
+            Some("com.lihaoyi"),
+            Some("upickle_3")
+          ),
+          ScalaTestDependency("com.lihaoyi", "upickle", "3.3.1")
+        )
       case JsonImplementation.Jsoniter =>
         List(ScalaTestDependency("com.softwaremill.sttp.client4", "jsoniter", TemplateDependencyInfo.sttpVersion))
       case JsonImplementation.ZIOJson =>
@@ -179,7 +188,7 @@ object BuildSbtView extends BuildView:
     val space = " " * 6
 
     dependencies
-      .map(_.asSbtDependency)
+      .map(asSbtDependency)
       .mkString(space, "," + System.lineSeparator() + space, "")
 
   override protected def getTapirVersion(): String = constantTapirVersion
@@ -188,7 +197,7 @@ object BuildScalaCliView extends BuildView:
   def format(dependencies: List[Dependency], test: Boolean): String =
     val importPrefix = if test then "//> using test.dep " else "//> using dep "
     dependencies
-      .map(_.asScalaCliDependency)
+      .map(asScalaCliDependency)
       .mkString(importPrefix, System.lineSeparator() + importPrefix, System.lineSeparator())
 
   override protected def getTapirVersion(): String = TemplateDependencyInfo.tapirVersion
