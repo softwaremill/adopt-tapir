@@ -10,7 +10,7 @@ rightBracket: Char = '}'
 )
 package @{starterDetails.groupId}
 
-import @{starterDetails.groupId}.Endpoints.@if(scalaVersion == com.softwaremill.adopttapir.starter.ScalaVersion.Scala2){_}else{*}
+import @{starterDetails.groupId}.Endpoints.@if(scalaVersion == com.softwaremill.adopttapir.starter.ScalaVersion.Scala2){_}else{@leftBracket*,given@rightBracket}
 import sttp.client4.{UriContext, basicRequest}
 import zio.test.Assertion.@if(scalaVersion == com.softwaremill.adopttapir.starter.ScalaVersion.Scala2){_}else{*}
 import zio.test.{ZIOSpecDefault, assertZIO}

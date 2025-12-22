@@ -11,7 +11,7 @@ rightBracket: Char = '}'
 )
 package @{starterDetails.groupId}
 
-import @{starterDetails.groupId}.Endpoints.@if(scalaVersion == com.softwaremill.adopttapir.starter.ScalaVersion.Scala2){_}else{*}
+import @{starterDetails.groupId}.Endpoints.@if(scalaVersion == com.softwaremill.adopttapir.starter.ScalaVersion.Scala2){_}else{@leftBracket*,given@rightBracket}
 import org.scalatest.EitherValues
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
