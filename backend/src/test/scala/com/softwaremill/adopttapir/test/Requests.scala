@@ -5,9 +5,9 @@ import com.softwaremill.adopttapir.starter.api.StarterRequest
 import com.softwaremill.adopttapir.test.RichIO.unwrap
 import io.circe.syntax.EncoderOps
 import sttp.capabilities.fs2.Fs2Streams
-import sttp.client3.{Response, SttpBackend, UriContext, asStreamUnsafe, basicRequest}
+import sttp.client4.{Response, StreamBackend, UriContext, asStreamUnsafe, basicRequest}
 
-class Requests(backend: SttpBackend[IO, Any with Fs2Streams[IO]]):
+class Requests(backend: StreamBackend[IO, Fs2Streams[IO]]):
 
   private val basePath = "http://localhost:9090/api/v1"
 
@@ -15,6 +15,6 @@ class Requests(backend: SttpBackend[IO, Any with Fs2Streams[IO]]):
     basicRequest
       .post(uri"$basePath/starter.zip")
       .body(request.asJson.noSpaces)
-      .response(asStreamUnsafe(Fs2Streams[IO]).getRight)
+      .response(asStreamUnsafe(Fs2Streams[IO]).orFail)
       .send(backend)
       .unwrap

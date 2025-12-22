@@ -7,10 +7,10 @@ import com.softwaremill.adopttapir.Dependencies
 import com.softwaremill.adopttapir.infrastructure.CorrelationId
 import org.scalatest.{BeforeAndAfterAll, Suite}
 import sttp.capabilities.fs2.Fs2Streams
-import sttp.client3.SttpBackend
-import sttp.client3.httpclient.fs2.HttpClientFs2Backend
-import sttp.client3.testing.SttpBackendStub
-import sttp.tapir.server.stub.TapirStubInterpreter
+import sttp.client4.{StreamBackend, WebSocketStreamBackend}
+import sttp.client4.httpclient.fs2.HttpClientFs2Backend
+import sttp.client4.testing.WebSocketStreamBackendStub
+import sttp.tapir.server.stub4.TapirWebSocketStreamStubInterpreter
 
 trait TestDependencies extends BeforeAndAfterAll:
   self: Suite with BaseTest =>
@@ -20,7 +20,7 @@ trait TestDependencies extends BeforeAndAfterAll:
   var releaseDependencies: IO[Unit] = _
   val TestConfig: Config = Config.read.unsafeRunSync()
 
-  private val stub: SttpBackendStub[IO, Fs2Streams[IO]] = HttpClientFs2Backend.stub[IO]
+  private val stub: WebSocketStreamBackendStub[IO, Fs2Streams[IO]] = HttpClientFs2Backend.stub[IO]
 
   override protected def beforeAll(): Unit =
     super.beforeAll()
@@ -39,8 +39,8 @@ trait TestDependencies extends BeforeAndAfterAll:
   override protected def afterAll(): Unit =
     releaseDependencies.unsafeRunSync()
 
-  private lazy val serverStub: SttpBackend[IO, Any with Fs2Streams[IO]] =
-    TapirStubInterpreter[IO, Any with Fs2Streams[IO]](stub)
+  private lazy val serverStub: WebSocketStreamBackend[IO, Fs2Streams[IO]] =
+    TapirWebSocketStreamStubInterpreter[IO, Fs2Streams[IO]](stub)
       .whenServerEndpointsRunLogic(dependencies.api.allPublicEndpoints)
       .backend()
 
