@@ -72,7 +72,7 @@ export async function doRequestStarter(formData: StarterRequest) {
 }
 
 export async function doRequestPreview(formData: StarterRequest, consumer: (resp: Tree) => void) {
-  const serverAddress = import.meta.env.VITE_SERVER_ADDRESS ?? 'https://adopt-tapir.softwaremill.com';
+  const serverAddress = import.meta.env.VITE_SERVER_ADDRESS || 'https://adopt-tapir.softwaremill.com';
   const response = await fetch(`${serverAddress}/api/v1/content`, {
     method: 'POST',
     headers: {
