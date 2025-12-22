@@ -56,7 +56,7 @@ describe('configuration form helpers', () => {
 
     test.each(cases)(
       'should return set of effect implementations based on StackType - (%s) and ScalaVersion - (%s)',
-      (stackType, scalaVersion, effectImplementations) => {
+      (stackType, _scalaVersion, effectImplementations) => {
         expect(getAvailableEffectImplementations(stackType)).toEqual(effectImplementations);
       }
     );
@@ -195,7 +195,7 @@ describe('configuration form helpers', () => {
 
     test.each(cases)(
       'should return set of form select options based on StackType - (%s) and ScalaVersion - (%s)',
-      (stackType, scalaVersion, formSelectOptions) => {
+      (stackType, _scalaVersion, formSelectOptions) => {
         const effectImplementationOptions = getEffectImplementationOptions(stackType);
 
         expect(effectImplementationOptions).toHaveLength(formSelectOptions.length);

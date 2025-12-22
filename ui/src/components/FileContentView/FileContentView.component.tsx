@@ -46,6 +46,7 @@ export function FileContentView({ openedFile }: Props) {
 
   return (
     <>
+      {/* @ts-expect-error - react-syntax-highlighter type definitions are incompatible with TypeScript 5.x */}
       <SyntaxHighlighter
         customStyle={{
           margin: 0,

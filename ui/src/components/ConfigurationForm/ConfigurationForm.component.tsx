@@ -167,7 +167,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
     open: false,
     severity: 'info',
   });
-  const handleSnackClose = (event?: SyntheticEvent | Event, reason?: string) => {
+  const handleSnackClose = (_event?: SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
       return;
     }
