@@ -21,8 +21,11 @@ abstract class BuildView:
     httpDependencies ++ metricsDependencies ++ docsDependencies ++ monitoringDependencies ++ jsonDependencies ++ loggerDependencies
 
   def getAllTestDependencies(starterDetails: StarterDetails): List[Dependency] =
-    ScalaTestDependency("com.softwaremill.sttp.tapir", "tapir-sttp-stub4-server", getTapirVersion()) ::
-      getTestDependencies(starterDetails.serverStack) ++ getJsonTestDependencies(starterDetails)
+    val stubServerDependency = ScalaTestDependency("com.softwaremill.sttp.tapir", "tapir-sttp-stub4-server", getTapirVersion())
+    val zioSttpDependency = if starterDetails.serverStack == ServerStack.ZIOStack then
+      List(ScalaTestDependency("com.softwaremill.sttp.client4", "zio", TemplateDependencyInfo.sttpVersion))
+    else Nil
+    stubServerDependency :: (getTestDependencies(starterDetails.serverStack) ++ getJsonTestDependencies(starterDetails) ++ zioSttpDependency)
 
   protected def getTapirVersion(): String
 

@@ -38,11 +38,11 @@ object EndpointsSpecView:
 
   object Stub:
     def prepareBackendStub(endpoint: String, serverStack: ServerStack): Code =
-      val (stub, interpreter) = serverStack match {
-        case ServerStack.FutureStack => ("BackendStub.asynchronousFuture", "TapirStubInterpreter")
-        case ServerStack.IOStack     => ("BackendStub[IO](new CatsMonadError[IO]())", "TapirStubInterpreter")
-        case ServerStack.ZIOStack    => ("BackendStub[ZIO[Any, Throwable, *]]", "TapirStubInterpreter")
-        case ServerStack.OxStack     => ("SyncBackendStub", "TapirSyncStubInterpreter")
+      val (stub, interpreter, additionalCode) = serverStack match {
+        case ServerStack.FutureStack => ("BackendStub.asynchronousFuture", "TapirStubInterpreter", "")
+        case ServerStack.IOStack     => ("BackendStub[IO](new CatsMonadError[IO]())", "TapirStubInterpreter", "")
+        case ServerStack.ZIOStack    => ("BackendStub[Task](new RIOMonadAsyncError[Any])", "TapirStubInterpreter", "")
+        case ServerStack.OxStack     => ("SyncBackendStub", "TapirSyncStubInterpreter", "")
       }
 
       val body =
@@ -67,8 +67,9 @@ object EndpointsSpecView:
           )
         case ServerStack.ZIOStack =>
           Set(
-            Import("zio.ZIO"),
+            Import("zio.Task"),
             Import("sttp.client4.testing.BackendStub"),
+            Import("sttp.client4.impl.zio.RIOMonadAsyncError"),
             Import("sttp.tapir.server.stub4.TapirStubInterpreter")
           )
         case ServerStack.OxStack =>
