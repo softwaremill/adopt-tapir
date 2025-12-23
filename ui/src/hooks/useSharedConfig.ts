@@ -40,7 +40,7 @@ export function useSharedConfig(): [StarterRequest | undefined, SnackbarConfig |
           });
         }
       })
-      .catch(_ => {
+      .catch(() => {
         setSnackbar({
           open: true,
           severity: 'warning',

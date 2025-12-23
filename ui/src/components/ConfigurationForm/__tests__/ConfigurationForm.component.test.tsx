@@ -1,14 +1,15 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
+import { vi } from 'vitest';
 import { ConfigurationForm } from '../ConfigurationForm.component';
 
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 describe('ConfigurationForm component', () => {
   test('successfully submitting the form after populating it with correct values', async () => {
     // given
-    (fetch as jest.Mock).mockImplementationOnce(
+    (fetch as ReturnType<typeof vi.fn>).mockImplementationOnce(
       // React 18 automatically batches setState in async code now, we need to delay resolve to the next tick
       () => new Promise(resolve => setTimeout(() => resolve({ ok: true }), 0))
     );
@@ -24,12 +25,12 @@ describe('ConfigurationForm component', () => {
     await user.type(screen.getByRole('textbox', { name: /Project name/i }), 'test-project');
     await user.type(screen.getByRole('textbox', { name: /Group ID/i }), 'com.softwaremill');
 
-    await user.click(screen.getByRole('button', { name: /Stack/i }));
+    await user.click(screen.getByRole('combobox', { name: /Stack/i }));
     await user.click(screen.getByText('Future'));
 
     await user.click(within(screen.getByRole('radiogroup', { name: /Scala version/i })).getByText('2'));
 
-    await user.click(screen.getByRole('button', { name: /Server implementation/i }));
+    await user.click(screen.getByRole('combobox', { name: /Server implementation/i }));
     await user.click(screen.getByText('Vert.X'));
 
     await user.click(within(screen.getByRole('radiogroup', { name: /Build tool/i })).getByText('Scala CLI'));
@@ -78,6 +79,7 @@ describe('ConfigurationForm component', () => {
 
   test('for validation error and lack of network request while trying to submit not complete form', async () => {
     // given
+    (fetch as ReturnType<typeof vi.fn>).mockClear();
     const user = userEvent.setup();
     render(
       <BrowserRouter>
@@ -124,12 +126,12 @@ describe('ConfigurationForm component', () => {
     await user.type(screen.getByRole('textbox', { name: /Project name/i }), 'test-project');
     await user.type(screen.getByRole('textbox', { name: /Group ID/i }), 'com.softwaremill');
 
-    await user.click(screen.getByRole('button', { name: /Stack/i }));
+    await user.click(screen.getByRole('combobox', { name: /Stack/i }));
     await user.click(screen.getByText('Future'));
 
     await user.click(within(screen.getByRole('radiogroup', { name: /Scala version/i })).getByText('2'));
 
-    await user.click(screen.getByRole('button', { name: /Server implementation/i }));
+    await user.click(screen.getByRole('combobox', { name: /Server implementation/i }));
     await user.click(screen.getByText('Vert.X'));
 
     await user.click(within(screen.getByRole('radiogroup', { name: /Build tool/i })).getByText('Scala CLI'));
@@ -170,13 +172,13 @@ describe('ConfigurationForm component', () => {
     );
 
     // when
-    await user.click(screen.getByRole('button', { name: /Stack/i }));
+    await user.click(screen.getByRole('combobox', { name: /Stack/i }));
     await user.click(screen.getByText('Functional (ZIO)'));
 
-    await user.click(screen.getByRole('button', { name: /Server implementation/i }));
+    await user.click(screen.getByRole('combobox', { name: /Server implementation/i }));
     await user.click(screen.getByText('ZIO Http'));
 
-    await user.click(screen.getByRole('button', { name: /Stack/i }));
+    await user.click(screen.getByRole('combobox', { name: /Stack/i }));
     await user.click(screen.getByText('Future'));
 
     // then
@@ -202,14 +204,14 @@ describe('ConfigurationForm component', () => {
     );
 
     // when
-    await user.click(screen.getByRole('button', { name: /Stack/i }));
+    await user.click(screen.getByRole('combobox', { name: /Stack/i }));
     await user.click(screen.getByText('Functional (ZIO)'));
 
     await user.click(
       within(screen.getByRole('radiogroup', { name: /Add JSON endpoint using/i })).getByText('zio-json')
     );
 
-    await user.click(screen.getByRole('button', { name: /Stack/i }));
+    await user.click(screen.getByRole('combobox', { name: /Stack/i }));
     await user.click(screen.getByText('Future'));
 
     // then
@@ -235,7 +237,7 @@ describe('ConfigurationForm component', () => {
     );
 
     // when
-    await user.click(screen.getByRole('button', { name: /Stack/i }));
+    await user.click(screen.getByRole('combobox', { name: /Stack/i }));
     await user.click(screen.getByText('Functional (IO, cats-effect)'));
 
     await user.click(screen.getByRole('radiogroup', { name: /Scala version/i }));

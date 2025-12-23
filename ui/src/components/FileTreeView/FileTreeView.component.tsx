@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
-import TreeView from '@mui/lab/TreeView';
+import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
+import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import { Folder, InsertDriveFileOutlined, FolderOpenTwoTone } from '@mui/icons-material';
-import TreeItem from '@mui/lab/TreeItem';
 import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
 import { TreeNode, Tree } from './FileTreeView.types';
 import { findNestedNode } from './FileTreeView.utils';
@@ -13,7 +13,7 @@ interface Props {
 
 const renderTree = (node: TreeNode) => {
   return (
-    <TreeItem key={node.name} nodeId={node.id ?? node.name} label={node.name}>
+    <TreeItem key={node.name} itemId={node.id ?? node.name} label={node.name}>
       {Array.isArray(node.content) ? node.content.map(deeperNode => renderTree(deeperNode)) : null}
     </TreeItem>
   );
@@ -34,8 +34,8 @@ export const FileTreeView = ({ tree, setOpenedFile }: Props) => {
     [tree, setOpenedFile]
   );
 
-  const handleSelect = (event: React.SyntheticEvent, nodeId: string) => {
-    openFile(nodeId);
+  const handleItemClick = (_event: React.SyntheticEvent, itemId: string) => {
+    openFile(itemId);
   };
 
   useEffect(() => {
@@ -77,20 +77,22 @@ export const FileTreeView = ({ tree, setOpenedFile }: Props) => {
   return (
     <>
       {parsedTree && (
-        <TreeView
+        <SimpleTreeView
           aria-label="file tree view"
-          defaultEndIcon={<InsertDriveFileOutlined />}
-          defaultCollapseIcon={<FolderOpenTwoTone />}
-          defaultExpandIcon={<Folder />}
-          defaultExpanded={uniqueIds}
-          defaultSelected={mainNodeId}
-          onNodeSelect={handleSelect}
-          sx={{ flexGrow: 1, display: 'inline-flex', flexDirection: 'column' }}
+          slots={{
+            endIcon: InsertDriveFileOutlined,
+            collapseIcon: FolderOpenTwoTone,
+            expandIcon: Folder,
+          }}
+          defaultExpandedItems={uniqueIds}
+          defaultSelectedItems={mainNodeId}
+          onItemClick={handleItemClick}
+          sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', width: '100%' }}
         >
           {parsedTree.map((node: TreeNode, index: number) => (
             <div key={index}>{renderTree(node)}</div>
           ))}
-        </TreeView>
+        </SimpleTreeView>
       )}
     </>
   );

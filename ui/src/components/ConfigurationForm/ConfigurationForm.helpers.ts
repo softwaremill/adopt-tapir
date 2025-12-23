@@ -1,4 +1,4 @@
-import { EffectImplementation, StackType, JSONImplementation, ScalaVersion } from 'api/starter';
+import { EffectImplementation, StackType, JSONImplementation, ScalaVersion } from '@/api/starter';
 import { EFFECT_IMPLEMENTATIONS_OPTIONS, STACK_TYPE_OPTIONS, JSON_OUTPUT_OPTIONS } from './ConfigurationForm.consts';
 import type { FormSelectOption } from '../FormSelect';
 import type { FormRadioOption } from '../FormRadioGroup';
