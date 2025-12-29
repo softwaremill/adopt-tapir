@@ -7,6 +7,7 @@ import { App } from './App';
 import { theme } from './theme';
 import reportWebVitals from './reportWebVitals';
 import { ConfigurationDataContextProvider } from './contexts';
+import './safari-fix.css';
 
 const muiCache = createCache({
   key: 'mui',
