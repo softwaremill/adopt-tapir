@@ -243,7 +243,6 @@ describe('ConfigurationForm component', () => {
     await user.click(screen.getByRole('radiogroup', { name: /Scala version/i }));
     await user.click(screen.getByText('3'));
 
-
     await user.click(screen.getByRole('radiogroup', { name: /Scala version/i }));
     await user.click(screen.getByText('2'));
 
