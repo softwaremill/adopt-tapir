@@ -102,17 +102,10 @@ abstract class BuildView:
       case JsonImplementation.WithoutJson => Nil
       case JsonImplementation.Circe       =>
         List(ScalaTestDependency("com.softwaremill.sttp.client4", "circe", TemplateDependencyInfo.sttpVersion))
-      case JsonImplementation.UPickle | JsonImplementation.Pickler =>
-        List(
-          ScalaTestDependency(
-            "com.softwaremill.sttp.client4",
-            "upickle",
-            TemplateDependencyInfo.sttpVersion,
-            Some("com.lihaoyi"),
-            Some("upickle_3")
-          ),
-          ScalaTestDependency("com.lihaoyi", "upickle", "3.3.1")
-        )
+      case JsonImplementation.UPickle =>
+        List(ScalaTestDependency("com.softwaremill.sttp.client4", "upickle", TemplateDependencyInfo.sttpVersion))
+      case JsonImplementation.Pickler =>
+        List(ScalaTestDependency("com.softwaremill.sttp.client4", "upickle", TemplateDependencyInfo.sttpVersion))
       case JsonImplementation.Jsoniter =>
         List(ScalaTestDependency("com.softwaremill.sttp.client4", "jsoniter", TemplateDependencyInfo.sttpVersion))
       case JsonImplementation.ZIOJson =>
