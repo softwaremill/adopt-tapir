@@ -47,11 +47,9 @@ jobs:
       fail-fast: false
       matrix:
         scala: [ "Scala2", "Scala3" ]
-        json: [ "No", "Circe", "UPickle", "Jsoniter", "ZIOJson", "Pickler" ]
+        json: [ "No", "Circe", "UPickle", "Jsoniter", "ZIOJson" ]
         stack: [ "OxStack", "FutureStack", "IOStack", "ZIOStack" ]
         exclude:
-          - scala: "Scala2"
-            json: "Pickler"
           - scala: "Scala2"
             stack: "OxStack"
     steps:
