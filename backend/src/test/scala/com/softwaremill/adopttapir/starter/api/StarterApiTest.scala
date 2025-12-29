@@ -5,7 +5,7 @@ import cats.effect.{IO, Resource}
 import com.softwaremill.adopttapir.http.Error_OUT
 import com.softwaremill.adopttapir.infrastructure.Json.*
 import com.softwaremill.adopttapir.starter.api.StackRequest.FutureStack
-import com.softwaremill.adopttapir.starter.api.JsonImplementationRequest.{Jsoniter, ZIOJson, Pickler}
+import com.softwaremill.adopttapir.starter.api.JsonImplementationRequest.{Jsoniter, ZIOJson}
 import com.softwaremill.adopttapir.starter.api.ScalaVersionRequest.Scala2
 import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Netty, ZIOHttp}
 import com.softwaremill.adopttapir.starter.api.StarterApiTest.{mainPath, validSbtRequest, validScalaCliRequest}
@@ -144,20 +144,6 @@ class StarterApiTest extends BaseTest with TestDependencies {
     )
   }
 
-  it should "return request error with information about picking wrong scala version for a json" in {
-    // given
-    val request = StarterRequestGenerators.randomStarterRequest().copy(scalaVersion = Scala2, json = Pickler)
-
-    // when
-    val rootEx = intercept[SttpClientException](requests.requestZip(request))
-    val ex = rootEx.cause.asInstanceOf[UnexpectedStatusCode[String]]
-
-    // then
-    ex.response.code.code shouldBe 400
-    jawn.decode[Error_OUT](ex.body).value.error should include(
-      "Pickler will work only with Scala 3"
-    )
-  }
 
   it should "return request error with information about wrong projectName " in {
     // given

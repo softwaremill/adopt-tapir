@@ -218,21 +218,18 @@ describe('configuration consts', () => {
         [ScalaVersion.Scala2, StackType.Future, JSONImplementation.UPickle, true],
         [ScalaVersion.Scala2, StackType.Future, JSONImplementation.Jsoniter, true],
         [ScalaVersion.Scala2, StackType.Future, JSONImplementation.ZIOJson, false],
-        [ScalaVersion.Scala2, StackType.Future, JSONImplementation.Pickler, false],
 
         [ScalaVersion.Scala2, StackType.IO, JSONImplementation.No, true],
         [ScalaVersion.Scala2, StackType.IO, JSONImplementation.Circe, true],
         [ScalaVersion.Scala2, StackType.IO, JSONImplementation.UPickle, true],
         [ScalaVersion.Scala2, StackType.IO, JSONImplementation.Jsoniter, true],
         [ScalaVersion.Scala2, StackType.IO, JSONImplementation.ZIOJson, false],
-        [ScalaVersion.Scala2, StackType.IO, JSONImplementation.Pickler, false],
 
         [ScalaVersion.Scala2, StackType.ZIO, JSONImplementation.No, true],
         [ScalaVersion.Scala2, StackType.ZIO, JSONImplementation.Circe, true],
         [ScalaVersion.Scala2, StackType.ZIO, JSONImplementation.UPickle, true],
         [ScalaVersion.Scala2, StackType.ZIO, JSONImplementation.Jsoniter, true],
         [ScalaVersion.Scala2, StackType.ZIO, JSONImplementation.ZIOJson, true],
-        [ScalaVersion.Scala2, StackType.ZIO, JSONImplementation.Pickler, false],
 
         // Scala 3 variants
         [ScalaVersion.Scala3, StackType.Future, JSONImplementation.No, true],
@@ -240,28 +237,24 @@ describe('configuration consts', () => {
         [ScalaVersion.Scala3, StackType.Future, JSONImplementation.UPickle, true],
         [ScalaVersion.Scala3, StackType.Future, JSONImplementation.Jsoniter, true],
         [ScalaVersion.Scala3, StackType.Future, JSONImplementation.ZIOJson, false],
-        [ScalaVersion.Scala3, StackType.Future, JSONImplementation.Pickler, true],
 
         [ScalaVersion.Scala3, StackType.IO, JSONImplementation.No, true],
         [ScalaVersion.Scala3, StackType.IO, JSONImplementation.Circe, true],
         [ScalaVersion.Scala3, StackType.IO, JSONImplementation.UPickle, true],
         [ScalaVersion.Scala3, StackType.IO, JSONImplementation.Jsoniter, true],
         [ScalaVersion.Scala3, StackType.IO, JSONImplementation.ZIOJson, false],
-        [ScalaVersion.Scala3, StackType.IO, JSONImplementation.Pickler, true],
 
         [ScalaVersion.Scala3, StackType.Ox, JSONImplementation.No, true],
         [ScalaVersion.Scala3, StackType.Ox, JSONImplementation.Circe, true],
         [ScalaVersion.Scala3, StackType.Ox, JSONImplementation.UPickle, true],
         [ScalaVersion.Scala3, StackType.Ox, JSONImplementation.Jsoniter, true],
         [ScalaVersion.Scala3, StackType.Ox, JSONImplementation.ZIOJson, false],
-        [ScalaVersion.Scala3, StackType.Ox, JSONImplementation.Pickler, true],
 
         [ScalaVersion.Scala3, StackType.ZIO, JSONImplementation.No, true],
         [ScalaVersion.Scala3, StackType.ZIO, JSONImplementation.Circe, true],
         [ScalaVersion.Scala3, StackType.ZIO, JSONImplementation.UPickle, true],
         [ScalaVersion.Scala3, StackType.ZIO, JSONImplementation.Jsoniter, true],
         [ScalaVersion.Scala3, StackType.ZIO, JSONImplementation.ZIOJson, true],
-        [ScalaVersion.Scala3, StackType.ZIO, JSONImplementation.Pickler, true],
       ];
 
       const cases = casesDetails.map(([scalaVersion, stackType, jsonImplementation, expected]) => ({

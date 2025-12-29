@@ -94,10 +94,6 @@ export const JSON_OUTPUT_OPTIONS: FormRadioOption<JSONImplementation>[] = [
     value: JSONImplementation.UPickle,
   },
   {
-    label: 'pickler',
-    value: JSONImplementation.Pickler,
-  },
-  {
     label: 'jsoniter',
     value: JSONImplementation.Jsoniter,
   },

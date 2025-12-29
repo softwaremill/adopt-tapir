@@ -73,10 +73,6 @@ abstract class BuildView:
         List(
           ScalaDependency("com.softwaremill.sttp.tapir", "tapir-json-upickle", getTapirVersion())
         )
-      case JsonImplementation.Pickler =>
-        List(
-          ScalaDependency("com.softwaremill.sttp.tapir", "tapir-json-pickler", getTapirVersion())
-        )
       case JsonImplementation.Jsoniter =>
         List(
           ScalaDependency("com.softwaremill.sttp.tapir", "tapir-jsoniter-scala", getTapirVersion()),
@@ -103,8 +99,6 @@ abstract class BuildView:
       case JsonImplementation.Circe       =>
         List(ScalaTestDependency("com.softwaremill.sttp.client4", "circe", TemplateDependencyInfo.sttpVersion))
       case JsonImplementation.UPickle =>
-        List(ScalaTestDependency("com.softwaremill.sttp.client4", "upickle", TemplateDependencyInfo.sttpVersion))
-      case JsonImplementation.Pickler =>
         List(ScalaTestDependency("com.softwaremill.sttp.client4", "upickle", TemplateDependencyInfo.sttpVersion))
       case JsonImplementation.Jsoniter =>
         List(ScalaTestDependency("com.softwaremill.sttp.client4", "jsoniter", TemplateDependencyInfo.sttpVersion))

@@ -19,10 +19,6 @@ import sttp.client4.*
 @{additionalImport.asScalaImport(scalaVersion)}}
 
 class EndpointsSpec extends AnyFlatSpec with Matchers with EitherValues:
-@if(jsonImplementation == com.softwaremill.adopttapir.starter.JsonImplementation.Pickler){
-  given Reader[Author] = upickle.default.macroR
-  given Reader[Book] = upickle.default.macroR
-}
 
   it should "return hello message" in {
     // given

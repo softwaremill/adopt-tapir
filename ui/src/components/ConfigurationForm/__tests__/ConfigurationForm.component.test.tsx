@@ -243,7 +243,6 @@ describe('ConfigurationForm component', () => {
     await user.click(screen.getByRole('radiogroup', { name: /Scala version/i }));
     await user.click(screen.getByText('3'));
 
-    await user.click(within(screen.getByRole('radiogroup', { name: /Add JSON endpoint using/i })).getByText('pickler'));
 
     await user.click(screen.getByRole('radiogroup', { name: /Scala version/i }));
     await user.click(screen.getByText('2'));

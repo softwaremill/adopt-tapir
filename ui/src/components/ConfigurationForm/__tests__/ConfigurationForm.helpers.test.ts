@@ -296,10 +296,6 @@ describe('configuration form helpers', () => {
             value: JSONImplementation.UPickle,
           },
           {
-            label: 'pickler',
-            value: JSONImplementation.Pickler,
-          },
-          {
             label: 'jsoniter',
             value: JSONImplementation.Jsoniter,
           },
@@ -320,10 +316,6 @@ describe('configuration form helpers', () => {
           {
             label: 'µPickle',
             value: JSONImplementation.UPickle,
-          },
-          {
-            label: 'pickler',
-            value: JSONImplementation.Pickler,
           },
           {
             label: 'jsoniter',
@@ -348,10 +340,6 @@ describe('configuration form helpers', () => {
             value: JSONImplementation.UPickle,
           },
           {
-            label: 'pickler',
-            value: JSONImplementation.Pickler,
-          },
-          {
             label: 'jsoniter',
             value: JSONImplementation.Jsoniter,
           },
@@ -372,10 +360,6 @@ describe('configuration form helpers', () => {
           {
             label: 'µPickle',
             value: JSONImplementation.UPickle,
-          },
-          {
-            label: 'pickler',
-            value: JSONImplementation.Pickler,
           },
           {
             label: 'jsoniter',
