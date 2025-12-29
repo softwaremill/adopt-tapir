@@ -3,7 +3,7 @@ package com.softwaremill.adopttapir.template
 import com.softwaremill.adopttapir.starter.*
 import com.softwaremill.adopttapir.starter.ServerStack.{FutureStack, IOStack, OxStack, ZIOStack}
 import com.softwaremill.adopttapir.starter.ServerImplementation.{Http4s, Netty, Pekko, VertX, ZIOHttp}
-import com.softwaremill.adopttapir.template.Dependency.{JavaDependency, ScalaDependency, ScalaTestDependency, asSbtDependency, asScalaCliDependency, constantTapirVersion}
+import com.softwaremill.adopttapir.template.Dependency.{JavaDependency, ScalaDependency, ScalaTestDependency, constantTapirVersion}
 import com.softwaremill.adopttapir.version.TemplateDependencyInfo
 
 abstract class BuildView:
@@ -184,7 +184,7 @@ object BuildSbtView extends BuildView:
     val space = " " * 6
 
     dependencies
-      .map(asSbtDependency)
+      .map(_.asSbtDependency)
       .mkString(space, "," + System.lineSeparator() + space, "")
 
   override protected def getTapirVersion(): String = constantTapirVersion
@@ -193,7 +193,7 @@ object BuildScalaCliView extends BuildView:
   def format(dependencies: List[Dependency], test: Boolean): String =
     val importPrefix = if test then "//> using test.dep " else "//> using dep "
     dependencies
-      .map(asScalaCliDependency)
+      .map(_.asScalaCliDependency)
       .mkString(importPrefix, System.lineSeparator() + importPrefix, System.lineSeparator())
 
   override protected def getTapirVersion(): String = TemplateDependencyInfo.tapirVersion
