@@ -87,3 +87,4 @@ enum ScalaVersionRequest(val toModel: ScalaVersion) derives JsonTaggedAdt.PureEn
 enum BuilderRequest(val toModel: Builder) derives JsonTaggedAdt.PureEncoder, JsonTaggedAdt.PureDecoder, Schema:
   case Sbt extends BuilderRequest(Builder.Sbt)
   case ScalaCli extends BuilderRequest(Builder.ScalaCli)
+  case ScalaCliSingleFile extends BuilderRequest(Builder.ScalaCliSingleFile)

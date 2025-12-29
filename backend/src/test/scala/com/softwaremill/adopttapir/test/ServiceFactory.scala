@@ -72,8 +72,9 @@ class ServiceFactory:
 
   def create(builder: Builder, tempDir: better.files.File): IO[GeneratedService] =
     builder match {
-      case Builder.Sbt      => IO.blocking(SbtService(tempDir))
-      case Builder.ScalaCli => IO.blocking(ScalaCliService(tempDir)).timeoutAndForget(waitForScalaCliCompileAndUnitTest)
+      case Builder.Sbt                => IO.blocking(SbtService(tempDir))
+      case Builder.ScalaCli           => IO.blocking(ScalaCliService(tempDir)).timeoutAndForget(waitForScalaCliCompileAndUnitTest)
+      case Builder.ScalaCliSingleFile => IO.blocking(ScalaCliSingleFileService(tempDir))
     }
 
   private case class SbtService(tempDir: better.files.File) extends GeneratedService:
@@ -105,4 +106,19 @@ class ServiceFactory:
       )
 
       os.proc("scala-cli", "--power", "run", ".")
+        .spawn(cwd = os.Path(tempDir.toJava), env = Map("HTTP_PORT" -> "0"), mergeErrIntoOut = true)
+
+  private case class ScalaCliSingleFileService(tempDir: better.files.File) extends GeneratedService:
+    override protected val portPattern = new Regex("^(?:Go to |Server started at )http://localhost:(\\d+).*")
+
+    override protected lazy val process: SubProcess =
+      // For single-file projects, we just compile and run (no tests)
+      val compile = os.proc("scala-cli", "--power", "compile", "*.scala").call(cwd = os.Path(tempDir.toJava), mergeErrIntoOut = true)
+      assert(
+        compile.exitCode == 0,
+        s"Compilation exited with [${compile.exitCode}] and output:${System
+            .lineSeparator()}${compile.out.lines().mkString(System.lineSeparator())}"
+      )
+
+      os.proc("scala-cli", "--power", "run", "*.scala")
         .spawn(cwd = os.Path(tempDir.toJava), env = Map("HTTP_PORT" -> "0"), mergeErrIntoOut = true)

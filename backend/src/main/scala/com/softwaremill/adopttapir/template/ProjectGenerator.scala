@@ -14,8 +14,9 @@ final case class GeneratedFile(
 object ProjectGenerator:
   def generate(starterDetails: StarterDetails): List[GeneratedFile] =
     starterDetails.builder match
-      case Builder.Sbt      => SbtProjectTemplate.generate(starterDetails)
-      case Builder.ScalaCli => ScalaCliProjectTemplate.generate(starterDetails)
+      case Builder.Sbt                => SbtProjectTemplate.generate(starterDetails)
+      case Builder.ScalaCli           => ScalaCliProjectTemplate.generate(starterDetails)
+      case Builder.ScalaCliSingleFile => ScalaCliSingleFileTemplate.generate(starterDetails)
 
 /** Twirl library was chosen for templating. Due to limitations in Twirl, some of arguments are passed as [[String]].<br> More advanced
   * rendering is done by dedicated objects `*View` e.g. @see [[EndpointsView]] or @[[MainView]].
@@ -233,3 +234,64 @@ private object ScalaCliProjectTemplate extends ProjectTemplate:
   private lazy val gitignore: GeneratedFile = GeneratedFile(".gitignore", txt.gitignore(List(".bsp/", ".scala-build/")).toString())
 
 end ScalaCliProjectTemplate
+
+private object ScalaCliSingleFileTemplate:
+  def generate(starterDetails: StarterDetails): List[GeneratedFile] =
+    List(getSingleFile(starterDetails), readme)
+
+  private def getSingleFile(starterDetails: StarterDetails): GeneratedFile = {
+    import CommonObjectTemplate.StarterDetailsWithLegalizedGroupId
+    val groupId = starterDetails.legalizedGroupId
+
+    // Get all dependencies (only main dependencies, no test dependencies)
+    val dependencies = (BuildScalaCliView.getMainDependencies _).andThen(deps => BuildScalaCliView.format(deps, false))(starterDetails)
+
+    // Get all code components
+    val helloServerEndpoint = EndpointsView.getHelloServerEndpoint(starterDetails)
+    val jsonEndpoint = EndpointsView.getJsonOutModel(starterDetails)
+    val library = EndpointsView.getJsonLibrary(starterDetails)
+    val apiEndpoints = EndpointsView.getApiEndpoints(starterDetails)
+    val docEndpoints = EndpointsView.getDocEndpoints(starterDetails)
+    val metricsEndpoint = EndpointsView.getMetricsEndpoint(starterDetails)
+    val allEndpoints = EndpointsView.getAllEndpoints(starterDetails)
+    val mainContentRaw = MainView.getProperMainContent(starterDetails)
+    // Remove package declaration from mainContent since we already have it in the template
+    val mainContent = mainContentRaw.linesIterator
+      .dropWhile(line => line.trim.startsWith("package"))
+      .mkString(System.lineSeparator())
+
+    // Collect all imports
+    val allImports = toSortedList(
+      helloServerEndpoint.imports ++ metricsEndpoint.imports ++ docEndpoints.imports
+        ++ jsonEndpoint.imports ++ library.imports ++ allEndpoints.imports
+    )
+
+    // Build the single file content
+    val content = txt
+      .scalaCliSingleFile(
+        starterDetails.projectName,
+        groupId,
+        starterDetails.scalaVersion.value,
+        dependencies,
+        allImports,
+        helloServerEndpoint.body,
+        jsonEndpoint.body,
+        library.body,
+        apiEndpoints.body,
+        docEndpoints.body,
+        metricsEndpoint.body,
+        allEndpoints.body,
+        mainContent,
+        starterDetails.scalaVersion
+      )
+      .toString()
+
+    GeneratedFile(s"${starterDetails.projectName}.scala", content)
+  }
+
+  private def toSortedList(set: Set[Import]): List[Import] = set.toList.sortBy(_.fullName)
+
+  private lazy val readme: GeneratedFile =
+    GeneratedFile(CommonObjectTemplate.readMePath, CommonObjectTemplate.templateResource("README_scala-cli-single-file.md"))
+
+end ScalaCliSingleFileTemplate

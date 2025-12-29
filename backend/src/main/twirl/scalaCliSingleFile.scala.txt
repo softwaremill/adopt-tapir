@@ -1,0 +1,50 @@
+@(
+name: String,
+groupId: String,
+scalaVersion: String,
+dependencies: String,
+additionalImports: List[com.softwaremill.adopttapir.template.scala.Import],
+helloEndpointServer: String,
+jsonEndpoint: String,
+library: String,
+apiEndpoints: String,
+docEndpoints: String,
+metricsEndpoint: String,
+allEndpoints: String,
+mainContent: String,
+scalaVersionEnum: com.softwaremill.adopttapir.starter.ScalaVersion,
+leftBracket: Char = '{',
+rightBracket: Char = '}'
+)
+//> using scala @scalaVersion
+@dependencies
+
+package @groupId
+
+import sttp.tapir.@if(scalaVersionEnum == com.softwaremill.adopttapir.starter.ScalaVersion.Scala2){_}else{*}
+@for(additionalImport <- additionalImports) {
+@{additionalImport.asScalaImport(scalaVersionEnum)}}
+
+object Endpoints@if(scalaVersionEnum == com.softwaremill.adopttapir.starter.ScalaVersion.Scala2){ @leftBracket}else{:}
+  case class User(name: String) extends AnyVal
+  val helloEndpoint: PublicEndpoint[User, Unit, String, Any] = endpoint.get
+    .in("hello")
+    .in(query[User]("name"))
+    .out(stringBody)
+@helloEndpointServer
+
+@jsonEndpoint
+
+@apiEndpoints
+
+@docEndpoints
+
+@metricsEndpoint
+
+@allEndpoints
+@if(scalaVersionEnum == com.softwaremill.adopttapir.starter.ScalaVersion.Scala2){@rightBracket}
+
+@library
+
+@mainContent
+
