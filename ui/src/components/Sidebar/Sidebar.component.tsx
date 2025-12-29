@@ -1,6 +1,6 @@
 import { Typography, IconButton, Link, Tooltip } from '@mui/material';
 import { GitHub, Article } from '@mui/icons-material';
-import { ReactComponent as TapirLogo } from 'assets/tapir-hex.svg';
+import TapirLogo from '@/assets/tapir-hex.svg?react';
 import { useStyles } from './Sidebar.styles';
 
 export const Sidebar = () => {

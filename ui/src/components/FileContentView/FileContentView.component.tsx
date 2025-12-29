@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Light as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { Light as SyntaxHighlighterBase, SyntaxHighlighterProps } from 'react-syntax-highlighter';
 import scala from 'react-syntax-highlighter/dist/esm/languages/hljs/scala';
 import markdown from 'react-syntax-highlighter/dist/esm/languages/hljs/markdown';
 import ini from 'react-syntax-highlighter/dist/esm/languages/hljs/ini';
@@ -9,10 +9,13 @@ import { TreeNode } from '../FileTreeView/FileTreeView.types';
 
 type SupportedLanguage = 'scala' | 'markdown' | 'ini' | 'plaintext';
 
-SyntaxHighlighter.registerLanguage('scala', scala);
-SyntaxHighlighter.registerLanguage('markdown', markdown);
-SyntaxHighlighter.registerLanguage('ini', ini);
-SyntaxHighlighter.registerLanguage('plaintext', plaintext);
+// Type assertion to fix React 18 compatibility issue with class-based component types
+const SyntaxHighlighter = SyntaxHighlighterBase as unknown as React.FC<SyntaxHighlighterProps>;
+
+SyntaxHighlighterBase.registerLanguage('scala', scala);
+SyntaxHighlighterBase.registerLanguage('markdown', markdown);
+SyntaxHighlighterBase.registerLanguage('ini', ini);
+SyntaxHighlighterBase.registerLanguage('plaintext', plaintext);
 
 type Props = {
   openedFile: TreeNode;

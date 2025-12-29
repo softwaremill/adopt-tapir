@@ -6,7 +6,7 @@ import {
   JSONImplementation,
   ScalaVersion,
   StarterRequest,
-} from 'api/starter';
+} from '@/api/starter';
 import { starterValidationSchema } from '../ConfigurationForm.consts';
 
 const TEST_FORM_VALUES: StarterRequest = {

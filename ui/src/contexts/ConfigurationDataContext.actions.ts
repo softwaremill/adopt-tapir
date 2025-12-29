@@ -12,7 +12,7 @@ type Set = {
   formData: StarterRequest;
 };
 
-export function reducer(state: ContextState, action: ContextAction) {
+export function reducer(_state: ContextState, action: ContextAction) {
   switch (action.type) {
     case 'reset':
       return {};

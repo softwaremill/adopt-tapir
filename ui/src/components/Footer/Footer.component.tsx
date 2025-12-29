@@ -1,5 +1,5 @@
 import { Typography, Link } from '@mui/material';
-import SoftwareMillLogo from 'assets/sml-logo-1024.png';
+import SoftwareMillLogo from '@/assets/sml-logo-1024.png';
 import { useStyles } from './Footer.styles';
 
 export const Footer: React.FC = () => {

@@ -1,7 +1,7 @@
 import { FormControl, FormLabel, FormControlLabel, RadioGroup, Radio } from '@mui/material';
 import { Controller, useFormContext } from 'react-hook-form';
 
-export type FormRadioOption<T extends string | boolean = any> = {
+export type FormRadioOption<T extends string | boolean = string | boolean> = {
   label: string;
   value: T;
 };

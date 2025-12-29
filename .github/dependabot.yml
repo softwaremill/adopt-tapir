@@ -1,0 +1,11 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/ui"
+    labels:
+      - "automerge"
+      - "javascript"
+      - "dependency"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 0 # This enables only security related PRs
