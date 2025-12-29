@@ -23,7 +23,7 @@ object EndpointsSpecView:
             Import("Library._")
           )
         )
-      case JsonImplementation.UPickle => stubBooks.addImports(Set(Import("sttp.client4.upicklejson.default.asJson"), Import("Library._")))
+      case JsonImplementation.UPickle  => stubBooks.addImports(Set(Import("sttp.client4.upicklejson.default.asJson"), Import("Library._")))
       case JsonImplementation.Jsoniter => stubBooks.addImports(Set(Import("sttp.client4.jsoniter._"), Import("Library._")))
       case JsonImplementation.ZIOJson  => stubBooks.addImports(Set(Import("sttp.client4.ziojson._"), Import("Library._")))
     }

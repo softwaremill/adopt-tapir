@@ -50,7 +50,6 @@ class FormValidatorTest extends BaseTest:
 
   }
 
-
   it should "raise a problem when stack will not match implementation" in {
     FormValidator.validate(randomStarterRequest(FutureStack, ZIOHttp)).left.value.msg should
       include("Picked FutureStack with ZIOHttp - Future stack will work only with: Netty, Vert.X, Pekko")

@@ -22,10 +22,13 @@ abstract class BuildView:
 
   def getAllTestDependencies(starterDetails: StarterDetails): List[Dependency] =
     val stubServerDependency = ScalaTestDependency("com.softwaremill.sttp.tapir", "tapir-sttp-stub4-server", getTapirVersion())
-    val zioSttpDependency = if starterDetails.serverStack == ServerStack.ZIOStack then
-      List(ScalaTestDependency("com.softwaremill.sttp.client4", "zio", TemplateDependencyInfo.sttpVersion))
-    else Nil
-    stubServerDependency :: (getTestDependencies(starterDetails.serverStack) ++ getJsonTestDependencies(starterDetails) ++ zioSttpDependency)
+    val zioSttpDependency =
+      if starterDetails.serverStack == ServerStack.ZIOStack then
+        List(ScalaTestDependency("com.softwaremill.sttp.client4", "zio", TemplateDependencyInfo.sttpVersion))
+      else Nil
+    stubServerDependency :: (getTestDependencies(starterDetails.serverStack) ++ getJsonTestDependencies(
+      starterDetails
+    ) ++ zioSttpDependency)
 
   protected def getTapirVersion(): String
 

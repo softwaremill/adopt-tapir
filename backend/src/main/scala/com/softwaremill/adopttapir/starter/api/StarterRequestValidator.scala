@@ -34,7 +34,6 @@ object RequestValidation:
   case object ZIOJsonWillWorkOnlyWithZIOStack extends RequestValidation:
     override val errMessage: String = s"ZIOJson will work only with ZIO stack"
 
-
 end RequestValidation
 
 sealed trait FormValidator:

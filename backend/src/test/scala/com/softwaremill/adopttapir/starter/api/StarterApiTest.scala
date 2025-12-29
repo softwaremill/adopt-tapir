@@ -144,7 +144,6 @@ class StarterApiTest extends BaseTest with TestDependencies {
     )
   }
 
-
   it should "return request error with information about wrong projectName " in {
     // given
     val request =
