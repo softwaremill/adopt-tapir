@@ -32,19 +32,17 @@ object Endpoints@if(scalaVersionEnum == com.softwaremill.adopttapir.starter.Scal
     .in(query[User]("name"))
     .out(stringBody)
 @helloEndpointServer
-
-@jsonEndpoint
-
+@if(jsonEndpoint.nonEmpty){
+@jsonEndpoint}
 @apiEndpoints
-
-@docEndpoints
-
-@metricsEndpoint
-
+@if(docEndpoints.nonEmpty){
+@docEndpoints}
+@if(metricsEndpoint.nonEmpty){
+@metricsEndpoint}
 @allEndpoints
 @if(scalaVersionEnum == com.softwaremill.adopttapir.starter.ScalaVersion.Scala2){@rightBracket}
-
+@if(library.nonEmpty){
 @library
-
+}
 @mainContent
 
