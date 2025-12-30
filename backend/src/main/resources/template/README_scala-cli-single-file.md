@@ -8,6 +8,12 @@ This is a single-file Scala CLI project. You can run it directly with:
 scala-cli --power run *.scala
 ```
 
+Or specify the exact file name:
+
+```shell
+scala-cli --power run <project-name>.scala
+```
+
 To compile the project:
 
 ```shell
