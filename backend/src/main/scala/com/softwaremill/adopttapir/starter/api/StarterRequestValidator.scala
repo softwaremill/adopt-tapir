@@ -5,8 +5,7 @@ import cats.syntax.all.*
 import com.softwaremill.adopttapir.Fail.*
 import com.softwaremill.adopttapir.starter.StarterDetails
 import com.softwaremill.adopttapir.starter.api.StackRequest.ZIOStack
-import com.softwaremill.adopttapir.starter.api.JsonImplementationRequest.{ZIOJson, Pickler}
-import com.softwaremill.adopttapir.starter.api.ScalaVersionRequest.Scala3
+import com.softwaremill.adopttapir.starter.api.JsonImplementationRequest.ZIOJson
 import com.softwaremill.adopttapir.starter.api.RequestValidation.{GroupIdShouldFollowJavaPackageConvention, ProjectNameShouldMatchRegex}
 import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Http4s, Netty, Pekko, VertX, ZIOHttp}
 
@@ -35,9 +34,6 @@ object RequestValidation:
   case object ZIOJsonWillWorkOnlyWithZIOStack extends RequestValidation:
     override val errMessage: String = s"ZIOJson will work only with ZIO stack"
 
-  case object PicklerWillWorkOnlyWithScala3 extends RequestValidation:
-    override val errMessage: String = s"Pickler will work only with Scala 3"
-
 end RequestValidation
 
 sealed trait FormValidator:
@@ -49,7 +45,7 @@ sealed trait FormValidator:
       validateGroupId(r.groupId),
       validateStackWithImplementation(r.stack, r.implementation, r.scalaVersion),
       validateMetrics(r.stack, r.implementation, r.addMetrics),
-      validateJson(r.stack, r.scalaVersion, r.json)
+      validateJson(r.stack, r.json)
     ).mapN { case (projectName, groupId, (effect, serverImplementation), addMetrics, json) =>
       StarterDetails(
         projectName,
@@ -99,10 +95,9 @@ sealed trait FormValidator:
 
   private def validateJson(
       stackRequest: StackRequest,
-      versionRequest: ScalaVersionRequest,
       json: JsonImplementationRequest
   ): ValidatedNec[RequestValidation, JsonImplementationRequest] =
-    validateStackWithJson(stackRequest, json).andThen(validateVersionWithJson(versionRequest, _))
+    validateStackWithJson(stackRequest, json)
 
   private def validateStackWithJson(
       stackRequest: StackRequest,
@@ -112,16 +107,6 @@ sealed trait FormValidator:
       case t @ (ZIOStack, ZIOJson) => t._2.validNec
       case (_, ZIOJson)            => RequestValidation.ZIOJsonWillWorkOnlyWithZIOStack.invalidNec
       case t                       => t._2.validNec
-    }
-
-  private def validateVersionWithJson(
-      versionRequest: ScalaVersionRequest,
-      json: JsonImplementationRequest
-  ): ValidatedNec[RequestValidation, JsonImplementationRequest] =
-    (versionRequest, json) match {
-      case t @ (Scala3, Pickler) => t._2.validNec
-      case (_, Pickler)          => RequestValidation.PicklerWillWorkOnlyWithScala3.invalidNec
-      case t                     => t._2.validNec
     }
 
 end FormValidator

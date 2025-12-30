@@ -13,7 +13,7 @@ import com.softwaremill.adopttapir.test.ServiceTimeouts.waitForPortTimeout
 import com.softwaremill.adopttapir.test.ShowHelpers.*
 import com.softwaremill.adopttapir.test.{BaseTest, GeneratedService, ServiceFactory}
 import org.scalatest.{Assertions, ParallelTestExecution}
-import sttp.client3.{HttpURLConnectionBackend, Identity, SttpBackend, UriContext, asStringAlways, basicRequest}
+import sttp.client4.{SyncBackend, DefaultSyncBackend, UriContext, asStringAlways, basicRequest}
 
 import scala.collection.mutable
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
@@ -74,7 +74,7 @@ class StarterServiceITTest extends BaseTest with ParallelTestExecution:
 
   for details <- Setup.validConfigurations do {
     it should s"work using the configuration: ${details.show}" in {
-      val backend: SttpBackend[Identity, Any] = HttpURLConnectionBackend()
+      val backend: SyncBackend = DefaultSyncBackend()
 
       // define endpoints integration tests
       val helloEndpointTest: Option[TestFunction] = Some(port =>

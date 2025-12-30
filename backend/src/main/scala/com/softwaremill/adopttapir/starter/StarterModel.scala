@@ -40,7 +40,7 @@ enum ServerStack(val name: String):
   case OxStack extends ServerStack("Ox")
 
 enum JsonImplementation:
-  case WithoutJson, Circe, UPickle, Jsoniter, ZIOJson, Pickler
+  case WithoutJson, Circe, UPickle, Jsoniter, ZIOJson
 
 enum ScalaVersion(val value: String):
   case Scala2 extends ScalaVersion(TemplateDependencyInfo.scala2Version)

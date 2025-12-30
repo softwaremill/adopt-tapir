@@ -5,7 +5,7 @@ import cats.effect.{IO, Resource}
 import com.softwaremill.adopttapir.http.Error_OUT
 import com.softwaremill.adopttapir.infrastructure.Json.*
 import com.softwaremill.adopttapir.starter.api.StackRequest.FutureStack
-import com.softwaremill.adopttapir.starter.api.JsonImplementationRequest.{Jsoniter, ZIOJson, Pickler}
+import com.softwaremill.adopttapir.starter.api.JsonImplementationRequest.{Jsoniter, ZIOJson}
 import com.softwaremill.adopttapir.starter.api.ScalaVersionRequest.Scala2
 import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Netty, ZIOHttp}
 import com.softwaremill.adopttapir.starter.api.StarterApiTest.{mainPath, validSbtRequest, validScalaCliRequest}
@@ -16,7 +16,8 @@ import io.circe.jawn
 import org.apache.commons.compress.archivers.zip.ZipFile
 import org.apache.commons.compress.utils.SeekableInMemoryByteChannel
 import org.scalatest.Assertion
-import sttp.client3.{HttpError, Response, SttpClientException}
+import sttp.client4.{Response, SttpClientException}
+import sttp.client4.ResponseException.UnexpectedStatusCode
 
 class StarterApiTest extends BaseTest with TestDependencies {
 
@@ -119,10 +120,10 @@ class StarterApiTest extends BaseTest with TestDependencies {
 
     // when
     val rootEx = intercept[SttpClientException](requests.requestZip(request))
-    val ex = rootEx.cause.asInstanceOf[HttpError[String]]
+    val ex = rootEx.cause.asInstanceOf[UnexpectedStatusCode[String]]
 
     // then
-    ex.statusCode.code shouldBe 400
+    ex.response.code.code shouldBe 400
     jawn.decode[Error_OUT](ex.body).value.error should include(
       "Picked FutureStack with ZIOHttp - Future stack will work only with: Netty, Vert.X"
     )
@@ -134,27 +135,12 @@ class StarterApiTest extends BaseTest with TestDependencies {
 
     // when
     val rootEx = intercept[SttpClientException](requests.requestZip(request))
-    val ex = rootEx.cause.asInstanceOf[HttpError[String]]
+    val ex = rootEx.cause.asInstanceOf[UnexpectedStatusCode[String]]
 
     // then
-    ex.statusCode.code shouldBe 400
+    ex.response.code.code shouldBe 400
     jawn.decode[Error_OUT](ex.body).value.error should include(
       "ZIOJson will work only with ZIO stack"
-    )
-  }
-
-  it should "return request error with information about picking wrong scala version for a json" in {
-    // given
-    val request = StarterRequestGenerators.randomStarterRequest().copy(scalaVersion = Scala2, json = Pickler)
-
-    // when
-    val rootEx = intercept[SttpClientException](requests.requestZip(request))
-    val ex = rootEx.cause.asInstanceOf[HttpError[String]]
-
-    // then
-    ex.statusCode.code shouldBe 400
-    jawn.decode[Error_OUT](ex.body).value.error should include(
-      "Pickler will work only with Scala 3"
     )
   }
 
@@ -165,10 +151,10 @@ class StarterApiTest extends BaseTest with TestDependencies {
 
     // when
     val rootEx = intercept[SttpClientException](requests.requestZip(request))
-    val ex = rootEx.cause.asInstanceOf[HttpError[String]]
+    val ex = rootEx.cause.asInstanceOf[UnexpectedStatusCode[String]]
 
     // then
-    ex.statusCode.code shouldBe 400
+    ex.response.code.code shouldBe 400
     jawn.decode[Error_OUT](ex.body).value.error should include(
       "Project name: `Uppercase` should match regex: `^[a-z0-9_]$|^[a-z0-9_]+[a-z0-9_-]*[a-z0-9_]+$`"
     )

@@ -16,7 +16,7 @@ val http4sEmberServerVersion = "0.23.33"
 val http4sCirceVersion = "0.23.33"
 val circeVersion = "0.14.15"
 val circeGenericsExtrasVersion = "0.14.3"
-val sttpVersion = "3.11.0"
+val sttpVersion = "4.0.13"
 val prometheusVersion = "0.16.0"
 val scalafmtVersion = "3.10.3"
 val scalaLoggingVersion = "3.9.6"
@@ -28,16 +28,16 @@ val zioTestVersion = "2.0.13"
 val httpDependencies = Seq(
   "org.http4s" %% "http4s-ember-server" % http4sEmberServerVersion,
   "org.http4s" %% "http4s-circe" % http4sCirceVersion,
-  "com.softwaremill.sttp.client3" %% "async-http-client-backend-fs2" % sttpVersion,
-  "com.softwaremill.sttp.client3" %% "slf4j-backend" % sttpVersion,
+  "com.softwaremill.sttp.client4" %% "fs2" % sttpVersion,
+  "com.softwaremill.sttp.client4" %% "slf4j-backend" % sttpVersion,
   "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % tapirVersion,
-  "com.softwaremill.sttp.tapir" %% "tapir-sttp-stub-server" % tapirVersion
+  "com.softwaremill.sttp.tapir" %% "tapir-sttp-stub4-server" % tapirVersion
 )
 
 val monitoringDependencies = Seq(
   "io.prometheus" % "simpleclient" % prometheusVersion,
   "io.prometheus" % "simpleclient_hotspot" % prometheusVersion,
-  "com.softwaremill.sttp.client3" %% "prometheus-backend" % sttpVersion,
+  "com.softwaremill.sttp.client4" %% "prometheus-backend" % sttpVersion,
   "com.softwaremill.sttp.tapir" %% "tapir-prometheus-metrics" % tapirVersion
 )
 
@@ -46,7 +46,7 @@ val jsonDependencies = Seq(
   "io.circe" %% "circe-generic" % circeVersion,
   "io.circe" %% "circe-parser" % circeVersion,
   "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % tapirVersion,
-  "com.softwaremill.sttp.client3" %% "circe" % sttpVersion,
+  "com.softwaremill.sttp.client4" %% "circe" % sttpVersion,
   "org.latestbit" %% "circe-tagged-adt-codec" % "0.11.0"
 )
 
@@ -247,7 +247,7 @@ lazy val templateDependencies: Project = project
     libraryDependencies --= scalafmtStandaloneDependencies,
     libraryDependencies ++= List(
       "ch.qos.logback" % "logback-classic" % logbackClassicVersion % Provided,
-      "com.softwaremill.sttp.tapir" %% "tapir-sttp-stub-server" % tapirVersion % Provided,
+      "com.softwaremill.sttp.tapir" %% "tapir-sttp-stub4-server" % tapirVersion % Provided,
       "org.scalatest" %% "scalatest" % scalaTestVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-bundle" % tapirVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % tapirVersion % Provided,
@@ -255,9 +255,9 @@ lazy val templateDependencies: Project = project
       "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % plokhotnyukJsoniterVersion % Provided,
       "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % plokhotnyukJsoniterVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-json-zio" % tapirVersion % Provided,
-      "com.softwaremill.sttp.client3" %% "circe" % sttpVersion % Provided,
-      "com.softwaremill.sttp.client3" %% "jsoniter" % sttpVersion % Provided,
-      "com.softwaremill.sttp.client3" %% "zio-json" % sttpVersion % Provided,
+      "com.softwaremill.sttp.client4" %% "circe" % sttpVersion % Provided,
+      "com.softwaremill.sttp.client4" %% "jsoniter" % sttpVersion % Provided,
+      "com.softwaremill.sttp.client4" %% "zio-json" % sttpVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-netty-server" % tapirVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-cats" % tapirVersion % Provided,
       "com.softwaremill.sttp.tapir" %% "tapir-netty-server-cats" % tapirVersion % Provided,

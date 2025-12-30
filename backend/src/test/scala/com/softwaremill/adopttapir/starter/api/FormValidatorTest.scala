@@ -50,17 +50,6 @@ class FormValidatorTest extends BaseTest:
 
   }
 
-  it should "raise a problem with picking Pickler for other version than Scala 3" in {
-    // given
-    val request = randomStarterRequest().copy(json = JsonImplementationRequest.Pickler, scalaVersion = ScalaVersionRequest.Scala2)
-
-    // when
-    val result = FormValidator.validate(request)
-
-    // then
-    result.left.value.msg should include(s"Pickler will work only with Scala 3")
-  }
-
   it should "raise a problem when stack will not match implementation" in {
     FormValidator.validate(randomStarterRequest(FutureStack, ZIOHttp)).left.value.msg should
       include("Picked FutureStack with ZIOHttp - Future stack will work only with: Netty, Vert.X, Pekko")

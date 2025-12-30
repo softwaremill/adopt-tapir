@@ -15,17 +15,11 @@ import @{starterDetails.groupId}.Endpoints.@if(scalaVersion == com.softwaremill.
 import org.scalatest.EitherValues
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import sttp.client3.testing.SttpBackendStub
-import sttp.client3.{UriContext, basicRequest}
-import sttp.tapir.server.stub.TapirStubInterpreter
+import sttp.client4.{UriContext, basicRequest}
 @for(additionalImport <- additionalImports) {
 @{additionalImport.asScalaImport(scalaVersion)}}
 
 class EndpointsSpec extends AnyFlatSpec with Matchers with EitherValues@if(scalaVersion == com.softwaremill.adopttapir.starter.ScalaVersion.Scala2){ @leftBracket}else{:}
-@if(jsonImplementation == com.softwaremill.adopttapir.starter.JsonImplementation.Pickler){
-  given Reader[Author] = upickle.default.macroR
-  given Reader[Book] = upickle.default.macroR
-}
 
   it should "return hello message" in {
     // given

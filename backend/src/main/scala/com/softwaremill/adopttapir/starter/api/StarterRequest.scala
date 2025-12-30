@@ -78,7 +78,6 @@ enum JsonImplementationRequest(val toModel: JsonImplementation) derives JsonTagg
   case Jsoniter extends JsonImplementationRequest(JsonImplementation.Jsoniter)
   case UPickle extends JsonImplementationRequest(JsonImplementation.UPickle)
   case ZIOJson extends JsonImplementationRequest(JsonImplementation.ZIOJson)
-  case Pickler extends JsonImplementationRequest(JsonImplementation.Pickler)
 
 enum ScalaVersionRequest(val toModel: ScalaVersion) derives JsonTaggedAdt.PureEncoder, JsonTaggedAdt.PureDecoder, Schema:
   case Scala2 extends ScalaVersionRequest(ScalaVersion.Scala2)
