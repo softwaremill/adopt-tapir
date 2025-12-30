@@ -33,7 +33,9 @@ describe('ConfigurationForm component', () => {
     await user.click(screen.getByRole('combobox', { name: /Server implementation/i }));
     await user.click(screen.getByText('Vert.X'));
 
-    await user.click(within(screen.getByRole('radiogroup', { name: /Build tool/i })).getByText('Scala CLI (multi-file)'));
+    await user.click(
+      within(screen.getByRole('radiogroup', { name: /Build tool/i })).getByText('Scala CLI (multi-file)')
+    );
 
     await user.click(
       within(
@@ -134,7 +136,9 @@ describe('ConfigurationForm component', () => {
     await user.click(screen.getByRole('combobox', { name: /Server implementation/i }));
     await user.click(screen.getByText('Vert.X'));
 
-    await user.click(within(screen.getByRole('radiogroup', { name: /Build tool/i })).getByText('Scala CLI (multi-file)'));
+    await user.click(
+      within(screen.getByRole('radiogroup', { name: /Build tool/i })).getByText('Scala CLI (multi-file)')
+    );
 
     await user.click(
       within(

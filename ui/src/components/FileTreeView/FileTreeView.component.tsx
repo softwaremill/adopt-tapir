@@ -55,10 +55,8 @@ export const FileTreeView = ({ tree, setOpenedFile }: Props) => {
 
     const findAndSetMainNodeId = (tree: Tree): void => {
       // First, check if this is a single-file project (has a .scala file at root level)
-      const rootScalaFiles = tree.filter(
-        file => typeof file.content === 'string' && file.name.endsWith('.scala')
-      );
-      
+      const rootScalaFiles = tree.filter(file => typeof file.content === 'string' && file.name.endsWith('.scala'));
+
       if (rootScalaFiles.length === 1) {
         // Single-file project: open the single .scala file
         if (rootScalaFiles[0].id !== undefined) {
@@ -66,7 +64,7 @@ export const FileTreeView = ({ tree, setOpenedFile }: Props) => {
         }
         return;
       }
-      
+
       // Multi-file project: look for Main.scala
       tree.forEach(file => {
         if (file.id !== undefined && file.name === 'Main.scala') {
