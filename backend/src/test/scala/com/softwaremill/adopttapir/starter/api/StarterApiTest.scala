@@ -8,7 +8,12 @@ import com.softwaremill.adopttapir.starter.api.StackRequest.FutureStack
 import com.softwaremill.adopttapir.starter.api.JsonImplementationRequest.{Jsoniter, ZIOJson}
 import com.softwaremill.adopttapir.starter.api.ScalaVersionRequest.Scala2
 import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Netty, ZIOHttp}
-import com.softwaremill.adopttapir.starter.api.StarterApiTest.{mainPath, validSbtRequest, validScalaCliRequest, validScalaCliSingleFileRequest}
+import com.softwaremill.adopttapir.starter.api.StarterApiTest.{
+  mainPath,
+  validSbtRequest,
+  validScalaCliRequest,
+  validScalaCliSingleFileRequest
+}
 import com.softwaremill.adopttapir.test.RichIO.unwrap
 import com.softwaremill.adopttapir.test.{BaseTest, TestDependencies}
 import fs2.io.file.Files
@@ -236,7 +241,7 @@ object StarterApiTest {
   )
 
   val validScalaCliRequest: StarterRequest = validSbtRequest.copy(builder = BuilderRequest.ScalaCli)
-  
+
   val validScalaCliSingleFileRequest: StarterRequest = validSbtRequest.copy(builder = BuilderRequest.ScalaCliSingleFile)
 
   val mainPath = "src/main/scala"

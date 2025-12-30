@@ -116,7 +116,7 @@ class ServiceFactory:
       // Get all .scala files in the directory (os.proc doesn't expand globs)
       val scalaFiles = os.list(os.Path(tempDir.toJava)).filter(_.ext == "scala").map(_.last).toSeq
       assert(scalaFiles.nonEmpty, s"No .scala files found in ${tempDir}")
-      
+
       val compile = os.proc("scala-cli", "--power", "compile" +: scalaFiles).call(cwd = os.Path(tempDir.toJava), mergeErrIntoOut = true)
       assert(
         compile.exitCode == 0,
