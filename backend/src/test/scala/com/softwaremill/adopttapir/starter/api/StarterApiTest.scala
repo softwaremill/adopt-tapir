@@ -8,7 +8,7 @@ import com.softwaremill.adopttapir.starter.api.StackRequest.FutureStack
 import com.softwaremill.adopttapir.starter.api.JsonImplementationRequest.{Jsoniter, ZIOJson}
 import com.softwaremill.adopttapir.starter.api.ScalaVersionRequest.Scala2
 import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Netty, ZIOHttp}
-import com.softwaremill.adopttapir.starter.api.StarterApiTest.{mainPath, validSbtRequest, validScalaCliRequest}
+import com.softwaremill.adopttapir.starter.api.StarterApiTest.{mainPath, validSbtRequest, validScalaCliRequest, validScalaCliSingleFileRequest}
 import com.softwaremill.adopttapir.test.RichIO.unwrap
 import com.softwaremill.adopttapir.test.{BaseTest, TestDependencies}
 import fs2.io.file.Files
@@ -81,6 +81,23 @@ class StarterApiTest extends BaseTest with TestDependencies {
         "README.md",
         ".gitignore",
         "logback.xml"
+      )
+    }
+  }
+
+  "/starter.zip" should "return a zip response with specified files for ScalaCliSingleFile builder" in {
+    // given
+    val req = validScalaCliSingleFileRequest
+
+    // when
+    val response: Response[fs2.Stream[IO, Byte]] = requests.requestZip(req)
+
+    // then
+    response.code.code shouldBe 200
+    checkStreamZipContent(response.body) { unpackedDir =>
+      unpackedDir.listRecursively.toList.filter(_.isRegularFile).map(_.path.getFileName.toString) should contain theSameElementsAs List(
+        s"${req.projectName}.scala",
+        "README.md"
       )
     }
   }
@@ -219,6 +236,8 @@ object StarterApiTest {
   )
 
   val validScalaCliRequest: StarterRequest = validSbtRequest.copy(builder = BuilderRequest.ScalaCli)
+  
+  val validScalaCliSingleFileRequest: StarterRequest = validSbtRequest.copy(builder = BuilderRequest.ScalaCliSingleFile)
 
   val mainPath = "src/main/scala"
   val testPath = "src/test/scala"
