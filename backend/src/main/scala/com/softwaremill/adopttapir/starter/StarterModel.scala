@@ -47,4 +47,4 @@ enum ScalaVersion(val value: String):
   case Scala3 extends ScalaVersion(TemplateDependencyInfo.scala3Version)
 
 enum Builder:
-  case Sbt, ScalaCli
+  case Sbt, ScalaCli, ScalaCliSingleFile
