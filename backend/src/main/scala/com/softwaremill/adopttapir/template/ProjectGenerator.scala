@@ -243,10 +243,8 @@ private object ScalaCliSingleFileTemplate:
     import CommonObjectTemplate.StarterDetailsWithLegalizedGroupId
     val groupId = starterDetails.legalizedGroupId
 
-    // Get all dependencies (only main dependencies, no test dependencies)
     val dependencies = (BuildScalaCliView.getMainDependencies _).andThen(deps => BuildScalaCliView.format(deps, false))(starterDetails)
 
-    // Get all code components
     val helloServerEndpoint = EndpointsView.getHelloServerEndpoint(starterDetails)
     val jsonEndpoint = EndpointsView.getJsonOutModel(starterDetails)
     val library = EndpointsView.getJsonLibrary(starterDetails)
@@ -260,13 +258,11 @@ private object ScalaCliSingleFileTemplate:
       .dropWhile(line => line.trim.startsWith("package"))
       .mkString(System.lineSeparator())
 
-    // Collect all imports
     val allImports = toSortedList(
       helloServerEndpoint.imports ++ metricsEndpoint.imports ++ docEndpoints.imports
         ++ jsonEndpoint.imports ++ library.imports ++ allEndpoints.imports
     )
 
-    // Build the single file content
     val content = txt
       .scalaCliSingleFile(
         starterDetails.projectName,
