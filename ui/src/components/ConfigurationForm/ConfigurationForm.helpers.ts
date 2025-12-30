@@ -72,7 +72,7 @@ const stackTypeJsonImplementationMap: Record<StackType, JSONImplementation[]> = 
 
 const versionTypeJsonImlpementationMap: Record<ScalaVersion, JSONImplementation[]> = {
   [ScalaVersion.Scala2]: commonJSONImplementations,
-  [ScalaVersion.Scala3]: commonJSONImplementations.concat(JSONImplementation.Pickler),
+  [ScalaVersion.Scala3]: commonJSONImplementations,
 };
 
 export const mapStackTypeToJSONImplementation = (stackType: StackType): JSONImplementation[] => {

@@ -90,12 +90,6 @@ object EndpointsView:
            |  ${if starterDetails.scalaVersion == Scala2 then "}" else ""}
            |
            |""".stripMargin
-        case JsonImplementation.Pickler =>
-          s"""
-               |  given Pickler[Author] = Pickler.derived
-               |  given Pickler[Book] = Pickler.derived
-               |
-               |""".stripMargin
         case _ => ""
       }
 
@@ -140,7 +134,6 @@ object EndpointsView:
             prepareBookListing,
             Set(Import("sttp.tapir.generic.auto._"), Import("upickle.default._"), Import("sttp.tapir.json.upickle._"))
           )
-        case JsonImplementation.Pickler  => Code(prepareBookListing, Set(Import("sttp.tapir.json.pickler._")))
         case JsonImplementation.Jsoniter =>
           val codecs = s"$givenPrefix codecBooks: JsonValueCodec[List[Book]] = JsonCodecMaker.make"
 
