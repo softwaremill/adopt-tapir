@@ -1,0 +1,13 @@
+/* Safari-specific fixes for Material-UI TextField label rendering issue */
+/* Fixes the "crossed with border" appearance on initial load */
+/* The issue is Safari not rendering the notch gap correctly */
+
+@supports (-webkit-hyphens: none) {
+  /* When label is shrunk (floating above the input), give it a background */
+  .MuiInputLabel-shrink {
+    background-color: white;
+    padding-left: 4px;
+    padding-right: 4px;
+    margin-left: -4px;
+  }
+}
