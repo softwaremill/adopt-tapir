@@ -18,7 +18,6 @@ rightBracket: Char = '}'
 )
 //> using scala @scalaVersion
 @dependencies
-
 /*
  * Single-file Scala CLI project
  * Run:     scala-cli run @{name}.scala
@@ -40,18 +39,14 @@ object Endpoints@if(scalaVersionEnum == com.softwaremill.adopttapir.starter.Scal
     .in("hello")
     .in(query[User]("name"))
     .out(stringBody)
-@helloEndpointServer
-@if(jsonEndpoint.nonEmpty){
+@helloEndpointServer@if(jsonEndpoint.nonEmpty){
 @jsonEndpoint}
-@apiEndpoints
-@if(docEndpoints.nonEmpty){
-@docEndpoints}
-@if(metricsEndpoint.nonEmpty){
+@apiEndpoints@if(docEndpoints.nonEmpty){
+@docEndpoints}@if(metricsEndpoint.nonEmpty){
 @metricsEndpoint}
-@allEndpoints
-@if(scalaVersionEnum == com.softwaremill.adopttapir.starter.ScalaVersion.Scala2){@rightBracket}
-@if(library.nonEmpty){
-@library
-}
+@allEndpoints@if(scalaVersionEnum == com.softwaremill.adopttapir.starter.ScalaVersion.Scala2){
+@rightBracket}@if(library.nonEmpty){
+@library}
+
 @mainContent
 
