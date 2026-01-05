@@ -73,44 +73,36 @@ class StarterApiTest extends BaseTest with TestDependencies {
     response.code.code shouldBe 200
     checkStreamZipContent(response.body) { unpackedDir =>
       unpackedDir.listRecursively.toList.filter(_.isRegularFile).map(_.path.getFileName.toString) should contain theSameElementsAs List(
-        "project.scala",
-        ".scalafmt.conf",
-        "EndpointsSpec.scala",
-        "Endpoints.scala",
-        "Main.scala",
-        "README.md",
-        ".gitignore",
-        "logback.xml"
+        s"${req.projectName}.scala"
       )
     }
   }
 
-  for req <- Seq(validSbtRequest, validScalaCliRequest) do {
-    it should s"have relative paths associated with groupId in request for .scala files for ${req.builder} builder" in {
-      // given
-      val groupIdRelativePath = s"${req.groupId.replace('.', '/')}"
+  it should "have relative paths associated with groupId in request for .scala files for Sbt builder" in {
+    // given
+    val req = validSbtRequest
+    val groupIdRelativePath = s"${req.groupId.replace('.', '/')}"
 
-      // when
-      val response: Response[fs2.Stream[IO, Byte]] = requests.requestZip(req)
+    // when
+    val response: Response[fs2.Stream[IO, Byte]] = requests.requestZip(req)
 
-      // then
-      response.code.code shouldBe 200
-      checkStreamZipContent(response.body) { unpackedDir =>
-        val paths = unpackedDir.listRecursively.toList
-          .collect {
-            case f: File
-                if f.path.toString.endsWith("README.md") ||
-                  f.path.toString.endsWith(".scala") && !f.path.endsWith("project.scala") && f.isRegularFile =>
-              unpackedDir.relativize(f)
-          }
-        val root = req.projectName
-        paths.map(_.toString) should contain theSameElementsAs List(
-          s"$root/README.md",
-          s"$root/$mainPath/$groupIdRelativePath/Main.scala",
-          s"$root/src/main/scala/$groupIdRelativePath/Endpoints.scala",
-          s"$root/src/test/scala/$groupIdRelativePath/EndpointsSpec.scala"
-        )
-      }
+    // then
+    response.code.code shouldBe 200
+    checkStreamZipContent(response.body) { unpackedDir =>
+      val paths = unpackedDir.listRecursively.toList
+        .collect {
+          case f: File
+              if f.path.toString.endsWith("README.md") ||
+                f.path.toString.endsWith(".scala") && !f.path.endsWith("project.scala") && f.isRegularFile =>
+            unpackedDir.relativize(f)
+        }
+      val root = req.projectName
+      paths.map(_.toString) should contain theSameElementsAs List(
+        s"$root/README.md",
+        s"$root/$mainPath/$groupIdRelativePath/Main.scala",
+        s"$root/src/main/scala/$groupIdRelativePath/Endpoints.scala",
+        s"$root/src/test/scala/$groupIdRelativePath/EndpointsSpec.scala"
+      )
     }
   }
 

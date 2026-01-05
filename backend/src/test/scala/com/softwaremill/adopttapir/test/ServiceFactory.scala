@@ -68,12 +68,10 @@ abstract class GeneratedService:
     override def toString: String = s"[$timestamp]"
 
 class ServiceFactory:
-  import ServiceTimeouts.waitForScalaCliCompileAndUnitTest
-
   def create(builder: Builder, tempDir: better.files.File): IO[GeneratedService] =
     builder match {
       case Builder.Sbt      => IO.blocking(SbtService(tempDir))
-      case Builder.ScalaCli => IO.blocking(ScalaCliService(tempDir)).timeoutAndForget(waitForScalaCliCompileAndUnitTest)
+      case Builder.ScalaCli => IO.blocking(ScalaCliService(tempDir))
     }
 
   private case class SbtService(tempDir: better.files.File) extends GeneratedService:
@@ -95,14 +93,17 @@ class ServiceFactory:
     override protected val portPattern = new Regex("^(?:Go to |Server started at )http://localhost:(\\d+).*")
 
     override protected lazy val process: SubProcess =
-      // one cannot chain multiple targets to scala-cli hence 'test' target (that implicitly calls compile) is called in
-      // blocking manner and once it returns with success (0 exit code) the configuration is actually started
-      val compileAndTest = os.proc("scala-cli", "--power", "test", ".").call(cwd = os.Path(tempDir.toJava), mergeErrIntoOut = true)
+      // For single-file projects, we just compile and run (no tests)
+      // Get all .scala files in the directory (os.proc doesn't expand globs)
+      val scalaFiles = os.list(os.Path(tempDir.toJava)).filter(_.ext == "scala").map(_.last).toSeq
+      assert(scalaFiles.nonEmpty, s"No .scala files found in ${tempDir}")
+
+      val compile = os.proc("scala-cli", "compile" +: scalaFiles).call(cwd = os.Path(tempDir.toJava), mergeErrIntoOut = true)
       assert(
-        compileAndTest.exitCode == 0,
-        s"Compilation and unit tests exited with [${compileAndTest.exitCode}] and output:${System
-            .lineSeparator()}${compileAndTest.out.lines().mkString(System.lineSeparator())}"
+        compile.exitCode == 0,
+        s"Compilation exited with [${compile.exitCode}] and output:${System
+            .lineSeparator()}${compile.out.lines().mkString(System.lineSeparator())}"
       )
 
-      os.proc("scala-cli", "--power", "run", ".")
+      os.proc("scala-cli", "run" +: scalaFiles)
         .spawn(cwd = os.Path(tempDir.toJava), env = Map("HTTP_PORT" -> "0"), mergeErrIntoOut = true)
