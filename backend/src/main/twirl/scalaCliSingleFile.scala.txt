@@ -16,15 +16,17 @@ scalaVersionEnum: com.softwaremill.adopttapir.starter.ScalaVersion,
 leftBracket: Char = '{',
 rightBracket: Char = '}'
 )
-// Single-file Scala CLI project
-// Run:     scala-cli --power run @{name}.scala
-// Compile: scala-cli --power compile @{name}.scala
-// Format:  scala-cli --power fmt @{name}.scala
-//
-// More info: https://tapir.softwaremill.com | https://scala-cli.virtuslab.org
-
 //> using scala @scalaVersion
 @dependencies
+
+/*
+ * Single-file Scala CLI project
+ * Run:     scala-cli run @{name}.scala
+ * Compile: scala-cli compile @{name}.scala
+ * Format:  scala-cli fmt @{name}.scala
+ *
+ * More info: https://tapir.softwaremill.com | https://scala-cli.virtuslab.org
+ */
 
 package @groupId
 
