@@ -101,8 +101,7 @@ class StarterApiTest extends BaseTest with TestDependencies {
     response.code.code shouldBe 200
     checkStreamZipContent(response.body) { unpackedDir =>
       unpackedDir.listRecursively.toList.filter(_.isRegularFile).map(_.path.getFileName.toString) should contain theSameElementsAs List(
-        s"${req.projectName}.scala",
-        "README.md"
+        s"${req.projectName}.scala"
       )
     }
   }

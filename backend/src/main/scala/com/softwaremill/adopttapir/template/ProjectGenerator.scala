@@ -237,7 +237,7 @@ end ScalaCliProjectTemplate
 
 private object ScalaCliSingleFileTemplate:
   def generate(starterDetails: StarterDetails): List[GeneratedFile] =
-    List(getSingleFile(starterDetails), readme)
+    List(getSingleFile(starterDetails))
 
   private def getSingleFile(starterDetails: StarterDetails): GeneratedFile = {
     import CommonObjectTemplate.StarterDetailsWithLegalizedGroupId
@@ -286,8 +286,5 @@ private object ScalaCliSingleFileTemplate:
   }
 
   private def toSortedList(set: Set[Import]): List[Import] = set.toList.sortBy(_.fullName)
-
-  private lazy val readme: GeneratedFile =
-    GeneratedFile(CommonObjectTemplate.readMePath, CommonObjectTemplate.templateResource("README_scala-cli-single-file.md"))
 
 end ScalaCliSingleFileTemplate
