@@ -8,12 +8,7 @@ import com.softwaremill.adopttapir.starter.api.StackRequest.FutureStack
 import com.softwaremill.adopttapir.starter.api.JsonImplementationRequest.{Jsoniter, ZIOJson}
 import com.softwaremill.adopttapir.starter.api.ScalaVersionRequest.Scala2
 import com.softwaremill.adopttapir.starter.api.ServerImplementationRequest.{Netty, ZIOHttp}
-import com.softwaremill.adopttapir.starter.api.StarterApiTest.{
-  mainPath,
-  validSbtRequest,
-  validScalaCliRequest,
-  validScalaCliSingleFileRequest
-}
+import com.softwaremill.adopttapir.starter.api.StarterApiTest.{mainPath, validSbtRequest, validScalaCliRequest}
 import com.softwaremill.adopttapir.test.RichIO.unwrap
 import com.softwaremill.adopttapir.test.{BaseTest, TestDependencies}
 import fs2.io.file.Files
@@ -78,21 +73,15 @@ class StarterApiTest extends BaseTest with TestDependencies {
     response.code.code shouldBe 200
     checkStreamZipContent(response.body) { unpackedDir =>
       unpackedDir.listRecursively.toList.filter(_.isRegularFile).map(_.path.getFileName.toString) should contain theSameElementsAs List(
-        "project.scala",
-        ".scalafmt.conf",
-        "EndpointsSpec.scala",
-        "Endpoints.scala",
-        "Main.scala",
-        "README.md",
-        ".gitignore",
-        "logback.xml"
+        s"${req.projectName}.scala"
       )
     }
   }
 
-  "/starter.zip" should "return a zip response with specified files for ScalaCliSingleFile builder" in {
+  it should "have relative paths associated with groupId in request for .scala files for Sbt builder" in {
     // given
-    val req = validScalaCliSingleFileRequest
+    val req = validSbtRequest
+    val groupIdRelativePath = s"${req.groupId.replace('.', '/')}"
 
     // when
     val response: Response[fs2.Stream[IO, Byte]] = requests.requestZip(req)
@@ -100,38 +89,20 @@ class StarterApiTest extends BaseTest with TestDependencies {
     // then
     response.code.code shouldBe 200
     checkStreamZipContent(response.body) { unpackedDir =>
-      unpackedDir.listRecursively.toList.filter(_.isRegularFile).map(_.path.getFileName.toString) should contain theSameElementsAs List(
-        s"${req.projectName}.scala"
+      val paths = unpackedDir.listRecursively.toList
+        .collect {
+          case f: File
+              if f.path.toString.endsWith("README.md") ||
+                f.path.toString.endsWith(".scala") && !f.path.endsWith("project.scala") && f.isRegularFile =>
+            unpackedDir.relativize(f)
+        }
+      val root = req.projectName
+      paths.map(_.toString) should contain theSameElementsAs List(
+        s"$root/README.md",
+        s"$root/$mainPath/$groupIdRelativePath/Main.scala",
+        s"$root/src/main/scala/$groupIdRelativePath/Endpoints.scala",
+        s"$root/src/test/scala/$groupIdRelativePath/EndpointsSpec.scala"
       )
-    }
-  }
-
-  for req <- Seq(validSbtRequest, validScalaCliRequest) do {
-    it should s"have relative paths associated with groupId in request for .scala files for ${req.builder} builder" in {
-      // given
-      val groupIdRelativePath = s"${req.groupId.replace('.', '/')}"
-
-      // when
-      val response: Response[fs2.Stream[IO, Byte]] = requests.requestZip(req)
-
-      // then
-      response.code.code shouldBe 200
-      checkStreamZipContent(response.body) { unpackedDir =>
-        val paths = unpackedDir.listRecursively.toList
-          .collect {
-            case f: File
-                if f.path.toString.endsWith("README.md") ||
-                  f.path.toString.endsWith(".scala") && !f.path.endsWith("project.scala") && f.isRegularFile =>
-              unpackedDir.relativize(f)
-          }
-        val root = req.projectName
-        paths.map(_.toString) should contain theSameElementsAs List(
-          s"$root/README.md",
-          s"$root/$mainPath/$groupIdRelativePath/Main.scala",
-          s"$root/src/main/scala/$groupIdRelativePath/Endpoints.scala",
-          s"$root/src/test/scala/$groupIdRelativePath/EndpointsSpec.scala"
-        )
-      }
     }
   }
 
@@ -240,8 +211,6 @@ object StarterApiTest {
   )
 
   val validScalaCliRequest: StarterRequest = validSbtRequest.copy(builder = BuilderRequest.ScalaCli)
-
-  val validScalaCliSingleFileRequest: StarterRequest = validSbtRequest.copy(builder = BuilderRequest.ScalaCliSingleFile)
 
   val mainPath = "src/main/scala"
   val testPath = "src/test/scala"

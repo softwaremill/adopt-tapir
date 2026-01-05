@@ -14,9 +14,8 @@ final case class GeneratedFile(
 object ProjectGenerator:
   def generate(starterDetails: StarterDetails): List[GeneratedFile] =
     starterDetails.builder match
-      case Builder.Sbt                => SbtProjectTemplate.generate(starterDetails)
-      case Builder.ScalaCli           => ScalaCliProjectTemplate.generate(starterDetails)
-      case Builder.ScalaCliSingleFile => ScalaCliSingleFileTemplate.generate(starterDetails)
+      case Builder.Sbt      => SbtProjectTemplate.generate(starterDetails)
+      case Builder.ScalaCli => ScalaCliSingleFileTemplate.generate(starterDetails)
 
 /** Twirl library was chosen for templating. Due to limitations in Twirl, some of arguments are passed as [[String]].<br> More advanced
   * rendering is done by dedicated objects `*View` e.g. @see [[EndpointsView]] or @[[MainView]].
@@ -208,32 +207,6 @@ object CommonObjectTemplate:
   }
 
 end CommonObjectTemplate
-
-private object ScalaCliProjectTemplate extends ProjectTemplate:
-  override def generate(starterDetails: StarterDetails): List[GeneratedFile] =
-    super.generate(starterDetails) ::: List(getProjectScalaCli(starterDetails), readme, gitignore)
-
-  private def getProjectScalaCli(starterDetails: StarterDetails): GeneratedFile = {
-    val dependencies = (BuildScalaCliView.getMainDependencies _).andThen(deps => BuildScalaCliView.format(deps, false))(starterDetails) +
-      (BuildScalaCliView.getAllTestDependencies _).andThen(deps => BuildScalaCliView.format(deps, true))(starterDetails)
-
-    val content = txt
-      .scalaCliBuild(
-        starterDetails.projectName,
-        starterDetails.groupId,
-        starterDetails.scalaVersion.value,
-        dependencies
-      )
-      .toString()
-    GeneratedFile("project.scala", content)
-  }
-
-  private lazy val readme: GeneratedFile =
-    GeneratedFile(CommonObjectTemplate.readMePath, CommonObjectTemplate.templateResource("README_scala-cli.md"))
-
-  private lazy val gitignore: GeneratedFile = GeneratedFile(".gitignore", txt.gitignore(List(".bsp/", ".scala-build/")).toString())
-
-end ScalaCliProjectTemplate
 
 private object ScalaCliSingleFileTemplate:
   def generate(starterDetails: StarterDetails): List[GeneratedFile] =

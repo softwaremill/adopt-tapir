@@ -293,7 +293,6 @@ describe('configuration consts', () => {
       const cases: { builder: Builder | undefined; expected: boolean }[] = [
         { builder: Builder.Sbt, expected: true },
         { builder: Builder.ScalaCli, expected: true },
-        { builder: Builder.ScalaCliSingleFile, expected: true },
         { builder: 'notScalaVersion' as Builder, expected: false },
         { builder: '' as Builder, expected: false },
         { builder: undefined, expected: false },

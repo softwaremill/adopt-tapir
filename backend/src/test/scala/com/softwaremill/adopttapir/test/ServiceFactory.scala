@@ -68,13 +68,10 @@ abstract class GeneratedService:
     override def toString: String = s"[$timestamp]"
 
 class ServiceFactory:
-  import ServiceTimeouts.waitForScalaCliCompileAndUnitTest
-
   def create(builder: Builder, tempDir: better.files.File): IO[GeneratedService] =
     builder match {
-      case Builder.Sbt                => IO.blocking(SbtService(tempDir))
-      case Builder.ScalaCli           => IO.blocking(ScalaCliService(tempDir)).timeoutAndForget(waitForScalaCliCompileAndUnitTest)
-      case Builder.ScalaCliSingleFile => IO.blocking(ScalaCliSingleFileService(tempDir))
+      case Builder.Sbt      => IO.blocking(SbtService(tempDir))
+      case Builder.ScalaCli => IO.blocking(ScalaCliService(tempDir))
     }
 
   private case class SbtService(tempDir: better.files.File) extends GeneratedService:
@@ -93,22 +90,6 @@ class ServiceFactory:
     }
 
   private case class ScalaCliService(tempDir: better.files.File) extends GeneratedService:
-    override protected val portPattern = new Regex("^(?:Go to |Server started at )http://localhost:(\\d+).*")
-
-    override protected lazy val process: SubProcess =
-      // one cannot chain multiple targets to scala-cli hence 'test' target (that implicitly calls compile) is called in
-      // blocking manner and once it returns with success (0 exit code) the configuration is actually started
-      val compileAndTest = os.proc("scala-cli", "--power", "test", ".").call(cwd = os.Path(tempDir.toJava), mergeErrIntoOut = true)
-      assert(
-        compileAndTest.exitCode == 0,
-        s"Compilation and unit tests exited with [${compileAndTest.exitCode}] and output:${System
-            .lineSeparator()}${compileAndTest.out.lines().mkString(System.lineSeparator())}"
-      )
-
-      os.proc("scala-cli", "--power", "run", ".")
-        .spawn(cwd = os.Path(tempDir.toJava), env = Map("HTTP_PORT" -> "0"), mergeErrIntoOut = true)
-
-  private case class ScalaCliSingleFileService(tempDir: better.files.File) extends GeneratedService:
     override protected val portPattern = new Regex("^(?:Go to |Server started at )http://localhost:(\\d+).*")
 
     override protected lazy val process: SubProcess =

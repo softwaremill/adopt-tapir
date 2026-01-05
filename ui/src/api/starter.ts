@@ -32,7 +32,6 @@ export enum ScalaVersion {
 export enum Builder {
   Sbt = 'Sbt',
   ScalaCli = 'ScalaCli',
-  ScalaCliSingleFile = 'ScalaCliSingleFile',
 }
 
 export type StarterRequest = {

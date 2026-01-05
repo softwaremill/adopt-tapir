@@ -109,12 +109,8 @@ export const BUILDER_OPTIONS: FormRadioOption<Builder>[] = [
     value: Builder.Sbt,
   },
   {
-    label: 'Scala CLI (multi-file)',
+    label: 'Scala CLI',
     value: Builder.ScalaCli,
-  },
-  {
-    label: 'Scala CLI (single-file)',
-    value: Builder.ScalaCliSingleFile,
   },
 ];
 
