@@ -72,7 +72,7 @@ object EndpointsView:
 
     def prepareLibraryModel(starterDetails: StarterDetails): Code = {
       val objects =
-        s"""object Library ${if starterDetails.scalaVersion == Scala2 then "{" else ":"}
+        s"""object Library${if starterDetails.scalaVersion == Scala2 then " {" else ":"}
          |  case class Author(name: String)
          |  case class Book(title: String, year: Int, author: Author)
          |
@@ -81,11 +81,11 @@ object EndpointsView:
       val implicits = starterDetails.jsonImplementation match {
         case JsonImplementation.UPickle =>
           s"""
-           |  object Author ${if starterDetails.scalaVersion == Scala2 then "{" else ":"}
+           |  object Author${if starterDetails.scalaVersion == Scala2 then " {" else ":"}
            |    implicit val rw: ReadWriter[Author] = macroRW
            |  ${if starterDetails.scalaVersion == Scala2 then "}" else ""}
            |
-           |  object Book ${if starterDetails.scalaVersion == Scala2 then "{" else ":"}
+           |  object Book${if starterDetails.scalaVersion == Scala2 then " {" else ":"}
            |    implicit val rw: ReadWriter[Book] = macroRW
            |  ${if starterDetails.scalaVersion == Scala2 then "}" else ""}
            |

@@ -6,9 +6,9 @@ import io.vertx.ext.web.Router
 import sttp.tapir.server.vertx.@if(addMetrics){{VertxFutureServerInterpreter, VertxFutureServerOptions}}else{VertxFutureServerInterpreter}
 import sttp.tapir.server.vertx.VertxFutureServerInterpreter.VertxFutureToScalaFuture
 
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
-import ExecutionContext.Implicits.global
+import scala.concurrent.{Await, Future}
 import scala.io.StdIn
 
 
