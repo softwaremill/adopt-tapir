@@ -265,9 +265,7 @@ private object ScalaCliSingleFileTemplate:
 
     val afterPackage = lines.dropWhile(line => line.trim.isEmpty || line.trim.startsWith("package"))
 
-    val (importLines, contentLines) = afterPackage.span(line =>
-      line.trim.isEmpty || line.trim.startsWith("import")
-    )
+    val (importLines, contentLines) = afterPackage.span(line => line.trim.isEmpty || line.trim.startsWith("import"))
 
     val imports = importLines
       .filter(_.trim.startsWith("import"))

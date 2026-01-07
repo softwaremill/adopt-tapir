@@ -78,8 +78,7 @@ object EndpointsView:
 
       val implicits = starterDetails.jsonImplementation match {
         case JsonImplementation.UPickle =>
-          if starterDetails.scalaVersion == Scala2 then
-            s"""
+          if starterDetails.scalaVersion == Scala2 then s"""
                |
                |  object Author {
                |    implicit val rw: ReadWriter[Author] = macroRW
@@ -88,8 +87,7 @@ object EndpointsView:
                |  object Book {
                |    implicit val rw: ReadWriter[Book] = macroRW
                |  }""".stripMargin
-          else
-            s"""
+          else s"""
                |
                |  object Author:
                |    implicit val rw: ReadWriter[Author] = macroRW
