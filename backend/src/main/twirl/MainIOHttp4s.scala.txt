@@ -10,17 +10,13 @@ import sttp.tapir.server.http4s.@if(addMetrics){{Http4sServerInterpreter, Http4s
 object Main extends IOApp {
 
   override def run(args: List[String]): IO[ExitCode] = {
-    @if(addMetrics) {
-    val serverOptions: Http4sServerOptions[IO] =
+    @if(addMetrics){val serverOptions: Http4sServerOptions[IO] =
       Http4sServerOptions.customiseInterceptors[IO]
         .metricsInterceptor(Endpoints.prometheusMetrics.metricsInterceptor())
         .options
     val routes = Http4sServerInterpreter[IO](serverOptions).toRoutes(Endpoints.all)
-    } else {
-    val routes = Http4sServerInterpreter[IO]().toRoutes(Endpoints.all)
-    }
-
-    val port = sys.env
+    }else{val routes = Http4sServerInterpreter[IO]().toRoutes(Endpoints.all)
+    }val port = sys.env
       .get("HTTP_PORT")
       .flatMap(_.toIntOption)
       .flatMap(Port.fromInt)
