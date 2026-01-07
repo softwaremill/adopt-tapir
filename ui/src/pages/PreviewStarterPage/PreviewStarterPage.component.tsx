@@ -40,17 +40,29 @@ export function PreviewStarterPage() {
     };
   }, [formData, navigate, call]);
 
+  // Check if this is a single-file project (Scala CLI)
+  const isSingleFile = tree && tree.length === 1 && typeof tree[0].content === 'string' && tree[0].name.endsWith('.scala');
+
+  // Automatically open the single file when detected
+  useEffect(() => {
+    if (isSingleFile && tree) {
+      setOpenedFile(tree[0]);
+    }
+  }, [isSingleFile, tree]);
+
   // 92.5px is the height of buttons panel.
   return (
     <>
       <Grid container style={{ height: 'calc(100vh - (100vh * 0.08) - 150px)', minHeight: '450px' }}>
-        <Grid item xs={2.4} className={classes.fullHeight}>
-          <Box className={cx(classes.fullHeight, classes.treeViewContainer)}>
-            <FileTreeView tree={tree} setOpenedFile={setOpenedFile} />
-          </Box>
-        </Grid>
-        <Grid item xs={9.6} className={classes.fullHeight}>
-          <Box className={cx(classes.fullHeight, classes.fileViewContainer)}>
+        {!isSingleFile && (
+          <Grid item xs={2.4} className={classes.fullHeight}>
+            <Box className={cx(classes.fullHeight, classes.treeViewContainer)}>
+              <FileTreeView tree={tree} setOpenedFile={setOpenedFile} />
+            </Box>
+          </Grid>
+        )}
+        <Grid item xs={isSingleFile ? 12 : 9.6} className={classes.fullHeight}>
+          <Box className={cx(classes.fullHeight, isSingleFile ? classes.fileViewContainerFullWidth : classes.fileViewContainer)}>
             <FileContentView openedFile={openedFile} />
           </Box>
         </Grid>
