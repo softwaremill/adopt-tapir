@@ -41,7 +41,8 @@ export function PreviewStarterPage() {
   }, [formData, navigate, call]);
 
   // Check if this is a single-file project (Scala CLI)
-  const isSingleFile = tree && tree.length === 1 && typeof tree[0].content === 'string' && tree[0].name.endsWith('.scala');
+  const isSingleFile =
+    tree && tree.length === 1 && typeof tree[0].content === 'string' && tree[0].name.endsWith('.scala');
 
   // Automatically open the single file when detected
   useEffect(() => {
@@ -62,7 +63,12 @@ export function PreviewStarterPage() {
           </Grid>
         )}
         <Grid item xs={isSingleFile ? 12 : 9.6} className={classes.fullHeight}>
-          <Box className={cx(classes.fullHeight, isSingleFile ? classes.fileViewContainerFullWidth : classes.fileViewContainer)}>
+          <Box
+            className={cx(
+              classes.fullHeight,
+              isSingleFile ? classes.fileViewContainerFullWidth : classes.fileViewContainer
+            )}
+          >
             <FileContentView openedFile={openedFile} />
           </Box>
         </Grid>
