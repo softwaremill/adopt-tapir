@@ -9,12 +9,10 @@ import scala.concurrent.{Await, Future}
 import scala.io.StdIn
 
 @@main def run(): Unit =
-  @if(addMetrics) {
-  val serverOptions = NettyFutureServerOptions.customiseInterceptors
+  @if(addMetrics){val serverOptions = NettyFutureServerOptions.customiseInterceptors
     .metricsInterceptor(Endpoints.prometheusMetrics.metricsInterceptor())
     .options
-  }
-  val port = sys.env.get("HTTP_PORT").flatMap(_.toIntOption).getOrElse(8080)
+  }val port = sys.env.get("HTTP_PORT").flatMap(_.toIntOption).getOrElse(8080)
   val program =
     for
       binding <- NettyFutureServer(@if(addMetrics) {serverOptions}).port(port).addEndpoints(Endpoints.all).start()
