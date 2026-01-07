@@ -3,7 +3,7 @@ package com.softwaremill.adopttapir.template
 import better.files.Resource
 import com.softwaremill.adopttapir.starter.ServerStack.{OxStack, ZIOStack}
 import com.softwaremill.adopttapir.starter.{Builder, ScalaVersion, StarterDetails}
-import com.softwaremill.adopttapir.template.scala.{Code, EndpointsSpecView, EndpointsView, Import, MainView}
+import com.softwaremill.adopttapir.template.scala.{EndpointsSpecView, EndpointsView, Import, MainView}
 import com.softwaremill.adopttapir.version.TemplateDependencyInfo
 
 final case class GeneratedFile(
