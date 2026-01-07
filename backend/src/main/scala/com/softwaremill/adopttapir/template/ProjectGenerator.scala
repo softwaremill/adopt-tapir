@@ -136,7 +136,7 @@ abstract class ProjectTemplate:
   private def pathUnderPackage(prefixDir: String, groupId: String, fileName: String): String =
     prefixDir + "/" + groupId.split('.').mkString("/") + "/" + fileName
 
-  private def toSortedList(set: Set[Import]): List[Import] = 
+  private def toSortedList(set: Set[Import]): List[Import] =
     set.toList.sortBy(imp => (imp.fullName.head.isUpper, imp.fullName.toLowerCase))
 end ProjectTemplate
 
@@ -218,16 +218,16 @@ private object ScalaCliSingleFileTemplate:
 
     val dependencies = (BuildScalaCliView.getMainDependencies _).andThen(deps => BuildScalaCliView.format(deps, false))(starterDetails)
 
-    val helloServerEndpoint = formatForSingleFile(EndpointsView.getHelloServerEndpoint(starterDetails))
-    val jsonEndpoint = formatForSingleFile(EndpointsView.getJsonOutModel(starterDetails))
-    val library = formatForSingleFile(EndpointsView.getJsonLibrary(starterDetails))
-    val apiEndpoints = formatForSingleFile(EndpointsView.getApiEndpoints(starterDetails))
-    val docEndpoints = formatForSingleFile(EndpointsView.getDocEndpoints(starterDetails))
-    val metricsEndpoint = formatForSingleFile(EndpointsView.getMetricsEndpoint(starterDetails))
-    val allEndpoints = formatForSingleFile(EndpointsView.getAllEndpoints(starterDetails))
+    val helloServerEndpoint = EndpointsView.getHelloServerEndpoint(starterDetails)
+    val jsonEndpoint = EndpointsView.getJsonOutModel(starterDetails)
+    val library = EndpointsView.getJsonLibrary(starterDetails)
+    val apiEndpoints = EndpointsView.getApiEndpoints(starterDetails)
+    val docEndpoints = EndpointsView.getDocEndpoints(starterDetails)
+    val metricsEndpoint = EndpointsView.getMetricsEndpoint(starterDetails)
+    val allEndpoints = EndpointsView.getAllEndpoints(starterDetails)
     val mainContentRaw = MainView.getProperMainContent(starterDetails)
-    
-    // Extract imports from Main content and remove package declaration and imports
+
+    // Extract imports and content after them
     val (mainImports, mainContent) = extractImportsAndContent(mainContentRaw)
 
     val allImports = toSortedList(
@@ -257,34 +257,25 @@ private object ScalaCliSingleFileTemplate:
     GeneratedFile(s"${starterDetails.projectName}.scala", content)
   }
 
-  private def toSortedList(set: Set[Import]): List[Import] = 
+  private def toSortedList(set: Set[Import]): List[Import] =
     set.toList.sortBy(imp => (imp.fullName.head.isUpper, imp.fullName.toLowerCase))
-
-  private def formatForSingleFile(code: Code): Code = {
-    // Just return the code as-is for now
-    code
-  }
 
   private def extractImportsAndContent(mainContentRaw: String): (Set[Import], String) = {
     val lines = mainContentRaw.linesIterator.toList
-    
-    // Skip package declaration
+
     val afterPackage = lines.dropWhile(line => line.trim.isEmpty || line.trim.startsWith("package"))
-    
-    // Extract import lines
-    val (importLines, contentLines) = afterPackage.span(line => 
+
+    val (importLines, contentLines) = afterPackage.span(line =>
       line.trim.isEmpty || line.trim.startsWith("import")
     )
-    
-    // Convert import lines to Import objects
+
     val imports = importLines
       .filter(_.trim.startsWith("import"))
       .map(line => Import(line.trim.stripPrefix("import").trim))
       .toSet
-    
-    // Join content lines, skipping leading empty lines
+
     val content = contentLines.dropWhile(_.trim.isEmpty).mkString(System.lineSeparator())
-    
+
     (imports, content)
   }
 
