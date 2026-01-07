@@ -136,8 +136,8 @@ abstract class ProjectTemplate:
   private def pathUnderPackage(prefixDir: String, groupId: String, fileName: String): String =
     prefixDir + "/" + groupId.split('.').mkString("/") + "/" + fileName
 
-  private def toSortedList(set: Set[Import]): List[Import] = set.toList.sortBy(_.fullName)
-
+  private def toSortedList(set: Set[Import]): List[Import] = 
+    set.toList.sortBy(imp => (imp.fullName.head.isUpper, imp.fullName.toLowerCase))
 end ProjectTemplate
 
 object SbtProjectTemplate extends ProjectTemplate:
@@ -257,7 +257,8 @@ private object ScalaCliSingleFileTemplate:
     GeneratedFile(s"${starterDetails.projectName}.scala", content)
   }
 
-  private def toSortedList(set: Set[Import]): List[Import] = set.toList.sortBy(_.fullName)
+  private def toSortedList(set: Set[Import]): List[Import] = 
+    set.toList.sortBy(imp => (imp.fullName.head.isUpper, imp.fullName.toLowerCase))
 
   private def formatForSingleFile(code: Code): Code = {
     // Just return the code as-is for now
