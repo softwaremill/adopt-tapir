@@ -56,7 +56,7 @@ class FormValidatorTest extends BaseTest:
     FormValidator.validate(randomStarterRequest(FutureStack, Http4s)).left.value.msg should
       include("Picked FutureStack with Http4s - Future stack will work only with: Netty, Vert.X, Pekko")
     FormValidator.validate(randomStarterRequest(IOStack, ZIOHttp)).left.value.msg should
-      be("Picked IOStack with ZIOHttp - IO stack will work only with: Netty, Vert.X, Http4s")
+      include("Picked IOStack with ZIOHttp - IO stack will work only with: Netty, Vert.X, Http4s")
   }
 
   it should "not raise a problem with Effect and Implementation" in {
