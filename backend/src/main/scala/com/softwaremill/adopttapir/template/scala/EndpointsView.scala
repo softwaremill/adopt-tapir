@@ -16,12 +16,10 @@ object EndpointsView:
 
   private object HelloServerEndpoint:
     def bodyTemplate(serverKind: String, pureEffectFn: String, scalaVersion: ScalaVersion): String =
-      if scalaVersion == Scala2 then
-        s"""${INDENT}val $helloServerEndpoint: $serverKind = $helloEndpoint.serverLogicSuccess(user =>
+      if scalaVersion == Scala2 then s"""${INDENT}val $helloServerEndpoint: $serverKind = $helloEndpoint.serverLogicSuccess(user =>
            |    $pureEffectFn(s"Hello $${user.name}")
            |  )""".stripMargin
-      else
-        s"""${INDENT}val $helloServerEndpoint: $serverKind = $helloEndpoint.serverLogicSuccess: user =>
+      else s"""${INDENT}val $helloServerEndpoint: $serverKind = $helloEndpoint.serverLogicSuccess: user =>
            |    $pureEffectFn(s"Hello $${user.name}")""".stripMargin
 
     def future(scalaVersion: ScalaVersion): Code = Code(
@@ -37,8 +35,7 @@ object EndpointsView:
         s"""${INDENT}val $helloServerEndpoint: ServerEndpoint[Any, Identity] = $helloEndpoint.handleSuccess(user =>
            |    s"Hello $${user.name}"
            |  )""".stripMargin
-      else
-        s"""${INDENT}val $helloServerEndpoint: ServerEndpoint[Any, Identity] = $helloEndpoint.handleSuccess: user =>
+      else s"""${INDENT}val $helloServerEndpoint: ServerEndpoint[Any, Identity] = $helloEndpoint.handleSuccess: user =>
            |    s"Hello $${user.name}"""".stripMargin,
       Set(
         Import("sttp.tapir.server.ServerEndpoint"),
@@ -228,7 +225,7 @@ object EndpointsView:
     private def prepareCode(projectName: String, serverStack: ServerStack): String =
       val (effect, endpoint) = serverStackToEffectAndEndpoint(serverStack)
       s"""val $docEndpoints: List[$endpoint] = SwaggerInterpreter()
-          .fromServerEndpoints[$effect]($apiEndpoints, "$projectName", "1.0.0")""".stripMargin
+         |    .fromServerEndpoints[$effect]($apiEndpoints, "$projectName", "1.0.0")""".stripMargin
 
     def prepareImports(serverStack: ServerStack): Set[Import] =
       serverStackImports(serverStack) + Import("sttp.tapir.swagger.bundle.SwaggerInterpreter")
