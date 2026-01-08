@@ -18,8 +18,8 @@ object EndpointsView:
     def bodyTemplate(serverKind: String, pureEffectFn: String, scalaVersion: ScalaVersion): String =
       if scalaVersion == Scala2 then
         s"""${INDENT}val $helloServerEndpoint: $serverKind = $helloEndpoint.serverLogicSuccess(user =>
-           |  $pureEffectFn(s"Hello $${user.name}")
-           |)""".stripMargin
+           |    $pureEffectFn(s"Hello $${user.name}")
+           |  )""".stripMargin
       else
         s"""${INDENT}val $helloServerEndpoint: $serverKind = $helloEndpoint.serverLogicSuccess: user =>
            |    $pureEffectFn(s"Hello $${user.name}")""".stripMargin
@@ -35,8 +35,8 @@ object EndpointsView:
     def sync(scalaVersion: ScalaVersion): Code = Code(
       if scalaVersion == Scala2 then
         s"""${INDENT}val $helloServerEndpoint: ServerEndpoint[Any, Identity] = $helloEndpoint.handleSuccess(user =>
-           |  s"Hello $${user.name}"
-           |)""".stripMargin
+           |    s"Hello $${user.name}"
+           |  )""".stripMargin
       else
         s"""${INDENT}val $helloServerEndpoint: ServerEndpoint[Any, Identity] = $helloEndpoint.handleSuccess: user =>
            |    s"Hello $${user.name}"""".stripMargin,
@@ -111,8 +111,7 @@ object EndpointsView:
            |    Book("On the Niemen", 1888, Author("Eliza Orzeszkowa")),
            |    Book("The Art of Computer Programming", 1968, Author("Donald Knuth")),
            |    Book("Pharaoh", 1897, Author("Boleslaw Prus"))
-           |  )
-           |${if starterDetails.scalaVersion == Scala2 then "}" else ""}""".stripMargin
+           |  )${if starterDetails.scalaVersion == Scala2 then "\n}" else ""}""".stripMargin
 
       Code(
         objects + implicits + list,

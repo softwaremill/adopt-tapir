@@ -48,6 +48,7 @@ object Endpoints@if(scalaVersionEnum == com.softwaremill.adopttapir.starter.Scal
 @rightBracket}@if(library.nonEmpty){
 
 @library
+
 @mainContent}else{
 
 @mainContent}
