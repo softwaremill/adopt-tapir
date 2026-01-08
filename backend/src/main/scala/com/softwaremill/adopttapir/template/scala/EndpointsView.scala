@@ -7,49 +7,52 @@ import com.softwaremill.adopttapir.template.scala.EndpointsView.Constants.*
 object EndpointsView:
 
   def getHelloServerEndpoint(starterDetails: StarterDetails): Code =
-    val helloServerCode = starterDetails.serverStack match {
-      case ServerStack.FutureStack => HelloServerEndpoint.future
-      case ServerStack.IOStack     => HelloServerEndpoint.io
-      case ServerStack.ZIOStack    => HelloServerEndpoint.zio
-      case ServerStack.OxStack     => HelloServerEndpoint.sync
+    starterDetails.serverStack match {
+      case ServerStack.FutureStack => HelloServerEndpoint.future(starterDetails.scalaVersion)
+      case ServerStack.IOStack     => HelloServerEndpoint.io(starterDetails.scalaVersion)
+      case ServerStack.ZIOStack    => HelloServerEndpoint.zio(starterDetails.scalaVersion)
+      case ServerStack.OxStack     => HelloServerEndpoint.sync(starterDetails.scalaVersion)
     }
 
-    helloServerCode.prependBody(INDENT)
-
   private object HelloServerEndpoint:
-    def bodyTemplate(serverKind: String, pureEffectFn: String): String =
-      s"""${INDENT}val $helloServerEndpoint: $serverKind = $helloEndpoint.serverLogicSuccess(user =>
-         |  $pureEffectFn(s"Hello $${user.name}")
-         |)""".stripMargin
+    def bodyTemplate(serverKind: String, pureEffectFn: String, scalaVersion: ScalaVersion): String =
+      if scalaVersion == Scala2 then s"""${INDENT}val $helloServerEndpoint: $serverKind = $helloEndpoint.serverLogicSuccess(user =>
+           |    $pureEffectFn(s"Hello $${user.name}")
+           |  )""".stripMargin
+      else s"""${INDENT}val $helloServerEndpoint: $serverKind = $helloEndpoint.serverLogicSuccess: user =>
+           |    $pureEffectFn(s"Hello $${user.name}")""".stripMargin
 
-    val future: Code = Code(
-      bodyTemplate("ServerEndpoint[Any, Future]", "Future.successful"),
+    def future(scalaVersion: ScalaVersion): Code = Code(
+      bodyTemplate("ServerEndpoint[Any, Future]", "Future.successful", scalaVersion),
       Set(
         Import("scala.concurrent.Future"),
         Import("sttp.tapir.server.ServerEndpoint")
       )
     )
 
-    val sync: Code = Code(
-      s"""${INDENT}val $helloServerEndpoint: ServerEndpoint[Any, Identity] = $helloEndpoint.handleSuccess(user =>
-         |  s"Hello $${user.name}"
-         |)""".stripMargin,
+    def sync(scalaVersion: ScalaVersion): Code = Code(
+      if scalaVersion == Scala2 then
+        s"""${INDENT}val $helloServerEndpoint: ServerEndpoint[Any, Identity] = $helloEndpoint.handleSuccess(user =>
+           |    s"Hello $${user.name}"
+           |  )""".stripMargin
+      else s"""${INDENT}val $helloServerEndpoint: ServerEndpoint[Any, Identity] = $helloEndpoint.handleSuccess: user =>
+           |    s"Hello $${user.name}"""".stripMargin,
       Set(
         Import("sttp.tapir.server.ServerEndpoint"),
         Import("sttp.shared.Identity")
       )
     )
 
-    val io: Code = Code(
-      bodyTemplate("ServerEndpoint[Any, IO]", "IO.pure"),
+    def io(scalaVersion: ScalaVersion): Code = Code(
+      bodyTemplate("ServerEndpoint[Any, IO]", "IO.pure", scalaVersion),
       Set(
         Import("cats.effect.IO"),
         Import("sttp.tapir.server.ServerEndpoint")
       )
     )
 
-    val zio: Code = Code(
-      bodyTemplate("ZServerEndpoint[Any, Any]", "ZIO.succeed"),
+    def zio(scalaVersion: ScalaVersion): Code = Code(
+      bodyTemplate("ZServerEndpoint[Any, Any]", "ZIO.succeed", scalaVersion),
       Set(
         Import("zio.ZIO"),
         Import("sttp.tapir.ztapir.ZServerEndpoint")
@@ -105,8 +108,7 @@ object EndpointsView:
            |    Book("On the Niemen", 1888, Author("Eliza Orzeszkowa")),
            |    Book("The Art of Computer Programming", 1968, Author("Donald Knuth")),
            |    Book("Pharaoh", 1897, Author("Boleslaw Prus"))
-           |  )
-           |${if starterDetails.scalaVersion == Scala2 then "}" else ""}""".stripMargin
+           |  )${if starterDetails.scalaVersion == Scala2 then "\n}" else ""}""".stripMargin
 
       Code(
         objects + implicits + list,
@@ -121,8 +123,8 @@ object EndpointsView:
 
       def prepareBookListing: String =
         s"""val $bookListing: PublicEndpoint[Unit, Unit, List[Book], Any] = endpoint.get
-           |  .in("books" / "list" / "all")
-           |  .out(jsonBody[List[Book]])""".stripMargin
+           |    .in("books" / "list" / "all")
+           |    .out(jsonBody[List[Book]])""".stripMargin
 
       starterDetails.jsonImplementation match {
         case JsonImplementation.WithoutJson => Code.empty
@@ -223,7 +225,7 @@ object EndpointsView:
     private def prepareCode(projectName: String, serverStack: ServerStack): String =
       val (effect, endpoint) = serverStackToEffectAndEndpoint(serverStack)
       s"""val $docEndpoints: List[$endpoint] = SwaggerInterpreter()
-          .fromServerEndpoints[$effect]($apiEndpoints, "$projectName", "1.0.0")""".stripMargin
+         |    .fromServerEndpoints[$effect]($apiEndpoints, "$projectName", "1.0.0")""".stripMargin
 
     def prepareImports(serverStack: ServerStack): Set[Import] =
       serverStackImports(serverStack) + Import("sttp.tapir.swagger.bundle.SwaggerInterpreter")
