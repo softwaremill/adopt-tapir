@@ -136,8 +136,8 @@ abstract class ProjectTemplate:
   private def pathUnderPackage(prefixDir: String, groupId: String, fileName: String): String =
     prefixDir + "/" + groupId.split('.').mkString("/") + "/" + fileName
 
-  private def toSortedList(set: Set[Import]): List[Import] = set.toList.sortBy(_.fullName)
-
+  private def toSortedList(set: Set[Import]): List[Import] =
+    set.toList.sortBy(imp => (imp.fullName.head.isUpper, imp.fullName.toLowerCase))
 end ProjectTemplate
 
 object SbtProjectTemplate extends ProjectTemplate:
@@ -226,14 +226,13 @@ private object ScalaCliSingleFileTemplate:
     val metricsEndpoint = EndpointsView.getMetricsEndpoint(starterDetails)
     val allEndpoints = EndpointsView.getAllEndpoints(starterDetails)
     val mainContentRaw = MainView.getProperMainContent(starterDetails)
-    // Remove package declaration from mainContent since we already have it in the template
-    val mainContent = mainContentRaw.linesIterator
-      .dropWhile(line => line.trim.startsWith("package"))
-      .mkString(System.lineSeparator())
+
+    // Extract imports and content after them
+    val (mainImports, mainContent) = extractImportsAndContent(mainContentRaw)
 
     val allImports = toSortedList(
       helloServerEndpoint.imports ++ metricsEndpoint.imports ++ docEndpoints.imports
-        ++ jsonEndpoint.imports ++ library.imports ++ allEndpoints.imports
+        ++ jsonEndpoint.imports ++ library.imports ++ allEndpoints.imports ++ mainImports
     )
 
     val content = txt
@@ -258,6 +257,24 @@ private object ScalaCliSingleFileTemplate:
     GeneratedFile(s"${starterDetails.projectName}.scala", content)
   }
 
-  private def toSortedList(set: Set[Import]): List[Import] = set.toList.sortBy(_.fullName)
+  private def toSortedList(set: Set[Import]): List[Import] =
+    set.toList.sortBy(imp => (imp.fullName.head.isUpper, imp.fullName.toLowerCase))
+
+  private def extractImportsAndContent(mainContentRaw: String): (Set[Import], String) = {
+    val lines = mainContentRaw.linesIterator.toList
+
+    val afterPackage = lines.dropWhile(line => line.trim.isEmpty || line.trim.startsWith("package"))
+
+    val (importLines, contentLines) = afterPackage.span(line => line.trim.isEmpty || line.trim.startsWith("import"))
+
+    val imports = importLines
+      .filter(_.trim.startsWith("import"))
+      .map(line => Import(line.trim.stripPrefix("import").trim))
+      .toSet
+
+    val content = contentLines.dropWhile(_.trim.isEmpty).mkString(System.lineSeparator())
+
+    (imports, content)
+  }
 
 end ScalaCliSingleFileTemplate

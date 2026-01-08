@@ -105,11 +105,11 @@ export const JSON_OUTPUT_OPTIONS: FormRadioOption<JSONImplementation>[] = [
 
 export const BUILDER_OPTIONS: FormRadioOption<Builder>[] = [
   {
-    label: 'sbt',
+    label: 'sbt (multi-file, with tests)',
     value: Builder.Sbt,
   },
   {
-    label: 'Scala CLI',
+    label: 'Scala CLI (single runnable file)',
     value: Builder.ScalaCli,
   },
 ];

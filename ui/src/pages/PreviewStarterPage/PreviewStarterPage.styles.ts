@@ -22,6 +22,13 @@ export const useStyles = makeStyles()(theme => ({
     borderTopRightRadius: '4px',
   },
 
+  fileViewContainerFullWidth: {
+    backgroundColor: 'white',
+    border: '1px solid ' + theme.palette.divider,
+    borderTopLeftRadius: '4px',
+    borderTopRightRadius: '4px',
+  },
+
   fileViewButtonsContainer: {
     display: 'flex',
     marginTop: theme.spacing(1),

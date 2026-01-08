@@ -10,20 +10,13 @@ object Main extends ZIOAppDefault {
   override implicit val runtime: zio.Runtime[Any] = zio.Runtime.default
 
   override def run: ZIO[Any with ZIOAppArgs with Scope, Any, Any] = {
-
     val port = sys.env.get("HTTP_PORT").flatMap(_.toIntOption).getOrElse(8080)
-
-    @if(addMetrics){
-    val options = NettyZioServerOptions
-    .customiseInterceptors[Any]
-    .metricsInterceptor(Endpoints.prometheusMetrics.metricsInterceptor())
-    .options
-    } else {
-    val options = NettyZioServerOptions
-    .default[Any]
-    }
-
-    val server = NettyZioServer(options).port(port)
+    @if(addMetrics){val options = NettyZioServerOptions
+      .customiseInterceptors[Any]
+      .metricsInterceptor(Endpoints.prometheusMetrics.metricsInterceptor())
+      .options
+    }else{val options = NettyZioServerOptions.default[Any]
+    }val server = NettyZioServer(options).port(port)
 
     for {
       bind <- server.addEndpoints(Endpoints.all).start()

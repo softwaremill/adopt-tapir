@@ -72,35 +72,41 @@ object EndpointsView:
 
     def prepareLibraryModel(starterDetails: StarterDetails): Code = {
       val objects =
-        s"""object Library ${if starterDetails.scalaVersion == Scala2 then "{" else ":"}
+        s"""object Library${if starterDetails.scalaVersion == Scala2 then " {" else ":"}
          |  case class Author(name: String)
-         |  case class Book(title: String, year: Int, author: Author)
-         |
-         |""".stripMargin
+         |  case class Book(title: String, year: Int, author: Author)""".stripMargin
 
       val implicits = starterDetails.jsonImplementation match {
         case JsonImplementation.UPickle =>
-          s"""
-           |  object Author ${if starterDetails.scalaVersion == Scala2 then "{" else ":"}
-           |    implicit val rw: ReadWriter[Author] = macroRW
-           |  ${if starterDetails.scalaVersion == Scala2 then "}" else ""}
-           |
-           |  object Book ${if starterDetails.scalaVersion == Scala2 then "{" else ":"}
-           |    implicit val rw: ReadWriter[Book] = macroRW
-           |  ${if starterDetails.scalaVersion == Scala2 then "}" else ""}
-           |
-           |""".stripMargin
+          if starterDetails.scalaVersion == Scala2 then s"""
+               |
+               |  object Author {
+               |    implicit val rw: ReadWriter[Author] = macroRW
+               |  }
+               |
+               |  object Book {
+               |    implicit val rw: ReadWriter[Book] = macroRW
+               |  }""".stripMargin
+          else s"""
+               |
+               |  object Author:
+               |    implicit val rw: ReadWriter[Author] = macroRW
+               |
+               |  object Book:
+               |    implicit val rw: ReadWriter[Book] = macroRW""".stripMargin
         case _ => ""
       }
 
       val list =
-        s"""|  val books = List(
-            |    Book("The Sorrows of Young Werther", 1774, Author("Johann Wolfgang von Goethe")),
-            |    Book("On the Niemen", 1888, Author("Eliza Orzeszkowa")),
-            |    Book("The Art of Computer Programming", 1968, Author("Donald Knuth")),
-            |    Book("Pharaoh", 1897, Author("Boleslaw Prus"))
-            |  )
-            |${if starterDetails.scalaVersion == Scala2 then "}" else ""}""".stripMargin
+        s"""
+           |
+           |  val books = List(
+           |    Book("The Sorrows of Young Werther", 1774, Author("Johann Wolfgang von Goethe")),
+           |    Book("On the Niemen", 1888, Author("Eliza Orzeszkowa")),
+           |    Book("The Art of Computer Programming", 1968, Author("Donald Knuth")),
+           |    Book("Pharaoh", 1897, Author("Boleslaw Prus"))
+           |  )
+           |${if starterDetails.scalaVersion == Scala2 then "}" else ""}""".stripMargin
 
       Code(
         objects + implicits + list,
