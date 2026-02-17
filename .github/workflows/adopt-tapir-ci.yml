@@ -124,7 +124,17 @@ jobs:
     uses: softwaremill/github-actions-workflows/.github/workflows/label.yml@main
 
   auto-merge:
-    # only for PRs by softwaremill-ci
+    # only for PRs by softwaremill-ci (Scala Steward)
     if: github.event.pull_request.user.login == 'softwaremill-ci'
     needs: [ verify_unit_tests_lint, verify_integration, verify_docker_image_build, label ]
     uses: softwaremill/github-actions-workflows/.github/workflows/auto-merge.yml@main
+    secrets:
+      github-token: ${{ secrets.SOFTWAREMILL_CI_PR_TOKEN }}
+
+  auto-merge-dependabot:
+    # only for PRs by dependabot[bot]
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    needs: [ verify_unit_tests_lint, verify_integration, verify_docker_image_build ]
+    uses: softwaremill/github-actions-workflows/.github/workflows/auto-merge.yml@main
+    secrets:
+      github-token: ${{ secrets.SOFTWAREMILL_CI_PR_TOKEN }}
