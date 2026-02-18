@@ -124,7 +124,25 @@ jobs:
     uses: softwaremill/github-actions-workflows/.github/workflows/label.yml@main
 
   auto-merge:
-    # only for PRs by softwaremill-ci
+    # only for PRs by softwaremill-ci (Scala Steward)
     if: github.event.pull_request.user.login == 'softwaremill-ci'
     needs: [ verify_unit_tests_lint, verify_integration, verify_docker_image_build, label ]
     uses: softwaremill/github-actions-workflows/.github/workflows/auto-merge.yml@main
+    # `secrets: inherit` (as used in e.g. tapir) won't work here. The reusable workflow
+    # expects an optional `github-token` secret and falls back to GITHUB_TOKEN when not
+    # provided. With `secrets: inherit`, `secrets.github-token` resolves to empty (no repo
+    # secret has that name), falling back to GITHUB_TOKEN — which doesn't trigger downstream
+    # workflows like deploy (GitHub's anti-recursion policy). The explicit mapping bridges
+    # the repo secret name (SOFTWAREMILL_CI_PR_TOKEN) to the workflow's expected input.
+    secrets:
+      github-token: ${{ secrets.SOFTWAREMILL_CI_PR_TOKEN }}
+
+  auto-merge-dependabot:
+    # Dependabot applies the 'automerge' label at PR creation (via dependabot.yml),
+    # so unlike softwaremill-ci PRs, there is no need to wait for the label job.
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    needs: [ verify_unit_tests_lint, verify_integration, verify_docker_image_build ]
+    uses: softwaremill/github-actions-workflows/.github/workflows/auto-merge.yml@main
+    # See auto-merge job above for why explicit secret mapping is needed.
+    secrets:
+      github-token: ${{ secrets.SOFTWAREMILL_CI_PR_TOKEN }}

@@ -8,19 +8,19 @@ import scala.sys.process.Process
 import scala.util.Try
 
 val scala2Version = "2.13.18"
-val scala3Version = "3.7.4"
+val scala3Version = "3.8.1"
 
-val tapirVersion = "1.13.5"
+val tapirVersion = "1.13.8"
 
 val http4sEmberServerVersion = "0.23.33"
 val http4sCirceVersion = "0.23.33"
 val circeVersion = "0.14.15"
 val circeGenericsExtrasVersion = "0.14.3"
-val sttpVersion = "4.0.14"
+val sttpVersion = "4.0.18"
 val prometheusVersion = "0.16.0"
-val scalafmtVersion = "3.10.4"
+val scalafmtVersion = "3.10.7"
 val scalaLoggingVersion = "3.9.6"
-val logbackClassicVersion = "1.5.25"
+val logbackClassicVersion = "1.5.32"
 val scalaTestVersion = "3.2.19"
 val plokhotnyukJsoniterVersion = "2.38.8"
 val zioTestVersion = "2.0.13"
@@ -63,7 +63,7 @@ val fileDependencies = Seq(
 )
 
 val configDependencies = Seq(
-  "com.github.pureconfig" %% "pureconfig-core" % "0.17.9"
+  "com.github.pureconfig" %% "pureconfig-core" % "0.17.10"
 )
 
 val baseDependencies = Seq(
@@ -84,7 +84,7 @@ val scalafmtStandaloneDependencies = Seq(
 val unitTestingStack = Seq(
   "org.scalatest" %% "scalatest" % scalaTestVersion % Test,
   "org.scalacheck" %% "scalacheck" % "1.19.0" % Test,
-  "com.lihaoyi" %% "os-lib" % "0.11.6" % Test
+  "com.lihaoyi" %% "os-lib" % "0.11.7" % Test
 )
 
 val commonDependencies =
