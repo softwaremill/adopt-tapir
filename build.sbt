@@ -21,7 +21,7 @@ val prometheusVersion = "0.16.0"
 val scalafmtVersion = "3.10.7"
 val scalaLoggingVersion = "3.9.6"
 val logbackClassicVersion = "1.5.32"
-val scalaTestVersion = "3.2.19"
+val scalaTestVersion = "3.2.20"
 val plokhotnyukJsoniterVersion = "2.38.9"
 val zioTestVersion = "2.0.13"
 
