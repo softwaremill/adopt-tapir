@@ -18,7 +18,6 @@ import sttp.client4.{SyncBackend, DefaultSyncBackend, UriContext, asStringAlways
 import scala.collection.mutable
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 import scala.util.Properties
-import scala.util.control.NonFatal
 
 object Setup:
   type TestFunction = Integer => IO[Unit]
@@ -97,31 +96,9 @@ class StarterServiceITTest extends BaseTest with ParallelTestExecution:
         }
       )
 
-      val metricsEndpointTest: Option[TestFunction] = Option.when(details.addMetrics)(port =>
-        def runWithRetries(retriesAllowed: Int): IO[Unit] =
-          IO.blocking {
-            val result: String =
-              basicRequest.response(asStringAlways).get(uri"http://localhost:$port/metrics").send(backend).body
-
-            result should (include("# HELP tapir_request_duration_seconds Duration of HTTP requests")
-              and include("# TYPE tapir_request_duration_seconds histogram")
-              and include("# HELP tapir_request_total Total HTTP requests")
-              and include("# TYPE tapir_request_total counter")
-              and include("# HELP tapir_request_active Active HTTP requests")
-              and include("# TYPE tapir_request_active gauge"))
-            info(subTest("metrics"))
-          }.handleErrorWith {
-            // Sometimes the registry is empty right after the server starts
-            case NonFatal(_) if retriesAllowed > 0 => IO.sleep(500.millis) >> runWithRetries(retriesAllowed - 1)
-            case NonFatal(e)                       => IO.raiseError(e)
-          }
-
-        runWithRetries(3)
-      )
-
       // get implementation for a given configuration, compile it, unit & integration test it
       val service = GeneratedServiceUnderTest(new ServiceFactory, details)
-      service.run(List(helloEndpointTest, docsEndpointTest, metricsEndpointTest).flatten)
+      service.run(List(helloEndpointTest, docsEndpointTest).flatten)
     }
   }
 

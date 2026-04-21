@@ -12,7 +12,7 @@ object Main extends IOApp:
   override def run(args: List[String]): IO[ExitCode] =
     @if(addMetrics){val serverOptions: Http4sServerOptions[IO] =
       Http4sServerOptions.customiseInterceptors[IO]
-        .metricsInterceptor(Endpoints.prometheusMetrics.metricsInterceptor())
+        .metricsInterceptor(Endpoints.otelMetrics.metricsInterceptor())
         .options
     val routes = Http4sServerInterpreter[IO](serverOptions).toRoutes(Endpoints.all)
     }else{val routes = Http4sServerInterpreter[IO]().toRoutes(Endpoints.all)

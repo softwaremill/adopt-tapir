@@ -230,20 +230,24 @@ object EndpointsView:
     def prepareImports(serverStack: ServerStack): Set[Import] =
       serverStackImports(serverStack) + Import("sttp.tapir.swagger.bundle.SwaggerInterpreter")
 
-  def getMetricsEndpoint(starterDetails: StarterDetails): Code =
+  def getMetricsDefinition(starterDetails: StarterDetails): Code =
     if starterDetails.addMetrics then {
-      MetricsEndpoint.prepareMetricsEndpoint(starterDetails.serverStack)
+      MetricsDefinition.prepareMetricsDefinition(starterDetails)
     } else {
       Code.empty
     }
 
-  private object MetricsEndpoint:
-    def prepareMetricsEndpoint(serverStack: ServerStack): Code =
-      val (effect, endpoint) = serverStackToEffectAndEndpoint(serverStack)
+  private object MetricsDefinition:
+    def prepareMetricsDefinition(starterDetails: StarterDetails): Code =
+      val serverStack = starterDetails.serverStack
+      val (effect, _) = serverStackToEffectAndEndpoint(serverStack)
       Code(
-        s"${INDENT}val prometheusMetrics: PrometheusMetrics[$effect] = PrometheusMetrics.default[$effect]()" + NEW_LINE_WITH_INDENT +
-          s"val metricsEndpoint: $endpoint = prometheusMetrics.metricsEndpoint",
-        serverStackImports(serverStack) + Import("sttp.tapir.server.metrics.prometheus.PrometheusMetrics")
+        s"${INDENT}val otel: OpenTelemetry = AutoConfiguredOpenTelemetrySdk.initialize().getOpenTelemetrySdk" + NEW_LINE_WITH_INDENT +
+          s"val $otelMetrics: OpenTelemetryMetrics[$effect] = OpenTelemetryMetrics.default[$effect](otel.getMeter(\"${starterDetails.projectName}\"))",
+        serverStackImports(serverStack) +
+          Import("io.opentelemetry.api.OpenTelemetry") +
+          Import("io.opentelemetry.sdk.autoconfigure.AutoConfiguredOpenTelemetrySdk") +
+          Import("sttp.tapir.server.metrics.opentelemetry.OpenTelemetryMetrics")
       )
 
   private def serverStackToEffectAndEndpoint(serverStack: ServerStack): (String, String) =
@@ -268,14 +272,13 @@ object EndpointsView:
       case ServerStack.ZIOStack    => "List[ZServerEndpoint[Any, Any]]"
     }
 
-    def bodyTemplate(serverKind: String, addMetrics: Boolean, hasDocumentation: Boolean): String = {
+    def bodyTemplate(serverKind: String, hasDocumentation: Boolean): String = {
       s"val ${Constants.all}: $serverKind = $apiEndpoints" +
-        s"${if hasDocumentation then s" ++ $docEndpoints" else ""}" +
-        s"${if addMetrics then s" ++ List($metricsEndpoint)" else ""}"
+        s"${if hasDocumentation then s" ++ $docEndpoints" else ""}"
 
     }
 
-    Code(bodyTemplate(serverKind, starterDetails.addMetrics, starterDetails.addDocumentation)).prependBody(INDENT)
+    Code(bodyTemplate(serverKind, starterDetails.addDocumentation)).prependBody(INDENT)
 
   object Constants:
     val INDENT: String = " " * 2
@@ -286,5 +289,5 @@ object EndpointsView:
     val booksListingServerEndpoint = "booksListingServerEndpoint"
     val apiEndpoints = "apiEndpoints"
     val docEndpoints = "docEndpoints"
-    val metricsEndpoint = "metricsEndpoint"
+    val otelMetrics = "otelMetrics"
     val all = "all"

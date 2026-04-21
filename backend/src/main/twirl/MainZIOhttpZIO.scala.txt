@@ -14,7 +14,7 @@ object Main extends ZIOAppDefault {
   override def run: ZIO[Any with ZIOAppArgs with Scope, Any, Any] = {
     val serverOptions: ZioHttpServerOptions[Any] =
       ZioHttpServerOptions.customiseInterceptors
-        @if(addMetrics){.metricsInterceptor(Endpoints.prometheusMetrics.metricsInterceptor())}
+        @if(addMetrics){.metricsInterceptor(Endpoints.otelMetrics.metricsInterceptor())}
         .options
 
     val app: Routes[Any, Response] = ZioHttpInterpreter(serverOptions).toHttp(Endpoints.all)

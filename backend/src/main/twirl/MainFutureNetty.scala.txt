@@ -12,7 +12,7 @@ object Main {
   def main(args: Array[String]): Unit = {
     @if(addMetrics) {
     val serverOptions = NettyFutureServerOptions.customiseInterceptors
-      .metricsInterceptor(Endpoints.prometheusMetrics.metricsInterceptor())
+      .metricsInterceptor(Endpoints.otelMetrics.metricsInterceptor())
       .options
     }
     val port = sys.env.get("HTTP_PORT").flatMap(_.toIntOption).getOrElse(8080)

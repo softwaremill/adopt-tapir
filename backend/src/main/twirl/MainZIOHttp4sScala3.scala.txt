@@ -16,7 +16,7 @@ object Main extends ZIOAppDefault:
     @if(addMetrics) {
     val serverOptions: Http4sServerOptions[Task] =
       Http4sServerOptions.customiseInterceptors[Task]
-        .metricsInterceptor(Endpoints.prometheusMetrics.metricsInterceptor())
+        .metricsInterceptor(Endpoints.otelMetrics.metricsInterceptor())
         .options
     val routes = ZHttp4sServerInterpreter(serverOptions).from(Endpoints.all).toRoutes[Any]
     } else {

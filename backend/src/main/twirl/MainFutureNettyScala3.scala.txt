@@ -10,7 +10,7 @@ import scala.io.StdIn
 
 @@main def run(): Unit =
   @if(addMetrics){val serverOptions = NettyFutureServerOptions.customiseInterceptors
-    .metricsInterceptor(Endpoints.prometheusMetrics.metricsInterceptor())
+    .metricsInterceptor(Endpoints.otelMetrics.metricsInterceptor())
     .options
   }val port = sys.env.get("HTTP_PORT").flatMap(_.toIntOption).getOrElse(8080)
   val program =

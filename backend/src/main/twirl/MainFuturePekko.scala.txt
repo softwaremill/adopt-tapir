@@ -16,7 +16,7 @@ object Main {
     @if(addMetrics) {
     val serverOptions: PekkoHttpServerOptions =
       PekkoHttpServerOptions.customiseInterceptors
-        .metricsInterceptor(Endpoints.prometheusMetrics.metricsInterceptor())
+        .metricsInterceptor(Endpoints.otelMetrics.metricsInterceptor())
         .options
 
     val route = PekkoHttpServerInterpreter(serverOptions).toRoute(Endpoints.all)
