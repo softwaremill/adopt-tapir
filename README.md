@@ -65,4 +65,4 @@ export VITE_SERVER_ADDRESS="http://localhost:9090"; ./frontend-start.sh
 
 ## Copyright
 
-Copyright (C) 2013-2025 SoftwareMill [https://softwaremill.com](https://softwaremill.com).
+Copyright (C) 2013-2026 SoftwareMill [https://softwaremill.com](https://softwaremill.com).
