@@ -3,7 +3,8 @@ package @groupId
 
 @if(addMetrics){import cats.effect.std.Dispatcher}
 import cats.effect.{ExitCode, IO, IOApp}
-import sttp.tapir.server.netty.cats.@if(addMetrics){{NettyCatsServer, NettyCatsServerOptions}}else{NettyCatsServer}
+@if(addMetrics){import io.opentelemetry.sdk.autoconfigure.AutoConfiguredOpenTelemetrySdk
+}import sttp.tapir.server.netty.cats.@if(addMetrics){{NettyCatsServer, NettyCatsServerOptions}}else{NettyCatsServer}
 
 object Main extends IOApp {
 
@@ -11,9 +12,10 @@ object Main extends IOApp {
     val port = sys.env.get("HTTP_PORT").flatMap(_.toIntOption).getOrElse(8080)
 
     @if(addMetrics){
+      val otel = AutoConfiguredOpenTelemetrySdk.initialize().getOpenTelemetrySdk
       Dispatcher[IO].map( d => { NettyCatsServer.apply[IO]({
         NettyCatsServerOptions.customiseInterceptors(d)
-          .metricsInterceptor(Endpoints.otelMetrics.metricsInterceptor())
+          .metricsInterceptor(Endpoints.metricsInterceptor(otel))
           .options
       }) })
     } else {

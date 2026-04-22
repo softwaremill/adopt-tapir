@@ -1,7 +1,8 @@
 @(groupId: String, addDocumentation: Boolean, addMetrics: Boolean)
 package @groupId
 
-import io.vertx.core.Vertx
+@if(addMetrics){import io.opentelemetry.sdk.autoconfigure.AutoConfiguredOpenTelemetrySdk
+}import io.vertx.core.Vertx
 import io.vertx.ext.web.Router
 import sttp.tapir.server.vertx.@if(addMetrics){{VertxFutureServerInterpreter, VertxFutureServerOptions}}else{VertxFutureServerInterpreter}
 import sttp.tapir.server.vertx.VertxFutureServerInterpreter.VertxFutureToScalaFuture
@@ -13,8 +14,9 @@ import scala.io.StdIn
 
 
 @@main def run(): Unit =
-  @if(addMetrics){val serverOptions = VertxFutureServerOptions.customiseInterceptors
-    .metricsInterceptor(Endpoints.otelMetrics.metricsInterceptor())
+  @if(addMetrics){val otel = AutoConfiguredOpenTelemetrySdk.initialize().getOpenTelemetrySdk
+  val serverOptions = VertxFutureServerOptions.customiseInterceptors
+    .metricsInterceptor(Endpoints.metricsInterceptor(otel))
     .options
   }val port = sys.env.get("HTTP_PORT").flatMap(_.toIntOption).getOrElse(8080)
 

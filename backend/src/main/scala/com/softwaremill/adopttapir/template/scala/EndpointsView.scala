@@ -242,11 +242,10 @@ object EndpointsView:
       val serverStack = starterDetails.serverStack
       val (effect, _) = serverStackToEffectAndEndpoint(serverStack)
       Code(
-        s"${INDENT}val otel: OpenTelemetry = AutoConfiguredOpenTelemetrySdk.initialize().getOpenTelemetrySdk" + NEW_LINE_WITH_INDENT +
-          s"val $otelMetrics: OpenTelemetryMetrics[$effect] = OpenTelemetryMetrics.default[$effect](otel.getMeter(\"${starterDetails.projectName}\"))",
+        s"${INDENT}def $metricsInterceptor(otel: OpenTelemetry) =" + NEW_LINE_WITH_INDENT +
+          s"  OpenTelemetryMetrics.default[$effect](otel.getMeter(\"${starterDetails.projectName}\")).metricsInterceptor()",
         serverStackImports(serverStack) +
           Import("io.opentelemetry.api.OpenTelemetry") +
-          Import("io.opentelemetry.sdk.autoconfigure.AutoConfiguredOpenTelemetrySdk") +
           Import("sttp.tapir.server.metrics.opentelemetry.OpenTelemetryMetrics")
       )
 
@@ -289,5 +288,5 @@ object EndpointsView:
     val booksListingServerEndpoint = "booksListingServerEndpoint"
     val apiEndpoints = "apiEndpoints"
     val docEndpoints = "docEndpoints"
-    val otelMetrics = "otelMetrics"
+    val metricsInterceptor = "metricsInterceptor"
     val all = "all"

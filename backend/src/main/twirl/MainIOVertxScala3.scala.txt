@@ -3,7 +3,8 @@ package @groupId
 
 import cats.effect._
 import cats.effect.std.Dispatcher
-import io.vertx.core.Vertx
+@if(addMetrics){import io.opentelemetry.sdk.autoconfigure.AutoConfiguredOpenTelemetrySdk
+}import io.vertx.core.Vertx
 import io.vertx.ext.web.Router
 import sttp.tapir.server.vertx.cats.@if(addMetrics){{VertxCatsServerInterpreter, VertxCatsServerOptions}}else{VertxCatsServerInterpreter}
 import sttp.tapir.server.vertx.cats.VertxCatsServerInterpreter._
@@ -19,10 +20,11 @@ object Main extends IOApp:
 
     Dispatcher[IO]
       @if(addMetrics) {
-      .map: d => 
+      .map: d =>
+        val otel = AutoConfiguredOpenTelemetrySdk.initialize().getOpenTelemetrySdk
         VertxCatsServerOptions
           .customiseInterceptors(d)
-          .metricsInterceptor(Endpoints.otelMetrics.metricsInterceptor())
+          .metricsInterceptor(Endpoints.metricsInterceptor(otel))
           .options
       }
       .use: @if(addMetrics) {serverOptions} else {dispatcher} =>

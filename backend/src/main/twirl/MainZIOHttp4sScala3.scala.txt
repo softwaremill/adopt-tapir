@@ -1,7 +1,8 @@
 @(groupId: String, addDocumentation: Boolean, addMetrics: Boolean)
 package @groupId
 
-import com.comcast.ip4s.{Host, Port, port}
+import com.comcast.ip4s.{Host, Port, port}@if(addMetrics){
+import io.opentelemetry.sdk.autoconfigure.AutoConfiguredOpenTelemetrySdk}
 import org.http4s.ember.server.EmberServerBuilder
 import org.http4s.server.Router@if(addMetrics){
 import sttp.tapir.server.http4s.Http4sServerOptions}
@@ -14,9 +15,10 @@ object Main extends ZIOAppDefault:
 
   override def run: ZIO[Any with ZIOAppArgs with Scope, Any, Any] =
     @if(addMetrics) {
+    val otel = AutoConfiguredOpenTelemetrySdk.initialize().getOpenTelemetrySdk
     val serverOptions: Http4sServerOptions[Task] =
       Http4sServerOptions.customiseInterceptors[Task]
-        .metricsInterceptor(Endpoints.otelMetrics.metricsInterceptor())
+        .metricsInterceptor(Endpoints.metricsInterceptor(otel))
         .options
     val routes = ZHttp4sServerInterpreter(serverOptions).from(Endpoints.all).toRoutes[Any]
     } else {
