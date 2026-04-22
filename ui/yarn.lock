@@ -3312,9 +3312,9 @@ locate-path@^6.0.0:
     p-locate "^5.0.0"
 
 lodash-es@^4.17.21:
-  version "4.17.23"
-  resolved "https://registry.yarnpkg.com/lodash-es/-/lodash-es-4.17.23.tgz#58c4360fd1b5d33afc6c0bbd3d1149349b1138e0"
-  integrity sha512-kVI48u3PZr38HdYz98UmfPnXl2DXrpdctLrFLCd3kOx1xUkOmpFPx7gCWWM5MPkL/fD8zb+Ph0QzjGFs4+hHWg==
+  version "4.18.1"
+  resolved "https://registry.yarnpkg.com/lodash-es/-/lodash-es-4.18.1.tgz#b962eeb80d9d983a900bf342961fb7418ca10b1d"
+  integrity sha512-J8xewKD/Gk22OZbhpOVSwcs60zhd95ESDwezOFuA3/099925PdHJ7OFHNTGtajL3AlZkykD32HykiMo+BIBI8A==
 
 lodash.merge@^4.6.2:
   version "4.6.2"
@@ -3322,9 +3322,9 @@ lodash.merge@^4.6.2:
   integrity sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==
 
 lodash@^4.17.15, lodash@^4.17.21:
-  version "4.17.23"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.23.tgz#f113b0378386103be4f6893388c73d0bde7f2c5a"
-  integrity sha512-LgVTMpQtIopCi79SJeDiP0TfWi5CNEc/L/aRdTh3yIvmZXTnheWpKjSZhnvMl8iXbC1tFg9gdHHDMLoV7CnG+w==
+  version "4.18.1"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.18.1.tgz#ff2b66c1f6326d59513de2407bf881439812771c"
+  integrity sha512-dMInicTPVE8d1e5otfwmmjlxkZoUpiVLwyeTdUsi/Caj/gfzzblBcCE5sRHV/AsjuCmxWrte2TNGSYuCeCq+0Q==
 
 loose-envify@^1.1.0, loose-envify@^1.4.0:
   version "1.4.0"
@@ -4533,10 +4533,10 @@ vite-plugin-svgr@^4.2.0:
     "@svgr/core" "^8.1.0"
     "@svgr/plugin-jsx" "^8.1.0"
 
-"vite@^6.0.0 || ^7.0.0", vite@^7.0.0:
-  version "7.3.0"
-  resolved "https://registry.yarnpkg.com/vite/-/vite-7.3.0.tgz#066c7a835993a66e82004eac3e185d0d157fd658"
-  integrity sha512-dZwN5L1VlUBewiP6H9s2+B3e3Jg96D0vzN+Ry73sOefebhYr9f94wwkMNN/9ouoU8pV1BqA1d1zGk8928cx0rg==
+"vite@^6.0.0 || ^7.0.0", vite@^7.3.2:
+  version "7.3.2"
+  resolved "https://registry.yarnpkg.com/vite/-/vite-7.3.2.tgz#cb041794d4c1395e28baea98198fd6e8f4b96b5c"
+  integrity sha512-Bby3NOsna2jsjfLVOHKes8sGwgl4TT0E6vvpYgnAYDIF/tie7MRaFthmKuHx1NSXjiTueXH3do80FMQgvEktRg==
   dependencies:
     esbuild "^0.27.0"
     fdir "^6.5.0"

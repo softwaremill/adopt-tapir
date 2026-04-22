@@ -8,22 +8,23 @@ import scala.sys.process.Process
 import scala.util.Try
 
 val scala2Version = "2.13.18"
-val scala3Version = "3.8.2"
+val scala3Version = "3.8.3"
 
-val tapirVersion = "1.13.13"
+val tapirVersion = "1.13.16"
 
-val http4sEmberServerVersion = "0.23.33"
-val http4sCirceVersion = "0.23.33"
+val http4sEmberServerVersion = "0.23.34"
+val http4sCirceVersion = "0.23.34"
 val circeVersion = "0.14.15"
 val circeGenericsExtrasVersion = "0.14.3"
-val sttpVersion = "4.0.19"
+val sttpVersion = "4.0.23"
 val prometheusVersion = "0.16.0"
-val scalafmtVersion = "3.10.7"
+val scalafmtVersion = "3.11.0"
 val scalaLoggingVersion = "3.9.6"
 val logbackClassicVersion = "1.5.32"
 val scalaTestVersion = "3.2.20"
 val plokhotnyukJsoniterVersion = "2.38.9"
 val zioTestVersion = "2.0.13"
+val opentelemetryVersion = "1.61.0"
 
 val httpDependencies = Seq(
   "org.http4s" %% "http4s-ember-server" % http4sEmberServerVersion,
@@ -281,6 +282,7 @@ lazy val templateDependencies: Project = project
       "http4sEmberServerVersion" -> http4sEmberServerVersion,
       "zioTestVersion" -> zioTestVersion,
       "scalafmtVersion" -> scalafmtVersion,
+      "opentelemetryVersion" -> opentelemetryVersion,
       "sbtVersion" -> sbtVersion.value
     ),
     buildInfoOptions += BuildInfoOption.ToJson,

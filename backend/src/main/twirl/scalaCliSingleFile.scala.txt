@@ -9,7 +9,7 @@ jsonEndpoint: String,
 library: String,
 apiEndpoints: String,
 docEndpoints: String,
-metricsEndpoint: String,
+metricsDefinition: String,
 allEndpoints: String,
 mainContent: String,
 scalaVersionEnum: com.softwaremill.adopttapir.starter.ScalaVersion,
@@ -42,8 +42,8 @@ object Endpoints@if(scalaVersionEnum == com.softwaremill.adopttapir.starter.Scal
 @helloEndpointServer@if(jsonEndpoint.nonEmpty){
 @jsonEndpoint}
 @apiEndpoints@if(docEndpoints.nonEmpty){
-@docEndpoints}@if(metricsEndpoint.nonEmpty){
-@metricsEndpoint}
+@docEndpoints}@if(metricsDefinition.nonEmpty){
+@metricsDefinition}
 @allEndpoints@if(scalaVersionEnum == com.softwaremill.adopttapir.starter.ScalaVersion.Scala2){
 @rightBracket}@if(library.nonEmpty){
 

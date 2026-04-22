@@ -56,7 +56,7 @@ To start the frontend:
 ```
 
 Please notice, that by default fronted points to the production backend.
-This could be changed by specifying the `REACT_APP_SERVER_ADDRESS` environmental variable.
+This could be changed by specifying the `VITE_SERVER_ADDRESS` environmental variable.
 To start the frontend pointing to `http://localhost:9090` run:
 
 ```sh
@@ -65,4 +65,4 @@ export VITE_SERVER_ADDRESS="http://localhost:9090"; ./frontend-start.sh
 
 ## Copyright
 
-Copyright (C) 2013-2025 SoftwareMill [https://softwaremill.com](https://softwaremill.com).
+Copyright (C) 2013-2026 SoftwareMill [https://softwaremill.com](https://softwaremill.com).

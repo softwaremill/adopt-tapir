@@ -1,7 +1,8 @@
 @(groupId: String, addDocumentation: Boolean, addMetrics: Boolean)
 package @groupId
 
-import sttp.tapir.server.ziohttp.{ZioHttpInterpreter, ZioHttpServerOptions}
+@if(addMetrics){import io.opentelemetry.sdk.autoconfigure.AutoConfiguredOpenTelemetrySdk
+}import sttp.tapir.server.ziohttp.{ZioHttpInterpreter, ZioHttpServerOptions}
 import zio.{Console, LogLevel, Scope, ZIO, ZIOAppArgs, ZIOAppDefault, ZLayer}
 import zio.http.{Response, Routes, Server}
 import zio.logging.LogFormat
@@ -12,9 +13,10 @@ object Main extends ZIOAppDefault {
   override val bootstrap: ZLayer[ZIOAppArgs, Any, Any] = SLF4J.slf4j(LogLevel.Debug, LogFormat.default)
 
   override def run: ZIO[Any with ZIOAppArgs with Scope, Any, Any] = {
-    val serverOptions: ZioHttpServerOptions[Any] =
+    @if(addMetrics){val otel = AutoConfiguredOpenTelemetrySdk.initialize().getOpenTelemetrySdk
+    }val serverOptions: ZioHttpServerOptions[Any] =
       ZioHttpServerOptions.customiseInterceptors
-        @if(addMetrics){.metricsInterceptor(Endpoints.prometheusMetrics.metricsInterceptor())}
+        @if(addMetrics){.metricsInterceptor(Endpoints.metricsInterceptor(otel))}
         .options
 
     val app: Routes[Any, Response] = ZioHttpInterpreter(serverOptions).toHttp(Endpoints.all)

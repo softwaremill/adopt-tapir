@@ -287,7 +287,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ isEmbedded
               label="Expose endpoint documentation using Swagger UI"
               options={ENDPOINTS_OPTIONS}
             />
-            <FormRadioGroup name="addMetrics" label="Add metrics endpoints" options={ENDPOINTS_OPTIONS} />
+            <FormRadioGroup name="addMetrics" label="Add endpoints metrics" options={ENDPOINTS_OPTIONS} />
           </fieldset>
 
           <div className={cx(classes.actionsContainer, classes.formActionsRow)}>
