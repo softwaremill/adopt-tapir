@@ -1,7 +1,8 @@
 @(groupId: String, addDocumentation: Boolean, addMetrics: Boolean)
 package @groupId
 
-import sttp.tapir.server.netty.@if(addMetrics){{NettyFutureServer, NettyFutureServerOptions}}else{NettyFutureServer}
+@if(addMetrics){import io.opentelemetry.sdk.autoconfigure.AutoConfiguredOpenTelemetrySdk
+}import sttp.tapir.server.netty.@if(addMetrics){{NettyFutureServer, NettyFutureServerOptions}}else{NettyFutureServer}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
@@ -11,8 +12,9 @@ import scala.io.StdIn
 object Main {
   def main(args: Array[String]): Unit = {
     @if(addMetrics) {
+    val otel = AutoConfiguredOpenTelemetrySdk.initialize().getOpenTelemetrySdk
     val serverOptions = NettyFutureServerOptions.customiseInterceptors
-      .metricsInterceptor(Endpoints.prometheusMetrics.metricsInterceptor())
+      .metricsInterceptor(Endpoints.metricsInterceptor(otel))
       .options
     }
     val port = sys.env.get("HTTP_PORT").flatMap(_.toIntOption).getOrElse(8080)

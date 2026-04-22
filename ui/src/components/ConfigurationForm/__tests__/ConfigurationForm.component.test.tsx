@@ -43,7 +43,7 @@ describe('ConfigurationForm component', () => {
       ).getByText('yes')
     );
     await user.click(within(screen.getByRole('radiogroup', { name: /Add JSON endpoint using/i })).getByText('circe'));
-    await user.click(within(screen.getByRole('radiogroup', { name: /Add metrics endpoints/i })).getByText('yes'));
+    await user.click(within(screen.getByRole('radiogroup', { name: /Add endpoints metrics/i })).getByText('yes'));
 
     await user.click(screen.getByRole('button', { name: /Generate .zip/i }));
 
@@ -144,7 +144,7 @@ describe('ConfigurationForm component', () => {
       ).getByText('yes')
     );
     await user.click(within(screen.getByRole('radiogroup', { name: /Add JSON endpoint using/i })).getByText('circe'));
-    await user.click(within(screen.getByRole('radiogroup', { name: /Add metrics endpoints/i })).getByText('yes'));
+    await user.click(within(screen.getByRole('radiogroup', { name: /Add endpoints metrics/i })).getByText('yes'));
 
     await user.click(screen.getByRole('button', { name: /Reset/i }));
 

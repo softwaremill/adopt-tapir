@@ -51,7 +51,7 @@ abstract class ProjectTemplate:
     val library = EndpointsView.getJsonLibrary(starterDetails)
     val apiEndpoints = EndpointsView.getApiEndpoints(starterDetails)
     val docEndpoints = EndpointsView.getDocEndpoints(starterDetails)
-    val metricsEndpoint = EndpointsView.getMetricsEndpoint(starterDetails)
+    val metricsDefinition = EndpointsView.getMetricsDefinition(starterDetails)
     val allEndpoints = EndpointsView.getAllEndpoints(starterDetails)
 
     GeneratedFile(
@@ -60,7 +60,7 @@ abstract class ProjectTemplate:
         .Endpoints(
           starterDetails = starterDetails,
           additionalImports = toSortedList(
-            helloServerEndpoint.imports ++ metricsEndpoint.imports ++ docEndpoints.imports
+            helloServerEndpoint.imports ++ metricsDefinition.imports ++ docEndpoints.imports
               ++ jsonEndpoint.imports ++ library.imports ++ allEndpoints.imports
           ),
           helloEndpointServer = helloServerEndpoint.body,
@@ -68,7 +68,7 @@ abstract class ProjectTemplate:
           library = library.body,
           apiEndpoints = apiEndpoints.body,
           docEndpoints = docEndpoints.body,
-          metricsEndpoint = metricsEndpoint.body,
+          metricsDefinition = metricsDefinition.body,
           allEndpoints = allEndpoints.body,
           scalaVersion = starterDetails.scalaVersion
         )
@@ -223,7 +223,7 @@ private object ScalaCliSingleFileTemplate:
     val library = EndpointsView.getJsonLibrary(starterDetails)
     val apiEndpoints = EndpointsView.getApiEndpoints(starterDetails)
     val docEndpoints = EndpointsView.getDocEndpoints(starterDetails)
-    val metricsEndpoint = EndpointsView.getMetricsEndpoint(starterDetails)
+    val metricsDefinition = EndpointsView.getMetricsDefinition(starterDetails)
     val allEndpoints = EndpointsView.getAllEndpoints(starterDetails)
     val mainContentRaw = MainView.getProperMainContent(starterDetails)
 
@@ -231,7 +231,7 @@ private object ScalaCliSingleFileTemplate:
     val (mainImports, mainContent) = extractImportsAndContent(mainContentRaw)
 
     val allImports = toSortedList(
-      helloServerEndpoint.imports ++ metricsEndpoint.imports ++ docEndpoints.imports
+      helloServerEndpoint.imports ++ metricsDefinition.imports ++ docEndpoints.imports
         ++ jsonEndpoint.imports ++ library.imports ++ allEndpoints.imports ++ mainImports
     )
 
@@ -247,7 +247,7 @@ private object ScalaCliSingleFileTemplate:
         library.body,
         apiEndpoints.body,
         docEndpoints.body,
-        metricsEndpoint.body,
+        metricsDefinition.body,
         allEndpoints.body,
         mainContent,
         starterDetails.scalaVersion

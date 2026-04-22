@@ -24,6 +24,7 @@ val logbackClassicVersion = "1.5.32"
 val scalaTestVersion = "3.2.19"
 val plokhotnyukJsoniterVersion = "2.38.9"
 val zioTestVersion = "2.0.13"
+val opentelemetryVersion = "1.61.0"
 
 val httpDependencies = Seq(
   "org.http4s" %% "http4s-ember-server" % http4sEmberServerVersion,
@@ -281,6 +282,7 @@ lazy val templateDependencies: Project = project
       "http4sEmberServerVersion" -> http4sEmberServerVersion,
       "zioTestVersion" -> zioTestVersion,
       "scalafmtVersion" -> scalafmtVersion,
+      "opentelemetryVersion" -> opentelemetryVersion,
       "sbtVersion" -> sbtVersion.value
     ),
     buildInfoOptions += BuildInfoOption.ToJson,

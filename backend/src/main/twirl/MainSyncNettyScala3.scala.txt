@@ -1,14 +1,16 @@
 @(groupId: String, addDocumentation: Boolean, addMetrics: Boolean)
 package @groupId
 
-import ox.*
+@if(addMetrics){import io.opentelemetry.sdk.autoconfigure.AutoConfiguredOpenTelemetrySdk
+}import ox.*
 import sttp.tapir.server.netty.sync.@if(addMetrics){{NettySyncServer, NettySyncServerOptions}}else{NettySyncServer}
 
 object Main extends OxApp.Simple:
 
   def run(using Ox): Unit =@if(addMetrics) {
+    val otel = AutoConfiguredOpenTelemetrySdk.initialize().getOpenTelemetrySdk
     val serverOptions = NettySyncServerOptions.customiseInterceptors
-      .metricsInterceptor(Endpoints.prometheusMetrics.metricsInterceptor())
+      .metricsInterceptor(Endpoints.metricsInterceptor(otel))
       .options}
     val port = sys.env.get("HTTP_PORT").flatMap(_.toIntOption).getOrElse(8080)
     val binding = useInScope(NettySyncServer(@if(addMetrics){serverOptions}).port(port).addEndpoints(Endpoints.all).start())(_.stop())

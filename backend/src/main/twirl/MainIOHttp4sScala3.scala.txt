@@ -3,16 +3,18 @@ package @groupId
 
 import cats.effect.{ExitCode, IO, IOApp}
 import com.comcast.ip4s.{Host, Port, port}
-import org.http4s.ember.server.EmberServerBuilder
+@if(addMetrics){import io.opentelemetry.sdk.autoconfigure.AutoConfiguredOpenTelemetrySdk
+}import org.http4s.ember.server.EmberServerBuilder
 import org.http4s.server.Router
 import sttp.tapir.server.http4s.@if(addMetrics){{Http4sServerInterpreter, Http4sServerOptions}}else{Http4sServerInterpreter}
 
 object Main extends IOApp:
 
   override def run(args: List[String]): IO[ExitCode] =
-    @if(addMetrics){val serverOptions: Http4sServerOptions[IO] =
+    @if(addMetrics){val otel = AutoConfiguredOpenTelemetrySdk.initialize().getOpenTelemetrySdk
+    val serverOptions: Http4sServerOptions[IO] =
       Http4sServerOptions.customiseInterceptors[IO]
-        .metricsInterceptor(Endpoints.prometheusMetrics.metricsInterceptor())
+        .metricsInterceptor(Endpoints.metricsInterceptor(otel))
         .options
     val routes = Http4sServerInterpreter[IO](serverOptions).toRoutes(Endpoints.all)
     }else{val routes = Http4sServerInterpreter[IO]().toRoutes(Endpoints.all)

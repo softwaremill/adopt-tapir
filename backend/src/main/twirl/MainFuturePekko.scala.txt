@@ -1,7 +1,8 @@
 @(groupId: String, addDocumentation: Boolean, addMetrics: Boolean)
 package @groupId
 
-import org.apache.pekko.actor.ActorSystem
+@if(addMetrics){import io.opentelemetry.sdk.autoconfigure.AutoConfiguredOpenTelemetrySdk
+}import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.http.scaladsl.Http
 import sttp.tapir.server.pekkohttp.@if(addMetrics){{PekkoHttpServerInterpreter, PekkoHttpServerOptions}}else{PekkoHttpServerInterpreter}
 
@@ -14,9 +15,10 @@ object Main {
     implicit val actorSystem: ActorSystem = ActorSystem()
 
     @if(addMetrics) {
+    val otel = AutoConfiguredOpenTelemetrySdk.initialize().getOpenTelemetrySdk
     val serverOptions: PekkoHttpServerOptions =
       PekkoHttpServerOptions.customiseInterceptors
-        .metricsInterceptor(Endpoints.prometheusMetrics.metricsInterceptor())
+        .metricsInterceptor(Endpoints.metricsInterceptor(otel))
         .options
 
     val route = PekkoHttpServerInterpreter(serverOptions).toRoute(Endpoints.all)

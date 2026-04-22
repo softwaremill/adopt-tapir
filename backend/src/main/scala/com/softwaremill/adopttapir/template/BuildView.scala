@@ -45,8 +45,13 @@ abstract class BuildView:
       List(ScalaDependency("com.softwaremill.sttp.tapir", "tapir-swagger-ui-bundle", getTapirVersion()))
     else Nil
 
-  private def getMetricsDependencies(starterDetails: StarterDetails): List[ScalaDependency] =
-    if starterDetails.addMetrics then List(ScalaDependency("com.softwaremill.sttp.tapir", "tapir-prometheus-metrics", getTapirVersion()))
+  private def getMetricsDependencies(starterDetails: StarterDetails): List[Dependency] =
+    if starterDetails.addMetrics then
+      List(
+        ScalaDependency("com.softwaremill.sttp.tapir", "tapir-opentelemetry-metrics", getTapirVersion()),
+        JavaDependency("io.opentelemetry", "opentelemetry-exporter-otlp", TemplateDependencyInfo.opentelemetryVersion),
+        JavaDependency("io.opentelemetry", "opentelemetry-sdk-extension-autoconfigure", TemplateDependencyInfo.opentelemetryVersion)
+      )
     else Nil
 
   private def getLoggerDependency(starterDetails: StarterDetails): List[Dependency] =

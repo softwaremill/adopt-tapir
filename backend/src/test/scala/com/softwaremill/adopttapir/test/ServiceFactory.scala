@@ -68,13 +68,13 @@ abstract class GeneratedService:
     override def toString: String = s"[$timestamp]"
 
 class ServiceFactory:
-  def create(builder: Builder, tempDir: better.files.File): IO[GeneratedService] =
+  def create(builder: Builder, tempDir: better.files.File, env: Map[String, String] = Map.empty): IO[GeneratedService] =
     builder match {
-      case Builder.Sbt      => IO.blocking(SbtService(tempDir))
-      case Builder.ScalaCli => IO.blocking(ScalaCliService(tempDir))
+      case Builder.Sbt      => IO.blocking(SbtService(tempDir, env))
+      case Builder.ScalaCli => IO.blocking(ScalaCliService(tempDir, env))
     }
 
-  private case class SbtService(tempDir: better.files.File) extends GeneratedService:
+  private case class SbtService(tempDir: better.files.File, env: Map[String, String]) extends GeneratedService:
     override protected val portPattern = new Regex("^(?:\\[info\\] )?(?:Go to |Server started at )http://localhost:(\\d+).*")
 
     override protected lazy val process: SubProcess = {
@@ -86,10 +86,10 @@ class ServiceFactory:
         // forward std input to forked process - https://www.scala-sbt.org/1.x/docs/Forking.html#Configuring+Input
         "set run / connectInput := true",
         ";compile ;test ;run"
-      ).spawn(cwd = os.Path(tempDir.toJava), env = Map("HTTP_PORT" -> "0"), mergeErrIntoOut = true)
+      ).spawn(cwd = os.Path(tempDir.toJava), env = Map("HTTP_PORT" -> "0") ++ env, mergeErrIntoOut = true)
     }
 
-  private case class ScalaCliService(tempDir: better.files.File) extends GeneratedService:
+  private case class ScalaCliService(tempDir: better.files.File, env: Map[String, String]) extends GeneratedService:
     override protected val portPattern = new Regex("^(?:Go to |Server started at )http://localhost:(\\d+).*")
 
     override protected lazy val process: SubProcess =
@@ -106,4 +106,4 @@ class ServiceFactory:
       )
 
       os.proc("scala-cli", "run" +: scalaFiles)
-        .spawn(cwd = os.Path(tempDir.toJava), env = Map("HTTP_PORT" -> "0"), mergeErrIntoOut = true)
+        .spawn(cwd = os.Path(tempDir.toJava), env = Map("HTTP_PORT" -> "0") ++ env, mergeErrIntoOut = true)

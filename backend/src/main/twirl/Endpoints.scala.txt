@@ -6,7 +6,7 @@ jsonEndpoint: String,
 library: String,
 apiEndpoints: String,
 docEndpoints: String,
-metricsEndpoint: String,
+metricsDefinition: String,
 allEndpoints: String,
 scalaVersion: com.softwaremill.adopttapir.starter.ScalaVersion,
 leftBracket: Char = '{',
@@ -32,7 +32,7 @@ object Endpoints@if(scalaVersion == com.softwaremill.adopttapir.starter.ScalaVer
 
 @docEndpoints
 
-@metricsEndpoint
+@metricsDefinition
 
 @allEndpoints
 @if(scalaVersion == com.softwaremill.adopttapir.starter.ScalaVersion.Scala2){@rightBracket}
