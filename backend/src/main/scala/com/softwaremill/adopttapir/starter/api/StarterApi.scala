@@ -12,6 +12,7 @@ import fs2.io.file.Files
 import sttp.capabilities.fs2.Fs2Streams
 import sttp.model.HeaderNames
 import sttp.tapir.CodecFormat
+import sttp.tapir.EndpointIO.Example
 
 class StarterApi(http: Http, starterService: StarterService, contentService: ContentService):
 
@@ -24,13 +25,34 @@ class StarterApi(http: Http, starterService: StarterService, contentService: Con
 
   private val starterPath = "starter.zip"
 
+  private val starterRequestJsonBody = jsonBody[StarterRequest]
+    .examples(
+      List(
+        Example[StarterRequest](
+          value = StarterRequest(
+            projectName = "my-http-app",
+            groupId = "com.softwaremill",
+            stack = StackRequest.OxStack,
+            implementation = ServerImplementationRequest.Netty,
+            addDocumentation = true,
+            addMetrics = true,
+            json = JsonImplementationRequest.Circe,
+            scalaVersion = ScalaVersionRequest.Scala3,
+            builder = BuilderRequest.Sbt
+          ),
+          name = "Direct style stack with ox and Netty".some,
+          summary = none
+        )
+      )
+    )
+
   private val starterEndpoint =
     val zippedFileStream = streamBinaryBody(Fs2Streams[IO])(CodecFormat.Zip())
 
     baseEndpoint.post
       .in(starterPath)
-      .in(jsonBody[StarterRequest])
-      .out(zippedFileStream)
+      .in(starterRequestJsonBody)
+      .out(zippedFileStream.description(""))
       .out(header(HeaderNames.AccessControlExposeHeaders, HeaderNames.ContentDisposition))
       .out(header[ContentDispositionValue](HeaderNames.ContentDisposition))
       .out(header[ContentLengthValue](HeaderNames.ContentLength))
@@ -61,8 +83,11 @@ class StarterApi(http: Http, starterService: StarterService, contentService: Con
   private val contentEndpoint =
     baseEndpoint.post
       .in(contentPath)
-      .in(jsonBody[StarterRequest])
+      .in(starterRequestJsonBody)
       .out(jsonBody[List[Node]])
+      .description(
+        "Returns the project that `/starter.zip` would generate, as a JSON file tree (paths and contents) instead of a zip archive. Applies the same validation rules and returns the same error format as `/starter.zip`."
+      )
       .serverLogic[IO] { (request: StarterRequest) =>
         val result: EitherT[IO, Fail, List[Node]] = for
           starterDetailsOrFail <- EitherT(IO.pure(FormValidator.validate(request)))
