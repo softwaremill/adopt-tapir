@@ -45,7 +45,7 @@
     "tss-react": "^3.7.0",
     "typescript": "^5.0.0",
     "unique-names-generator": "^4.7.1",
-    "uuid": "^9.0.0",
+    "uuid": "^14.0.0",
     "vite": "^7.3.2",
     "vite-plugin-svgr": "^4.2.0",
     "vitest": "^4.0.16",
