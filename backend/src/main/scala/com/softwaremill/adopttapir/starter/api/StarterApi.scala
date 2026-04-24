@@ -26,6 +26,7 @@ class StarterApi(http: Http, starterService: StarterService, contentService: Con
   private val starterPath = "starter.zip"
 
   private val starterRequestJsonBody = jsonBody[StarterRequest]
+    .description("Parameters defining the stack for the tapir app template")
     .examples(
       List(
         Example[StarterRequest](
@@ -41,6 +42,51 @@ class StarterApi(http: Http, starterService: StarterService, contentService: Con
             builder = BuilderRequest.Sbt
           ),
           name = "Direct style stack with ox and Netty".some,
+          summary = none
+        ),
+        Example[StarterRequest](
+          value = StarterRequest(
+            projectName = "my-http-app",
+            groupId = "com.softwaremill",
+            stack = StackRequest.ZIOStack,
+            implementation = ServerImplementationRequest.ZIOHttp,
+            addDocumentation = true,
+            addMetrics = true,
+            json = JsonImplementationRequest.ZIOJson,
+            scalaVersion = ScalaVersionRequest.Scala3,
+            builder = BuilderRequest.Sbt
+          ),
+          name = "ZIO stack".some,
+          summary = none
+        ),
+        Example[StarterRequest](
+          value = StarterRequest(
+            projectName = "my-http-app",
+            groupId = "com.softwaremill",
+            stack = StackRequest.FutureStack,
+            implementation = ServerImplementationRequest.Pekko,
+            addDocumentation = true,
+            addMetrics = true,
+            json = JsonImplementationRequest.Circe,
+            scalaVersion = ScalaVersionRequest.Scala3,
+            builder = BuilderRequest.Sbt
+          ),
+          name = "Scala Future stack with Pekko".some,
+          summary = none
+        ),
+        Example[StarterRequest](
+          value = StarterRequest(
+            projectName = "my-http-app",
+            groupId = "com.softwaremill",
+            stack = StackRequest.IOStack,
+            implementation = ServerImplementationRequest.Http4s,
+            addDocumentation = true,
+            addMetrics = true,
+            json = JsonImplementationRequest.Circe,
+            scalaVersion = ScalaVersionRequest.Scala3,
+            builder = BuilderRequest.Sbt
+          ),
+          name = "Cats Effect IO stack with http4s".some,
           summary = none
         )
       )
