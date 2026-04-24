@@ -1,12 +1,14 @@
 package com.softwaremill.adopttapir.http
 
+import cats.data.Kleisli
 import cats.effect.{IO, Resource}
 import com.comcast.ip4s.Port
 import com.softwaremill.adopttapir.infrastructure.{CorrelationId, CorrelationIdInterceptor}
 import com.softwaremill.adopttapir.logging.FLogging
 import com.softwaremill.adopttapir.util.ServerEndpoints
-import org.http4s.HttpRoutes
 import org.http4s.ember.server.EmberServerBuilder
+import org.http4s.{Header, HttpRoutes}
+import org.typelevel.ci.CIString
 import sttp.capabilities.fs2.Fs2Streams
 import sttp.tapir.*
 import sttp.tapir.files.{FilesOptions, staticResourcesGetServerEndpoint}
@@ -57,7 +59,18 @@ class HttpApi(
     .metricsInterceptor(prometheusMetrics.metricsInterceptor())
     .options
 
-  private lazy val publicRoutes: HttpRoutes[IO] = Http4sServerInterpreter(serverOptions).toRoutes(allPublicEndpoints)
+  private def withHintForLLMs(routes: HttpRoutes[IO]): HttpRoutes[IO] =
+    Kleisli { req =>
+      routes(req).map { resp =>
+        val path = req.uri.path.renderString
+        if path == "/" || path.isEmpty || path == "/index.html" then
+          resp.putHeaders(Header.Raw(CIString("Link"), """</llms.txt>; rel="llms-txt"; type="text/markdown""""))
+        else resp
+      }
+    }
+
+  private lazy val publicRoutes: HttpRoutes[IO] =
+    withHintForLLMs(Http4sServerInterpreter(serverOptions).toRoutes(allPublicEndpoints))
   private lazy val adminRoutes: HttpRoutes[IO] = Http4sServerInterpreter(serverOptions).toRoutes(allAdminEndpoints)
 
   lazy val allPublicEndpoints: List[ServerEndpoint[Any with Fs2Streams[IO], IO]] = {
