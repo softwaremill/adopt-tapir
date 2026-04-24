@@ -98,10 +98,11 @@ class StarterApi(http: Http, starterService: StarterService, contentService: Con
     baseEndpoint.post
       .in(starterPath)
       .in(starterRequestJsonBody)
-      .out(zippedFileStream.description(""))
+      .out(zippedFileStream)
       .out(header(HeaderNames.AccessControlExposeHeaders, HeaderNames.ContentDisposition))
       .out(header[ContentDispositionValue](HeaderNames.ContentDisposition))
       .out(header[ContentLengthValue](HeaderNames.ContentLength))
+      .description("Fetches starter template based on provided parameters as a zip archive.")
       .serverLogic[IO] { (request: StarterRequest) =>
         val result: EitherT[IO, Fail, (fs2.Stream[IO, Byte], ContentDispositionValue, ContentLengthValue)] = for
           starterDetailsOrFail <- EitherT(IO.pure(FormValidator.validate(request)))
@@ -132,7 +133,7 @@ class StarterApi(http: Http, starterService: StarterService, contentService: Con
       .in(starterRequestJsonBody)
       .out(jsonBody[List[Node]])
       .description(
-        "Returns the project that `/starter.zip` would generate, as a JSON file tree (paths and contents) instead of a zip archive. Applies the same validation rules and returns the same error format as `/starter.zip`."
+        "Fetches starter template as a JSON file tree instead of a zip archive, useful to preview the template contents."
       )
       .serverLogic[IO] { (request: StarterRequest) =>
         val result: EitherT[IO, Fail, List[Node]] = for
