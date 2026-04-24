@@ -1,10 +1,10 @@
 package com.softwaremill.adopttapir.starter.api
 
 import com.softwaremill.adopttapir.starter.*
-import io.circe.generic.semiauto.*
 import io.circe.{Decoder, Encoder}
 import org.latestbit.circe.adt.codec.*
 import sttp.tapir.Schema
+import sttp.tapir.Schema.annotations.description
 
 case class StarterRequest(
     projectName: String,

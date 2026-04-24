@@ -1,0 +1,33 @@
+# adopt-tapir
+
+> adopt-tapir generates ready-to-run Scala HTTP service skeletons built on [tapir](https://tapir.softwaremill.com/).
+Tapir provides a programmer-friendly, type-safe API to expose, consume and document HTTP endpoints, using the Scala language.
+Pick an effect stack, server implementation, JSON library, Scala version, and build tool, and get a downloadable project zip.
+
+## Docs
+
+- [OpenAPI Swagger UI documentation](https://adopt-tapir.softwaremill.com/api/v1/docs/): interactive Swagger UI documenting starter zip endpoint, request schema, and supported options.
+- [OpenAPI definition in yaml format](https://adopt-tapir.softwaremill.com/api/v1/docs/docs.yaml): download OpenAPI definition in yaml format.
+
+## Usage
+
+Download a starter zip with curl:
+
+```sh
+curl -X 'POST' \
+  'https://adopt-tapir.softwaremill.com/api/v1/starter.zip' \
+  -H 'accept: application/zip' \
+  -H 'Content-Type: application/json' \
+  -o my-http-app.zip \
+  -d '{
+  "projectName": "my-http-app",
+  "groupId": "com.softwaremill",
+  "stack": "OxStack",
+  "implementation": "Netty",
+  "addDocumentation": true,
+  "addMetrics": true,
+  "json": "Circe",
+  "scalaVersion": "Scala3",
+  "builder": "Sbt"
+}'
+```
