@@ -65,7 +65,6 @@ export function FileContentView({ openedFile }: Props) {
   }, [copied]);
 
   const fileContent = String(openedFile.content);
-  const hasContent = fileContent.length > 0;
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(fileContent);
@@ -74,19 +73,19 @@ export function FileContentView({ openedFile }: Props) {
 
   return (
     <div className={classes.wrapper}>
-      <Tooltip title={copied ? 'Copied!' : 'Copy file contents'} arrow>
-        <span className={classes.copyButton}>
+      {fileContent.length > 0 && (
+        <Tooltip title={copied ? 'Copied!' : 'Copy file contents'} arrow>
           <IconButton
+            className={classes.copyButton}
             color="secondary"
             size="small"
             aria-label="copy file contents"
             onClick={handleCopy}
-            disabled={!hasContent}
           >
             <ContentCopyIcon fontSize="small" />
           </IconButton>
-        </span>
-      </Tooltip>
+        </Tooltip>
+      )}
       <SyntaxHighlighter
         customStyle={{
           margin: 0,
