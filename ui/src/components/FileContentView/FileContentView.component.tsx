@@ -5,7 +5,10 @@ import markdown from 'react-syntax-highlighter/dist/esm/languages/hljs/markdown'
 import ini from 'react-syntax-highlighter/dist/esm/languages/hljs/ini';
 import plaintext from 'react-syntax-highlighter/dist/esm/languages/hljs/plaintext';
 import { a11yLight } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import { IconButton, Tooltip } from '@mui/material';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { TreeNode } from '../FileTreeView/FileTreeView.types';
+import { useStyles } from './FileContentView.styles';
 
 type SupportedLanguage = 'scala' | 'markdown' | 'ini' | 'plaintext';
 
@@ -22,7 +25,9 @@ type Props = {
 };
 
 export function FileContentView({ openedFile }: Props) {
+  const { classes } = useStyles();
   const [language, setLanguage] = useState<SupportedLanguage>('plaintext');
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (openedFile.name === undefined) {
@@ -47,8 +52,41 @@ export function FileContentView({ openedFile }: Props) {
     }
   }, [openedFile.name]);
 
+  useEffect(() => {
+    setCopied(false);
+  }, [openedFile.name, openedFile.content]);
+
+  useEffect(() => {
+    if (!copied) {
+      return;
+    }
+    const timeout = setTimeout(() => setCopied(false), 2000);
+    return () => clearTimeout(timeout);
+  }, [copied]);
+
+  const fileContent = String(openedFile.content);
+  const hasContent = fileContent.length > 0;
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(fileContent);
+    setCopied(true);
+  };
+
   return (
-    <>
+    <div className={classes.wrapper}>
+      <Tooltip title={copied ? 'Copied!' : 'Copy file contents'} arrow>
+        <span className={classes.copyButton}>
+          <IconButton
+            color="secondary"
+            size="small"
+            aria-label="copy file contents"
+            onClick={handleCopy}
+            disabled={!hasContent}
+          >
+            <ContentCopyIcon fontSize="small" />
+          </IconButton>
+        </span>
+      </Tooltip>
       <SyntaxHighlighter
         customStyle={{
           margin: 0,
@@ -69,8 +107,8 @@ export function FileContentView({ openedFile }: Props) {
         showInlineLineNumbers={false}
         style={a11yLight}
       >
-        {String(openedFile.content)}
+        {fileContent}
       </SyntaxHighlighter>
-    </>
+    </div>
   );
 }
