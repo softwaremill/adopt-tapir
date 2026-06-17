@@ -70,7 +70,7 @@ val configDependencies = Seq(
 val baseDependencies = Seq(
   "org.typelevel" %% "cats-effect" % "3.7.0",
   "com.softwaremill.common" %% "tagging" % "2.3.5",
-  "com.softwaremill.quicklens" %% "quicklens" % "1.9.12"
+  "com.softwaremill.quicklens" %% "quicklens" % "1.9.15"
 )
 
 val apiDocsDependencies = Seq(
