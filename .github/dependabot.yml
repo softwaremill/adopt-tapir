@@ -9,3 +9,5 @@ updates:
     schedule:
       interval: "daily"
     open-pull-requests-limit: 0 # This enables only security related PRs
+    cooldown:
+      default-days: 3
