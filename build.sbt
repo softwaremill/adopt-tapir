@@ -22,7 +22,7 @@ val scalafmtVersion = "3.11.5"
 val scalaLoggingVersion = "3.9.6"
 val logbackClassicVersion = "1.6.1"
 val scalaTestVersion = "3.2.20"
-val plokhotnyukJsoniterVersion = "2.39.1"
+val plokhotnyukJsoniterVersion = "2.40.1"
 val zioTestVersion = "2.0.13"
 val opentelemetryVersion = "1.61.0"
 
