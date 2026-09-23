@@ -17,7 +17,7 @@ val http4sCirceVersion = "0.23.37"
 val circeVersion = "0.14.16"
 val circeGenericsExtrasVersion = "0.14.3"
 val sttpVersion = "4.0.26"
-val prometheusVersion = "0.16.0"
+val prometheusVersion = "1.9.0"
 val scalafmtVersion = "3.11.5"
 val scalaLoggingVersion = "3.9.6"
 val logbackClassicVersion = "1.6.3"
@@ -36,8 +36,8 @@ val httpDependencies = Seq(
 )
 
 val monitoringDependencies = Seq(
-  "io.prometheus" % "simpleclient" % prometheusVersion,
-  "io.prometheus" % "simpleclient_hotspot" % prometheusVersion,
+  "io.prometheus" % "prometheus-metrics-core" % prometheusVersion,
+  "io.prometheus" % "prometheus-metrics-instrumentation-jvm" % prometheusVersion,
   "com.softwaremill.sttp.client4" %% "prometheus-backend" % sttpVersion,
   "com.softwaremill.sttp.tapir" %% "tapir-prometheus-metrics" % tapirVersion
 )
