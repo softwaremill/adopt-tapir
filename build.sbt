@@ -185,12 +185,12 @@ def now(): String = {
   new SimpleDateFormat("yyyy-MM-dd-hhmmss").format(new Date())
 }
 
-lazy val rootProject = (project in file("."))
+lazy val root = rootProject
   .settings(commonSettings)
   .settings(
     name := "adopt-tapir"
   )
-  .aggregate(backend, ui, templateDependencies)
+  .autoAggregate
 
 lazy val ItTest = config("ItTest").extend(Test)
 
