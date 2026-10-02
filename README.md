@@ -14,13 +14,13 @@ so that they are not exhausting available resources and as a result fail with a 
 that additional group needs to be called:
 
 ```shell
-sbt ';test ;ItTest / test'
+sbt ';testFull ;ItTest / testFull'
 ```
 
 Note that `ItTest` can be restricted (or run in parallel) by Scala or JSON implementations e.g.
 
 ```shell
-SCALA=Scala2 JSON="Circe,No" sbt 'ItTest / test'
+SCALA=Scala2 JSON="Circe,No" sbt 'ItTest / testFull'
 ```
 
 results in running integration tests only for `Scala 2` configurations that JSON is either disabled (`No`) or using

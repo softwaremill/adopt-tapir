@@ -10,7 +10,7 @@ import scala.util.Try
 val scala2Version = "2.13.18"
 val scala3Version = "3.9.0"
 
-val tapirVersion = "1.13.19"
+val tapirVersion = "1.13.31"
 
 val http4sEmberServerVersion = "0.23.37"
 val http4sCirceVersion = "0.23.37"
@@ -24,7 +24,7 @@ val logbackClassicVersion = "1.6.4"
 val scalaTestVersion = "3.2.20"
 val plokhotnyukJsoniterVersion = "2.41.2"
 val zioTestVersion = "2.0.13"
-val opentelemetryVersion = "1.61.0"
+val opentelemetryVersion = "1.64.0"
 
 val httpDependencies = Seq(
   "org.http4s" %% "http4s-ember-server" % http4sEmberServerVersion,
@@ -104,11 +104,11 @@ lazy val commonSettings =
       scalaVersion := scala3Version,
       libraryDependencies ++= commonDependencies,
       uiDirectory := (ThisBuild / baseDirectory).value / uiProjectName,
-      updateYarn := {
+      updateYarn := Def.uncached {
         streams.value.log("Updating npm/yarn dependencies")
         haltOnCmdResultError(Process("yarn install", uiDirectory.value).!)
       },
-      yarnTask := {
+      yarnTask := Def.uncached {
         val taskName = spaceDelimited("<arg>").parsed.mkString(" ")
         updateYarn.value
         val localYarnCommand = "yarn " + taskName
@@ -141,9 +141,9 @@ lazy val buildInfoSettings = Seq(
 lazy val fatJarSettings = Seq(
   assembly / assemblyJarName := "adopttapir.jar",
   assembly / assemblyMergeStrategy := {
-    case PathList(ps @ _*) if ps.last endsWith "io.netty.versions.properties"       => MergeStrategy.first
-    case PathList(ps @ _*) if ps.last endsWith "pom.properties"                     => MergeStrategy.first
-    case PathList(ps @ _*) if ps.last endsWith "scala-collection-compat.properties" => MergeStrategy.first
+    case PathList(ps @ _*) if ps.last.endsWith("io.netty.versions.properties")       => MergeStrategy.first
+    case PathList(ps @ _*) if ps.last.endsWith("pom.properties")                     => MergeStrategy.first
+    case PathList(ps @ _*) if ps.last.endsWith("scala-collection-compat.properties") => MergeStrategy.first
     case x                                                                          =>
       val oldStrategy = (assembly / assemblyMergeStrategy).value
       oldStrategy(x)
@@ -183,17 +183,17 @@ def now(): String = {
   new SimpleDateFormat("yyyy-MM-dd-hhmmss").format(new Date())
 }
 
-lazy val rootProject = (project in file("."))
+lazy val root = rootProject
   .settings(commonSettings)
   .settings(
     name := "adopt-tapir"
   )
-  .aggregate(backend, ui, templateDependencies)
+  .autoAggregate
 
-lazy val ItTest = config("ItTest") extend Test
+lazy val ItTest = config("ItTest").extend(Test)
 
-def itFilter(name: String): Boolean = name endsWith "ITTest"
-def unitFilter(name: String): Boolean = (name endsWith "Test") && !itFilter(name)
+def itFilter(name: String): Boolean = name.endsWith("ITTest")
+def unitFilter(name: String): Boolean = name.endsWith("Test") && !itFilter(name)
 
 lazy val backend: Project = (project in file("backend"))
   .configs(ItTest)
@@ -209,14 +209,16 @@ lazy val backend: Project = (project in file("backend"))
   .settings(
     inConfig(ItTest)(Defaults.testTasks),
     Compile / mainClass := Some("com.softwaremill.adopttapir.Main"),
-    copyWebapp := {
+    // sbt 2 defaults to true, which would package the jar (and so build the ui) on every run/test
+    exportJars := false,
+    copyWebapp := Def.uncached {
       val source = uiDirectory.value / "build"
       val target = (Compile / classDirectory).value / "webapp"
       streams.value.log.info(s"Copying the webapp resources from $source to $target")
       IO.copyDirectory(source, target)
     },
     copyWebapp := copyWebapp.dependsOn(yarnTask.toTask(" build")).value,
-    Compile / packageBin := ((Compile / packageBin) dependsOn copyWebapp).value,
+    Compile / packageBin := (Compile / packageBin).dependsOn(copyWebapp).value,
     Test / testOptions := Seq(Tests.Filter(unitFilter)) ++ Seq(Tests.Argument("-P" + java.lang.Runtime.getRuntime.availableProcessors())),
     ItTest / testOptions := Seq(Tests.Filter(itFilter)) ++ Seq(
       Tests.Argument(
@@ -226,7 +228,6 @@ lazy val backend: Project = (project in file("backend"))
     ItTest / logBuffered := false
   )
   .settings(dockerSettings)
-  .settings(Revolver.settings)
   .settings(buildInfoSettings)
   .settings(fatJarSettings)
   .enablePlugins(DockerPlugin)
@@ -237,7 +238,14 @@ lazy val backend: Project = (project in file("backend"))
 
 lazy val ui = (project in file(uiProjectName))
   .settings(commonSettings)
-  .settings(Test / test := (Test / test).dependsOn(yarnTask.toTask(" lint:check")).dependsOn(yarnTask.toTask(" test")).value)
+  .settings(
+    Test / test := {
+      yarnTask.toTask(" lint:check").value
+      yarnTask.toTask(" test").value
+      (Test / test).evaluated
+    },
+    Test / testFull := Def.uncached((Test / testFull).dependsOn(yarnTask.toTask(" lint:check"), yarnTask.toTask(" test")).value)
+  )
   .settings(cleanFiles += baseDirectory.value / "build")
 
 lazy val templateDependencies: Project = project
@@ -283,7 +291,7 @@ lazy val templateDependencies: Project = project
       "zioTestVersion" -> zioTestVersion,
       "scalafmtVersion" -> scalafmtVersion,
       "opentelemetryVersion" -> opentelemetryVersion,
-      "sbtVersion" -> sbtVersion.value
+      sbtVersion
     ),
     buildInfoOptions += BuildInfoOption.ToJson,
     buildInfoOptions += BuildInfoOption.ToMap,
