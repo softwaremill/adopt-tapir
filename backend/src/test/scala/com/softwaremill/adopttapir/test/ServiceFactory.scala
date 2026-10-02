@@ -80,12 +80,13 @@ class ServiceFactory:
     override protected lazy val process: SubProcess = {
       os.proc(
         "sbt",
+        "--server",
         "-no-colors",
         // start in forked mode so that process input can be forwarded and process waits before closing otherwise `StdIn.readLine` will exit immediately
         "set run / fork := true",
         // forward std input to forked process - https://www.scala-sbt.org/1.x/docs/Forking.html#Configuring+Input
         "set run / connectInput := true",
-        ";compile ;test ;run"
+        ";compile ;testFull ;run"
       ).spawn(cwd = os.Path(tempDir.toJava), env = Map("HTTP_PORT" -> "0") ++ env, mergeErrIntoOut = true)
     }
 

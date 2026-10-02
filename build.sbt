@@ -25,8 +25,6 @@ val scalaTestVersion = "3.2.20"
 val plokhotnyukJsoniterVersion = "2.41.2"
 val zioTestVersion = "2.0.13"
 val opentelemetryVersion = "1.61.0"
-// sbt version used by the generated projects; independent of the sbt version used to build adopt-tapir itself
-val templateSbtVersion = "1.12.9"
 
 val httpDependencies = Seq(
   "org.http4s" %% "http4s-ember-server" % http4sEmberServerVersion,
@@ -290,7 +288,7 @@ lazy val templateDependencies: Project = project
       "zioTestVersion" -> zioTestVersion,
       "scalafmtVersion" -> scalafmtVersion,
       "opentelemetryVersion" -> opentelemetryVersion,
-      "sbtVersion" -> templateSbtVersion
+      sbtVersion
     ),
     buildInfoOptions += BuildInfoOption.ToJson,
     buildInfoOptions += BuildInfoOption.ToMap,
