@@ -238,11 +238,14 @@ lazy val backend: Project = (project in file("backend"))
 
 lazy val ui = (project in file(uiProjectName))
   .settings(commonSettings)
-  .settings(Test / test := {
-    yarnTask.toTask(" lint:check").value
-    yarnTask.toTask(" test").value
-    (Test / test).evaluated
-  })
+  .settings(
+    Test / test := {
+      yarnTask.toTask(" lint:check").value
+      yarnTask.toTask(" test").value
+      (Test / test).evaluated
+    },
+    Test / testFull := Def.uncached((Test / testFull).dependsOn(yarnTask.toTask(" lint:check"), yarnTask.toTask(" test")).value)
+  )
   .settings(cleanFiles += baseDirectory.value / "build")
 
 lazy val templateDependencies: Project = project

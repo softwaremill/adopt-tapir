@@ -42,7 +42,7 @@ jobs:
 
       - name: Run unit tests & lint
         id: run-unit-tests
-        run: sbt test
+        run: sbt testFull
 
   verify_integration:
     runs-on: ubuntu-22.04
@@ -72,7 +72,7 @@ jobs:
         uses: sbt/setup-sbt@v1
 
       - name: Run integration tests for ${{ matrix.stack }}, ${{ matrix.scala }} with ${{ matrix.json }} JSON support
-        run: SCALA=${{ matrix.scala }} JSON=${{ matrix.json }} STACK=${{ matrix.stack }} IT_TESTS_THREADS_NO=1 sbt 'ItTest / test'
+        run: SCALA=${{ matrix.scala }} JSON=${{ matrix.json }} STACK=${{ matrix.stack }} IT_TESTS_THREADS_NO=1 sbt 'ItTest / testFull'
 
   verify_docker_image_build:
     if: github.event_name == 'pull_request' && github.ref != 'refs/heads/main'
