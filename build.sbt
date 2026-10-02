@@ -10,7 +10,7 @@ import scala.util.Try
 val scala2Version = "2.13.18"
 val scala3Version = "3.9.0"
 
-val tapirVersion = "1.13.19"
+val tapirVersion = "1.13.31"
 
 val http4sEmberServerVersion = "0.23.37"
 val http4sCirceVersion = "0.23.37"
@@ -24,7 +24,7 @@ val logbackClassicVersion = "1.6.4"
 val scalaTestVersion = "3.2.20"
 val plokhotnyukJsoniterVersion = "2.41.2"
 val zioTestVersion = "2.0.13"
-val opentelemetryVersion = "1.61.0"
+val opentelemetryVersion = "1.64.0"
 
 val httpDependencies = Seq(
   "org.http4s" %% "http4s-ember-server" % http4sEmberServerVersion,
