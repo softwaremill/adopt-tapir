@@ -10,7 +10,7 @@ import scala.util.Try
 val scala2Version = "2.13.18"
 val scala3Version = "3.9.0"
 
-val tapirVersion = "1.13.31"
+val tapirVersion = "1.13.32"
 
 val http4sEmberServerVersion = "0.23.37"
 val http4sCirceVersion = "0.23.37"
@@ -144,7 +144,7 @@ lazy val fatJarSettings = Seq(
     case PathList(ps @ _*) if ps.last.endsWith("io.netty.versions.properties")       => MergeStrategy.first
     case PathList(ps @ _*) if ps.last.endsWith("pom.properties")                     => MergeStrategy.first
     case PathList(ps @ _*) if ps.last.endsWith("scala-collection-compat.properties") => MergeStrategy.first
-    case x                                                                          =>
+    case x                                                                           =>
       val oldStrategy = (assembly / assemblyMergeStrategy).value
       oldStrategy(x)
   }
