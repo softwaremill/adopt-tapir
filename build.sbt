@@ -20,7 +20,7 @@ val sttpVersion = "4.0.26"
 val prometheusVersion = "0.16.0"
 val scalafmtVersion = "3.11.5"
 val scalaLoggingVersion = "3.9.6"
-val logbackClassicVersion = "1.6.4"
+val logbackClassicVersion = "1.6.5"
 val scalaTestVersion = "3.2.20"
 val plokhotnyukJsoniterVersion = "2.41.2"
 val zioTestVersion = "2.0.13"
@@ -144,7 +144,7 @@ lazy val fatJarSettings = Seq(
     case PathList(ps @ _*) if ps.last.endsWith("io.netty.versions.properties")       => MergeStrategy.first
     case PathList(ps @ _*) if ps.last.endsWith("pom.properties")                     => MergeStrategy.first
     case PathList(ps @ _*) if ps.last.endsWith("scala-collection-compat.properties") => MergeStrategy.first
-    case x                                                                          =>
+    case x                                                                           =>
       val oldStrategy = (assembly / assemblyMergeStrategy).value
       oldStrategy(x)
   }
