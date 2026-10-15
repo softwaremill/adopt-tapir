@@ -1,6 +1,6 @@
 addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.13.2")
 
-addSbtPlugin("com.softwaremill.sbt-softwaremill" % "sbt-softwaremill-common" % "3.0.1")
+addSbtPlugin("com.softwaremill.sbt-softwaremill" % "sbt-softwaremill-common" % "3.0.2")
 
 addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "2.5.0")
 
