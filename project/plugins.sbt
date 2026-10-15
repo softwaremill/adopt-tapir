@@ -8,6 +8,6 @@ addSbtPlugin("com.github.sbt" % "sbt-native-packager" % "1.12.0")
 
 addSbtPlugin("com.github.sbt" % "sbt-git" % "2.2.0")
 
-addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.7.0")
+addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.7.1")
 
 addSbtPlugin("org.playframework.twirl" % "sbt-twirl" % "2.1.0-M9")
