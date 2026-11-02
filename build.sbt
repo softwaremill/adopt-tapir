@@ -85,7 +85,7 @@ val scalafmtStandaloneDependencies = Seq(
 val unitTestingStack = Seq(
   "org.scalatest" %% "scalatest" % scalaTestVersion % Test,
   "org.scalacheck" %% "scalacheck" % "1.20.0" % Test,
-  "com.lihaoyi" %% "os-lib" % "0.11.8" % Test
+  "com.lihaoyi" %% "os-lib" % "0.11.10" % Test
 )
 
 val commonDependencies =
