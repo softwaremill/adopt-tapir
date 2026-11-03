@@ -154,7 +154,7 @@ def versionWithTimestamp(version: String): String = s"$version-${System.currentT
 
 lazy val dockerSettings = Seq(
   dockerExposedPorts := Seq(8080),
-  dockerBaseImage := "eclipse-temurin:17.0.4_8-jdk-jammy",
+  dockerBaseImage := "eclipse-temurin:25-jdk-jammy",
   Docker / packageName := "adopttapir",
   dockerUsername := Some("softwaremill"),
   dockerUpdateLatest := true,
