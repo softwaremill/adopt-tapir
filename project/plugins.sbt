@@ -1,4 +1,4 @@
-addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.13.2")
+addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.14.0")
 
 addSbtPlugin("com.softwaremill.sbt-softwaremill" % "sbt-softwaremill-common" % "3.0.2")
 
