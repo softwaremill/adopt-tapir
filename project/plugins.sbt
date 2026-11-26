@@ -6,7 +6,7 @@ addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "2.5.0")
 
 addSbtPlugin("com.github.sbt" % "sbt-native-packager" % "1.13.0")
 
-addSbtPlugin("com.github.sbt" % "sbt-git" % "2.2.0")
+addSbtPlugin("com.github.sbt" % "sbt-git" % "3.0.0")
 
 addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.7.1")
 
